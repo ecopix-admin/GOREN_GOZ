@@ -6,43 +6,43 @@ import numpy as np
 from gtts import gTTS
 import base64
 
-# Proqramın adı
+# Səhifə başlığı
 st.title("👁️ Görən Göz AI")
 
-# Modeli ən sadə yolla yüklə
+# Modeli yüklə (Ən yüngül versiya)
 @st.cache_resource
-def get_model():
-    return YOLO("yolov8n.pt")
+def load_model():
+    return YOLO('yolov8n.pt')
 
-model = get_model()
+model = load_model()
 
 # Səs funksiyası
-def play_voice(text):
+def speak(text):
     tts = gTTS(text=text, lang='az')
-    tts.save("v.mp3")
-    with open("v.mp3", "rb") as f:
+    tts.save("voice.mp3")
+    with open("voice.mp3", "rb") as f:
         data = f.read()
         b64 = base64.b64encode(data).decode()
         st.markdown(f'<audio autoplay="true" src="data:audio/mp3;base64,{b64}">', unsafe_allow_html=True)
 
-# Şəkil çəkmə hissəsi
-img_data = st.camera_input("Kameranı açın")
+# Kamera
+img_file = st.camera_input("Kameranı açın")
 
-if img_data:
-    img = Image.open(img_data)
+if img_file:
+    img = Image.open(img_file)
     results = model(img)
     
-    # Nəticəni analiz et
-    if len(results[0].boxes) > 0:
-        names = results[0].names
-        detected = [names[int(box.cls[0])] for box in results[0].boxes]
-        
-        # Tərcümə
-        tr = {"person": "İnsan", "car": "Maşın", "bus": "Avtobus", "cell phone": "Telefon"}
-        final_list = [tr.get(i, i) for i in set(detected)]
-        
-        msg = "Görürəm: " + ", ".join(final_list)
-        st.write(msg)
-        play_voice(msg)
+    # Nəticəni tap
+    names = results[0].names
+    detected = [names[int(box.cls[0])] for box in results[0].boxes]
+    
+    if detected:
+        # Tərcümə lüğəti
+        dic = {"person": "İnsan", "car": "Maşın", "bus": "Avtobus", "cell phone": "Telefon"}
+        objects = [dic.get(o, o) for o in set(detected)]
+        cavab = "Görürəm: " + ", ".join(objects)
+        st.success(cavab)
+        speak(cavab)
     else:
-        play_voice("Yol təmizdir")
+        st.info("Heç nə tapılmadı.")
+        speak("Yol təmizdir")
