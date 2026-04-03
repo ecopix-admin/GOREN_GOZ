@@ -5,19 +5,19 @@ from PIL import Image
 import numpy as np
 from gtts import gTTS
 import base64
-import os
 
-# Səhifə Ayarları
+# Səhifəni başlat
 st.set_page_config(page_title="Görən Göz AI", layout="wide")
-st.title("👁️ Görən Göz - Sürətli Versiya")
+st.title("👁️ Görən Göz - Stabil Versiya")
 
-# Modeli Yüklə (YOLOv8 Nano - Ən yüngül və sürətli model)
+# Modeli yüklə (Nano versiya ən sürətlisidir)
 @st.cache_resource
 def load_model():
-    return YOLO('yolov8n.pt') 
+    return YOLO('yolov8n.pt')
 
 model = load_model()
 
+# Səs funksiyası
 def speak(text):
     try:
         tts = gTTS(text=text, lang='az')
@@ -27,29 +27,33 @@ def speak(text):
             b64 = base64.b64encode(data).decode()
             md = f'<audio autoplay="true" src="data:audio/mp3;base64,{b64}">'
             st.markdown(md, unsafe_allow_html=True)
-    except:
-        pass
+    except Exception as e:
+        st.error(f"Səs xətası: {e}")
 
-# Kamera Girişi
-img_file = st.camera_input("Kameranı Aktivləşdirin")
+# Kamera interfeysi
+img_file = st.camera_input("Şəkil çəkin və ya kameranı açın")
 
 if img_file:
     img = Image.open(img_file)
-    # Analiz
-    results = model(img)
+    img_array = np.array(img)
     
-    names = results[0].names
-    detected_indices = results[0].boxes.cls.cpu().numpy()
+    # Süni İntellekt Analizi
+    results = model(img_array)
     
-    if len(detected_indices) > 0:
-        translations = {"person": "İnsan", "bus": "Avtobus", "car": "Maşın", "cell phone": "Telefon"}
-        found = []
-        for idx in detected_indices:
-            name = names[int(idx)]
-            found.append(translations.get(name, name))
+    # Nəticələri emal et
+    found_objects = []
+    if len(results[0].boxes) > 0:
+        for box in results[0].boxes:
+            class_id = int(box.cls[0])
+            label = results[0].names[class_id]
+            
+            # Azərbaycan dilinə tərcümə
+            translations = {"person": "İnsan", "car": "Maşın", "bus": "Avtobus", "cell phone": "Telefon", "bottle": "Butulka"}
+            found_objects.append(translations.get(label, label))
         
-        result_text = "Görürəm: " + ", ".join(list(set(found)))
-        st.success(result_text)
-        speak(result_text)
+        detected_text = "Görürəm: " + ", ".join(list(set(found_objects)))
+        st.success(detected_text)
+        speak(detected_text)
     else:
-        speak("Yol təmizdir.")
+        st.info("Heç nə tapılmadı.")
+        speak("Yol təmizdir")
