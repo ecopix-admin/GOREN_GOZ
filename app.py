@@ -6,54 +6,43 @@ import numpy as np
 from gtts import gTTS
 import base64
 
-# Səhifəni başlat
-st.set_page_config(page_title="Görən Göz AI", layout="wide")
-st.title("👁️ Görən Göz - Stabil Versiya")
+# Proqramın adı
+st.title("👁️ Görən Göz AI")
 
-# Modeli yüklə (Nano versiya ən sürətlisidir)
+# Modeli ən sadə yolla yüklə
 @st.cache_resource
-def load_model():
-    return YOLO('yolov8n.pt')
+def get_model():
+    return YOLO("yolov8n.pt")
 
-model = load_model()
+model = get_model()
 
 # Səs funksiyası
-def speak(text):
-    try:
-        tts = gTTS(text=text, lang='az')
-        tts.save("temp.mp3")
-        with open("temp.mp3", "rb") as f:
-            data = f.read()
-            b64 = base64.b64encode(data).decode()
-            md = f'<audio autoplay="true" src="data:audio/mp3;base64,{b64}">'
-            st.markdown(md, unsafe_allow_html=True)
-    except Exception as e:
-        st.error(f"Səs xətası: {e}")
+def play_voice(text):
+    tts = gTTS(text=text, lang='az')
+    tts.save("v.mp3")
+    with open("v.mp3", "rb") as f:
+        data = f.read()
+        b64 = base64.b64encode(data).decode()
+        st.markdown(f'<audio autoplay="true" src="data:audio/mp3;base64,{b64}">', unsafe_allow_html=True)
 
-# Kamera interfeysi
-img_file = st.camera_input("Şəkil çəkin və ya kameranı açın")
+# Şəkil çəkmə hissəsi
+img_data = st.camera_input("Kameranı açın")
 
-if img_file:
-    img = Image.open(img_file)
-    img_array = np.array(img)
+if img_data:
+    img = Image.open(img_data)
+    results = model(img)
     
-    # Süni İntellekt Analizi
-    results = model(img_array)
-    
-    # Nəticələri emal et
-    found_objects = []
+    # Nəticəni analiz et
     if len(results[0].boxes) > 0:
-        for box in results[0].boxes:
-            class_id = int(box.cls[0])
-            label = results[0].names[class_id]
-            
-            # Azərbaycan dilinə tərcümə
-            translations = {"person": "İnsan", "car": "Maşın", "bus": "Avtobus", "cell phone": "Telefon", "bottle": "Butulka"}
-            found_objects.append(translations.get(label, label))
+        names = results[0].names
+        detected = [names[int(box.cls[0])] for box in results[0].boxes]
         
-        detected_text = "Görürəm: " + ", ".join(list(set(found_objects)))
-        st.success(detected_text)
-        speak(detected_text)
+        # Tərcümə
+        tr = {"person": "İnsan", "car": "Maşın", "bus": "Avtobus", "cell phone": "Telefon"}
+        final_list = [tr.get(i, i) for i in set(detected)]
+        
+        msg = "Görürəm: " + ", ".join(final_list)
+        st.write(msg)
+        play_voice(msg)
     else:
-        st.info("Heç nə tapılmadı.")
-        speak("Yol təmizdir")
+        play_voice("Yol təmizdir")
