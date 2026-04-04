@@ -3,91 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Görən Göz Live</title>
+    <title>TikTok Live Clone</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: white; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; font-family: sans-serif; color: white; }
+
+        /* Səhifələrin idarə olunması */
+        .page { display: none; height: 100vh; width: 100%; position: relative; }
+        .active { display: block; }
+
+        /* --- SƏHİFƏ 1: ANA SƏHİFƏ (FEED) --- */
+        .feed-container { height: 100%; position: relative; background: url('https://via.placeholder.com/1080x1920/1a1a1a/ffffff?text=Video+Yuku') no-repeat center; background-size: cover; }
+        .top-nav { position: absolute; top: 20px; width: 100%; display: flex; justify-content: center; gap: 20px; font-weight: bold; opacity: 0.8; z-index: 10; }
+        .top-nav span.active-tab { border-bottom: 2px solid white; opacity: 1; }
         
-        /* Video Container */
-        .video-container { height: 100vh; scroll-snap-type: y mandatory; overflow-y: scroll; }
-        .video-card { height: 100vh; width: 100%; scroll-snap-align: start; position: relative; background: #111; }
+        .live-overlay-card { position: absolute; bottom: 150px; left: 15px; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 10px; border-left: 4px solid #ff0050; cursor: pointer; }
+        .live-tag { background: #ff0050; font-size: 10px; padding: 2px 5px; border-radius: 3px; display: inline-block; margin-bottom: 5px; }
 
-        /* Canlı Yayım Etiketi (LIVE) */
-        .live-badge { position: absolute; top: 20px; left: 15px; display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.4); padding: 5px 10px; border-radius: 20px; z-index: 20; }
-        .live-dot { width: 8px; height: 8px; background: #ff0050; border-radius: 50%; box-shadow: 0 0 10px #ff0050; }
-        .viewer-count { font-size: 13px; font-weight: bold; }
+        /* --- SƏHİFƏ 2: CANLI YAYIM DAXİLİ --- */
+        .live-container { height: 100%; background: linear-gradient(to bottom, #2c3e50, #000); }
+        .live-header { position: absolute; top: 15px; left: 10px; right: 10px; display: flex; justify-content: space-between; align-items: center; z-index: 20; }
+        .user-info { background: rgba(0,0,0,0.5); padding: 5px 12px; border-radius: 25px; display: flex; align-items: center; gap: 8px; }
+        .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: #555; }
+        .follow-btn { background: #ff0050; border: none; color: white; border-radius: 15px; padding: 4px 10px; font-size: 12px; }
+        
+        .viewer-stats { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.3); padding: 5px 10px; border-radius: 15px; }
 
-        /* Sağ Panel (Actions) */
-        .sidebar { position: absolute; right: 10px; bottom: 120px; display: flex; flex-direction: column; gap: 15px; align-items: center; z-index: 20; }
-        .avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid white; position: relative; margin-bottom: 10px; }
-        .plus-icon { position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); background: #ff0050; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 16px; border: 2px solid white; }
-        .action-item { text-align: center; cursor: pointer; }
-        .action-icon { font-size: 30px; margin-bottom: 2px; }
-        .action-label { font-size: 11px; font-weight: 500; }
+        /* Canlı Çat */
+        .live-chat { position: absolute; bottom: 80px; left: 10px; width: 75%; max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        .chat-msg { background: rgba(0,0,0,0.3); padding: 5px 10px; border-radius: 10px; font-size: 13px; }
+        .chat-msg b { color: #82b1ff; }
 
-        /* Canlı Çat (Comments) */
-        .chat-area { position: absolute; bottom: 80px; left: 15px; width: 70%; max-height: 200px; overflow-y: hidden; z-index: 20; display: flex; flex-direction: column; gap: 8px; }
-        .comment { background: rgba(0,0,0,0.3); padding: 6px 12px; border-radius: 12px; font-size: 14px; animation: slideIn 0.3s ease; width: fit-content; }
-        .comment b { color: #ffeb3b; margin-right: 5px; }
+        /* Alt Alətlər Paneli */
+        .live-footer { position: absolute; bottom: 15px; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; }
+        .comment-input { background: rgba(255,255,255,0.2); border: none; border-radius: 20px; padding: 10px 15px; color: white; width: 45%; outline: none; }
+        .footer-icons { display: flex; gap: 15px; font-size: 24px; }
 
-        /* Hədiyyə Animasiyası Mesajı */
-        #gift-alert { position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(90deg, #ff0050, #00f2ea); padding: 10px 20px; border-radius: 30px; font-weight: bold; display: none; z-index: 100; box-shadow: 0 0 20px rgba(255,0,80,0.5); }
+        /* Ümumi Alt Menyu (Tab Bar) */
+        .tab-bar { position: fixed; bottom: 0; width: 100%; height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #333; z-index: 100; }
+        .tab-item { text-align: center; font-size: 10px; color: #888; }
+        .tab-item i { font-size: 20px; display: block; margin-bottom: 3px; }
+        .tab-item.active { color: white; }
+        .upload-btn { background: white; color: black; padding: 5px 15px; border-radius: 10px; font-size: 18px !important; }
 
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+        /* Animasiyalar */
+        .heart-float { position: absolute; bottom: 100px; right: 20px; color: #ff0050; font-size: 30px; animation: floatUp 1s forwards; pointer-events: none; }
+        @keyframes floatUp { to { transform: translateY(-200px); opacity: 0; } }
     </style>
 </head>
 <body>
 
-<div id="gift-alert">🎁 Shamxal Qızılgül göndərdi!</div>
-
-<div class="video-container">
-    <div class="video-card">
-        <div class="live-badge">
-            <div class="live-dot"></div>
-            <div class="viewer-count">1.4K baxır</div>
+    <div id="feed-page" class="page active">
+        <div class="top-nav">
+            <span>Takip Edilen</span>
+            <span class="active-tab">Sizin İçin</span>
         </div>
-
-        <div class="sidebar">
-            <div class="avatar">
-                <img src="https://via.placeholder.com/50" style="border-radius:50%; width:100%">
-                <div class="plus-icon">+</div>
+        
+        <div class="feed-container">
+            <div class="live-overlay-card" onclick="goToLive()">
+                <div class="live-tag">Şu anda CANLI Yayında</div>
+                <div style="font-weight:bold">Volkman1001</div>
+                <div style="font-size:12px; opacity:0.8">Dünya Turu - Japonya 🇯🇵</div>
+                <div style="margin-top:10px; font-size:13px">📊 CANLI izlemek için dokun</div>
             </div>
-            <div class="action-item" onclick="showHeart()">
-                <div class="action-icon">❤️</div>
-                <div class="action-label">24.5K</div>
-            </div>
-            <div class="action-item" onclick="sendGift()">
-                <div class="action-icon">🎁</div>
-                <div class="action-label">Hədiyyə</div>
-            </div>
-            <div class="action-item">
-                <div class="action-icon">🔗</div>
-                <div class="action-label">Paylaş</div>
-            </div>
-        </div>
-
-        <div class="chat-area">
-            <div class="comment"><b>Elvin:</b> Salam, yayım əladır! 🔥</div>
-            <div class="comment"><b>Aysel:</b> PUBG turniri nə vaxtdır?</div>
-            <div class="comment"><b>Gamer99:</b> Hədiyyə göndərdim, baxarsan</div>
         </div>
     </div>
 
-    <div class="video-card" style="background: #0d0d0d;">
+    <div id="live-page" class="page">
+        <div class="live-container">
+            <div class="live-header">
+                <div class="user-info">
+                    <div class="user-avatar"></div>
+                    <div>
+                        <div style="font-size:12px; font-weight:bold">Volkman1001</div>
+                        <div style="font-size:10px">❤️ 130.7K</div>
+                    </div>
+                    <button class="follow-btn">+ Takip et</button>
+                </div>
+                <div class="viewer-stats">
+                    <span style="font-size:12px">👁️ 1.1K</span>
+                    <i class="fas fa-times" onclick="goBack()" style="font-size:20px"></i>
+                </div>
+            </div>
+
+            <div class="live-chat" id="chat">
+                <div class="chat-msg"><b>İlayda:</b> İsviçrede yaşamak mantıklı mı?</div>
+                <div class="chat-msg"><b>Luis:</b> Heryerde kamera var</div>
+                <div class="chat-msg" style="color: #ffeb3b">Fatoş katıldı! 👋</div>
+            </div>
+
+            <div class="live-footer">
+                <input type="text" class="comment-input" placeholder="Yazın...">
+                <div class="footer-icons">
+                    <i class="fas fa-users" style="color:#00f2ea"></i>
+                    <i class="fas fa-gift" style="color:#ff0050" onclick="sendGift()"></i>
+                    <i class="fas fa-heart" style="color:#ff0050" onclick="spawnHeart()"></i>
+                    <i class="fas fa-share" style="color:white"></i>
+                </div>
+            </div>
         </div>
-</div>
+    </div>
 
-<script>
-    function sendGift() {
-        const alert = document.getElementById('gift-alert');
-        alert.style.display = 'block';
-        setTimeout(() => { alert.style.display = 'none'; }, 2000);
-    }
+    <div class="tab-bar" id="tab-bar">
+        <div class="tab-item active"><i class="fas fa-home"></i>Ana sayfa</div>
+        <div class="tab-item"><i class="fas fa-user-friends"></i>Arkadaşlar</div>
+        <div class="tab-item"><i class="fas fa-plus-square upload-btn"></i></div>
+        <div class="tab-item"><i class="fas fa-comment-alt"></i>Gelen kutusu</div>
+        <div class="tab-item"><i class="fas fa-user"></i>Profil</div>
+    </div>
 
-    function showHeart() {
-        // TikTok-dakı kimi kiçik ürək animasiyası üçün bura kod əlavə ediləcək
-        console.log("Ürək göndərildi!");
-    }
-</script>
+    <script>
+        function goToLive() {
+            document.getElementById('feed-page').classList.remove('active');
+            document.getElementById('live-page').classList.add('active');
+            document.getElementById('tab-bar').style.display = 'none'; // Canlı yayımda tab-bar gizlənir (TikTok kimi)
+        }
 
+        function goBack() {
+            document.getElementById('live-page').classList.remove('active');
+            document.getElementById('feed-page').classList.add('active');
+            document.getElementById('tab-bar').style.display = 'flex';
+        }
+
+        function spawnHeart() {
+            const heart = document.createElement('div');
+            heart.innerHTML = '❤️';
+            heart.className = 'heart-float';
+            heart.style.left = (Math.random() * 50 + 70) + '%'; 
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 1000);
+        }
+
+        function sendGift() {
+            const msg = document.createElement('div');
+            msg.className = 'chat-msg';
+            msg.style.background = 'linear-gradient(90deg, #ff0050, transparent)';
+            msg.innerHTML = '<b>Siz:</b> Hediye gönderdi! 🎁';
+            document.getElementById('chat').appendChild(msg);
+            document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+        }
+    </script>
 </body>
 </html>
