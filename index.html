@@ -3,76 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GamerStream Live</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Görən Göz Live</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; font-family: sans-serif; }
-        .video-container { height: 100vh; scroll-snap-type: y mandatory; overflow-y: scroll; scroll-behavior: smooth; }
-        .video-card { height: 100vh; width: 100%; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; color: white; }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: white; }
         
-        /* Video Arxa Fonu */
-        .placeholder-video { width: 100%; height: 100%; object-fit: cover; background: linear-gradient(180deg, #1a1a1a, #000); }
-        
-        /* İnterfeys Elementləri */
-        .overlay { position: absolute; bottom: 80px; left: 15px; z-index: 10; }
-        .username { font-weight: bold; font-size: 18px; margin-bottom: 5px; }
-        .description { font-size: 14px; opacity: 0.9; }
+        /* Video Container */
+        .video-container { height: 100vh; scroll-snap-type: y mandatory; overflow-y: scroll; }
+        .video-card { height: 100vh; width: 100%; scroll-snap-align: start; position: relative; background: #111; }
 
-        .sidebar { position: absolute; right: 10px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; align-items: center; }
-        .action-btn { background: rgba(0,0,0,0.5); border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
-        
-        /* Alt Menyu */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 60px; background: rgba(0,0,0,0.9); display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #333; }
-        .nav-item { color: #fff; font-size: 12px; text-align: center; opacity: 0.6; }
-        .nav-item.active { opacity: 1; border-bottom: 2px solid #fe2c55; }
+        /* Canlı Yayım Etiketi (LIVE) */
+        .live-badge { position: absolute; top: 20px; left: 15px; display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.4); padding: 5px 10px; border-radius: 20px; z-index: 20; }
+        .live-dot { width: 8px; height: 8px; background: #ff0050; border-radius: 50%; box-shadow: 0 0 10px #ff0050; }
+        .viewer-count { font-size: 13px; font-weight: bold; }
+
+        /* Sağ Panel (Actions) */
+        .sidebar { position: absolute; right: 10px; bottom: 120px; display: flex; flex-direction: column; gap: 15px; align-items: center; z-index: 20; }
+        .avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid white; position: relative; margin-bottom: 10px; }
+        .plus-icon { position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); background: #ff0050; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 16px; border: 2px solid white; }
+        .action-item { text-align: center; cursor: pointer; }
+        .action-icon { font-size: 30px; margin-bottom: 2px; }
+        .action-label { font-size: 11px; font-weight: 500; }
+
+        /* Canlı Çat (Comments) */
+        .chat-area { position: absolute; bottom: 80px; left: 15px; width: 70%; max-height: 200px; overflow-y: hidden; z-index: 20; display: flex; flex-direction: column; gap: 8px; }
+        .comment { background: rgba(0,0,0,0.3); padding: 6px 12px; border-radius: 12px; font-size: 14px; animation: slideIn 0.3s ease; width: fit-content; }
+        .comment b { color: #ffeb3b; margin-right: 5px; }
+
+        /* Hədiyyə Animasiyası Mesajı */
+        #gift-alert { position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(90deg, #ff0050, #00f2ea); padding: 10px 20px; border-radius: 30px; font-weight: bold; display: none; z-index: 100; box-shadow: 0 0 20px rgba(255,0,80,0.5); }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
     </style>
 </head>
 <body>
 
-<div class="video-container" id="feed">
+<div id="gift-alert">🎁 Shamxal Qızılgül göndərdi!</div>
+
+<div class="video-container">
     <div class="video-card">
-        <div class="placeholder-video"></div> <div class="overlay">
-            <div class="username">@shakhmal_gamer</div>
-            <div class="description">PUBG Mobile - Turnir finalı! 🎮</div>
+        <div class="live-badge">
+            <div class="live-dot"></div>
+            <div class="viewer-count">1.4K baxır</div>
         </div>
+
         <div class="sidebar">
-            <div class="action-btn" onclick="like()">❤️</div>
-            <div class="action-btn">💬</div>
-            <div class="action-btn">🎁</div>
+            <div class="avatar">
+                <img src="https://via.placeholder.com/50" style="border-radius:50%; width:100%">
+                <div class="plus-icon">+</div>
+            </div>
+            <div class="action-item" onclick="showHeart()">
+                <div class="action-icon">❤️</div>
+                <div class="action-label">24.5K</div>
+            </div>
+            <div class="action-item" onclick="sendGift()">
+                <div class="action-icon">🎁</div>
+                <div class="action-label">Hədiyyə</div>
+            </div>
+            <div class="action-item">
+                <div class="action-icon">🔗</div>
+                <div class="action-label">Paylaş</div>
+            </div>
+        </div>
+
+        <div class="chat-area">
+            <div class="comment"><b>Elvin:</b> Salam, yayım əladır! 🔥</div>
+            <div class="comment"><b>Aysel:</b> PUBG turniri nə vaxtdır?</div>
+            <div class="comment"><b>Gamer99:</b> Hədiyyə göndərdim, baxarsan</div>
         </div>
     </div>
 
-    <div class="video-card">
-        <div class="placeholder-video" style="background: linear-gradient(180deg, #2c3e50, #000);"></div>
-        <div class="overlay">
-            <div class="username">@elvin_live</div>
-            <div class="description">Gəlin söhbət edək ☕ #JustChatting</div>
+    <div class="video-card" style="background: #0d0d0d;">
         </div>
-        <div class="sidebar">
-            <div class="action-btn">❤️</div>
-            <div class="action-btn">💬</div>
-            <div class="action-btn">🎁</div>
-        </div>
-    </div>
-</div>
-
-<div class="bottom-nav">
-    <div class="nav-item active">Əsas</div>
-    <div class="nav-item">Kəşf et</div>
-    <div class="nav-item" style="font-size: 30px;">+</div>
-    <div class="nav-item">Gələnlər</div>
-    <div class="nav-item">Profil</div>
 </div>
 
 <script>
-    // Telegram Mini App Initialization
-    const tg = window.Telegram.WebApp;
-    tg.expand(); // Tətbiqi tam ekran edir
-    tg.headerColor = '#000000';
+    function sendGift() {
+        const alert = document.getElementById('gift-alert');
+        alert.style.display = 'block';
+        setTimeout(() => { alert.style.display = 'none'; }, 2000);
+    }
 
-    function like() {
-        tg.HapticFeedback.impactOccurred('medium'); // Telefonda vibrasiya yaradır
-        alert("Bəyənildi!");
+    function showHeart() {
+        // TikTok-dakı kimi kiçik ürək animasiyası üçün bura kod əlavə ediləcək
+        console.log("Ürək göndərildi!");
     }
 </script>
 
