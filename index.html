@@ -3,178 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TikTok Live Pro</title>
+    <title>Görən Göz - Canlı PK</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; font-family: sans-serif; color: white; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body, html { margin: 0; padding: 0; height: 100%; background: #000; font-family: sans-serif; color: white; overflow: hidden; }
 
-        /* Səhifələr */
-        .page { display: none; height: 100vh; width: 100%; position: relative; }
-        .active { display: block; }
+        /* PK Sayğacı (Top Bar) */
+        .pk-header { position: absolute; top: 70px; width: 94%; left: 3%; z-index: 100; }
+        .pk-bar { height: 12px; display: flex; border-radius: 6px; overflow: hidden; background: #333; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        .blue-part { background: #00f2ea; width: 50%; transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .red-part { background: #ff0050; width: 50%; transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .pk-scores { display: flex; justify-content: space-between; margin-top: 5px; font-weight: bold; font-size: 14px; text-shadow: 1px 1px 2px #000; }
 
-        /* --- ANA SƏHİFƏ --- */
-        .feed-container { height: 100%; position: relative; background: #1a1a1a; display: flex; align-items: center; justify-content: center; }
-        .live-overlay-card { background: rgba(0,0,0,0.6); padding: 20px; border-radius: 15px; border-left: 5px solid #ff0050; cursor: pointer; text-align: center; }
-        .live-tag { background: #ff0050; font-size: 12px; padding: 3px 8px; border-radius: 4px; display: inline-block; margin-bottom: 10px; font-weight: bold; }
-
-        /* --- CANLI YAYIM DAXİLİ --- */
-        .live-container { height: 100%; background: linear-gradient(to bottom, #1e3a5f, #000); position: relative; overflow: hidden; }
+        /* İkilik Video Sahəsi */
+        .live-split-screen { display: flex; height: 100vh; width: 100%; position: relative; }
+        .host-half { flex: 1; background: #1a1a1a; border-right: 1px solid #333; position: relative; overflow: hidden; }
+        .guest-half { flex: 1; background: #111; position: relative; overflow: hidden; }
         
-        /* Klik sahəsi (Ürəklər üçün) */
-        #click-area { position: absolute; top: 0; left: 0; width: 100%; height: 85%; z-index: 5; }
+        .host-label { position: absolute; bottom: 10px; left: 10px; font-size: 12px; background: rgba(0,0,0,0.5); padding: 2px 8px; border-radius: 4px; }
 
-        /* Header */
-        .live-header { position: absolute; top: 20px; left: 10px; right: 10px; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
-        .user-info { background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 30px; display: flex; align-items: center; gap: 10px; }
-        .user-avatar { width: 35px; height: 35px; border-radius: 50%; background: #444; border: 2px solid #ff0050; }
-        .follow-btn { background: #ff0050; border: none; color: white; border-radius: 20px; padding: 5px 12px; font-size: 12px; font-weight: bold; cursor: pointer; }
-        
-        .viewer-stats { display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.4); padding: 8px 15px; border-radius: 20px; }
+        /* Düymələr və İnterfeys */
+        .side-icons { position: absolute; right: 10px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; z-index: 110; }
+        .icon-btn { font-size: 28px; text-align: center; cursor: pointer; }
+        .icon-btn span { display: block; font-size: 10px; margin-top: 4px; }
 
-        /* Canlı Çat (Şəffaf və Uçan) */
-        .live-chat { position: absolute; bottom: 100px; left: 15px; width: 70%; max-height: 200px; overflow-y: hidden; display: flex; flex-direction: column; gap: 10px; z-index: 10; pointer-events: none; }
-        .chat-msg { background: rgba(0,0,0,0.4); padding: 8px 15px; border-radius: 15px; font-size: 14px; animation: msgIn 0.3s ease-out; max-width: 90%; }
-        .chat-msg b { color: #82b1ff; }
-        .chat-msg.join { color: #ffeb3b; background: rgba(255, 235, 59, 0.1); }
+        .chat-overlay { position: absolute; bottom: 90px; left: 10px; width: 65%; max-height: 150px; overflow: hidden; z-index: 100; pointer-events: none; }
+        .msg { background: rgba(0,0,0,0.3); padding: 5px 10px; border-radius: 10px; margin-bottom: 5px; font-size: 13px; animation: slideIn 0.3s; }
 
-        /* Footer */
-        .live-footer { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; z-index: 10; }
-        .comment-input { background: rgba(255,255,255,0.15); border: none; border-radius: 25px; padding: 12px 20px; color: white; width: 50%; outline: none; font-size: 15px; }
-        .footer-icons { display: flex; gap: 20px; font-size: 28px; }
-        .icon-btn { cursor: pointer; transition: transform 0.1s; }
-        .icon-btn:active { transform: scale(1.2); }
-
-        /* Animasiyalar */
-        @keyframes msgIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .heart-particle { position: absolute; pointer-events: none; animation: heartFly 1.5s ease-out forwards; z-index: 100; }
-        @keyframes heartFly {
+        /* Ürək Animasiyası */
+        .heart { position: absolute; pointer-events: none; animation: fly 1.5s linear forwards; font-size: 24px; z-index: 200; }
+        @keyframes fly {
             0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-300px) translateX(var(--dx)) scale(1.5) rotate(var(--rg)); opacity: 0; }
+            100% { transform: translateY(-400px) translateX(var(--x)) rotate(var(--r)) scale(2); opacity: 0; }
         }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } }
 
-        .gift-burst { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 80px; animation: giftPop 1s ease-out forwards; z-index: 110; pointer-events: none; display: none; }
-        @keyframes giftPop {
-            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(1) translateY(-100px); opacity: 0; }
-        }
+        /* PK Vaxtı */
+        .pk-timer { position: absolute; top: 40px; left: 50%; transform: translateX(-50%); background: rgba(255,0,80,0.8); padding: 2px 12px; border-radius: 10px; font-size: 12px; font-weight: bold; z-index: 100; }
     </style>
 </head>
 <body>
 
-    <div id="gift-burst" class="gift-burst">🎁🔥</div>
+    <div class="pk-timer">PK 04:59</div>
 
-    <div id="feed-page" class="page active">
-        <div class="feed-container">
-            <div class="live-overlay-card" onclick="goToLive()">
-                <div class="live-tag">CANLI</div>
-                <div style="font-weight:bold; font-size:18px">Volkman1001</div>
-                <div style="font-size:14px; opacity:0.8; margin: 5px 0 15px 0">Dünya Turu - Japonya 🇯🇵</div>
-                <div style="font-size:14px; color: #fe2c55">📊 İzelemek üçün dokun</div>
-            </div>
+    <div class="pk-header">
+        <div class="pk-bar">
+            <div id="blue-bar" class="blue-part"></div>
+            <div id="red-bar" class="red-part"></div>
+        </div>
+        <div class="pk-scores">
+            <span id="blue-score">1250</span>
+            <span id="red-score">1250</span>
         </div>
     </div>
 
-    <div id="live-page" class="page">
-        <div class="live-container">
-            <div id="click-area" onclick="spawnHeart(event)"></div>
-
-            <div class="live-header">
-                <div class="user-info">
-                    <div class="user-avatar"></div>
-                    <div>
-                        <div style="font-size:13px; font-weight:bold">Volkman1001</div>
-                        <div style="font-size:11px">❤️ <span id="like-counter">130.7</span>K</div>
-                    </div>
-                    <button class="follow-btn">+ Takip et</button>
-                </div>
-                <div class="viewer-stats">
-                    <span style="font-size:14px">👁️ 1.1K</span>
-                    <i class="fas fa-times icon-btn" onclick="goBack()" style="font-size:24px"></i>
-                </div>
-            </div>
-
-            <div class="live-chat" id="chat">
-                <div class="chat-msg"><b>İlayda:</b> Salam, necesiniz? 👋</div>
-                <div class="chat-msg"><b>Luis:</b> Bu hansı şeherdir?</div>
-                <div class="chat-msg join">Fatoş katıldı! ✨</div>
-            </div>
-
-            <div class="live-footer">
-                <input type="text" class="comment-input" placeholder="Yazın...">
-                <div class="footer-icons">
-                    <i class="fas fa-gift icon-btn" style="color:#ff0050" onclick="sendGift()"></i>
-                    <i class="fas fa-heart icon-btn" style="color:#ff0050" onclick="spawnHeart(event, true)"></i>
-                    <i class="fas fa-share icon-btn" style="color:white"></i>
-                </div>
-            </div>
+    <div class="live-split-screen" id="click-zone" onclick="sendHeart(event)">
+        <div class="host-half">
+            <div id="local-video" style="width:100%; height:100%; background: #222;"></div>
+            <div class="host-label">Sən (Host)</div>
         </div>
+        <div class="guest-half">
+            <div id="remote-video" style="width:100%; height:100%; background: #111;"></div>
+            <div class="host-label">Rəqib (Guest)</div>
+        </div>
+    </div>
+
+    <div class="chat-overlay" id="chat">
+        <div class="msg"><b>Gamer99:</b> Mavi tərəf udur! 🚀</div>
+        <div class="msg"><b>Ayxan:</b> Rəqib çox güclüdür.</div>
+    </div>
+
+    <div class="side-icons">
+        <div class="icon-btn" onclick="addScore('blue', 100)">🎁<span>Mavi</span></div>
+        <div class="icon-btn" onclick="addScore('red', 100)">🎁<span>Qırmızı</span></div>
+        <div class="icon-btn">💬<span>24</span></div>
+        <div class="icon-btn">🔗<span>Paylaş</span></div>
     </div>
 
     <script>
-        let likeCount = 130.7;
+        let bScore = 1250;
+        let rScore = 1250;
 
-        function goToLive() {
-            document.getElementById('feed-page').classList.remove('active');
-            document.getElementById('live-page').classList.add('active');
+        // Xal əlavə etmək (Google Sheets-ə bağlanan hissə bura olacaq)
+        function addScore(side, points) {
+            if(side === 'blue') bScore += points;
+            else rScore += points;
+            
+            updateBar();
+            
+            // Google Sheets simulyasiyası
+            console.log("Google Sheets-ə yazılır: " + side + " + " + points);
         }
 
-        function goBack() {
-            document.getElementById('live-page').classList.remove('active');
-            document.getElementById('feed-page').classList.add('active');
+        function updateBar() {
+            let total = bScore + rScore;
+            let bPercent = (bScore / total) * 100;
+            let rPercent = (rScore / total) * 100;
+
+            document.getElementById('blue-bar').style.width = bPercent + "%";
+            document.getElementById('red-bar').style.width = rPercent + "%";
+            
+            document.getElementById('blue-score').innerText = bScore;
+            document.getElementById('red-score').innerText = rScore;
         }
 
-        function spawnHeart(event, fromButton = false) {
-            // Sayğacı artır (vizual)
-            likeCount += 0.1;
-            document.getElementById('like-counter').innerText = likeCount.toFixed(1);
-
+        function sendHeart(e) {
             const heart = document.createElement('div');
             heart.innerHTML = '❤️';
-            heart.className = 'heart-particle';
-            
-            // Koordinatları təyin et
-            let x, y;
-            if (fromButton) {
-                // Düymədən gəlirsə, düymənin yerindən başla
-                const btn = event.target.getBoundingClientRect();
-                x = btn.left + btn.width / 2;
-                y = btn.top;
-            } else {
-                // Ekrana kliklənibsə, klik yerindən başla
-                x = event.clientX;
-                y = event.clientY;
-            }
-
-            heart.style.left = x + 'px';
-            heart.style.top = y + 'px';
-            
-            // Təsadüfi uçuş istiqaməti
-            heart.style.setProperty('--dx', (Math.random() * 200 - 100) + 'px');
-            heart.style.setProperty('--rg', (Math.random() * 40 - 20) + 'deg');
+            heart.className = 'heart';
+            heart.style.left = e.clientX + 'px';
+            heart.style.top = e.clientY + 'px';
+            heart.style.setProperty('--x', (Math.random() * 200 - 100) + 'px');
+            heart.style.setProperty('--r', (Math.random() * 50 - 25) + 'deg');
             
             document.body.appendChild(heart);
             setTimeout(() => heart.remove(), 1500);
+            
+            // Hər klikdə 1 xal artır
+            if(e.clientX < window.innerWidth / 2) addScore('blue', 1);
+            else addScore('red', 1);
         }
 
-        function sendGift() {
-            // Ekranda partlayış animasiyası
-            const burst = document.getElementById('gift-burst');
-            burst.style.display = 'block';
-            setTimeout(() => burst.style.display = 'none', 1000);
+        // Google Sheets App Script URL-ni bura qoyacaqsan
+        const G_SHEET_URL = "SENIN_URL_BURAYA";
 
-            // Çata mesaj əlavə et
-            const msg = document.createElement('div');
-            msg.className = 'chat-msg';
-            msg.style.background = 'linear-gradient(90deg, #ff0050, transparent)';
-            msg.innerHTML = '<b>Siz:</b> Hediye gönderdi! 🎁🔥';
-            document.getElementById('chat').appendChild(msg);
-            
-            // Avtomatik aşağı sürüşdür
-            const chat = document.getElementById('chat');
-            chat.scrollTop = chat.scrollHeight;
+        async function syncWithSheet() {
+            // Bu funksiya hər 5 saniyədən bir cədvəldən ən son xalları çəkəcək
+            // Amma hələlik boş saxlayırıq ki, kod xəta verməsin.
         }
     </script>
 </body>
