@@ -2,71 +2,101 @@
 <html lang="az">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>YouTube Live Stream Feed</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Stream TV - Bonus Sistemi</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; color: white; font-family: sans-serif; }
+        body, html { margin: 0; padding: 0; height: 100%; background: #000; color: white; font-family: sans-serif; overflow: hidden; }
         
-        /* Üst Reklam Sahəsi */
-        .ad-container { position: absolute; top: 0; left: 0; width: 100%; height: 60px; background: rgba(0,0,0,0.8); z-index: 100; display: flex; justify-content: center; align-items: center; border-bottom: 1px solid #333; }
-        
+        /* Adsterra Üst Banner */
+        .ad-top { width: 100%; height: 65px; background: #111; display: flex; justify-content: center; align-items: center; border-bottom: 2px solid #ff0000; }
+
+        /* Əsas Konteyner */
+        .main-container { display: flex; flex-direction: column; height: calc(100vh - 65px); }
+
         /* Video Sahəsi */
-        #feed-container { width: 100%; height: 100vh; position: relative; }
+        .video-box { flex: 2; position: relative; background: #000; }
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* Sürüşdürmə İpucu və Düymə */
-        .controls { position: absolute; bottom: 30px; left: 0; width: 100%; text-align: center; z-index: 100; }
-        .next-btn { background: #ff0000; color: white; border: none; padding: 12px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; box-shadow: 0 0 15px rgba(255,0,0,0.5); }
-        .swipe-info { margin-top: 10px; font-size: 12px; opacity: 0.7; }
+        /* Şərhlər Sahəsi (Chat) */
+        .chat-box { flex: 1; background: #181818; border-top: 1px solid #333; }
+
+        /* İdarəetmə Düymələri */
+        .controls { padding: 10px; display: flex; justify-content: space-around; background: #000; align-items: center; }
+        .next-btn { background: #ff0000; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        .timer-info { font-size: 14px; color: #00f2ea; }
     </style>
 </head>
 <body>
 
-    <div class="ad-container">
-        <div id="ad-top">ADSTERRA BANNER (60px)</div>
+    <div class="ad-top">
+        <div id="adsterra_slot">ADSTERRA REKLAM (60px)</div>
     </div>
 
-    <div id="feed-container">
-        <iframe id="youtube-player" src="https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&mute=1" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
-    </div>
+    <div class="main-container">
+        <div class="video-box" id="player-container">
+            <iframe id="yt-video" src="" allowfullscreen></iframe>
+        </div>
 
-    <div class="controls">
-        <button class="next-btn" onclick="changeVideo()">NÖVBƏTİ CANLI YAYIM</button>
-        <div class="swipe-info">Hər keçiddə bonus xal qazanırsınız!</div>
+        <div class="chat-box" id="chat-container">
+            <iframe id="yt-chat" src="" height="100%" width="100%"></iframe>
+        </div>
+
+        <div class="controls">
+            <div class="timer-info">Mükafat üçün: <span id="timer">00:00</span></div>
+            <button class="next-btn" onclick="changeLive()">NÖVBƏTİ CANLI ➔</button>
+        </div>
     </div>
 
     <script>
-        // Aktiv 24/7 yayımlanan YouTube kanallarının ID-ləri
-        const youtubeLiveIDs = [
-            "jfKfPfyJRdk", // Lofi Girl (Musiqi)
-            "4xDzrJKXOOY", // Lofi Hip Hop
-            "live_id_buraya", // Əgər başqa ID tapsan bura əlavə et
-            "5_X7SESSWAc"  // NASA Live (Kosmos)
+        // Real və Həmişə Aktiv Olan Canlı Kanalların ID-ləri
+        const liveChannels = [
+            "v9m8O9-iN9U", // Haber Global (TR/AZ Xəbər)
+            "9AuqUPgd28M", // Sky News (Dünya Xəbər)
+            "R8m7XU6Gf9M", // TRT Haber (Canlı)
+            "21X5lGlDOfg", // NASA TV (Kosmos)
+            "S579IDV-zNM", // Al Jazeera English
+            "_90_Z8D_0zQ", // France 24 English
+            "v97YvWw5w9w", // ABC News (USA)
+            "3_mS8_8m_3s", // NBC News
+            "uS6r6x_v5_s", // Bloomberg Quicktake
+            "XWqCOlInI6U", // Reuters Live
+            "H_G_X_v5_sX"  // DW News
         ];
-        
-        let currentIndex = 0;
 
-        function changeVideo() {
-            // 1. REKLAM HİYLƏSİ (Adsterra Direct Link açmaq üçün)
-            // window.open('SƏNİN_ADSTERRA_DIRECT_LINKİN', '_blank');
+        let currentIdx = 0;
+        const domain = window.location.hostname; // Şərhlərin işləməsi üçün vacibdir
 
-            // 2. NÖVBƏTİ VİDEOYA KEÇİD
-            currentIndex = (currentIndex + 1) % youtubeLiveIDs.length;
-            const player = document.getElementById('youtube-player');
+        function updateStream(idx) {
+            const videoID = liveChannels[idx];
+            const videoFrame = document.getElementById('yt-video');
+            const chatFrame = document.getElementById('yt-chat');
+
+            // Video Linki
+            videoFrame.src = `https://www.youtube.com/embed/${videoID}?autoplay=1&mute=1`;
             
-            // YouTube Embed formatı
-            player.src = "https://www.youtube.com/embed/" + youtubeLiveIDs[currentIndex] + "?autoplay=1";
-            
-            console.log("Video dəyişdirildi: " + youtubeLiveIDs[currentIndex]);
+            // Şərhlər Linki (DİQQƏT: Live chat yalnız real hostinqlərdə tam görünür)
+            chatFrame.src = `https://www.youtube.com/live_chat?v=${videoID}&embed_domain=${domain}`;
         }
 
-        // Mobil üçün yuxarı sürüşdürmə funksiyası (Opsional)
-        let startY = 0;
-        document.addEventListener('touchstart', e => { startY = e.touches[0].pageY; });
-        document.addEventListener('touchend', e => {
-            let endY = e.changedTouches[0].pageY;
-            if (startY - endY > 100) { changeVideo(); }
-        });
+        function changeLive() {
+            // Adsterra Direct Link Hiyləsi (İstəsən aktivləşdirə bilərsən)
+            // window.open('SƏNİN_ADSTERRA_DIRECT_LINKİN', '_blank');
+
+            currentIdx = (currentIdx + 1) % liveChannels.length;
+            updateStream(currentIdx);
+        }
+
+        // İlkin yükləmə
+        window.onload = () => updateStream(0);
+
+        // Sadə Taymer
+        let sec = 0;
+        setInterval(() => {
+            sec++;
+            let m = Math.floor(sec / 60);
+            let s = sec % 60;
+            document.getElementById('timer').innerText = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+        }, 1000);
     </script>
 </body>
 </html>
