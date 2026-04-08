@@ -2,71 +2,66 @@
 <html lang="az">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TikTok Live Feed</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volkman33 Canlı Yayım</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; color: white; }
-        
-        /* Reklam Sahəsi */
-        .ad-container { position: absolute; top: 10px; left: 0; width: 100%; z-index: 100; text-align: center; height: 60px; pointer-events: none; }
-        
-        /* Yayım Konteyneri */
-        #feed-container { width: 100%; height: 100vh; position: relative; }
-        iframe { width: 100%; height: 100%; border: none; }
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: #000;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
 
-        /* Sürüşdürmə İpucu */
-        .swipe-hint { position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); opacity: 0.6; font-size: 12px; pointer-events: none; }
+        /* Reklam sahəsi (Bura Adsterra kodunu qoya bilərsən) */
+        .ad-top {
+            width: 100%;
+            height: 60px;
+            background: #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #555;
+            font-size: 12px;
+            border-bottom: 1px solid #333;
+        }
+
+        .video-container {
+            flex-grow: 1;
+            width: 100%;
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
     </style>
 </head>
 <body>
 
-    <div class="ad-container">
-        <div id="ad-top"></div>
+    <div class="ad-top">
+        REKLAM SAHƏSİ (Adsterra Banner)
     </div>
 
-    <div id="feed-container">
-        <iframe id="live-player" src="https://www.tiktok.com/embed/v2/@SƏNİN_ADIN"></iframe>
+    <div class="video-container">
+        <iframe 
+            src="https://www.tiktok.com/embed/v2/live?unique_id=@volkman33&autoplay=1" 
+            allow="autoplay; fullscreen" 
+            allowfullscreen>
+        </iframe>
     </div>
-
-    <div class="swipe-hint">Növbəti canlı üçün yuxarı sürüşdür ↑</div>
 
     <script>
-        // Canlı yayımların siyahısı (Bura istədiyin qədər populyar yayımçı əlavə edə bilərsən)
-        const liveFeeds = [
-            "https://www.tiktok.com/embed/v2/@istifadeci1",
-            "https://www.tiktok.com/embed/v2/@istifadeci2",
-            "https://www.tiktok.com/embed/v2/@SƏNİN_ADIN",
-            "https://www.tiktok.com/embed/v2/@xeberler"
-        ];
-        
-        let currentIndex = 0;
-        let startY = 0;
-
-        const player = document.getElementById('live-player');
-
-        // Sürüşdürməni tutmaq
-        document.addEventListener('touchstart', e => { startY = e.touches[0].pageY; });
-
-        document.addEventListener('touchend', e => {
-            let endY = e.changedTouches[0].pageY;
-            if (startY - endY > 100) { // Yuxarı sürüşdürmə (100px-dən çoxdursa)
-                changeLive();
-            }
-        });
-
-        function changeLive() {
-            currentIndex = (currentIndex + 1) % liveFeeds.length;
-            
-            // Pleyeri gizlət və yenisini yüklə (effekt üçün)
-            player.style.opacity = 0.5;
-            player.src = liveFeeds[currentIndex];
-            
-            player.onload = () => {
-                player.style.opacity = 1;
-                // REKLAMI YENİLƏMƏK (Adsterra Direct Link-i hər keçiddə açmaq olar)
-                console.log("Yeni yayım yükləndi, reklam baxışı sayıldı.");
-            };
-        }
+        // İstifadəçi ekrana ilk dəfə toxunanda reklam açılması üçün (Direct Link hiyləsi)
+        document.body.addEventListener('click', function() {
+            console.log("Reklam baxışı qeydə alındı!");
+            // window.open('SƏNİN_ADSTERRA_DIRECT_LINKİN', '_blank');
+        }, {once: true});
     </script>
+
 </body>
 </html>
