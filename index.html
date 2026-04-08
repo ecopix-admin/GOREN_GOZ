@@ -2,66 +2,71 @@
 <html lang="az">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Volkman33 Canlı Yayım</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>YouTube Live Stream Feed</title>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            background-color: #000;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; color: white; font-family: sans-serif; }
+        
+        /* Üst Reklam Sahəsi */
+        .ad-container { position: absolute; top: 0; left: 0; width: 100%; height: 60px; background: rgba(0,0,0,0.8); z-index: 100; display: flex; justify-content: center; align-items: center; border-bottom: 1px solid #333; }
+        
+        /* Video Sahəsi */
+        #feed-container { width: 100%; height: 100vh; position: relative; }
+        iframe { width: 100%; height: 100%; border: none; }
 
-        /* Reklam sahəsi (Bura Adsterra kodunu qoya bilərsən) */
-        .ad-top {
-            width: 100%;
-            height: 60px;
-            background: #111;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #555;
-            font-size: 12px;
-            border-bottom: 1px solid #333;
-        }
-
-        .video-container {
-            flex-grow: 1;
-            width: 100%;
-            position: relative;
-        }
-
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
+        /* Sürüşdürmə İpucu və Düymə */
+        .controls { position: absolute; bottom: 30px; left: 0; width: 100%; text-align: center; z-index: 100; }
+        .next-btn { background: #ff0000; color: white; border: none; padding: 12px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; box-shadow: 0 0 15px rgba(255,0,0,0.5); }
+        .swipe-info { margin-top: 10px; font-size: 12px; opacity: 0.7; }
     </style>
 </head>
 <body>
 
-    <div class="ad-top">
-        REKLAM SAHƏSİ (Adsterra Banner)
+    <div class="ad-container">
+        <div id="ad-top">ADSTERRA BANNER (60px)</div>
     </div>
 
-    <div class="video-container">
-        <iframe 
-            src="https://www.tiktok.com/embed/v2/live?unique_id=@volkman33&autoplay=1" 
-            allow="autoplay; fullscreen" 
-            allowfullscreen>
-        </iframe>
+    <div id="feed-container">
+        <iframe id="youtube-player" src="https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&mute=1" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+    </div>
+
+    <div class="controls">
+        <button class="next-btn" onclick="changeVideo()">NÖVBƏTİ CANLI YAYIM</button>
+        <div class="swipe-info">Hər keçiddə bonus xal qazanırsınız!</div>
     </div>
 
     <script>
-        // İstifadəçi ekrana ilk dəfə toxunanda reklam açılması üçün (Direct Link hiyləsi)
-        document.body.addEventListener('click', function() {
-            console.log("Reklam baxışı qeydə alındı!");
-            // window.open('SƏNİN_ADSTERRA_DIRECT_LINKİN', '_blank');
-        }, {once: true});
-    </script>
+        // Aktiv 24/7 yayımlanan YouTube kanallarının ID-ləri
+        const youtubeLiveIDs = [
+            "jfKfPfyJRdk", // Lofi Girl (Musiqi)
+            "4xDzrJKXOOY", // Lofi Hip Hop
+            "live_id_buraya", // Əgər başqa ID tapsan bura əlavə et
+            "5_X7SESSWAc"  // NASA Live (Kosmos)
+        ];
+        
+        let currentIndex = 0;
 
+        function changeVideo() {
+            // 1. REKLAM HİYLƏSİ (Adsterra Direct Link açmaq üçün)
+            // window.open('SƏNİN_ADSTERRA_DIRECT_LINKİN', '_blank');
+
+            // 2. NÖVBƏTİ VİDEOYA KEÇİD
+            currentIndex = (currentIndex + 1) % youtubeLiveIDs.length;
+            const player = document.getElementById('youtube-player');
+            
+            // YouTube Embed formatı
+            player.src = "https://www.youtube.com/embed/" + youtubeLiveIDs[currentIndex] + "?autoplay=1";
+            
+            console.log("Video dəyişdirildi: " + youtubeLiveIDs[currentIndex]);
+        }
+
+        // Mobil üçün yuxarı sürüşdürmə funksiyası (Opsional)
+        let startY = 0;
+        document.addEventListener('touchstart', e => { startY = e.touches[0].pageY; });
+        document.addEventListener('touchend', e => {
+            let endY = e.changedTouches[0].pageY;
+            if (startY - endY > 100) { changeVideo(); }
+        });
+    </script>
 </body>
 </html>
