@@ -2,191 +2,71 @@
 <html lang="az">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>OkoTok - Video Bazar</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TikTok Live Feed</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; background: #000; color: white; font-family: 'Inter', sans-serif; overflow: hidden; }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; color: white; }
         
-        /* Grid Rejimi */
-        #gridView { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; height: 100vh; overflow-y: auto; padding: 60px 0 90px 0; }
-        .grid-item { aspect-ratio: 9/16; background: #111; position: relative; cursor: pointer; border-radius: 4px; overflow: hidden; }
-        .grid-item video { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
-        .grid-price { position: absolute; bottom: 5px; left: 5px; background: rgba(0,0,0,0.7); font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: bold; color: #fbbf24; }
-        .vip-badge { position: absolute; top: 5px; right: 5px; color: #fbbf24; font-size: 10px; }
-
-        /* TikTok Feed Rejimi */
-        #feedView { display: none; height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; -ms-overflow-style: none; }
-        #feedView::-webkit-scrollbar { display: none; }
-        .snap-section { height: 100vh; scroll-snap-align: start; position: relative; background: #000; overflow: hidden; }
-        .snap-section video { width: 100%; height: 100%; object-fit: contain; }
+        /* Reklam Sahəsi */
+        .ad-container { position: absolute; top: 10px; left: 0; width: 100%; z-index: 100; text-align: center; height: 60px; pointer-events: none; }
         
-        /* Video üzərində Loqo (Watermark) */
-        .watermark { position: absolute; top: 70px; left: 20px; opacity: 0.5; font-weight: 900; font-style: italic; font-size: 20px; letter-spacing: -1px; pointer-events: none; z-index: 60; color: rgba(255,255,255,0.4); }
+        /* Yayım Konteyneri */
+        #feed-container { width: 100%; height: 100vh; position: relative; }
+        iframe { width: 100%; height: 100%; border: none; }
 
-        /* İnfo və Düymələr */
-        .overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 40%, transparent 60%, rgba(0,0,0,0.4) 100%); pointer-events: none; }
-        .info-box { position: absolute; bottom: 120px; left: 15px; right: 80px; z-index: 40; }
-        .side-bar { position: absolute; right: 15px; bottom: 150px; display: flex; flex-direction: column; gap: 18px; z-index: 50; }
-        
-        .action-btn { width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 18px; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
-        .action-btn span { font-size: 10px; margin-top: 2px; font-weight: bold; }
-
-        /* Naviqasiya */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 75px; background: #000; border-top: 1px solid #1a1a1a; display: flex; justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom); z-index: 100; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #777; font-size: 10px; cursor: pointer; transition: 0.2s; }
-        .nav-item.active { color: white; }
-
-        /* Profil və Sevimlilər (Placeholder) */
-        .modal { display: none; position: fixed; inset: 0; background: #000; z-index: 200; padding: 20px; text-align: center; }
+        /* Sürüşdürmə İpucu */
+        .swipe-hint { position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); opacity: 0.6; font-size: 12px; pointer-events: none; }
     </style>
 </head>
 <body>
 
-    <div class="fixed top-0 w-full p-5 flex justify-between items-center z-[110] bg-gradient-to-b from-black to-transparent">
-        <h1 class="text-2xl font-black italic tracking-tighter text-white" onclick="location.reload()">OKOTOK</h1>
-        <div class="flex gap-4">
-            <button onclick="showGrid()" id="gridBtn" class="text-xl text-white opacity-100"><i class="fas fa-th-large"></i></button>
-            <button onclick="showFeed(0)" id="feedBtn" class="text-xl text-white opacity-50"><i class="fas fa-play-circle"></i></button>
-        </div>
+    <div class="ad-container">
+        <div id="ad-top"></div>
     </div>
 
-    <div id="gridView"></div>
-    <div id="feedView" onscroll="handleScroll()"></div>
-
-    <div id="profileModal" class="modal">
-        <div class="mt-20">
-            <i class="fas fa-user-circle text-6xl mb-4 text-gray-500"></i>
-            <h2 class="text-xl font-bold">Profiliniz</h2>
-            <p class="text-gray-400 mt-2 text-sm">Elan yerləşdirmək və elanlarınıza nəzarət etmək üçün botumuza daxil olun.</p>
-            <a href="https://t.me/OkoTokBot" class="inline-block mt-6 bg-blue-600 px-8 py-3 rounded-full font-bold">Bota keçid et</a>
-            <button onclick="closeModals()" class="block w-full mt-4 text-gray-500">Bağla</button>
-        </div>
+    <div id="feed-container">
+        <iframe id="live-player" src="https://www.tiktok.com/embed/v2/@SƏNİN_ADIN"></iframe>
     </div>
 
-    <div class="nav-bar">
-        <div class="nav-item active" onclick="showGrid()"><i class="fas fa-home text-2xl"></i><span>Əsas</span></div>
-        <div class="nav-item" onclick="openProfile()"><i class="fas fa-search text-2xl"></i><span>Axtar</span></div>
-        <div onclick="openProfile()" class="bg-white w-12 h-9 rounded-lg flex items-center justify-center text-black text-xl font-bold shadow-[0_0_15px_rgba(255,255,255,0.3)]"><i class="fas fa-plus"></i></div>
-        <div class="nav-item" onclick="openProfile()"><i class="fas fa-heart text-2xl"></i><span>Sevimlilər</span></div>
-        <div class="nav-item" onclick="openProfile()"><i class="fas fa-user text-2xl"></i><span>Profil</span></div>
-    </div>
+    <div class="swipe-hint">Növbəti canlı üçün yuxarı sürüşdür ↑</div>
 
     <script>
-        // SUPABASE AÇARLARI (ÖZÜNKÜLƏRİ BURA YAZ)
-        const S_URL = "SƏNİN_PROJECT_URL"; 
-        const S_KEY = "SƏNİN_ANON_KEY";
+        // Canlı yayımların siyahısı (Bura istədiyin qədər populyar yayımçı əlavə edə bilərsən)
+        const liveFeeds = [
+            "https://www.tiktok.com/embed/v2/@istifadeci1",
+            "https://www.tiktok.com/embed/v2/@istifadeci2",
+            "https://www.tiktok.com/embed/v2/@SƏNİN_ADIN",
+            "https://www.tiktok.com/embed/v2/@xeberler"
+        ];
+        
+        let currentIndex = 0;
+        let startY = 0;
 
-        let allAds = [];
-        let currentVideo = null;
+        const player = document.getElementById('live-player');
 
-        async function fetchData() {
-            try {
-                const res = await fetch(`${S_URL}/rest/v1/elanlar?select=*&order=is_vip.desc,created_at.desc`, {
-                    headers: { "apikey": S_KEY, "Authorization": `Bearer ${S_KEY}` }
-                });
-                allAds = await res.json();
-                renderGrid();
-            } catch (e) { console.error("Baza bağlantısı xətası:", e); }
-        }
+        // Sürüşdürməni tutmaq
+        document.addEventListener('touchstart', e => { startY = e.touches[0].pageY; });
 
-        function renderGrid() {
-            stopAllVideos();
-            document.getElementById('gridView').style.display = 'grid';
-            document.getElementById('feedView').style.display = 'none';
-            document.getElementById('gridBtn').classList.replace('opacity-50', 'opacity-100');
-            document.getElementById('feedBtn').classList.replace('opacity-100', 'opacity-50');
+        document.addEventListener('touchend', e => {
+            let endY = e.changedTouches[0].pageY;
+            if (startY - endY > 100) { // Yuxarı sürüşdürmə (100px-dən çoxdursa)
+                changeLive();
+            }
+        });
+
+        function changeLive() {
+            currentIndex = (currentIndex + 1) % liveFeeds.length;
             
-            const grid = document.getElementById('gridView');
-            grid.innerHTML = allAds.map((ad, i) => `
-                <div class="grid-item" onclick="showFeed(${i})">
-                    <video src="${ad.media_url}" muted playsinline></video>
-                    <div class="grid-price">${ad.price} AZN</div>
-                    ${ad.is_vip ? '<div class="vip-badge"><i class="fas fa-star"></i></div>' : ''}
-                </div>
-            `).join('');
-        }
-
-        function showFeed(index) {
-            document.getElementById('gridView').style.display = 'none';
-            document.getElementById('feedView').style.display = 'block';
-            document.getElementById('gridBtn').classList.replace('opacity-100', 'opacity-50');
-            document.getElementById('feedBtn').classList.replace('opacity-50', 'opacity-100');
+            // Pleyeri gizlət və yenisini yüklə (effekt üçün)
+            player.style.opacity = 0.5;
+            player.src = liveFeeds[currentIndex];
             
-            const feed = document.getElementById('feedView');
-            feed.innerHTML = allAds.map(ad => `
-                <div class="snap-section">
-                    <div class="watermark">OKOTOK</div>
-                    <video src="${ad.media_url}" loop playsinline onclick="togglePlay(this)"></video>
-                    <div class="overlay"></div>
-                    <div class="side-bar">
-                        <div class="action-btn text-white" onclick="toggleLike(this)"><i class="fas fa-heart"></i><span>0</span></div>
-                        <a href="https://wa.me/${ad.whatsapp}" class="action-btn text-green-500"><i class="fab fa-whatsapp"></i><span>WP</span></a>
-                        <a href="tel:${ad.phone}" class="action-btn text-blue-500"><i class="fas fa-phone"></i><span>Zəng</span></a>
-                        <div class="action-btn text-white" onclick="shareAd('${ad.id}')"><i class="fas fa-share"></i><span>Paylaş</span></div>
-                    </div>
-                    <div class="info-box">
-                        <div class="flex items-center gap-2 mb-2">
-                             <span class="bg-yellow-500 text-black text-[10px] font-bold px-2 py-0.5 rounded">YENİ</span>
-                             <span class="text-yellow-400 font-bold text-xl">${ad.price} AZN</span>
-                        </div>
-                        <h2 class="text-xl font-bold text-white shadow-sm">${ad.marka} ${ad.model}</h2>
-                        <p class="text-gray-300 text-sm mt-1 line-clamp-2">${ad.description}</p>
-                    </div>
-                </div>
-            `).join('');
-            
-            const sections = document.querySelectorAll('.snap-section');
-            sections[index].scrollIntoView();
-            setTimeout(() => playVideoAt(index), 100);
+            player.onload = () => {
+                player.style.opacity = 1;
+                // REKLAMI YENİLƏMƏK (Adsterra Direct Link-i hər keçiddə açmaq olar)
+                console.log("Yeni yayım yükləndi, reklam baxışı sayıldı.");
+            };
         }
-
-        function handleScroll() {
-            const feed = document.getElementById('feedView');
-            const index = Math.round(feed.scrollTop / window.innerHeight);
-            playVideoAt(index);
-        }
-
-        function playVideoAt(index) {
-            const videos = document.querySelectorAll('#feedView video');
-            videos.forEach((v, i) => {
-                if(i === index) {
-                    v.play().catch(() => { v.muted = true; v.play(); });
-                    currentVideo = v;
-                } else {
-                    v.pause();
-                    v.currentTime = 0;
-                }
-            });
-        }
-
-        function togglePlay(video) {
-            if (video.paused) video.play();
-            else video.pause();
-        }
-
-        function stopAllVideos() {
-            document.querySelectorAll('video').forEach(v => { v.pause(); v.currentTime = 0; });
-        }
-
-        function shareAd(id) {
-            if (navigator.share) {
-                navigator.share({ title: 'OkoTok Elan', url: window.location.href });
-            } else { alert("Link kopyalandı!"); }
-        }
-
-        function toggleLike(btn) {
-            btn.classList.toggle('text-red-500');
-            let count = parseInt(btn.querySelector('span').innerText);
-            btn.querySelector('span').innerText = btn.classList.contains('text-red-500') ? count + 1 : count - 1;
-        }
-
-        function openProfile() { document.getElementById('profileModal').style.display = 'block'; }
-        function closeModals() { document.getElementById('profileModal').style.display = 'none'; }
-        function showGrid() { renderGrid(); }
-
-        window.onload = fetchData;
     </script>
 </body>
 </html>
