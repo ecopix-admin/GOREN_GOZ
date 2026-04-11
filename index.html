@@ -3,31 +3,29 @@
 <head>
     <meta charset='utf-8'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>GÖREN GÖZ | CORE LOGIC</title>
+    <title>GÖREN GÖZ | CLEAN AR</title>
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
     <style>
         body { margin: 0; overflow: hidden; background: #000; font-family: sans-serif; }
-        #intro-screen {
+        #welcome-ui {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; color: #fff; display: flex; align-items: center; 
             justify-content: center; z-index: 9999; text-align: center;
         }
         .start-btn {
-            padding: 20px 50px; border-radius: 50px; background: #00f2fe;
-            border: none; font-weight: bold; font-size: 20px; cursor: pointer;
-            box-shadow: 0 0 30px #00f2fe; color: #000;
+            padding: 15px 40px; border-radius: 30px; background: #00f2fe;
+            border: none; font-weight: bold; cursor: pointer; color: #000;
         }
     </style>
 </head>
 
 <body>
 
-    <div id="intro-screen">
+    <div id="welcome-ui">
         <div>
-            <h1 style="letter-spacing: 5px;">GÖRƏN GÖZ</h1>
-            <p style="opacity: 0.6; margin-bottom: 40px;">Rəqəmsal qatı görmək üçün toxun</p>
-            <button class="start-btn" onclick="initAR()">BAŞLA</button>
+            <h1>GÖRƏN GÖZ</h1>
+            <button class="start-btn" onclick="startExperience()">RADARI AÇ</button>
         </div>
     </div>
 
@@ -39,7 +37,7 @@
         raycaster="objects: .clickable">
 
         <a-assets>
-            <img id="tk-icon" src="https://img.icons8.com/color/512/tiktok.png">
+            <img id="tk-logo" src="https://img.icons8.com/color/512/tiktok.png">
             <video id="reklam-video" src="https://www.w3schools.com/html/mov_bbb.mp4" 
                    preload="auto" loop="true" crossorigin="anonymous" playsinline muted>
             </video>
@@ -49,39 +47,34 @@
 
         <a-entity gps-entity-place="latitude: 40.437298; longitude: 49.865704;">
             
-            <a-cylinder position="0 0 0" radius="0.05" height="30" color="#00f2fe" opacity="0.2"></a-cylinder>
-
-            <a-entity position="0 2 0" scale="6 6 6">
+            <a-entity position="0 1.6 0" scale="5 5 5">
                 
-                <a-entity animation="property: rotation; to: 0 360 0; loop: true; dur: 9000; easing: linear">
-                    <a-image src="#tk-icon" width="1" height="1" 
-                             class="clickable" 
+                <a-entity animation="property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear">
+                    <a-image src="#tk-logo" width="1" height="1" class="clickable" 
                              onclick="window.location.href='https://www.tiktok.com'"></a-image>
                 </a-entity>
 
-                <a-video src="#reklam-video" width="2" height="1.1" position="0 1.4 0.1" 
-                         material="shader: flat;"></a-video>
+                <a-video src="#reklam-video" width="1.8" height="1" position="0 1.2 0" 
+                         material="shader: flat; side: double;"></a-video>
                 
-                <a-text value="SAMXAL PRO" align="center" position="0 -0.8 0.1" width="3" color="#fff"></a-text>
+                <a-text value="SAMXAL PRO" align="center" position="0 -0.8 0" width="3" color="#fff"></a-text>
             </a-entity>
 
-            <a-ring color="#00f2fe" radius-inner="0.8" radius-outer="1" rotation="-90 0 0" position="0 -1.5 0" opacity="0.6"></a-ring>
+            <a-ring color="#00f2fe" radius-inner="0.4" radius-outer="0.5" rotation="-90 0 0" position="0 -1.5 0" opacity="0.4"></a-ring>
 
         </a-entity>
 
     </a-scene>
 
     <script>
-        function initAR() {
-            // Giriş ekranını bağla
-            document.getElementById('intro-screen').style.display = 'none';
-            // Videonu işə sal
+        function startExperience() {
+            document.getElementById('welcome-ui').style.display = 'none';
             var v = document.querySelector('#reklam-video');
             v.play();
         }
 
-        // GPS dəqiqliyini pulsuz maksimuma qaldırırıq
-        navigator.geolocation.getCurrentPosition(() => {}, () => {}, {
+        // GPS dəqiqliyi üçün hibrid metodu aktiv edirik
+        navigator.geolocation.getCurrentPosition(()=>{}, ()=>{}, {
             enableHighAccuracy: true,
             timeout: 5000,
             maximumAge: 0
