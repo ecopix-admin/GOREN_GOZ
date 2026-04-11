@@ -2,95 +2,114 @@
 <html>
 <head>
     <meta charset='utf-8'>
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>GÖREN GÖZ | MULTI-PLATFORM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>GÖREN GÖZ | AR MOBILE</title>
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
     <style>
-        body { margin: 0; font-family: sans-serif; background: #000; }
-        #ui-layer {
+        body { margin: 0; padding: 0; background: #000; font-family: 'Segoe UI', Roboto, sans-serif; overflow: hidden; }
+        
+        /* Mobil Giriş Ekranı */
+        #welcome-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(180deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 999; background: #000; transition: 0.8s;
+            z-index: 9999; text-align: center; color: white;
         }
-        .scan-btn {
-            width: 100px; height: 100px; border-radius: 50%;
-            background: #fff; color: #000; border: none; font-weight: bold;
-            cursor: pointer; box-shadow: 0 0 20px #fff;
+
+        .logo-text { font-size: 32px; font-weight: 800; letter-spacing: 3px; margin-bottom: 10px; text-shadow: 0 0 15px #00f2fe; }
+        .description { font-size: 16px; opacity: 0.8; padding: 0 40px; margin-bottom: 50px; line-height: 1.5; }
+
+        /* Yanıb-sönən dalğalı düymə */
+        .btn-container { position: relative; }
+        .pulse-btn {
+            width: 90px; height: 90px; background: #fff; border-radius: 50%;
+            border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            position: relative; z-index: 2; outline: none;
         }
-        /* Alt tərəfdə hansı linkin aktiv olduğunu göstərən panel */
-        #status-bar {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: rgba(255,255,255,0.9); color: #000; padding: 10px 25px;
-            border-radius: 30px; display: none; font-weight: bold; z-index: 100;
+        .pulse-btn svg { fill: #302b63; width: 40px; height: 40px; }
+
+        .pulse-ring {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 50%; background: rgba(255,255,255,0.4);
+            animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 0.8; }
+            100% { transform: scale(2.5); opacity: 0; }
+        }
+
+        /* AR Aktiv olanda üst panel */
+        #ar-overlay {
+            position: fixed; top: 20px; width: 100%; display: none;
+            justify-content: center; z-index: 100;
+        }
+        .ar-badge {
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+            padding: 10px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.3);
+            color: white; font-size: 14px; font-weight: bold;
         }
     </style>
 </head>
 
-<body style="margin: 0; overflow: hidden;">
+<body>
 
-    <div id="ui-layer">
-        <button class="scan-btn" onclick="startAR()">BAŞLA</button>
-        <p style="color: white; margin-top: 15px;">GÖREN GÖZ PLATFORMASI</p>
+    <div id="welcome-screen">
+        <div class="logo-text">GÖRƏN GÖZ</div>
+        <div class="description">Xoş gəlmisiniz! Şəhərin rəqəmsal qatını kəşf etməyə hazırsınız? Düyməyə toxunub kameranı ətrafa tutun.</div>
+        
+        <div class="btn-container" onclick="initExperience()">
+            <div class="pulse-ring"></div>
+            <button class="pulse-btn">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg>
+            </button>
+        </div>
+        <p style="margin-top: 30px; font-size: 12px; opacity: 0.5;">v1.0 Pro Mobile Experience</p>
     </div>
 
-    <div id="status-bar" id="status-text">Obyekt axtarılır...</div>
+    <div id="ar-overlay">
+        <div class="ar-badge">Skaner Aktivdir • Linkləri Axtarın</div>
+    </div>
 
     <a-scene 
         vr-mode-ui="enabled: false"
         embedded 
         arjs="sourceType: webcam; debugUIEnabled: false; smoothing: true; smoothingFactor: 10;">
-
+        
         <a-assets>
-            <img id="tk-icon" src="https://img.icons8.com/color/512/tiktok.png">
-            <img id="ig-icon" src="https://img.icons8.com/color/512/instagram-new.png">
-            <img id="tg-icon" src="https://img.icons8.com/color/512/telegram-app.png">
-            <img id="tap-icon" src="https://www.google.com/s2/favicons?sz=64&domain=tap.az">
+            <img id="tk-logo" src="https://img.icons8.com/color/512/tiktok.png">
         </a-assets>
 
-        <a-camera gps-camera="minDistance: 5;" rotation-reader></a-camera>
+        <a-camera gps-camera="minDistance: 5;" rotation-reader fov="80"></a-camera>
 
         <a-entity gps-entity-place="latitude: 40.350554; longitude: 49.965319;">
-            <a-entity position="0 1.5 0" scale="3 3 3" animation="property: rotation; to: 0 360 0; loop: true; dur: 6000; easing: linear">
-                <a-image src="#tk-icon" width="1" height="1" onclick="window.location.href='https://tiktok.com'"></a-image>
-                <a-text value="TIKTOK" align="center" position="0 -0.8 0" width="4" color="#fff" wrap-count="15"></a-text>
-            </a-entity>
-        </a-entity>
-
-        <a-entity gps-entity-place="latitude: 40.350600; longitude: 49.965400;">
-            <a-entity position="0 1.5 0" scale="3 3 3" animation="property: rotation; to: 0 360 0; loop: true; dur: 6000; easing: linear">
-                <a-image src="#ig-icon" width="1" height="1" onclick="window.location.href='https://instagram.com'"></a-image>
-                <a-text value="INSTAGRAM" align="center" position="0 -0.8 0" width="4" color="#fff"></a-text>
-            </a-entity>
-        </a-entity>
-
-        <a-entity gps-entity-place="latitude: 40.350400; longitude: 49.965200;">
-            <a-entity position="0 1.5 0" scale="3 3 3" animation="property: rotation; to: 0 360 0; loop: true; dur: 6000; easing: linear">
-                <a-image src="#tg-icon" width="1" height="1" onclick="window.location.href='https://t.me'"></a-image>
-                <a-text value="TELEGRAM" align="center" position="0 -0.8 0" width="4" color="#fff"></a-text>
-            </a-entity>
-        </a-entity>
-
-        <a-entity gps-entity-place="latitude: 40.350700; longitude: 49.965500;">
-            <a-entity position="0 1.5 0" scale="3 3 3" animation="property: rotation; to: 0 360 0; loop: true; dur: 6000; easing: linear">
-                <a-image src="#tap-icon" width="1" height="1" onclick="window.location.href='https://tap.az'"></a-image>
-                <a-text value="TAP.AZ" align="center" position="0 -0.8 0" width="4" color="#fff"></a-text>
+            <a-entity position="0 1.5 0" scale="6 6 6" animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear">
+                <a-image src="#tk-logo" width="1.2" height="1.2" class="clickable"></a-image>
+                <a-text value="TIKTOK" align="center" position="0 -0.8 0.1" width="3" color="#fff" font="https://cdn.aframe.io/fonts/Exo2Bold.fnt"></a-text>
             </a-entity>
         </a-entity>
 
     </a-scene>
 
     <script>
-        function startAR() {
-            document.getElementById('ui-layer').style.display = 'none';
-            document.getElementById('status-bar').style.display = 'block';
-            document.getElementById('status-bar').innerText = "Kameranı ətrafa tutun";
+        function initExperience() {
+            // Səsləri və ya digər icazələri aktiv etmək olar
+            document.getElementById('welcome-screen').style.transition = '0.8s';
+            document.getElementById('welcome-screen').style.opacity = '0';
+            document.getElementById('ar-overlay').style.display = 'flex';
+            
+            setTimeout(() => {
+                document.getElementById('welcome-screen').style.display = 'none';
+            }, 800);
         }
 
-        // Hər hansı bir obyektə toxunanda yönləndirmə
-        window.addEventListener('click', function (evt) {
-            // A-Frame-də obyekt kliklənməsini buraya da bağlamaq olar
-        });
+        // Klikləyəndə TikTok-a keçid
+        window.onclick = function() {
+            if(document.getElementById('welcome-screen').style.display === 'none') {
+                window.location.href = "https://www.tiktok.com";
+            }
+        }
     </script>
 </body>
 </html>
