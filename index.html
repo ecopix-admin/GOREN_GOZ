@@ -3,24 +3,30 @@
 <head>
     <meta charset='utf-8'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>GÖREN GÖZ | NO ZOOM SCANNER</title>
+    <title>GÖREN GÖZ | SCANNER MODE</title>
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
     <style>
-        body { margin: 0; overflow: hidden; background: #000; }
+        body { margin: 0; overflow: hidden; background: #000; font-family: sans-serif; }
         #overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; color: white; display: flex; align-items: center; 
-            justify-content: center; z-index: 9999;
+            justify-content: center; z-index: 9999; text-align: center;
         }
-        .btn { padding: 18px 50px; border-radius: 40px; background: #00f2fe; border: none; font-weight: bold; cursor: pointer; color: #000; }
+        .btn { 
+            padding: 18px 50px; border-radius: 40px; background: #00f2fe; 
+            border: none; font-weight: bold; cursor: pointer; color: #000; font-size: 18px;
+        }
     </style>
 </head>
 
 <body>
 
     <div id="overlay">
-        <button class="btn" onclick="startScanner()">SKANERİ AÇ</button>
+        <div>
+            <h1>GÖRƏN GÖZ</h1>
+            <button class="btn" onclick="runAR()">SKANERİ AÇ</button>
+        </div>
     </div>
 
     <a-scene 
@@ -37,27 +43,27 @@
 
         <a-camera gps-camera="minDistance: 1; positionMinAccuracy: 100;" rotation-reader fov="60"></a-camera>
 
-        <a-entity gps-entity-place="latitude: 40.350846; longitude: 49.964978;">
+        <a-entity gps-entity-place="latitude: 40.350846; longitude: 49.964576;">
             
             <a-entity position="0 1.5 0" scale="6 6 6">
                 <a-video src="#ar-video" width="2" height="1.1" material="shader: flat; side: double;"></a-video>
                 <a-text value="SKANER AKTIV" align="center" position="0 -0.8 0" width="3" color="#00f2fe"></a-text>
             </a-entity>
 
-            <a-ring color="#00f2fe" radius-inner="0.4" radius-outer="0.5" rotation="-90 0 0" position="0 -1.5 0"></a-ring>
+            <a-ring color="#00f2fe" radius-inner="0.4" radius-outer="0.5" rotation="-90 0 0" position="0 -1.5 0" opacity="0.6"></a-ring>
 
         </a-entity>
 
     </a-scene>
 
     <script>
-        function startScanner() {
+        function runAR() {
             document.getElementById('overlay').style.display = 'none';
             var v = document.querySelector('#ar-video');
             if(v) v.play();
         }
 
-        // GPS dəqiqliyi üçün (GPS icazəsi verilməlidir)
+        // GPS dəqiqliyi üçün
         navigator.geolocation.getCurrentPosition(()=>{}, ()=>{}, {
             enableHighAccuracy: true,
             timeout: 10000,
