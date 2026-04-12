@@ -3,7 +3,7 @@
 <head>
     <meta charset='utf-8'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>GÖREN GÖZ | YT MODE</title>
+    <title>GÖREN GÖZ | YouTube Scanner</title>
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
     <style>
@@ -16,7 +16,8 @@
         .btn { 
             padding: 18px 50px; border-radius: 40px; background: #ff0000; 
             border: none; font-weight: bold; cursor: pointer; color: #fff; font-size: 18px;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.6);
+            text-transform: uppercase; letter-spacing: 2px;
         }
     </style>
 </head>
@@ -25,9 +26,9 @@
 
     <div id="overlay">
         <div>
-            <h1 style="color: #ff0000;">GÖRƏN GÖZ</h1>
-            <p style="opacity: 0.6; margin-bottom: 30px;">Nərimanov koordinatı aktivdir</p>
-            <button class="btn" onclick="runAR()">SKANERİ AÇ</button>
+            <h1 style="color: #ff0000; letter-spacing: 3px;">GÖRƏN GÖZ</h1>
+            <p style="opacity: 0.6; margin-bottom: 30px;">Yeni YouTube nöqtəsi skan edilir...</p>
+            <button class="btn" onclick="startAR()">YOUTUBE-U AÇ</button>
         </div>
     </div>
 
@@ -46,17 +47,18 @@
 
         <a-camera gps-camera="minDistance: 1; positionMinAccuracy: 100;" rotation-reader fov="60"></a-camera>
 
-        <a-entity gps-entity-place="latitude: 40.437330; longitude: 49.865768;">
+        <a-entity gps-entity-place="latitude: 40.437360; longitude: 49.865777;">
             
             <a-entity position="0 1.5 0" scale="6 6 6">
                 
-                <a-video src="#ar-video" width="2" height="1.1" position="0 1.3 0" material="shader: flat; side: double;"></a-video>
+                <a-video src="#ar-video" width="2" height="1.1" position="0 1.3 0" 
+                         material="shader: flat; side: double;"></a-video>
 
                 <a-entity animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear">
-                    <a-image src="#yt-logo" width="0.8" height="0.8" position="0 0 0"></a-image>
+                    <a-image src="#yt-logo" width="0.8" height="0.8" position="0 0.1 0"></a-image>
                 </a-entity>
                 
-                <a-text value="YOUTUBE POINT" align="center" position="0 -0.8 0" width="3" color="#ff0000"></a-text>
+                <a-text value="YOUTUBE SCAN" align="center" position="0 -0.8 0" width="3" color="#ff0000"></a-text>
             </a-entity>
 
             <a-ring color="#ff0000" radius-inner="0.4" radius-outer="0.5" rotation="-90 0 0" position="0 -1.5 0" opacity="0.6"></a-ring>
@@ -66,7 +68,7 @@
     </a-scene>
 
     <script>
-        function runAR() {
+        function startAR() {
             document.getElementById('overlay').style.display = 'none';
             var v = document.querySelector('#ar-video');
             if(v) v.play();
