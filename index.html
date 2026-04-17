@@ -3,130 +3,158 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Görən Göz - Real-Time AR</title>
+    <title>Görən Göz - AR Platform v5</title>
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
     <script src="https://unpkg.com/aframe-look-at-component@0.8.0/dist/aframe-look-at-component.min.js"></script>
     
     <style>
-        .ui-overlay {
-            position: fixed; bottom: 20px; left: 5%; width: 90%;
-            background: rgba(0,0,0,0.85); padding: 15px; border-radius: 20px;
-            z-index: 1000; color: white; font-family: sans-serif;
+        body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; background: #000; }
+        
+        /* Giriş Ekranı - Proqram açılan kimi kamera görünməsin deyə */
+        #welcome-screen {
+            position: fixed; inset: 0; background: linear-gradient(135deg, #000428, #004e92);
+            z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;
+        }
+        #start-btn {
+            padding: 15px 40px; font-size: 20px; background: #00f2ea; border: none; border-radius: 30px;
+            color: #000; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 0 20px #00f2ea;
+        }
+
+        /* İnterfeys Dizaynı */
+        .ui-container {
+            position: fixed; bottom: 20px; left: 5%; width: 90%; z-index: 1000;
+            background: rgba(0, 0, 0, 0.85); padding: 20px; border-radius: 25px;
+            border: 2px solid #00f2ea; display: none; /* Kamera açılana qədər gizli */
         }
         input, select, button { 
-            width: 100%; padding: 12px; margin: 5px 0; 
-            border-radius: 10px; border: none; font-size: 14px;
+            width: 100%; padding: 12px; margin: 8px 0; border-radius: 12px; border: none; outline: none;
         }
-        #post-btn { background: #00f2ea; color: black; font-weight: bold; }
-        .limit-msg { color: #ff0050; font-weight: bold; display: none; text-align: center; }
+        #content-value { background: #222; color: white; border: 1px solid #444; }
+        #post-btn { background: #ff0050; color: white; font-weight: bold; font-size: 16px; cursor: pointer; }
+        
+        .status-bar { color: #00f2ea; font-size: 12px; text-align: center; margin-bottom: 5px; }
+        #subscription-msg { color: #ff0050; display: none; text-align: center; font-weight: bold; }
     </style>
 </head>
 
-<body style="margin: 0; overflow: hidden;">
+<body>
 
-    <div class="ui-overlay">
-        <div id="subscription-panel" class="limit-msg">
-            LİMİT BİTDİ! Aylıq abunəlik üçün bizimlə əlaqə saxlayın.
-            <button onclick="contactAdmin()" style="background:#ff0050; color:white;">ABUNƏ OL</button>
-        </div>
+    <div id="welcome-screen">
+        <h1 style="letter-spacing: 5px;">GÖRƏN GÖZ</h1>
+        <p>Dünyaya rəqəmsal izini burax</p>
+        <button id="start-btn" onclick="initAR()">SİSTEMİ BAŞLAT</button>
+    </div>
+
+    <div class="ui-container" id="main-ui">
+        <div class="status-bar" id="stat-info">Limit: 0/3 pulsuz</div>
+        <div id="subscription-msg">LİMİT BİTDİ! Abunəlik üçün müraciət edin.</div>
         
-        <div id="main-controls">
+        <div id="controls">
             <select id="content-type">
-                <option value="text">Mətn Mesajı</option>
-                <option value="link">Sosial Şəbəkə (Link)</option>
-                <option value="media">Şəkil/Video URL</option>
+                <option value="text">3D Mətn Yazısı</option>
+                <option value="link">Sosial Profil (Link)</option>
+                <option value="media">Şəkil/Video (URL)</option>
             </select>
-            <input type="text" id="content-value" placeholder="Məlumatı daxil edin...">
-            <button id="post-btn">HAVAYA AS (3D)</button>
+            <input type="text" id="content-value" placeholder="Məlumatı bura yazın...">
+            <button id="post-btn">HAVAYA AS (REAL-TIME)</button>
         </div>
     </div>
 
-    <a-scene vr-mode-ui="enabled: false" embedded arjs="sourceType: webcam; debugUIEnabled: false;" cursor="rayOrigin: mouse">
-        <a-camera gps-camera rotation-reader fov="80"></a-camera>
-        <a-entity id="ar-container"></a-entity>
+    <a-scene 
+        vr-mode-ui="enabled: false"
+        embedded 
+        arjs="sourceType: webcam; debugUIEnabled: false; videoTexture: true;"
+        cursor="rayOrigin: mouse">
+        
+        <a-camera gps-camera="simulateLatitude: 0; simulateLongitude: 0;" rotation-reader fov="80">
+            <a-cursor color="#00f2ea" scale="2 2 2"></a-cursor>
+        </a-camera>
+
+        <a-entity id="ar-world"></a-entity>
     </a-scene>
 
     <script>
         let userLat, userLon;
-        let userLimit = parseInt(localStorage.getItem('postCount')) || 0;
-        const MAX_FREE = 3;
+        let postCount = parseInt(localStorage.getItem('gorenGozCount')) || 0;
+        const FREE_LIMIT = 3;
 
-        // 1. Məkanı Avtomatik Tutmaq
-        navigator.geolocation.getCurrentPosition(pos => {
-            userLat = pos.coords.latitude;
-            userLon = pos.coords.longitude;
-        });
+        // Kameranı və interfeysi işə salan funksiya
+        function initAR() {
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('main-ui').style.display = 'block';
+            updateLimitDisplay();
+            
+            // GPS koordinatlarını götür
+            navigator.geolocation.watchPosition(pos => {
+                userLat = pos.coords.latitude;
+                userLon = pos.coords.longitude;
+            }, err => alert("GPS icazəsi lazımdır!"), {enableHighAccuracy: true});
+        }
 
-        // 2. Havaya Asma Funksiyası
-        document.getElementById('post-btn').addEventListener('click', function() {
-            if (userLimit >= MAX_FREE) {
-                document.getElementById('main-controls').style.display = 'none';
-                document.getElementById('subscription-panel').style.display = 'block';
-                return;
+        function updateLimitDisplay() {
+            document.getElementById('stat-info').innerText = `Limit: ${postCount}/${FREE_LIMIT}`;
+            if(postCount >= FREE_LIMIT) {
+                document.getElementById('controls').style.display = 'none';
+                document.getElementById('subscription-msg').style.display = 'block';
             }
+        }
 
+        document.getElementById('post-btn').addEventListener('click', function() {
             const type = document.getElementById('content-type').value;
             const val = document.getElementById('content-value').value;
-            if(!val) return alert("Boş buraxma!");
-
-            create3DObject(type, val, userLat, userLon);
             
-            // Limiti artır və yadda saxla
-            userLimit++;
-            localStorage.setItem('postCount', userLimit);
-            
-            // Sənə bildiriş göndərmək (WhatsApp üzərindən avtomatik)
-            notifyAdmin(type, val);
-        });
+            if(!val) return alert("Məlumat daxil et!");
 
-        function create3DObject(type, val, lat, lon) {
-            const container = document.getElementById('ar-container');
+            // 3D OBYEKT YARATMA
+            const world = document.getElementById('ar-world');
             const entity = document.createElement('a-entity');
-            entity.setAttribute('gps-entity-place', `latitude: ${lat}; longitude: ${lon}`);
+            entity.setAttribute('gps-entity-place', `latitude: ${userLat}; longitude: ${userLon}`);
             entity.setAttribute('look-at', '[gps-camera]');
             entity.setAttribute('position', '0 1.6 0');
 
-            if (type === 'text' || type === 'link') {
-                // 3D Mətn Paneli
+            if(type === 'text' || type === 'link') {
                 const box = document.createElement('a-box');
-                box.setAttribute('width', '2'); box.setAttribute('height', '0.6'); box.setAttribute('depth', '0.1');
-                box.setAttribute('color', type === 'link' ? '#4facfe' : '#ff0050');
-                
+                box.setAttribute('width', '2.2'); box.setAttribute('height', '0.7'); box.setAttribute('depth', '0.1');
+                box.setAttribute('color', type === 'link' ? '#00f2ea' : '#ff0050');
+                box.setAttribute('material', 'opacity: 0.9');
+
                 const text = document.createElement('a-text');
                 text.setAttribute('value', val);
                 text.setAttribute('align', 'center');
+                text.setAttribute('scale', '1 1 1');
                 text.setAttribute('position', '0 0 0.06');
-                text.setAttribute('scale', '0.8 0.8 0.8');
-                
+
                 box.appendChild(text);
                 entity.appendChild(box);
-
+                
                 if(type === 'link') {
                     box.addEventListener('click', () => window.open(val, '_blank'));
                 }
-            } else if (type === 'media') {
-                // 3D Şəkil/Video Paneli
+            } else {
                 const img = document.createElement('a-image');
                 img.setAttribute('src', val);
-                img.setAttribute('width', '2');
-                img.setAttribute('height', '1.5');
+                img.setAttribute('width', '2.5');
+                img.setAttribute('height', '1.8');
                 entity.appendChild(img);
             }
 
-            container.appendChild(entity);
-            alert("Uğurla havaya asıldı!");
-        }
-
-        function notifyAdmin(type, val) {
-            const msg = encodeURIComponent(`Görən Göz: Yeni iz buraxıldı!\nNöv: ${type}\nMəzmun: ${val}\nKoordinat: ${userLat}, ${userLon}`);
-            // Gizli şəkildə bildiriş linki (istifadəçi basmasa da olar, amma ilk vaxtlar ən etibarlı yoldur)
-            console.log("Adminə bildiriş göndərildi.");
-        }
+            world.appendChild(entity);
+            
+            // LİMİTİ YENİLƏ
+            postCount++;
+            localStorage.setItem('gorenGozCount', postCount);
+            updateLimitDisplay();
+            
+            // SƏNƏ BİLDİRİŞ (WHATSAPP SİMULYASİYASI)
+            console.log("Yeni iz buraxıldı: " + val);
+        });
 
         function contactAdmin() {
             window.location.href = "https://wa.me/994XXXXXXXXX?text=Limitim%20bitdi,%20abunə%20olmaq%20istəyirəm";
         }
+        
+        document.getElementById('subscription-msg').onclick = contactAdmin;
     </script>
 </body>
 </html>
