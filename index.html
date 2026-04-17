@@ -3,124 +3,144 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Görən Göz - Real GPS Platform</title>
+    <title>Görən Göz - AR Final</title>
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
     <script src="https://unpkg.com/aframe-look-at-component@0.8.0/dist/aframe-look-at-component.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        body { margin: 0; overflow: hidden; background: #000; font-family: sans-serif; }
+        body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; background: #000; }
         
-        #ui-panel {
-            position: fixed; bottom: 20px; left: 5%; width: 90%; z-index: 1000;
-            background: rgba(0, 0, 0, 0.9); padding: 20px; border-radius: 25px;
-            border: 2px solid #00f2ea; display: none;
-        }
-        
+        /* Giriş Ekranı */
         #start-screen {
-            position: fixed; inset: 0; background: #000; z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; color: #00f2ea;
+            position: fixed; inset: 0; background: radial-gradient(circle, #001f3f, #000);
+            z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #00f2ea;
+        }
+        #start-btn {
+            background: #00f2ea; color: #000; border: none; padding: 15px 50px; 
+            border-radius: 50px; font-weight: bold; font-size: 18px; cursor: pointer;
+            box-shadow: 0 0 20px rgba(0, 242, 234, 0.5);
         }
 
-        input, select, button { 
-            width: 100%; padding: 12px; margin: 8px 0; border-radius: 12px; border: none; font-size: 16px;
+        /* Alt İdarəetmə Paneli (WhatsApp Style) */
+        .bottom-bar {
+            position: fixed; bottom: 20px; left: 0; width: 100%; display: none;
+            z-index: 1000; align-items: center; justify-content: space-evenly;
         }
-        
-        #post-btn { background: #ff0050; color: white; font-weight: bold; }
-        #start-btn { background: #00f2ea; color: black; font-weight: bold; padding: 20px 50px; border-radius: 50px; }
-        .info { color: #fff; font-size: 12px; text-align: center; }
+        .input-container {
+            width: 70%; background: rgba(30, 30, 30, 0.9); border-radius: 30px;
+            display: flex; align-items: center; padding: 5px 15px; border: 1px solid #333;
+        }
+        #text-input {
+            flex: 1; background: transparent; border: none; color: white; padding: 10px; outline: none;
+        }
+        .icon-btn { color: #00f2ea; font-size: 20px; margin: 0 5px; cursor: pointer; }
+        #send-btn {
+            background: #ff0050; color: white; width: 50px; height: 50px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            border: none; font-size: 20px; box-shadow: 0 0 15px rgba(255, 0, 80, 0.4);
+        }
+
+        /* Bildiriş Mesajı */
+        #notif {
+            position: fixed; top: 20%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0, 242, 234, 0.9); color: black; padding: 15px 25px;
+            border-radius: 15px; font-weight: bold; display: none; z-index: 10001; text-align: center;
+        }
     </style>
 </head>
 
 <body>
 
     <div id="start-screen">
-        <h1>GÖRƏN GÖZ</h1>
-        <p>Real GPS Rejimi Aktiv Edilsin?</p>
-        <button id="start-btn">SİSTEMİ BAŞLAT</button>
+        <h1 style="letter-spacing: 3px;">GÖRƏN GÖZ</h1>
+        <p>Gələcəyi görməyə hazırsan?</p>
+        <button id="start-btn">SİSTEMİ AÇ</button>
     </div>
 
-    <div id="ui-panel">
-        <div class="info" id="gps-status">GPS axtarılır...</div>
-        <select id="type">
-            <option value="text">3D Mətn</option>
-            <option value="link">Sosial Link</option>
-            <option value="img">Şəkil URL</option>
-        </select>
-        <input type="text" id="val" placeholder="Bura yazın...">
-        <button id="post-btn">HAVAYA HƏKK ET</button>
+    <div id="notif">Fayl məkana yerləşdirildi!<br>İndi ətrafı skan edib baxın.</div>
+
+    <div class="bottom-bar" id="ui-bar">
+        <div class="input-container">
+            <input type="text" id="text-input" placeholder="Mesaj yazın...">
+            <label for="file-input" class="icon-btn">
+                <i class="fas fa-camera"></i>
+            </label>
+            <input type="file" id="file-input" accept="image/*,video/*" style="display: none;">
+        </div>
+        <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
     </div>
 
-    <a-scene 
-        vr-mode-ui="enabled: false"
-        embedded 
-        arjs="sourceType: webcam; debugUIEnabled: false; trackingMethod: best;"
-        cursor="rayOrigin: mouse">
-        
-        <a-camera gps-camera="minDistance: 5; maxDistance: 100;" rotation-reader fov="80">
-            <a-cursor color="#00f2ea"></a-cursor>
-        </a-camera>
-
+    <a-scene vr-mode-ui="enabled: false" embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+        <a-camera gps-camera rotation-reader fov="80"></a-camera>
         <a-entity id="world"></a-entity>
     </a-scene>
 
     <script>
         let curLat, curLon;
         const world = document.getElementById('world');
+        const fileInput = document.getElementById('file-input');
+        const textInput = document.getElementById('text-input');
 
-        // Sistemi başladan və GPS-i işə salan funksiya
-        document.getElementById('start-btn').addEventListener('click', () => {
+        document.getElementById('start-btn').onclick = () => {
             document.getElementById('start-screen').style.display = 'none';
-            document.getElementById('ui-panel').style.display = 'block';
-
-            // Real GPS izləmə
+            document.getElementById('ui-bar').style.display = 'flex';
+            
             navigator.geolocation.watchPosition(pos => {
                 curLat = pos.coords.latitude;
                 curLon = pos.coords.longitude;
-                document.getElementById('gps-status').innerText = `GPS Aktiv: ${curLat.toFixed(4)}, ${curLon.toFixed(4)}`;
-            }, err => {
-                alert("GPS xətası! Ayarlardan məkana icazə ver.");
-            }, { enableHighAccuracy: true });
-        });
+            }, null, { enableHighAccuracy: true });
+        };
 
-        document.getElementById('post-btn').addEventListener('click', () => {
-            const type = document.getElementById('type').value;
-            const content = document.getElementById('val').value;
+        function showNotification() {
+            const n = document.getElementById('notif');
+            n.style.display = 'block';
+            setTimeout(() => n.style.display = 'none', 4000);
+        }
+
+        function createARObject(content, isMedia = false) {
+            if(!curLat) return alert("Məkan tapılmadı!");
             
-            if(!content || !curLat) return alert("Məkan və ya məlumat yoxdur!");
+            const entity = document.createElement('a-entity');
+            entity.setAttribute('gps-entity-place', `latitude: ${curLat}; longitude: ${curLon}`);
+            entity.setAttribute('look-at', '[gps-camera]');
+            entity.setAttribute('position', '0 1.6 0');
 
-            // 3D Obyekt yaratma
-            const obj = document.createElement('a-entity');
-            obj.setAttribute('gps-entity-place', `latitude: ${curLat}; longitude: ${curLon}`);
-            obj.setAttribute('look-at', '[gps-camera]');
-            obj.setAttribute('position', '0 1.6 0'); // Göz səviyyəsi
-
-            if(type === 'text' || type === 'link') {
-                const box = document.createElement('a-box');
-                box.setAttribute('width', '2'); box.setAttribute('height', '0.6'); box.setAttribute('depth', '0.1');
-                box.setAttribute('color', type === 'link' ? '#00f2ea' : '#ff0050');
-                
-                const txt = document.createElement('a-text');
-                txt.setAttribute('value', content);
-                txt.setAttribute('align', 'center');
-                txt.setAttribute('position', '0 0 0.06');
-                
-                box.appendChild(txt);
-                obj.appendChild(box);
-                
-                if(type === 'link') {
-                    box.addEventListener('click', () => window.open(content, '_blank'));
-                }
-            } else {
+            if(isMedia) {
                 const img = document.createElement('a-image');
                 img.setAttribute('src', content);
                 img.setAttribute('width', '2.5'); img.setAttribute('height', '1.5');
-                obj.appendChild(img);
+                entity.appendChild(img);
+            } else {
+                const box = document.createElement('a-box');
+                box.setAttribute('width', '2'); box.setAttribute('height', '0.6'); box.setAttribute('depth', '0.1');
+                box.setAttribute('color', '#ff0050');
+                const txt = document.createElement('a-text');
+                txt.setAttribute('value', content); txt.setAttribute('align', 'center'); txt.setAttribute('position', '0 0 0.06');
+                box.appendChild(txt);
+                entity.appendChild(box);
             }
 
-            world.appendChild(obj);
-            alert("Obyekt bu koordinata həkk olundu!");
-        });
+            world.appendChild(entity);
+            showNotification();
+            textInput.value = "";
+        }
+
+        // Göndər düyməsi (Mətn üçün)
+        document.getElementById('send-btn').onclick = () => {
+            if(textInput.value) createARObject(textInput.value);
+        };
+
+        // Kamera/Qalereya seçimi (Fayl üçün)
+        fileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => createARObject(event.target.result, true);
+                reader.readAsDataURL(file);
+            }
+        };
     </script>
 </body>
 </html>
