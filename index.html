@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
-    <title>Görən Göz Pro v4</title>
+    <title>Görən Göz Pro v5 - Social AR</title>
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
     <script src="https://unpkg.com/aframe-look-at-component@0.8.0/dist/aframe-look-at-component.min.js"></script>
@@ -11,218 +11,231 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     
     <style>
-        :root { --neon: #00f2ea; --pink: #ff0050; }
-        body { margin: 0; overflow: hidden; font-family: sans-serif; background: #000; }
+        :root { --neon: #00f2ea; --pink: #ff0050; --glass: rgba(0, 0, 0, 0.6); }
+        body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; background: #000; }
 
-        /* Kamera görüntüsünü tam ekran etmək və zoomu ləğv etmək üçün */
-        .a-canvas { width: 100% !important; height: 100% !important; }
-        video { object-fit: cover !important; width: 100vw !important; height: 100vh !important; margin: 0; }
+        /* Kamera və Zoom Tənzimləməsi */
+        video { object-fit: cover !important; width: 100vw !important; height: 100vh !important; }
 
-        /* Üst Panel */
-        .top-ui {
-            position: fixed; top: 0; width: 100%; padding: 15px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%);
-            display: flex; justify-content: space-between; align-items: center; z-index: 10;
+        /* Üst Header */
+        .app-header {
+            position: fixed; top: 0; width: 100%; padding: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 1000; background: linear-gradient(180deg, rgba(0,0,0,0.8), transparent);
+            box-sizing: border-box;
         }
 
-        /* Bildiriş Paneli */
-        #alert-box {
-            position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
-            background: var(--neon); color: #000; padding: 10px 20px;
-            border-radius: 20px; font-weight: bold; display: none; z-index: 100;
+        /* Bildiriş Stil */
+        #notify-bar {
+            position: fixed; top: 85px; left: 50%; transform: translateX(-50%);
+            background: var(--neon); color: #000; padding: 8px 20px;
+            border-radius: 25px; font-weight: bold; z-index: 2000; display: none;
+            box-shadow: 0 0 15px var(--neon); font-size: 14px;
         }
 
-        /* Alt Naviqasiya */
-        .bottom-nav {
-            position: fixed; bottom: 0; width: 100%; padding: 20px;
-            background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, transparent 100%);
-            display: flex; align-items: center; gap: 10px; z-index: 10;
+        /* ALT NAVİQASİYA (Mərkəzləşdirilmiş) */
+        .social-dock {
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+            width: 95%; max-width: 500px; display: flex; align-items: center; 
+            justify-content: space-between; z-index: 1000; box-sizing: border-box;
         }
 
-        .input-wrap {
-            flex: 1; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
-            border-radius: 30px; display: flex; align-items: center; padding: 5px 15px;
-            border: 1px solid rgba(255,255,255,0.2);
+        .dock-input-area {
+            flex: 1; background: var(--glass); backdrop-filter: blur(15px);
+            border-radius: 30px; border: 1px solid rgba(255,255,255,0.2);
+            display: flex; align-items: center; padding: 5px 15px; margin: 0 10px;
         }
 
-        #main-input { flex: 1; background: transparent; border: none; color: #fff; padding: 10px; outline: none; }
+        #main-input { flex: 1; background: transparent; border: none; color: #fff; padding: 12px; outline: none; }
 
-        .icon-btn { color: #fff; font-size: 22px; cursor: pointer; border: none; background: none; transition: 0.2s; }
-        #send-btn { background: var(--pink); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-
-        /* İnteraksiya (Rəy/Bəyəni) Paneli */
-        #social-panel {
-            position: fixed; bottom: 90px; left: 5%; width: 90%;
-            background: rgba(0,0,0,0.9); border-radius: 20px; padding: 15px;
-            display: none; z-index: 100; border: 1px solid var(--neon);
+        /* Düymə Animasiyaları */
+        .btn-action {
+            width: 48px; height: 48px; border-radius: 50%; border: none;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: transform 0.2s active; font-size: 20px; color: white;
         }
 
-        .comments { max-height: 100px; overflow-y: auto; color: #ddd; font-size: 14px; margin-bottom: 10px; }
+        .btn-action:active { transform: scale(0.85); } /* Basıldıqda kiçilmə effekti */
 
-        /* Ürək Partlayışı Animasiyası */
-        #heart-anim {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 120px; color: var(--pink); pointer-events: none;
-            display: none; z-index: 1000; opacity: 0.7;
+        .btn-plus { background: var(--pink); box-shadow: 0 0 15px var(--pink); }
+        .btn-media { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); }
+
+        /* Sosial Panel */
+        #interaction-card {
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+            width: 90%; background: rgba(0,0,0,0.95); border-radius: 25px;
+            padding: 20px; display: none; z-index: 3000; border: 1px solid var(--neon);
+            box-sizing: border-box;
+        }
+
+        .comment-stream { max-height: 120px; overflow-y: auto; color: #ccc; margin: 10px 0; font-size: 14px; }
+
+        /* Ürək Partlayışı */
+        #heart-pop {
+            position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 150px; color: var(--pink); display: none; z-index: 5000;
+            text-shadow: 0 0 30px var(--pink); pointer-events: none;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="top-ui">
-        <div style="color: var(--neon); font-weight: bold;"><i class="fas fa-eye"></i> GÖZ PRO v4</div>
-        <div style="color: #fff; font-size: 12px;"><i class="fas fa-circle" style="color: red; font-size: 8px;"></i> CANLI</div>
+    <div class="app-header">
+        <div style="color: var(--neon); font-weight: 900; letter-spacing: 1px;"><i class="fas fa-eye"></i> GÖZ PRO v5</div>
+        <div style="color: white; font-size: 12px;"><i class="fas fa-satellite-dish animate__animated animate__flash animate__infinite"></i> GPS CANLI</div>
     </div>
 
-    <div id="alert-box"></div>
-    <div id="heart-anim"><i class="fas fa-heart"></i></div>
+    <div id="notify-bar">İz yerləşdirildi!</div>
+    <div id="heart-pop"><i class="fas fa-heart"></i></div>
 
-    <div id="social-panel">
-        <div style="display:flex; justify-content:space-between; color:#fff; margin-bottom:10px;">
-            <small id="obj-id">Obyekt ID: ...</small>
-            <i class="fas fa-times" onclick="closeSocial()"></i>
+    <div id="interaction-card" class="animate__animated animate__fadeInUp">
+        <div style="display:flex; justify-content: space-between; align-items: center; color: white;">
+            <span id="obj-label" style="font-weight: bold; color: var(--neon);">Yeni İz</span>
+            <i class="fas fa-times-circle" onclick="closeSocial()" style="font-size: 22px;"></i>
         </div>
-        <div id="comment-list" class="comments"></div>
-        <div style="display:flex; gap:5px;">
-            <input type="text" id="reply-txt" placeholder="Rəyə cavab ver..." style="flex:1; background:#222; border:none; color:#fff; padding:8px; border-radius:10px;">
-            <button onclick="handleAction('COMMENT')" class="icon-btn" style="color: var(--neon)"><i class="fas fa-paper-plane"></i></button>
-            <button onclick="handleAction('LIKE')" class="icon-btn" style="color: var(--pink)"><i class="fas fa-heart"></i></button>
+        <div id="chat-list" class="comment-stream"></div>
+        <div style="display:flex; gap:10px;">
+            <input type="text" id="reply-box" placeholder="Rəy yazın..." style="flex:1; padding:12px; border-radius:15px; border:none; background:#222; color:white;">
+            <button onclick="socialFire('COMMENT')" class="btn-action" style="background:var(--neon); color:#000; width:42px; height:42px;"><i class="fas fa-paper-plane"></i></button>
+            <button onclick="socialFire('LIKE')" class="btn-action" style="background:var(--pink); width:42px; height:42px;"><i class="fas fa-heart"></i></button>
         </div>
     </div>
 
-    <div class="bottom-nav">
-        <label for="file-in" class="icon-btn"><i class="fas fa-folder-plus"></i></label>
-        <input type="file" id="file-in" hidden accept="image/*,video/*,audio/*">
-        
-        <div class="input-wrap">
+    <div class="social-dock">
+        <label for="media-file" class="btn-action btn-media">
+            <i class="fas fa-cloud-upload-alt"></i>
+        </label>
+        <input type="file" id="media-file" hidden accept="image/*,video/*,audio/*">
+
+        <div class="dock-input-area">
             <input type="text" id="main-input" placeholder="Məkana iz burax...">
-            <button id="mic-btn" class="icon-btn" style="color: var(--neon)"><i class="fas fa-microphone"></i></button>
+            <i class="fas fa-microphone" id="mic-trigger" style="color: var(--neon); cursor: pointer; font-size: 20px;"></i>
         </div>
-        
-        <button id="send-btn" onclick="sendText()"><i class="fas fa-plus" style="color: white;"></i></button>
+
+        <button class="btn-action btn-plus" onclick="pushTextTrace()">
+            <i class="fas fa-plus"></i>
+        </button>
     </div>
 
-    <a-scene vr-mode-ui="enabled: false" embedded arjs="sourceType: webcam; debugUIEnabled: false; videoTexture: true;">
-        <a-camera gps-camera="minDistance: 1; maxDistance: 1000;" rotation-reader fov="80">
+    <a-scene vr-mode-ui="enabled: false" embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+        <a-camera gps-camera="minDistance: 1;" rotation-reader fov="80">
             <a-cursor color="#00f2ea" scale="2 2 2"></a-cursor>
         </a-camera>
-        <a-entity id="ar-container"></a-entity>
+        <a-entity id="world"></a-entity>
     </a-scene>
 
     <script>
         const TG_TOKEN = "8799012820:AAEPVV76TIkjw9L_Jh6DUqpNHGBdMLd770A";
         const TG_CHAT = "@vidosmarkarxiv";
-        let uLat, uLon, activeTraceId = null;
-        let mRecorder, aChunks = [];
+        let lat, lon, activeID = null;
+        let recorder, chunks = [];
 
-        // 1. GPS Məlumatı
-        navigator.geolocation.watchPosition(pos => {
-            uLat = pos.coords.latitude;
-            uLon = pos.coords.longitude;
-        }, err => console.log("GPS Error"), {enableHighAccuracy: true});
+        // GPS İzləmə
+        navigator.geolocation.watchPosition(p => {
+            lat = p.coords.latitude; lon = p.coords.longitude;
+        }, null, {enableHighAccuracy: true});
 
-        // 2. Bildiriş və Log
-        function showNotify(msg) {
-            const b = document.getElementById('alert-box');
-            b.innerText = msg; b.style.display = 'block';
-            setTimeout(() => b.style.display = 'none', 3000);
+        function doNotify(text) {
+            const bar = document.getElementById('notify-bar');
+            bar.innerText = text; bar.style.display = 'block';
+            setTimeout(() => bar.style.display = 'none', 3000);
         }
 
-        async function logToTG(msg) {
+        async function postToTG(msg) {
             fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage?chat_id=${TG_CHAT}&text=${encodeURIComponent(msg)}`);
         }
 
-        // 3. AR-a Obyekt Əlavə Etmə (Şəkil, Video, MP3, Mətn)
-        function spawnTrace(data, type) {
-            if(!uLat) return alert("GPS hələ aktiv deyil!");
-            const id = "ID_" + Math.floor(Math.random()*9999);
+        // Obyekt Yaratma (Bütün növlər üçün)
+        function createTrace(content, type) {
+            if(!lat) return doNotify("GPS gözlənilir...");
+            const id = "OBJ_" + Date.now();
             const entity = document.createElement('a-entity');
-            entity.setAttribute('gps-entity-place', `latitude: ${uLat}; longitude: ${uLon}`);
+            entity.setAttribute('gps-entity-place', `latitude: ${lat}; longitude: ${lon}`);
             entity.setAttribute('look-at', '[gps-camera]');
-            entity.setAttribute('scale', '20 20 20'); // Daha görünən ölçü
+            entity.setAttribute('scale', '15 15 15');
 
-            let visual;
+            let model;
             if(type === 'image') {
-                visual = document.createElement('a-image');
-                visual.setAttribute('src', data);
+                model = document.createElement('a-image');
+                model.setAttribute('src', content);
             } else if(type === 'video') {
-                visual = document.createElement('a-video');
-                visual.setAttribute('src', data);
+                model = document.createElement('a-video');
+                model.setAttribute('src', content);
+                model.setAttribute('width', '2');
             } else {
-                visual = document.createElement('a-box');
-                visual.setAttribute('color', type === 'audio' ? '#ff0050' : '#111');
-                visual.setAttribute('width', '1.5'); visual.setAttribute('height', '0.6'); visual.setAttribute('depth', '0.1');
+                model = document.createElement('a-box');
+                model.setAttribute('color', type === 'audio' ? '#ff0050' : '#111');
+                model.setAttribute('width', '1.6'); model.setAttribute('height', '0.6'); model.setAttribute('depth', '0.1');
                 const t = document.createElement('a-text');
-                t.setAttribute('value', type === 'audio' ? 'SƏS İZİ' : data);
-                t.setAttribute('align', 'center'); t.setAttribute('width', '3'); t.setAttribute('position', '0 0 0.1');
-                visual.appendChild(t);
+                t.setAttribute('value', type === 'audio' ? '🎵 SƏSİ DİNLƏ' : content);
+                t.setAttribute('align', 'center'); t.setAttribute('width', '4'); t.setAttribute('position', '0 0 0.1');
+                model.appendChild(t);
             }
 
-            visual.onclick = () => {
-                activeTraceId = id;
-                document.getElementById('obj-id').innerText = "İz: " + id;
-                document.getElementById('social-panel').style.display = 'block';
-                if(type === 'audio') new Audio(data).play();
+            model.onclick = () => {
+                activeID = id;
+                document.getElementById('interaction-card').style.display = 'block';
+                if(type === 'audio') new Audio(content).play();
             };
 
-            entity.appendChild(visual);
-            document.getElementById('ar-container').appendChild(entity);
-            showNotify("Yeni iz havaya buraxıldı!");
-            logToTG(`YENİ İZ|Tip:${type}|ID:${id}|Koor:${uLat},${uLon}`);
+            entity.appendChild(model);
+            document.getElementById('world').appendChild(entity);
+            doNotify("İz məkana buraxıldı!");
+            postToTG(`YENİ İZ|Tip:${type}|Koor:${lat},${lon}`);
         }
 
-        // 4. Funksiyalar
-        function sendText() {
-            const v = document.getElementById('main-input').value;
-            if(v) { spawnTrace(v, 'text'); document.getElementById('main-input').value = ""; }
+        // Funksiyalar
+        function pushTextTrace() {
+            const val = document.getElementById('main-input').value;
+            if(val) { createTrace(val, 'text'); document.getElementById('main-input').value = ""; }
         }
 
-        document.getElementById('file-in').onchange = (e) => {
-            const f = e.target.files[0];
-            const r = new FileReader();
-            r.onload = (ev) => {
-                let t = f.type.split('/')[0]; // image, video və ya audio
-                spawnTrace(ev.target.result, t);
+        document.getElementById('media-file').onchange = (e) => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                let t = file.type.startsWith('image') ? 'image' : (file.type.startsWith('video') ? 'video' : 'audio');
+                createTrace(ev.target.result, t);
             };
-            r.readAsDataURL(f);
+            reader.readAsDataURL(file);
         };
 
-        document.getElementById('mic-btn').onclick = async function() {
-            if(!mRecorder || mRecorder.state === "inactive") {
-                const s = await navigator.mediaDevices.getUserMedia({audio:true});
-                mRecorder = new MediaRecorder(s);
-                aChunks = [];
-                mRecorder.ondataavailable = x => aChunks.push(x.data);
-                mRecorder.onstop = () => {
-                    const b = new Blob(aChunks, {type:'audio/mp3'});
-                    spawnTrace(URL.createObjectURL(b), 'audio');
+        document.getElementById('mic-trigger').onclick = async function() {
+            if(!recorder || recorder.state === "inactive") {
+                const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+                recorder = new MediaRecorder(stream);
+                chunks = [];
+                recorder.ondataavailable = e => chunks.push(e.data);
+                recorder.onstop = () => {
+                    const blob = new Blob(chunks, {type:'audio/mp3'});
+                    createTrace(URL.createObjectURL(blob), 'audio');
                 };
-                mRecorder.start();
-                this.style.color = "red"; showNotify("Səs yazılır...");
+                recorder.start();
+                this.style.color = "red"; doNotify("Səs yazılır...");
             } else {
-                mRecorder.stop(); this.style.color = "var(--neon)";
+                recorder.stop(); this.style.color = "var(--neon)";
             }
         };
 
-        function handleAction(act) {
-            if(act === 'LIKE') {
-                const h = document.getElementById('heart-anim');
-                h.style.display = 'block';
-                h.className = "animate__animated animate__zoomIn";
-                setTimeout(()=>h.style.display='none', 1000);
-                logToTG(`BƏYƏNİ|ID:${activeTraceId}`);
-                showNotify("İz bəyənildi! ❤️");
+        function socialFire(type) {
+            if(type === 'LIKE') {
+                const pop = document.getElementById('heart-pop');
+                pop.style.display = 'block';
+                pop.className = "animate__animated animate__fadeOutUp";
+                setTimeout(() => pop.style.display = 'none', 1000);
+                postToTG(`BƏYƏNİ|ID:${activeID}`);
+                doNotify("Bəyənildi! ❤️");
             } else {
-                const r = document.getElementById('reply-txt').value;
-                if(!r) return;
-                document.getElementById('comment-list').innerHTML += `<div><b>Siz:</b> ${r}</div>`;
-                logToTG(`RƏY|ID:${activeTraceId}|Mətn:${r}`);
-                document.getElementById('reply-txt').value = "";
+                const msg = document.getElementById('reply-box').value;
+                if(!msg) return;
+                document.getElementById('chat-list').innerHTML += `<div><b>Siz:</b> ${msg}</div>`;
+                postToTG(`RƏY|ID:${activeID}|Mətn:${msg}`);
+                document.getElementById('reply-box').value = "";
             }
         }
 
-        function closeSocial() { document.getElementById('social-panel').style.display = 'none'; }
+        function closeSocial() { document.getElementById('interaction-card').style.display = 'none'; }
     </script>
 </body>
 </html>
