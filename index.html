@@ -1,161 +1,248 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Görən Göz - WA Style</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <title>Görən Göz Pro - AR Social</title>
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
     <script src="https://unpkg.com/aframe-look-at-component@0.8.0/dist/aframe-look-at-component.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        /* Qara ekranı ləğv edən əsas CSS */
-        body { margin: 0; overflow: hidden; background: transparent; }
-        .a-canvas { z-index: 0 !important; }
-        video { z-index: -1 !important; position: absolute; top: 0; left: 0; width: 100% !important; height: 100% !important; object-fit: cover; }
+        :root {
+            --neon-blue: #00f2ea;
+            --neon-pink: #ff0050;
+            --glass: rgba(255, 255, 255, 0.1);
+        }
 
-        /* WhatsApp Header */
+        body { margin: 0; overflow: hidden; font-family: 'SF Pro Display', -apple-system, sans-serif; background: #000; }
+
+        /* Üst Panel */
         .header {
-            position: fixed; top: 0; width: 100%; height: 60px;
-            background: #075E54; color: white; display: flex;
-            align-items: center; justify-content: space-between;
-            padding: 0 15px; z-index: 1000; box-sizing: border-box;
-            font-family: sans-serif;
+            position: fixed; top: 0; width: 100%; height: 70px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; z-index: 100; box-sizing: border-box;
         }
 
-        /* WhatsApp Input Bar */
-        .footer {
-            position: fixed; bottom: 15px; width: 100%;
-            display: flex; align-items: center; padding: 0 10px;
-            z-index: 1000; gap: 8px; box-sizing: border-box;
+        .logo { color: var(--neon-blue); font-weight: 900; letter-spacing: 2px; font-size: 18px; text-shadow: 0 0 10px var(--neon-blue); }
+
+        /* Bildirişlər */
+        #social-alert {
+            position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+            background: var(--glass); backdrop-filter: blur(10px);
+            color: white; padding: 12px 25px; border-radius: 30px;
+            border: 1px solid var(--neon-blue); z-index: 1000; display: none;
+            animation: slideIn 0.3s ease-out;
         }
 
-        .input-box {
-            flex: 1; background: white; border-radius: 25px;
-            display: flex; align-items: center; padding: 5px 15px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        /* Sosial Panel (Şərhlər və Bəyənmə) */
+        #interaction-panel {
+            position: fixed; bottom: 100px; left: 5%; width: 90%;
+            background: rgba(0,0,0,0.9); border-radius: 25px;
+            padding: 20px; display: none; z-index: 2000;
+            border: 1px solid #333; box-shadow: 0 -10px 25px rgba(0,0,0,0.5);
         }
 
-        #msg-input { flex: 1; border: none; outline: none; padding: 10px; font-size: 16px; }
-        
-        .send-btn {
-            background: #128C7E; color: white; width: 50px; height: 50px;
-            border-radius: 50%; border: none; display: flex;
-            align-items: center; justify-content: center; font-size: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        .comment-list { max-height: 150px; overflow-y: auto; margin-bottom: 15px; color: #ccc; font-size: 14px; }
+        .comment-item { margin-bottom: 8px; border-bottom: 1px solid #222; padding-bottom: 4px; }
+
+        /* Alt İdarəetmə */
+        .bottom-bar {
+            position: fixed; bottom: 0; width: 100%; height: 90px;
+            display: flex; align-items: center; justify-content: space-around;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); z-index: 100;
         }
 
-        /* Ürək effekti */
-        #heart-pop {
+        .input-container {
+            width: 70%; background: #1a1a1a; border-radius: 25px;
+            display: flex; align-items: center; padding: 5px 15px; border: 1px solid #444;
+        }
+
+        #msg-input { flex: 1; background: transparent; border: none; color: white; padding: 10px; outline: none; }
+
+        .btn-circle {
+            width: 50px; height: 50px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; border: none; cursor: pointer; transition: 0.3s;
+        }
+
+        #send-btn { background: var(--neon-pink); color: white; box-shadow: 0 0 15px var(--neon-pink); }
+        .icon-btn { color: var(--neon-blue); font-size: 22px; background: none; }
+
+        /* Ürək Animasiyası */
+        #big-heart {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 150px; color: #ff2e63; display: none; z-index: 2000;
-            pointer-events: none; animation: pop 0.8s ease-out;
+            font-size: 200px; color: var(--neon-pink); display: none;
+            z-index: 5000; pointer-events: none;
         }
 
-        @keyframes pop {
-            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-            50% { opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
-        }
-
-        /* Reaksiya Paneli */
-        #panel {
-            position: fixed; bottom: 80px; left: 5%; width: 90%;
-            background: #f0f2f5; border-radius: 20px; display: none;
-            padding: 15px; z-index: 1500; box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-        }
+        @keyframes slideIn { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
     </style>
 </head>
 
 <body>
+
     <div class="header">
-        <div style="font-weight: bold;">Görən Göz v.3.5</div>
-        <div id="gps" style="font-size: 12px;">GPS Gözlənilir...</div>
+        <div class="logo"><i class="fas fa-eye"></i> GÖZ PRO</div>
+        <div id="user-stats" style="color: white; font-size: 12px;"><i class="fas fa-location-arrow"></i> Aktiv İzlər: <span id="trace-count">0</span></div>
     </div>
 
-    <div id="heart-pop"><i class="fas fa-heart"></i></div>
+    <div id="social-alert"></div>
+    <div id="big-heart" class="animate__animated animate__heartBeat"><i class="fas fa-heart"></i></div>
 
-    <div id="panel">
-        <input type="text" id="comm" placeholder="Rəy yaz..." style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ccc; margin-bottom: 10px; outline: none;">
+    <div id="interaction-panel">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3 style="color: white; margin: 0;">Sosial İzlər</h3>
+            <button onclick="closePanel()" style="background:none; border:none; color:white; font-size: 20px;">&times;</button>
+        </div>
+        <div id="comment-box" class="comment-list">
+            </div>
         <div style="display: flex; gap: 10px;">
-            <button onclick="action('MSG')" style="flex:2; background:#128C7E; color:white; border:none; padding:12px; border-radius:10px; font-weight:bold;">Göndər</button>
-            <button onclick="action('LIKE')" style="flex:1; background:#ff2e63; color:white; border:none; border-radius:10px;"><i class="fas fa-heart"></i></button>
+            <input type="text" id="comm-input" placeholder="Şərh yaz..." style="flex:1; padding: 10px; border-radius: 10px; border:none; background: #222; color: white;">
+            <button onclick="addComment()" style="background: var(--neon-blue); border:none; padding: 10px 20px; border-radius: 10px; font-weight: bold;">Göndər</button>
+            <button onclick="likeObject()" style="background: var(--neon-pink); border:none; padding: 10px; border-radius: 10px; color: white;"><i class="fas fa-heart"></i></button>
         </div>
-        <button onclick="document.getElementById('panel').style.display='none'" style="display:block; width:100%; margin-top:10px; background:none; border:none; color:#777;">Bağla</button>
     </div>
 
-    <div class="footer">
-        <div class="input-box">
-            <i class="fas fa-smile" style="color:#8696a0; padding:10px;"></i>
-            <input type="text" id="msg-input" placeholder="Məkana iz burax...">
-            <label for="f"><i class="fas fa-paperclip" style="color:#8696a0; padding:10px;"></i></label>
-            <input type="file" id="f" style="display:none;">
-            <i class="fas fa-microphone" style="color:#8696a0; padding:10px;"></i>
+    <div class="bottom-bar">
+        <label for="file-upload" class="icon-btn"><i class="fas fa-camera"></i></label>
+        <input type="file" id="file-upload" hidden accept="image/*">
+        
+        <div class="input-container">
+            <input type="text" id="msg-input" placeholder="Bura bir iz burax...">
+            <button id="voice-btn" class="icon-btn" style="padding: 0 10px;"><i class="fas fa-microphone"></i></button>
         </div>
-        <button class="send-btn" onclick="post()"><i class="fas fa-paper-plane"></i></button>
+        
+        <button id="send-btn" class="btn-circle"><i class="fas fa-paper-plane"></i></button>
     </div>
 
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+    <a-scene vr-mode-ui="enabled: false" embedded arjs="sourceType: webcam; debugUIEnabled: false;">
         <a-camera gps-camera="minDistance: 1;" rotation-reader>
-            <a-cursor color="#128C7E"></a-cursor>
+            <a-cursor color="#00f2ea" fuse="false"></a-cursor>
         </a-camera>
-        <a-entity id="world"></a-entity>
+        <a-entity id="ar-world"></a-entity>
     </a-scene>
 
     <script>
-        const T = "8799012820:AAEPVV76TIkjw9L_Jh6DUqpNHGBdMLd770A";
-        const C = "@vidosmarkarxiv";
-        let lat, lon, activeId = null;
+        const TG_TOKEN = "8799012820:AAEPVV76TIkjw9L_Jh6DUqpNHGBdMLd770A";
+        const TG_CHAT = "@vidosmarkarxiv";
+        let userLat, userLon, activeObjId = null;
+        let traceCount = 0;
 
         // GPS İzləmə
         navigator.geolocation.watchPosition(p => {
-            lat = p.coords.latitude;
-            lon = p.coords.longitude;
-            document.getElementById('gps').innerText = `Dəqiqlik: ${p.coords.accuracy.toFixed(1)}m`;
-        }, null, {enableHighAccuracy: true});
+            userLat = p.coords.latitude;
+            userLon = p.coords.longitude;
+        }, err => console.error("GPS Error", err), {enableHighAccuracy: true});
 
-        function tg(m) {
-            fetch(`https://api.telegram.org/bot${T}/sendMessage?chat_id=${C}&text=${encodeURIComponent(m)}`);
+        // Telegram Log
+        async function logSocial(msg) {
+            try {
+                await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage?chat_id=${TG_CHAT}&text=${encodeURIComponent(msg)}`);
+            } catch (e) { console.log("Log error"); }
         }
 
-        function post() {
-            const v = document.getElementById('msg-input').value;
-            if(!v || !lat) return;
-            
-            const id = Date.now();
-            const e = document.createElement('a-entity');
-            e.setAttribute('gps-entity-place', `latitude: ${lat}; longitude: ${lon}`);
-            e.setAttribute('look-at', '[gps-camera]');
-            e.setAttribute('scale', '20 20 20');
-            
-            const b = document.createElement('a-box');
-            b.setAttribute('width', '2.5'); b.setAttribute('height', '0.7');
-            b.setAttribute('color', 'white');
-            b.onclick = () => { activeId = id; document.getElementById('panel').style.display='block'; };
-
-            const t = document.createElement('a-text');
-            t.setAttribute('value', v); t.setAttribute('color', 'black');
-            t.setAttribute('align', 'center'); t.setAttribute('width', '4');
-
-            b.appendChild(t); e.appendChild(b);
-            document.getElementById('world').appendChild(e);
-            
-            tg(`YENİ İZ|ID:${id}|Məkan:${lat},${lon}`);
-            document.getElementById('msg-input').value = "";
+        function notify(txt) {
+            const el = document.getElementById('social-alert');
+            el.innerText = txt; el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 3000);
         }
 
-        function action(type) {
-            if(type === 'LIKE') {
-                const h = document.getElementById('heart-pop');
-                h.style.display = 'block'; setTimeout(() => h.style.display='none', 800);
-                tg(`❤️ BƏYƏNİ|ID:${activeId}`);
-            } else {
-                const r = document.getElementById('comm').value;
-                if(r) tg(`💬 RƏY|ID:${activeId}|Mətn:${r}`);
+        // AR Obyekti Yerləşdirmə
+        function dropTrace(content, type = 'text') {
+            if(!userLat || !userLon) return notify("GPS tapılmadı!");
+
+            const id = "trace_" + Date.now();
+            const entity = document.createElement('a-entity');
+            entity.setAttribute('gps-entity-place', `latitude: ${userLat}; longitude: ${userLon}`);
+            entity.setAttribute('look-at', '[gps-camera]');
+            entity.setAttribute('scale', '10 10 10');
+            entity.id = id;
+
+            // Vizual Kart (Obyekt)
+            const card = document.createElement('a-plane');
+            card.setAttribute('width', '3'); card.setAttribute('height', '1.5');
+            card.setAttribute('color', '#000'); card.setAttribute('opacity', '0.8');
+            card.setAttribute('class', 'clickable');
+            
+            // Mətn əlavəsi
+            const text = document.createElement('a-text');
+            const displayVal = type === 'audio' ? '🎵 Səs İzi (Dinlə)' : content.substring(0, 20) + '...';
+            text.setAttribute('value', displayVal);
+            text.setAttribute('align', 'center');
+            text.setAttribute('width', '6');
+            text.setAttribute('position', '0 0.2 0.05');
+
+            // Alt məlumat (Koordinat)
+            const meta = document.createElement('a-text');
+            meta.setAttribute('value', `Lat: ${userLat.toFixed(4)} | İzlər: 0`);
+            meta.setAttribute('align', 'center');
+            meta.setAttribute('width', '3');
+            meta.setAttribute('position', '0 -0.4 0.05');
+            meta.setAttribute('color', '#00f2ea');
+
+            card.onclick = () => {
+                activeObjId = id;
+                openPanel();
+            };
+
+            card.appendChild(text);
+            card.appendChild(meta);
+            entity.appendChild(card);
+            document.getElementById('ar-world').appendChild(entity);
+
+            traceCount++;
+            document.getElementById('trace-count').innerText = traceCount;
+            notify("Məkana yeni iz buraxıldı! 🚀");
+            logSocial(`YENİ İZ|ID:${id}|Koor:${userLat},${userLon}|Məzmun:${content}`);
+        }
+
+        // Sosial Funksiyalar
+        function openPanel() { document.getElementById('interaction-panel').style.display = 'block'; }
+        function closePanel() { document.getElementById('interaction-panel').style.display = 'none'; }
+
+        function likeObject() {
+            const heart = document.getElementById('big-heart');
+            heart.style.display = 'block';
+            setTimeout(() => heart.style.display = 'none', 1000);
+            notify("Bu izi bəyəndiniz! ❤️");
+            logSocial(`LIKE|ID:${activeObjId}`);
+        }
+
+        function addComment() {
+            const input = document.getElementById('comm-input');
+            if(!input.value) return;
+            
+            const box = document.getElementById('comment-box');
+            const item = document.createElement('div');
+            item.className = 'comment-item';
+            item.innerHTML = `<strong>Siz:</strong> ${input.value}`;
+            box.prepend(item);
+            
+            logSocial(`ŞƏRH|ID:${activeObjId}|Mətn:${input.value}`);
+            input.value = "";
+            notify("Şərhiniz əlavə edildi!");
+        }
+
+        // Button Eventləri
+        document.getElementById('send-btn').onclick = () => {
+            const val = document.getElementById('msg-input').value;
+            if(val) {
+                dropTrace(val, 'text');
+                document.getElementById('msg-input').value = "";
             }
-            document.getElementById('panel').style.display = 'none';
-        }
+        };
+
+        // Səs yazma (Sadələşdirilmiş simulyasiya - Real yazma üçün əvvəlki məntiqlə eynidir)
+        let isRecording = false;
+        document.getElementById('voice-btn').onclick = function() {
+            isRecording = !isRecording;
+            this.style.color = isRecording ? "red" : "var(--neon-blue)";
+            if(!isRecording) dropTrace("Audio Record", "audio");
+            notify(isRecording ? "Səs yazılır..." : "Səs izi buraxıldı.");
+        };
+
     </script>
 </body>
 </html>
