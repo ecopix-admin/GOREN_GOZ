@@ -3,171 +3,169 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
-    <title>Görən Göz - WA Style AR</title>
+    <title>Görən Göz - WA Messencer AR</title>
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
     <script src="https://unpkg.com/aframe-look-at-component@0.8.0/dist/aframe-look-at-component.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        body { margin: 0; overflow: hidden; background: #000; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+        /* Ekranın qaralmaması üçün vacib düzəlişlər */
+        body { margin: 0; overflow: hidden; background-color: transparent; font-family: 'Segoe UI', sans-serif; }
         
-        /* Kamera arxa fonu */
-        video { width: 100vw !important; height: 100vh !important; object-fit: cover !important; position: absolute; top: 0; left: 0; }
+        /* Kameranın görünməsini təmin edən qat */
+        .a-canvas { position: absolute; z-index: 0; }
+        video { position: absolute; top: 0; left: 0; z-index: -1 !important; width: 100% !important; height: 100% !important; object-fit: cover; }
 
-        /* Üst Panel - WhatsApp tərzi tünd yaşıl/qara */
-        .header {
+        /* WhatsApp Üst Panel */
+        .wa-header {
             position: fixed; top: 0; width: 100%; height: 60px;
             background: #075E54; color: white; display: flex;
             align-items: center; justify-content: space-between;
-            padding: 0 15px; z-index: 5000; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            padding: 0 15px; z-index: 1000; box-sizing: border-box;
         }
 
-        #gps-status { font-size: 12px; opacity: 0.9; }
+        #gps-info { font-size: 11px; font-family: monospace; }
 
-        /* WhatsApp Style Bottom Input */
-        .wa-bottom {
+        /* WhatsApp Alt Input Paneli */
+        .wa-footer {
             position: fixed; bottom: 15px; width: 100%;
-            display: flex; align-items: flex-end; justify-content: center;
-            padding: 0 10px; z-index: 5000; gap: 8px;
+            display: flex; align-items: flex-end; padding: 0 10px;
+            z-index: 2000; gap: 8px; box-sizing: border-box;
         }
 
-        .input-container {
+        .input-pill {
             flex: 1; background: white; border-radius: 25px;
-            display: flex; align-items: center; padding: 5px 15px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.2); min-height: 48px;
+            display: flex; align-items: center; padding: 5px 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); min-height: 48px;
         }
 
         #msg-input {
             flex: 1; border: none; outline: none; padding: 10px;
-            font-size: 16px; background: transparent; max-height: 100px;
+            font-size: 16px; background: transparent;
         }
 
-        .wa-icon { color: #919191; font-size: 20px; cursor: pointer; padding: 10px; }
-        
-        /* Dairəvi Göndər Düyməsi */
-        .wa-send-btn {
+        .wa-icon { color: #8696a0; font-size: 20px; cursor: pointer; padding: 8px; }
+
+        .send-circle {
             background: #128C7E; color: white; width: 50px; height: 50px;
             border-radius: 50%; border: none; display: flex;
             align-items: center; justify-content: center; font-size: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.4); flex-shrink: 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3); flex-shrink: 0;
         }
 
-        /* Ürək effekti */
-        #heart-effect {
+        /* Uçan Ürək Animasiyası */
+        #heart-anim {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 150px; color: #e91e63; display: none; z-index: 6000;
-            pointer-events: none; animation: pulse 0.8s ease-out forwards;
+            font-size: 180px; color: #ff2e63; display: none; z-index: 3000;
+            pointer-events: none; animation: wa-pop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
 
-        @keyframes pulse {
-            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+        @keyframes wa-pop {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
             50% { opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
         }
 
-        /* Rəy Paneli - WhatsApp Style */
-        #comment-panel {
-            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-            width: 90%; background: #ece5dd; border-radius: 15px;
-            display: none; z-index: 5500; padding: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        /* Rəy Paneli */
+        #reaction-panel {
+            position: fixed; bottom: 85px; left: 5%; width: 90%;
+            background: #f0f2f5; border-radius: 20px; display: none;
+            padding: 15px; z-index: 2500; box-shadow: 0 4px 20px rgba(0,0,0,0.4);
         }
     </style>
 </head>
 
 <body>
 
-    <div class="header">
-        <div style="font-weight: bold; font-size: 18px;">Görən Göz v.3.3</div>
-        <div id="gps-status">GPS Siqnalı...</div>
+    <div class="wa-header">
+        <div style="font-weight: 600;">Görən Göz v.3.4</div>
+        <div id="gps-info"><i class="fas fa-satellite"></i> GPS Axtarılır...</div>
     </div>
 
-    <div id="heart-effect"><i class="fas fa-heart"></i></div>
+    <div id="heart-anim"><i class="fas fa-heart"></i></div>
 
-    <div id="comment-panel">
-        <div style="background: white; border-radius: 10px; padding: 10px; margin-bottom: 10px;">
-            <input type="text" id="comm-txt" placeholder="Rəy yazın..." style="width: 100%; border: none; outline: none;">
+    <div id="reaction-panel">
+        <div style="background:white; border-radius:10px; padding:10px; margin-bottom:10px;">
+            <input type="text" id="comm-txt" placeholder="Rəy yazın..." style="width:100%; border:none; outline:none; font-size:16px;">
         </div>
-        <div style="display: flex; gap: 10px;">
-            <button onclick="sendSocial('COMMENT')" style="flex: 2; background: #128C7E; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold;">Rəy Bildir</button>
-            <button onclick="sendSocial('LIKE')" style="flex: 1; background: #ff2e63; color: white; border: none; padding: 12px; border-radius: 8px;"><i class="fas fa-heart"></i></button>
+        <div style="display: flex; gap: 8px;">
+            <button onclick="sendSocial('COMMENT')" style="flex:2; background:#128C7E; color:white; border:none; padding:12px; border-radius:10px; font-weight:bold;">Rəy Bildir</button>
+            <button onclick="sendSocial('LIKE')" style="flex:1; background:#ff2e63; color:white; border:none; border-radius:10px;"><i class="fas fa-heart"></i></button>
         </div>
+        <center><button onclick="document.getElementById('reaction-panel').style.display='none'" style="background:none; border:none; color:#666; margin-top:10px;">Bağla</button></center>
     </div>
 
-    <div class="wa-bottom">
-        <div class="input-container">
+    <div class="wa-footer">
+        <div class="input-pill">
             <i class="fas fa-smile wa-icon"></i>
             <input type="text" id="msg-input" placeholder="Mesaj yazın...">
-            <label for="file-upload"><i class="fas fa-paperclip wa-icon"></i></label>
-            <input type="file" id="file-upload" accept="audio/*" style="display:none;">
-            <i class="fas fa-microphone wa-icon" id="voice-btn"></i>
+            <label for="file-up"><i class="fas fa-paperclip wa-icon"></i></label>
+            <input type="file" id="file-up" accept="audio/*" style="display:none;">
+            <i class="fas fa-microphone wa-icon" id="mic-btn"></i>
         </div>
-        <button class="wa-send-btn" id="send-btn"><i class="fas fa-paper-plane"></i></button>
+        <button class="send-circle" id="post-btn"><i class="fas fa-paper-plane"></i></button>
     </div>
 
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
-        <a-camera gps-camera="minDistance: 0.1;" rotation-reader>
-            <a-cursor color="#128C7E"></a-cursor>
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false">
+        <a-camera gps-camera="minDistance: 1;" rotation-reader>
+            <a-cursor color="#128C7E" scale="2 2 2"></a-cursor>
         </a-camera>
-        <a-entity id="main-world"></a-entity>
+        <a-entity id="world"></a-entity>
     </a-scene>
 
     <script>
-        const TG_TOKEN = "8799012820:AAEPVV76TIkjw9L_Jh6DUqpNHGBdMLd770A";
-        const TG_CHAT = "@vidosmarkarxiv";
-        let lat, lon, activeObjId = null;
+        const TOKEN = "8799012820:AAEPVV76TIkjw9L_Jh6DUqpNHGBdMLd770A";
+        const CHAT = "@vidosmarkarxiv";
+        let lat, lon, activeID = null;
 
         navigator.geolocation.watchPosition(p => {
             lat = p.coords.latitude;
             lon = p.coords.longitude;
-            document.getElementById('gps-status').innerText = `Xəta: ${p.coords.accuracy.toFixed(1)}m`;
+            document.getElementById('gps-info').innerHTML = `<i class="fas fa-location-arrow"></i> Xəta: ${p.coords.accuracy.toFixed(1)}m`;
         }, null, {enableHighAccuracy: true});
 
-        async function tgLog(msg) {
-            fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage?chat_id=${TG_CHAT}&text=${encodeURIComponent(msg)}`);
+        function tg(m) {
+            fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT}&text=${encodeURIComponent(m)}`);
         }
 
-        function placeAR(content, type = 'text') {
+        function createAR(val, type='text') {
             if(!lat) return;
             const id = Date.now();
-            const entity = document.createElement('a-entity');
-            entity.setAttribute('gps-entity-place', `latitude: ${lat}; longitude: ${lon}`);
-            entity.setAttribute('look-at', '[gps-camera]');
-            entity.setAttribute('scale', '15 15 15');
+            const el = document.createElement('a-entity');
+            el.setAttribute('gps-entity-place', `latitude: ${lat}; longitude: ${lon}`);
+            el.setAttribute('look-at', '[gps-camera]');
+            el.setAttribute('scale', '15 15 15');
             
             const box = document.createElement('a-box');
             box.setAttribute('width', '2.5'); box.setAttribute('height', '0.7');
-            box.setAttribute('color', '#fff'); 
-            box.setAttribute('material', 'opacity: 0.9');
-            
-            box.onclick = () => { activeObjId = id; document.getElementById('comment-panel').style.display = 'block'; };
+            box.setAttribute('color', '#ffffff');
+            box.onclick = () => { activeID = id; document.getElementById('reaction-panel').style.display='block'; };
 
-            const txt = document.createElement('a-text');
-            txt.setAttribute('value', content.substring(0,20));
-            txt.setAttribute('color', '#000'); txt.setAttribute('align', 'center');
-            txt.setAttribute('width', '4');
+            const t = document.createElement('a-text');
+            t.setAttribute('value', val.substring(0,20));
+            t.setAttribute('color', '#000'); t.setAttribute('align', 'center'); t.setAttribute('width', '4');
 
-            box.appendChild(txt);
-            entity.appendChild(box);
-            document.getElementById('main-world').appendChild(entity);
-            tgLog(`YENİ MESAJ|ID:${id}|Məkan:${lat},${lon}`);
+            box.appendChild(t); el.appendChild(box);
+            document.getElementById('world').appendChild(el);
+            tg(`YENİ İZ|ID:${id}|Məkan:${lat},${lon}`);
         }
 
         function sendSocial(type) {
             if(type === 'LIKE') {
-                const h = document.getElementById('heart-effect');
+                const h = document.getElementById('heart-anim');
                 h.style.display = 'block'; setTimeout(() => h.style.display = 'none', 800);
-                tgLog(`❤️ BEYENI|ID:${activeObjId}`);
+                tg(`❤️ BƏYƏNİ|ID:${activeID}`);
             } else {
                 const c = document.getElementById('comm-txt').value;
-                if(c) tgLog(`💬 SERH|ID:${activeObjId}|Yazi:${c}`);
+                if(c) { tg(`💬 ŞƏRH|ID:${activeID}|Rəy:${c}`); document.getElementById('comm-txt').value=""; }
             }
-            document.getElementById('comment-panel').style.display = 'none';
+            document.getElementById('reaction-panel').style.display = 'none';
         }
 
-        document.getElementById('send-btn').onclick = () => {
+        document.getElementById('post-btn').onclick = () => {
             const v = document.getElementById('msg-input').value;
-            if(v) { placeAR(v); document.getElementById('msg-input').value = ""; }
+            if(v) { createAR(v); document.getElementById('msg-input').value = ""; }
         };
     </script>
 </body>
