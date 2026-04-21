@@ -6,32 +6,72 @@
     <title>Sham-Cell Pro</title>
     <style>
         :root { --dark: #0b141a; --gray: #202c33; --green: #00a884; --light-gray: #8696a0; }
-        body, html { margin: 0; padding: 0; height: 100%; background: var(--dark); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         
-        #app { display: flex; flex-direction: column; height: 100vh; }
+        * { box-sizing: border-box; }
         
-        /* Header */
-        .header { background: var(--gray); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
-        .id-badge { background: var(--green); padding: 4px 12px; border-radius: 15px; font-weight: bold; font-size: 14px; }
+        body, html { 
+            margin: 0; padding: 0; height: 100%; width: 100%;
+            background: var(--dark); color: white; 
+            font-family: 'Segoe UI', sans-serif; 
+            overflow: hidden; /* Səhifənin özünün sürüşməsini bağlayırıq */
+        }
+        
+        #app { 
+            display: flex; flex-direction: column; 
+            height: 100vh; width: 100vw;
+            position: relative;
+        }
+        
+        /* Header - Sabit yuxarıda */
+        .header { 
+            background: var(--gray); padding: 12px 15px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 1px solid #333; z-index: 10;
+        }
+        .id-badge { background: var(--green); padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 14px; }
 
-        /* Chat List & Active Chat */
-        #main-view { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
-        .chat-container { display: none; flex-direction: column; height: 100%; }
-        .active { display: flex; }
-
-        .messages-area { flex: 1; padding: 15px; overflow-y: auto; background: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); }
-        .msg { margin-bottom: 10px; padding: 8px 12px; border-radius: 10px; max-width: 80%; word-wrap: break-word; }
-        .msg.sent { background: #005c4b; align-self: flex-end; margin-left: auto; }
+        /* Chat Sahəsi - Ortada sürüşən hissə */
+        .messages-area { 
+            flex: 1; padding: 15px; 
+            overflow-y: auto; 
+            background: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+            display: flex; flex-direction: column;
+        }
+        
+        .msg { margin-bottom: 10px; padding: 10px; border-radius: 8px; max-width: 85%; font-size: 15px; line-height: 1.4; }
         .msg.received { background: var(--gray); align-self: flex-start; }
+        .msg.sent { background: #005c4b; align-self: flex-end; }
 
-        /* Input Area */
-        .input-bar { background: var(--gray); padding: 10px; display: flex; align-items: center; gap: 10px; }
-        input { flex: 1; background: #2a3942; border: none; padding: 12px; color: white; border-radius: 20px; outline: none; }
-        .btn-round { background: var(--green); border: none; width: 45px; height: 45px; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        /* Alt Panel - Həmişə görünən və sabit */
+        .input-bar { 
+            background: var(--gray); padding: 10px; 
+            display: flex; align-items: center; gap: 8px;
+            border-top: 1px solid #333; z-index: 10;
+            padding-bottom: env(safe-area-inset-bottom, 10px); /* iPhone-lar üçün qorunma */
+        }
+        
+        input { 
+            background: #2a3942; border: none; padding: 12px; 
+            color: white; border-radius: 20px; outline: none; font-size: 16px;
+        }
+        #target-id { width: 70px; text-align: center; }
+        #msg-text { flex: 1; }
 
-        /* Call Overlay */
-        #call-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--dark); z-index: 2000; flex-direction: column; align-items: center; justify-content: center; }
-        .call-btn { width: 70px; height: 70px; border-radius: 50%; border: none; color: white; font-size: 24px; margin: 20px; cursor: pointer; }
+        .btn-round { 
+            background: var(--green); border: none; 
+            width: 45px; height: 45px; border-radius: 50%; 
+            color: white; cursor: pointer; font-size: 20px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* Zəng Ekranı */
+        #call-screen { 
+            display: none; position: fixed; top: 0; left: 0; 
+            width: 100%; height: 100%; background: var(--dark); 
+            z-index: 2000; flex-direction: column; align-items: center; justify-content: center; 
+        }
+        .call-btn { width: 70px; height: 70px; border-radius: 50%; border: none; color: white; font-size: 24px; margin: 20px; }
         .accept { background: var(--green); }
         .reject { background: #ea0038; }
     </style>
@@ -40,29 +80,25 @@
 
 <div id="app">
     <div class="header">
-        <div><b>Sham-Cell</b> <span id="status" style="font-size: 10px; color: var(--green);">● Online</span></div>
+        <div><b>Sham-Cell</b> <span style="font-size: 10px; color: var(--green);">● Online</span></div>
         <div class="id-badge">ID: <span id="my-id">...</span></div>
     </div>
 
-    <div id="main-view">
-        <div id="chat-window" class="chat-container active">
-            <div class="messages-area" id="msg-display">
-                <div class="msg received">Sistem hazır. Mesaj yazmaq üçün ID daxil edin.</div>
-            </div>
-            
-            <div class="input-bar">
-                <input type="number" id="target-id" style="flex: 0.3;" placeholder="ID">
-                <input type="text" id="msg-text" placeholder="Mesaj yazın...">
-                <button class="btn-round" onclick="sendMessage()">➤</button>
-                <button class="btn-round" style="background: #2196F3;" onclick="startCall()">📞</button>
-            </div>
-        </div>
+    <div class="messages-area" id="msg-display">
+        <div class="msg received">Sistem hazır. Mesaj yazmaq üçün ID daxil edin.</div>
+    </div>
+    
+    <div class="input-bar">
+        <input type="number" id="target-id" placeholder="ID">
+        <input type="text" id="msg-text" placeholder="Mesaj...">
+        <button class="btn-round" onclick="sendMessage()">➤</button>
+        <button class="btn-round" style="background: #2196F3;" onclick="startCall()">📞</button>
     </div>
 </div>
 
 <div id="call-screen">
     <h1 id="call-info">Zəng gəlir...</h1>
-    <div style="font-size: 20px; color: var(--light-gray);" id="call-id">ID: ----</div>
+    <div id="call-id" style="font-size: 20px; color: var(--light-gray);">ID: ----</div>
     <div style="display: flex; margin-top: 50px;">
         <button class="call-btn accept" id="ans-btn" onclick="acceptCall()">✔</button>
         <button class="call-btn reject" onclick="endCall()">✖</button>
@@ -74,7 +110,6 @@
     document.getElementById('my-id').innerText = MY_ID;
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const FREQS = { CALL: 18000, MSG_START: 19000, DATA_0: 18500, DATA_1: 19500 };
 
     function playTone(freq, ms) {
         const osc = audioCtx.createOscillator();
@@ -84,32 +119,27 @@
         osc.start(); osc.stop(audioCtx.currentTime + ms/1000);
     }
 
-    // Mesaj Göndərmə
     function sendMessage() {
         const tid = document.getElementById('target-id').value;
         const txt = document.getElementById('msg-text').value;
         if(!tid || !txt) return;
 
         const area = document.getElementById('msg-display');
-        area.innerHTML += `<div class="msg sent"><b>Siz (ID ${tid}):</b><br>${txt}</div>`;
+        area.innerHTML += `<div class="msg sent"><b>ID ${tid}:</b><br>${txt}</div>`;
         area.scrollTop = area.scrollHeight;
         
-        // Akustik ötürmə (Simulyasiya deyil, real səs vibrasiyası)
-        playTone(FREQS.MSG_START, 200); 
+        playTone(19000, 200); // Akustik siqnal
         document.getElementById('msg-text').value = "";
     }
 
-    // Zəng Etmə
     function startCall() {
         const tid = document.getElementById('target-id').value;
         if(!tid) return alert("ID daxil edin!");
-        
         document.getElementById('call-screen').style.display = 'flex';
         document.getElementById('call-info').innerText = "ZƏNG EDİLİR...";
         document.getElementById('call-id').innerText = "ID: " + tid;
         document.getElementById('ans-btn').style.display = 'none';
-        
-        playTone(FREQS.CALL, 500); // Boruya/Kabelə zəng siqnalı göndər
+        playTone(18000, 500); 
     }
 
     function acceptCall() {
@@ -117,30 +147,29 @@
         document.getElementById('ans-btn').style.display = 'none';
     }
 
-    function endCall() {
-        document.getElementById('call-screen').style.display = 'none';
-    }
+    function endCall() { document.getElementById('call-screen').style.display = 'none'; }
 
-    // Alıcı mexanizmi (Mikrofon analizi)
     async function initReceiver() {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const source = audioCtx.createMediaStreamSource(stream);
-        const analyzer = audioCtx.createAnalyser();
-        analyzer.fftSize = 2048;
-        source.connect(analyzer);
-        const data = new Uint8Array(analyzer.frequencyBinCount);
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const source = audioCtx.createMediaStreamSource(stream);
+            const analyzer = audioCtx.createAnalyser();
+            analyzer.fftSize = 2048;
+            source.connect(analyzer);
+            const data = new Uint8Array(analyzer.frequencyBinCount);
 
-        function check() {
-            analyzer.getByteFrequencyData(data);
-            const freqIdx = Math.round(FREQS.CALL / (audioCtx.sampleRate / analyzer.fftSize));
-            if (data[freqIdx] > 150) { // Zəng siqnalı tutuldu
-                document.getElementById('call-screen').style.display = 'flex';
-                document.getElementById('call-info').innerText = "ZƏNG GƏLİR!";
-                document.getElementById('ans-btn').style.display = 'block';
+            function check() {
+                analyzer.getByteFrequencyData(data);
+                const freqIdx = Math.round(18000 / (audioCtx.sampleRate / analyzer.fftSize));
+                if (data[freqIdx] > 150) { 
+                    document.getElementById('call-screen').style.display = 'flex';
+                    document.getElementById('call-info').innerText = "ZƏNG GƏLİR!";
+                    document.getElementById('ans-btn').style.display = 'block';
+                }
+                requestAnimationFrame(check);
             }
-            requestAnimationFrame(check);
-        }
-        check();
+            check();
+        } catch(e) { console.log("Mikrofon icazəsi rədd edildi."); }
     }
 
     window.onload = initReceiver;
