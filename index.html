@@ -2,143 +2,148 @@
 <html lang="az">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sham-Cell Pro</title>
     <style>
-        :root { --ws-green: #00a884; --ws-dark: #0b141a; --ws-gray: #202c33; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--ws-dark); color: white; margin: 0; text-align: center; overflow: hidden; }
+        :root { --dark: #0b141a; --gray: #202c33; --green: #00a884; --light-gray: #8696a0; }
+        body, html { margin: 0; padding: 0; height: 100%; background: var(--dark); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        
         #app { display: flex; flex-direction: column; height: 100vh; }
-        .header { background: var(--ws-gray); padding: 20px; border-bottom: 1px solid #333; }
-        .id-badge { background: var(--ws-green); padding: 5px 15px; border-radius: 20px; font-weight: bold; }
-        #display { flex: 1; padding: 20px; overflow-y: auto; font-family: monospace; color: #8696a0; }
-        .controls { background: var(--ws-gray); padding: 20px; display: grid; gap: 10px; }
-        input { padding: 15px; border-radius: 10px; border: none; background: #2a3942; color: white; font-size: 16px; }
-        .btn { padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        .btn-call { background: var(--ws-green); color: white; }
-        .btn-hangup { background: #ea0038; color: white; }
-        #call-ui { display: none; position: fixed; top: 0; left:0; width: 100%; height:100%; background: var(--ws-dark); z-index: 1000; flex-direction: column; justify-content: center; align-items: center; }
-        .ringing { animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        
+        /* Header */
+        .header { background: var(--gray); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
+        .id-badge { background: var(--green); padding: 4px 12px; border-radius: 15px; font-weight: bold; font-size: 14px; }
+
+        /* Chat List & Active Chat */
+        #main-view { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+        .chat-container { display: none; flex-direction: column; height: 100%; }
+        .active { display: flex; }
+
+        .messages-area { flex: 1; padding: 15px; overflow-y: auto; background: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); }
+        .msg { margin-bottom: 10px; padding: 8px 12px; border-radius: 10px; max-width: 80%; word-wrap: break-word; }
+        .msg.sent { background: #005c4b; align-self: flex-end; margin-left: auto; }
+        .msg.received { background: var(--gray); align-self: flex-start; }
+
+        /* Input Area */
+        .input-bar { background: var(--gray); padding: 10px; display: flex; align-items: center; gap: 10px; }
+        input { flex: 1; background: #2a3942; border: none; padding: 12px; color: white; border-radius: 20px; outline: none; }
+        .btn-round { background: var(--green); border: none; width: 45px; height: 45px; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+        /* Call Overlay */
+        #call-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--dark); z-index: 2000; flex-direction: column; align-items: center; justify-content: center; }
+        .call-btn { width: 70px; height: 70px; border-radius: 50%; border: none; color: white; font-size: 24px; margin: 20px; cursor: pointer; }
+        .accept { background: var(--green); }
+        .reject { background: #ea0038; }
     </style>
 </head>
 <body>
 
 <div id="app">
     <div class="header">
-        SHAM-CELL <br>
-        <small>ID: <span id="my-id" class="id-badge">Yüklənir...</span></small>
+        <div><b>Sham-Cell</b> <span id="status" style="font-size: 10px; color: var(--green);">● Online</span></div>
+        <div class="id-badge">ID: <span id="my-id">...</span></div>
     </div>
 
-    <div id="display">Sistem Hazır. Dinləmə aktivdir...</div>
-
-    <div id="call-ui">
-        <h1 id="call-status">ZƏNG GƏLİR...</h1>
-        <div id="caller-info" style="font-size: 24px; margin-bottom: 30px;">ID: ????</div>
-        <button class="btn btn-call" id="ans-btn" onclick="answerCall()">CAVAB VER</button>
-        <button class="btn btn-hangup" onclick="hangUp()">SONLANDIR</button>
+    <div id="main-view">
+        <div id="chat-window" class="chat-container active">
+            <div class="messages-area" id="msg-display">
+                <div class="msg received">Sistem hazır. Mesaj yazmaq üçün ID daxil edin.</div>
+            </div>
+            
+            <div class="input-bar">
+                <input type="number" id="target-id" style="flex: 0.3;" placeholder="ID">
+                <input type="text" id="msg-text" placeholder="Mesaj yazın...">
+                <button class="btn-round" onclick="sendMessage()">➤</button>
+                <button class="btn-round" style="background: #2196F3;" onclick="startCall()">📞</button>
+            </div>
+        </div>
     </div>
+</div>
 
-    <div class="controls">
-        <input type="number" id="target-id" placeholder="Qarşı tərəfin ID-si">
-        <button class="btn btn-call" onclick="initiateCall()">ZƏNG ET</button>
+<div id="call-screen">
+    <h1 id="call-info">Zəng gəlir...</h1>
+    <div style="font-size: 20px; color: var(--light-gray);" id="call-id">ID: ----</div>
+    <div style="display: flex; margin-top: 50px;">
+        <button class="call-btn accept" id="ans-btn" onclick="acceptCall()">✔</button>
+        <button class="call-btn reject" onclick="endCall()">✖</button>
     </div>
 </div>
 
 <script>
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const MY_ID = Math.floor(1000 + Math.random() * 9000);
     document.getElementById('my-id').innerText = MY_ID;
 
-    // Tezlik Protokolu (İnsan qulağı üçün demək olar ki, eşidilməz)
-    const FREQS = {
-        CALL_INIT: 18000,
-        CALL_ACK: 18500, // Qudok (Təsdiq)
-        DATA_0: 19000,
-        DATA_1: 19500
-    };
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const FREQS = { CALL: 18000, MSG_START: 19000, DATA_0: 18500, DATA_1: 19500 };
 
-    let analyzer, dataArray;
-
-    // --- SİGNAL ÖTÜRÜCÜ ---
-    function sendTone(freq, ms) {
+    function playTone(freq, ms) {
         const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+        const g = audioCtx.createGain();
         osc.frequency.value = freq;
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + (ms/1000));
+        osc.connect(g); g.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + ms/1000);
     }
 
-    // --- ZƏNG PROSESİ ---
-    function initiateCall() {
+    // Mesaj Göndərmə
+    function sendMessage() {
         const tid = document.getElementById('target-id').value;
-        if(!tid) return;
+        const txt = document.getElementById('msg-text').value;
+        if(!tid || !txt) return;
+
+        const area = document.getElementById('msg-display');
+        area.innerHTML += `<div class="msg sent"><b>Siz (ID ${tid}):</b><br>${txt}</div>`;
+        area.scrollTop = area.scrollHeight;
         
-        log(`ID ${tid} üçün zəng siqnalı göndərilir...`);
-        // Protokol: CALL_INIT + 4 rəqəmli ID
-        sendTone(FREQS.CALL_INIT, 500);
+        // Akustik ötürmə (Simulyasiya deyil, real səs vibrasiyası)
+        playTone(FREQS.MSG_START, 200); 
+        document.getElementById('msg-text').value = "";
+    }
+
+    // Zəng Etmə
+    function startCall() {
+        const tid = document.getElementById('target-id').value;
+        if(!tid) return alert("ID daxil edin!");
         
-        // Qudok simulyasiyası (Həqiqi qudok qarşıdan CALL_ACK gələndə çalacaq)
-        document.getElementById('call-status').innerText = "ZƏNG EDİLİR...";
-        document.getElementById('call-ui').style.display = 'flex';
+        document.getElementById('call-screen').style.display = 'flex';
+        document.getElementById('call-info').innerText = "ZƏNG EDİLİR...";
+        document.getElementById('call-id').innerText = "ID: " + tid;
+        document.getElementById('ans-btn').style.display = 'none';
+        
+        playTone(FREQS.CALL, 500); // Boruya/Kabelə zəng siqnalı göndər
+    }
+
+    function acceptCall() {
+        document.getElementById('call-info').innerText = "DANIŞIQ AKTİVDİR";
         document.getElementById('ans-btn').style.display = 'none';
     }
 
-    function log(msg) {
-        const d = document.getElementById('display');
-        d.innerHTML += `<div>> ${msg}</div>`;
-        d.scrollTop = d.scrollHeight;
+    function endCall() {
+        document.getElementById('call-screen').style.display = 'none';
     }
 
-    // --- ALICI (DİNLƏMƏ) ---
-    async function startListener() {
+    // Alıcı mexanizmi (Mikrofon analizi)
+    async function initReceiver() {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         const source = audioCtx.createMediaStreamSource(stream);
-        analyzer = audioCtx.createAnalyser();
+        const analyzer = audioCtx.createAnalyser();
         analyzer.fftSize = 2048;
         source.connect(analyzer);
-        dataArray = new Uint8Array(analyzer.frequencyBinCount);
-        
-        detectSignal();
-    }
+        const data = new Uint8Array(analyzer.frequencyBinCount);
 
-    function detectSignal() {
-        analyzer.getByteFrequencyData(dataArray);
-        
-        const getVal = (freq) => dataArray[Math.round(freq / (audioCtx.sampleRate / analyzer.fftSize))];
-
-        // Zəng siqnalını tut
-        if (getVal(FREQS.CALL_INIT) > 150) {
-            document.getElementById('call-ui').style.display = 'flex';
-            document.getElementById('call-status').innerText = "ZƏNG GƏLİR!";
-            document.getElementById('ans-btn').style.display = 'block';
-            // Avtomatik cavab siqnalı göndər (Qarşı tərəfdə qudok səsi üçün)
-            sendTone(FREQS.CALL_ACK, 200);
+        function check() {
+            analyzer.getByteFrequencyData(data);
+            const freqIdx = Math.round(FREQS.CALL / (audioCtx.sampleRate / analyzer.fftSize));
+            if (data[freqIdx] > 150) { // Zəng siqnalı tutuldu
+                document.getElementById('call-screen').style.display = 'flex';
+                document.getElementById('call-info').innerText = "ZƏNG GƏLİR!";
+                document.getElementById('ans-btn').style.display = 'block';
+            }
+            requestAnimationFrame(check);
         }
-
-        // Qudok (ACK) siqnalını tut
-        if (getVal(FREQS.CALL_ACK) > 150) {
-            log("Zəng qarşıya çatdı (Qudok)...");
-        }
-
-        requestAnimationFrame(detectSignal);
+        check();
     }
 
-    function answerCall() {
-        log("Bağlantı quruldu. Səsli rabitə aktivdir.");
-        document.getElementById('call-status').innerText = "DANIŞIQ...";
-    }
-
-    function hangUp() {
-        document.getElementById('call-screen').style.display = 'none';
-        location.reload(); // Sistemi reset etmək üçün
-    }
-
-    // Proqramı başlat
-    window.onload = () => {
-        startListener();
-    };
+    window.onload = initReceiver;
 </script>
 </body>
 </html>
