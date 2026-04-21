@@ -1,259 +1,144 @@
 <!DOCTYPE html>
-<html>
+<html lang="az">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
-    <title>Görən Göz Pro v6</title>
-    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
-    <script src="https://unpkg.com/aframe-look-at-component@0.8.0/dist/aframe-look-at-component.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sham-Cell Pro</title>
     <style>
-        :root { --neon: #00f2ea; --pink: #ff0050; --glass: rgba(0, 0, 0, 0.7); }
-        body { margin: 0; overflow: hidden; font-family: 'Segoe UI', Roboto, sans-serif; background: #000; }
-
-        /* Kamera tam ekran və zoomsuz */
-        video { object-fit: cover !important; width: 100vw !important; height: 100vh !important; }
-
-        /* Üst Panel */
-        .header-ui {
-            position: fixed; top: 0; width: 100%; padding: 20px;
-            display: flex; justify-content: space-between; align-items: center;
-            z-index: 1000; box-sizing: border-box;
-            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
-        }
-
-        /* Bildiriş */
-        #status-alert {
-            position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
-            background: var(--neon); color: #000; padding: 10px 20px;
-            border-radius: 30px; font-weight: bold; z-index: 2000; display: none;
-            box-shadow: 0 0 20px var(--neon); font-size: 13px;
-        }
-
-        /* ALT İDARƏETMƏ PANELI - TAM MƏRKƏZLƏŞDİRİLMİŞ */
-        .bottom-ui {
-            position: fixed; bottom: 30px; left: 0; width: 100%;
-            display: flex; justify-content: center; align-items: center;
-            z-index: 1000; padding: 0 15px; box-sizing: border-box;
-        }
-
-        .controls-container {
-            display: flex; align-items: center; justify-content: center;
-            width: 100%; max-width: 450px; gap: 12px;
-        }
-
-        .input-pill {
-            flex: 1; background: var(--glass); backdrop-filter: blur(20px);
-            border-radius: 40px; border: 1px solid rgba(255,255,255,0.2);
-            display: flex; align-items: center; padding: 4px 15px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-        }
-
-        #main-input {
-            flex: 1; background: transparent; border: none; color: #fff;
-            padding: 12px; outline: none; font-size: 15px;
-        }
-
-        /* Düymə Effektləri */
-        .btn-circle {
-            width: 50px; height: 50px; border-radius: 50%; border: none;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; color: white; font-size: 20px;
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .btn-circle:active { transform: scale(0.8); } /* Basılma effekti */
-
-        .btn-main { background: var(--pink); box-shadow: 0 0 15px var(--pink); }
-        .btn-secondary { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
-
-        /* Sosial Kart (Rəylər) */
-        #social-overlay {
-            position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 400px; background: rgba(0,0,0,0.95);
-            border-radius: 25px; border: 1px solid var(--neon);
-            padding: 20px; display: none; z-index: 3000; box-sizing: border-box;
-        }
-
-        .comment-box { max-height: 150px; overflow-y: auto; color: #eee; margin: 10px 0; }
-
-        /* Ürək Animasiyası */
-        #heart-anim {
-            position: fixed; top: 45%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 150px; color: var(--pink); display: none; z-index: 5000;
-            pointer-events: none; text-shadow: 0 0 40px var(--pink);
-        }
+        :root { --ws-green: #00a884; --ws-dark: #0b141a; --ws-gray: #202c33; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--ws-dark); color: white; margin: 0; text-align: center; overflow: hidden; }
+        #app { display: flex; flex-direction: column; height: 100vh; }
+        .header { background: var(--ws-gray); padding: 20px; border-bottom: 1px solid #333; }
+        .id-badge { background: var(--ws-green); padding: 5px 15px; border-radius: 20px; font-weight: bold; }
+        #display { flex: 1; padding: 20px; overflow-y: auto; font-family: monospace; color: #8696a0; }
+        .controls { background: var(--ws-gray); padding: 20px; display: grid; gap: 10px; }
+        input { padding: 15px; border-radius: 10px; border: none; background: #2a3942; color: white; font-size: 16px; }
+        .btn { padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .btn-call { background: var(--ws-green); color: white; }
+        .btn-hangup { background: #ea0038; color: white; }
+        #call-ui { display: none; position: fixed; top: 0; left:0; width: 100%; height:100%; background: var(--ws-dark); z-index: 1000; flex-direction: column; justify-content: center; align-items: center; }
+        .ringing { animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
     </style>
 </head>
-
 <body>
 
-    <div class="header-ui">
-        <div style="color: var(--neon); font-weight: 900; letter-spacing: 1px; font-size: 20px;">
-            <i class="fas fa-eye"></i> GÖZ PRO <span style="font-size: 10px; vertical-align: middle;">v6</span>
-        </div>
-        <div style="color: #fff; font-size: 12px;">
-            <i class="fas fa-broadcast-tower animate__animated animate__pulse animate__infinite" style="color: #00ff00;"></i> CANLI
-        </div>
+<div id="app">
+    <div class="header">
+        SHAM-CELL <br>
+        <small>ID: <span id="my-id" class="id-badge">Yüklənir...</span></small>
     </div>
 
-    <div id="status-alert"></div>
-    <div id="heart-anim"><i class="fas fa-heart"></i></div>
+    <div id="display">Sistem Hazır. Dinləmə aktivdir...</div>
 
-    <div id="social-overlay" class="animate__animated animate__fadeInUp">
-        <div style="display:flex; justify-content: space-between; align-items:center; border-bottom: 1px solid #333; padding-bottom:10px;">
-            <b style="color: var(--neon);">İnteraksiya</b>
-            <i class="fas fa-times-circle" onclick="closeSocial()" style="color:#fff; cursor:pointer; font-size: 20px;"></i>
-        </div>
-        <div id="comment-list" class="comment-box"></div>
-        <div style="display:flex; gap:10px;">
-            <input type="text" id="reply-input" placeholder="Rəy yaz..." style="flex:1; background:#222; border:none; color:#fff; padding:12px; border-radius:15px;">
-            <button onclick="socialAction('COMMENT')" class="btn-circle" style="width:42px; height:42px; background:var(--neon); color:#000;"><i class="fas fa-paper-plane"></i></button>
-            <button onclick="socialAction('LIKE')" class="btn-circle" style="width:42px; height:42px; background:var(--pink);"><i class="fas fa-heart"></i></button>
-        </div>
+    <div id="call-ui">
+        <h1 id="call-status">ZƏNG GƏLİR...</h1>
+        <div id="caller-info" style="font-size: 24px; margin-bottom: 30px;">ID: ????</div>
+        <button class="btn btn-call" id="ans-btn" onclick="answerCall()">CAVAB VER</button>
+        <button class="btn btn-hangup" onclick="hangUp()">SONLANDIR</button>
     </div>
 
-    <div class="bottom-ui">
-        <div class="controls-container">
-            <label for="media-upload" class="btn-circle btn-secondary">
-                <i class="fas fa-images"></i>
-            </label>
-            <input type="file" id="media-upload" hidden accept="image/*,video/*,audio/*">
-
-            <div class="input-pill">
-                <input type="text" id="main-input" placeholder="Məkana iz burax...">
-                <i class="fas fa-microphone" id="voice-trigger" style="color: var(--neon); cursor: pointer; font-size: 22px; padding: 5px;"></i>
-            </div>
-
-            <button class="btn-circle btn-main" onclick="publishText()">
-                <i class="fas fa-plus"></i>
-            </button>
-        </div>
+    <div class="controls">
+        <input type="number" id="target-id" placeholder="Qarşı tərəfin ID-si">
+        <button class="btn btn-call" onclick="initiateCall()">ZƏNG ET</button>
     </div>
+</div>
 
-    <a-scene vr-mode-ui="enabled: false" embedded arjs="sourceType: webcam; debugUIEnabled: false;">
-        <a-camera gps-camera="minDistance: 1;" rotation-reader fov="80">
-            <a-cursor color="#00f2ea" scale="2 2 2"></a-cursor>
-        </a-camera>
-        <a-entity id="ar-space"></a-entity>
-    </a-scene>
+<script>
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const MY_ID = Math.floor(1000 + Math.random() * 9000);
+    document.getElementById('my-id').innerText = MY_ID;
 
-    <script>
-        const TG_TOKEN = "8799012820:AAEPVV76TIkjw9L_Jh6DUqpNHGBdMLd770A";
-        const TG_CHAT = "@vidosmarkarxiv";
-        let lat, lon, activeObjId = null;
-        let recorder, chunks = [];
+    // Tezlik Protokolu (İnsan qulağı üçün demək olar ki, eşidilməz)
+    const FREQS = {
+        CALL_INIT: 18000,
+        CALL_ACK: 18500, // Qudok (Təsdiq)
+        DATA_0: 19000,
+        DATA_1: 19500
+    };
 
-        // GPS İzləmə
-        navigator.geolocation.watchPosition(p => {
-            lat = p.coords.latitude; lon = p.coords.longitude;
-        }, null, {enableHighAccuracy: true});
+    let analyzer, dataArray;
 
-        function notify(msg) {
-            const el = document.getElementById('status-alert');
-            el.innerText = msg; el.style.display = 'block';
-            setTimeout(() => el.style.display = 'none', 3000);
+    // --- SİGNAL ÖTÜRÜCÜ ---
+    function sendTone(freq, ms) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.frequency.value = freq;
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + (ms/1000));
+    }
+
+    // --- ZƏNG PROSESİ ---
+    function initiateCall() {
+        const tid = document.getElementById('target-id').value;
+        if(!tid) return;
+        
+        log(`ID ${tid} üçün zəng siqnalı göndərilir...`);
+        // Protokol: CALL_INIT + 4 rəqəmli ID
+        sendTone(FREQS.CALL_INIT, 500);
+        
+        // Qudok simulyasiyası (Həqiqi qudok qarşıdan CALL_ACK gələndə çalacaq)
+        document.getElementById('call-status').innerText = "ZƏNG EDİLİR...";
+        document.getElementById('call-ui').style.display = 'flex';
+        document.getElementById('ans-btn').style.display = 'none';
+    }
+
+    function log(msg) {
+        const d = document.getElementById('display');
+        d.innerHTML += `<div>> ${msg}</div>`;
+        d.scrollTop = d.scrollHeight;
+    }
+
+    // --- ALICI (DİNLƏMƏ) ---
+    async function startListener() {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const source = audioCtx.createMediaStreamSource(stream);
+        analyzer = audioCtx.createAnalyser();
+        analyzer.fftSize = 2048;
+        source.connect(analyzer);
+        dataArray = new Uint8Array(analyzer.frequencyBinCount);
+        
+        detectSignal();
+    }
+
+    function detectSignal() {
+        analyzer.getByteFrequencyData(dataArray);
+        
+        const getVal = (freq) => dataArray[Math.round(freq / (audioCtx.sampleRate / analyzer.fftSize))];
+
+        // Zəng siqnalını tut
+        if (getVal(FREQS.CALL_INIT) > 150) {
+            document.getElementById('call-ui').style.display = 'flex';
+            document.getElementById('call-status').innerText = "ZƏNG GƏLİR!";
+            document.getElementById('ans-btn').style.display = 'block';
+            // Avtomatik cavab siqnalı göndər (Qarşı tərəfdə qudok səsi üçün)
+            sendTone(FREQS.CALL_ACK, 200);
         }
 
-        async function sendLog(text) {
-            fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage?chat_id=${TG_CHAT}&text=${encodeURIComponent(text)}`);
+        // Qudok (ACK) siqnalını tut
+        if (getVal(FREQS.CALL_ACK) > 150) {
+            log("Zəng qarşıya çatdı (Qudok)...");
         }
 
-        // AR Obyekti Yaratmaq (Mətn, Şəkil, Video, Səs)
-        function createAR(data, type) {
-            if(!lat) return notify("GPS axtarılır...");
-            const id = "TRACE_" + Date.now();
-            const entity = document.createElement('a-entity');
-            entity.setAttribute('gps-entity-place', `latitude: ${lat}; longitude: ${lon}`);
-            entity.setAttribute('look-at', '[gps-camera]');
-            entity.setAttribute('scale', '15 15 15');
+        requestAnimationFrame(detectSignal);
+    }
 
-            let model;
-            if(type === 'image') {
-                model = document.createElement('a-image');
-                model.setAttribute('src', data);
-            } else if(type === 'video') {
-                model = document.createElement('a-video');
-                model.setAttribute('src', data);
-            } else {
-                model = document.createElement('a-box');
-                model.setAttribute('color', type === 'audio' ? '#ff0050' : '#000');
-                model.setAttribute('width', '1.8'); model.setAttribute('height', '0.7'); model.setAttribute('depth', '0.1');
-                model.setAttribute('opacity', '0.8');
-                
-                const txt = document.createElement('a-text');
-                txt.setAttribute('value', type === 'audio' ? '🎵 SƏS İZİ' : data);
-                txt.setAttribute('align', 'center'); txt.setAttribute('width', '4'); txt.setAttribute('position', '0 0 0.1');
-                model.appendChild(txt);
-            }
+    function answerCall() {
+        log("Bağlantı quruldu. Səsli rabitə aktivdir.");
+        document.getElementById('call-status').innerText = "DANIŞIQ...";
+    }
 
-            model.classList.add('clickable');
-            model.onclick = () => {
-                activeObjId = id;
-                document.getElementById('social-overlay').style.display = 'block';
-                if(type === 'audio') new Audio(data).play();
-            };
+    function hangUp() {
+        document.getElementById('call-screen').style.display = 'none';
+        location.reload(); // Sistemi reset etmək üçün
+    }
 
-            entity.appendChild(model);
-            document.getElementById('ar-space').appendChild(entity);
-            notify("Yeni iz havaya yerləşdirildi! 🚀");
-            sendLog(`YENİ İZ|Tip:${type}|Koor:${lat},${lon}`);
-        }
-
-        // Funksiyalar
-        function publishText() {
-            const val = document.getElementById('main-input').value;
-            if(val) { createAR(val, 'text'); document.getElementById('main-input').value = ""; }
-        }
-
-        document.getElementById('media-upload').onchange = (e) => {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                let type = file.type.split('/')[0];
-                createAR(ev.target.result, type);
-            };
-            reader.readAsDataURL(file);
-        };
-
-        document.getElementById('voice-trigger').onclick = async function() {
-            if(!recorder || recorder.state === "inactive") {
-                const stream = await navigator.mediaDevices.getUserMedia({audio:true});
-                recorder = new MediaRecorder(stream);
-                chunks = [];
-                recorder.ondataavailable = e => chunks.push(e.data);
-                recorder.onstop = () => {
-                    const blob = new Blob(chunks, {type:'audio/mp3'});
-                    createAR(URL.createObjectURL(blob), 'audio');
-                };
-                recorder.start();
-                this.style.color = "red"; notify("Səs yazılır...");
-            } else {
-                recorder.stop(); this.style.color = "var(--neon)";
-            }
-        };
-
-        function socialAction(type) {
-            if(type === 'LIKE') {
-                const anim = document.getElementById('heart-anim');
-                anim.style.display = 'block';
-                anim.className = "animate__animated animate__zoomInUp";
-                setTimeout(() => { anim.style.display = 'none'; }, 1000);
-                sendLog(`BƏYƏNİ|ID:${activeObjId}`);
-                notify("Bəyənildi! ❤️");
-            } else {
-                const r = document.getElementById('reply-input').value;
-                if(!r) return;
-                document.getElementById('comment-list').innerHTML += `<div><b>Siz:</b> ${r}</div>`;
-                sendLog(`RƏY|ID:${activeObjId}|Mətn:${r}`);
-                document.getElementById('reply-input').value = "";
-            }
-        }
-
-        function closeSocial() { document.getElementById('social-overlay').style.display = 'none'; }
-    </script>
+    // Proqramı başlat
+    window.onload = () => {
+        startListener();
+    };
+</script>
 </body>
 </html>
