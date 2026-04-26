@@ -3,86 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sehrli Kukla - FINAL</title>
+    <title>Magic Toy AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { margin: 0; background: #000; font-family: sans-serif; overflow: hidden; color: white; text-align: center; }
-        #cam { width: 100%; height: 100vh; object-fit: cover; position: fixed; top:0; left:0; }
-        .ui { position: absolute; bottom: 30px; width: 100%; z-index: 10; left:0; right:0; }
-        #talkBtn { 
-            background: #ff00ff; border: 5px solid white; border-radius: 50%; width: 90px; height: 90px; 
-            box-shadow: 0 0 25px #ff00ff; cursor: pointer;
-        }
-        #status { background: rgba(0,0,0,0.85); padding: 15px; border-radius: 10px; margin: 15px; font-size: 18px; border: 1px solid #ff00ff; }
-        #mouth {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 140px; height: 50px; background: #ff0000; border-radius: 50%;
-            display: none; border: 5px solid white; z-index: 20; box-shadow: 0 0 40px red;
-            animation: talk 0.2s infinite alternate;
-        }
-        @keyframes talk { from { height: 10px; } to { height: 80px; } }
+        .pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+        #mouth { transition: all 0.1s ease-in-out; }
     </style>
 </head>
-<body>
+<body class="bg-black h-screen flex flex-col items-center justify-between overflow-hidden">
 
-    <video id="cam" autoplay playsinline></video>
-    <canvas id="canvas" style="display:none;"></canvas>
-    <div id="mouth"></div>
+    <video id="video" autoplay playsinline class="absolute inset-0 w-full h-full object-cover opacity-60"></video>
+    <canvas id="canvas" class="hidden"></canvas>
 
-    <div class="ui">
-        <div id="status">KUKLANI TUT VƏ DÜYMƏYƏ BAS!</div>
-        <button id="talkBtn" onclick="awakenToy()"></button>
+    <div id="statusBox" class="z-10 mt-10 p-4 bg-black/80 border border-magenta-500 rounded-xl text-white text-center w-4/5 text-sm font-bold">
+        OYUNCAĞINI GÖSTƏR VƏ DÜYMƏYƏ BAS
+    </div>
+
+    <div id="mouth" class="z-20 w-32 h-10 bg-red-600 rounded-full border-4 border-white hidden shadow-[0_0_50px_rgba(255,0,0,0.8)]"></div>
+
+    <div class="z-10 mb-12 flex flex-col items-center">
+        <button id="actionBtn" class="w-24 h-24 bg-gradient-to-tr from-purple-600 to-pink-500 rounded-full border-4 border-white shadow-2xl flex items-center justify-center active:scale-90 transition-transform">
+            <div class="w-8 h-8 bg-white rounded-sm rotate-45"></div>
+        </button>
+        <p class="text-white/50 text-[10px] mt-4 uppercase tracking-widest">AI Powered by Gemini</p>
     </div>
 
     <script>
-        const API_KEY = 'AIzaSyCbGLOBDKi6qj5KzKuLe5G1-8cVEY092S4'; 
-
-        const video = document.getElementById('cam');
+        const API_KEY = "AIzaSyCbGLOBDKi6qj5KzKuLe5G1-8cVEY092S4";
+        const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
-        const status = document.getElementById('status');
+        const statusBox = document.getElementById('statusBox');
         const mouth = document.getElementById('mouth');
+        const btn = document.getElementById('actionBtn');
 
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-            .then(s => video.srcObject = s).catch(() => status.innerText = "KAMERANI AÇ!");
+        // Kameranı ən yüksək keyfiyyətdə aç
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment", focusMode: "continuous" } })
+            .then(stream => video.srcObject = stream);
 
-        async function awakenToy() {
-            status.innerText = "DÜŞÜNÜRƏM... GÖZLƏ!";
+        async function processVision() {
+            statusBox.innerText = "OYUNCAĞI ANALİZ EDİRƏM...";
+            statusBox.classList.add('pulse');
             
-            try {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                canvas.getContext('2d').drawImage(video, 0, 0);
-                const imgData = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+            // Şəkli yüksək sürətlə çək
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth / 2; // Sürət üçün optimizasiya
+            canvas.height = video.videoHeight / 2;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const base64 = canvas.toDataURL('image/jpeg', 0.6).split(',')[1];
 
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         contents: [{ parts: [
-                            { text: "Sən bu şəkildəki kuklasan. Şəkildə nəsə görsən də, görməsən də mütləq uşaqla Azərbaycan dilində çox şən bir salamlaşma et. Maksimum 8 söz." },
-                            { inline_data: { mime_type: "image/jpeg", data: imgData } }
+                            { text: "Sən bu şəkildəki kuklasan. Çox şən və uşaq dili ilə Azərbaycan dilində salam de. Maksimum 7 söz olsun." },
+                            { inline_data: { mime_type: "image/jpeg", data: base64 } }
                         ]}]
                     })
                 });
 
-                const data = await res.json();
-                const text = data.candidates[0].content.parts[0].text;
-                
-                status.innerText = text;
-                speakText(text);
-
-            } catch (e) {
-                status.innerText = "YENİDƏN BAS, İNTERNET GECİKDİ!";
+                const data = await response.json();
+                const aiText = data.candidates[0].content.parts[0].text;
+                talk(aiText);
+            } catch (err) {
+                statusBox.innerText = "İNTERNET GECİKDİ, BİR DAHA CƏHD ET!";
+                statusBox.classList.remove('pulse');
             }
         }
 
-        function speakText(text) {
-            window.speechSynthesis.cancel();
+        function talk(text) {
+            statusBox.innerText = text;
+            statusBox.classList.remove('pulse');
             const speech = new SpeechSynthesisUtterance(text);
-            speech.lang = 'tr-TR'; 
-            speech.onstart = () => { mouth.style.display = 'block'; };
-            speech.onend = () => { mouth.style.display = 'none'; };
+            speech.lang = 'az-AZ';
+            
+            speech.onstart = () => {
+                mouth.style.display = 'block';
+                animateMouth();
+            };
+            speech.onend = () => {
+                mouth.style.display = 'none';
+                statusBox.innerText = "YENİDƏN DANIŞDIR!";
+            };
+            
             window.speechSynthesis.speak(speech);
         }
+
+        function animateMouth() {
+            if (mouth.style.display === 'block') {
+                mouth.style.height = (Math.random() * 50 + 10) + 'px';
+                setTimeout(animateMouth, 100);
+            }
+        }
+
+        btn.onclick = processVision;
     </script>
 </body>
 </html>
