@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sehrli Kukla</title>
+    <title>Sehrli Kukla - FINAL</title>
     <style>
-        body { margin: 0; background: #000; font-family: sans-serif; overflow: hidden; color: white; }
-        #cam { width: 100%; height: 100vh; object-fit: cover; position: fixed; }
-        .ui { position: absolute; bottom: 30px; width: 100%; text-align: center; z-index: 10; }
+        body { margin: 0; background: #000; font-family: sans-serif; overflow: hidden; color: white; text-align: center; }
+        #cam { width: 100%; height: 100vh; object-fit: cover; position: fixed; top:0; left:0; }
+        .ui { position: absolute; bottom: 30px; width: 100%; z-index: 10; left:0; right:0; }
         #talkBtn { 
             background: #ff00ff; border: 5px solid white; border-radius: 50%; width: 90px; height: 90px; 
-            box-shadow: 0 0 20px #ff00ff; cursor: pointer;
+            box-shadow: 0 0 25px #ff00ff; cursor: pointer;
         }
-        #status { background: rgba(0,0,0,0.8); padding: 15px; border-radius: 10px; margin: 0 20px 15px; font-size: 16px; min-height: 40px; }
+        #status { background: rgba(0,0,0,0.85); padding: 15px; border-radius: 10px; margin: 15px; font-size: 18px; border: 1px solid #ff00ff; }
         #mouth {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 120px; height: 40px; background: #ff0000; border-radius: 50%;
-            display: none; border: 4px solid white; z-index: 20; box-shadow: 0 0 30px red;
-            animation: talkAnim 0.3s infinite alternate;
+            width: 140px; height: 50px; background: #ff0000; border-radius: 50%;
+            display: none; border: 5px solid white; z-index: 20; box-shadow: 0 0 40px red;
+            animation: talk 0.2s infinite alternate;
         }
-        @keyframes talkAnim { from { height: 10px; } to { height: 60px; } }
+        @keyframes talk { from { height: 10px; } to { height: 80px; } }
     </style>
 </head>
 <body>
@@ -29,63 +29,58 @@
     <div id="mouth"></div>
 
     <div class="ui">
-        <div id="status">Kuklanı göstər və çəhrayı düyməyə bas!</div>
+        <div id="status">KUKLANI TUT VƏ DÜYMƏYƏ BAS!</div>
         <button id="talkBtn" onclick="awakenToy()"></button>
     </div>
 
     <script>
         const API_KEY = 'AIzaSyCbGLOBDKi6qj5KzKuLe5G1-8cVEY092S4'; 
-        
+
         const video = document.getElementById('cam');
         const canvas = document.getElementById('canvas');
         const status = document.getElementById('status');
         const mouth = document.getElementById('mouth');
 
         navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-            .then(s => video.srcObject = s).catch(e => status.innerText = "Kameraya icazə ver!");
+            .then(s => video.srcObject = s).catch(() => status.innerText = "KAMERANI AÇ!");
 
         async function awakenToy() {
-            status.innerText = "Kukla ilə danışıram... Gözlə...";
+            status.innerText = "DÜŞÜNÜRƏM... GÖZLƏ!";
             
             try {
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
                 canvas.getContext('2d').drawImage(video, 0, 0);
-                const imgData = canvas.toDataURL('image/jpeg', 0.4).split(',')[1];
+                const imgData = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
 
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
                     method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         contents: [{ parts: [
-                            { text: "Sən bu şəkildəki kuklasan. Azərbaycan dilində uşaqla çox şən salamlaş (maksimum 1 cümlə)." },
+                            { text: "Sən bu şəkildəki kuklasan. Şəkildə nəsə görsən də, görməsən də mütləq uşaqla Azərbaycan dilində çox şən bir salamlaşma et. Maksimum 8 söz." },
                             { inline_data: { mime_type: "image/jpeg", data: imgData } }
                         ]}]
                     })
                 });
 
-                const data = await response.json();
-                if(data.candidates) {
-                    const text = data.candidates[0].content.parts[0].text;
-                    status.innerText = text;
-                    speakText(text);
-                } else {
-                    status.innerText = "AI kuklanı görə bilmədi, bir az yaxın tut.";
-                }
+                const data = await res.json();
+                const text = data.candidates[0].content.parts[0].text;
+                
+                status.innerText = text;
+                speakText(text);
 
             } catch (e) {
-                status.innerText = "Bağlantı xətası! Səhifəni yenilə və yenidən yoxla.";
+                status.innerText = "YENİDƏN BAS, İNTERNET GECİKDİ!";
             }
         }
 
         function speakText(text) {
             window.speechSynthesis.cancel();
             const speech = new SpeechSynthesisUtterance(text);
-            speech.lang = 'tr-TR'; // Türk səsi daha sürətli və stabil işləyir
+            speech.lang = 'tr-TR'; 
             speech.onstart = () => { mouth.style.display = 'block'; };
-            speech.onend = () => { 
-                mouth.style.display = 'none'; 
-                status.innerText = "Yenidən danışmaq üçün bas!";
-            };
+            speech.onend = () => { mouth.style.display = 'none'; };
             window.speechSynthesis.speak(speech);
         }
     </script>
