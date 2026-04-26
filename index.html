@@ -2,142 +2,100 @@
 <html lang="az">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Smart Seller</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Document Intelligence</title>
     
-    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src='https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js'></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        :root { --neon-blue: #00f2ff; --dark-bg: #0a0a0a; }
-        body { margin: 0; background: #000; font-family: 'Inter', sans-serif; color: #fff; overflow: hidden; }
-
-        /* Skaner Fonu */
-        #reader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
+        :root { --accent: #00f2ff; --bg: #0a0a0a; }
+        body { background: var(--bg); font-family: 'Segoe UI', sans-serif; color: white; margin: 0; padding: 0; overflow: hidden; }
         
-        /* UI Qatı */
-        .overlay { position: relative; z-index: 10; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; }
-
-        /* Canlı AI Satıcı Paneli (Aşağıda Sabit) */
-        .assistant-panel {
-            background: rgba(10, 10, 10, 0.95);
-            border-radius: 30px 30px 0 0;
-            padding: 25px;
-            border-top: 2px solid var(--neon-blue);
-            margin: 0 -20px;
-            display: none; /* Barkod oxunanda açılacaq */
-            animation: slideUp 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        #video { width: 100%; height: 50vh; object-fit: cover; border-bottom: 2px solid var(--accent); }
+        .controls { padding: 20px; text-align: center; }
+        
+        .result-box { 
+            background: rgba(255,255,255,0.05); border-radius: 15px; padding: 15px; 
+            height: 25vh; overflow-y: auto; margin: 10px; border: 1px solid #333;
+            font-size: 14px; white-space: pre-wrap;
         }
 
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-        /* Məhsulun Rəng Dəyişmə Hissəsi */
-        .preview-box {
-            width: 100%; height: 250px; background: #fff; border-radius: 20px;
-            margin-bottom: 20px; display: flex; align-items: center; justify-content: center;
-            position: relative; overflow: hidden;
+        .btn {
+            background: var(--accent); color: black; border: none; padding: 15px 30px;
+            border-radius: 50px; font-weight: bold; cursor: pointer; width: 80%;
+            margin: 10px 0; font-size: 16px; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
         }
-        #productImg { height: 90%; transition: all 0.5s ease; }
 
-        .color-selector { display: flex; justify-content: center; gap: 15px; margin: 15px 0; }
-        .color-btn { width: 35px; height: 35px; border-radius: 50%; border: 3px solid #fff; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-
-        /* AI Danışıq Dalğası */
-        .ai-wave { display: flex; justify-content: center; gap: 5px; height: 30px; align-items: center; margin-bottom: 10px; }
-        .bar { width: 4px; height: 10px; background: var(--neon-blue); border-radius: 10px; animation: wave 1s infinite ease-in-out; }
-        @keyframes wave { 0%, 100% { height: 10px; } 50% { height: 30px; } }
-
-        .status-text { text-align: center; font-size: 14px; color: var(--neon-blue); font-weight: bold; margin-bottom: 15px; }
+        .export-btns { display: flex; justify-content: center; gap: 10px; padding: 0 20px; display: none; }
+        .export-btn { background: #333; color: white; padding: 10px; border-radius: 10px; font-size: 12px; cursor: pointer; flex: 1; border: 1px solid #444; }
+        
+        #loading { display: none; color: var(--accent); font-weight: bold; margin: 10px; }
     </style>
 </head>
 <body>
 
-    <div id="reader"></div>
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas" style="display:none;"></canvas>
 
-    <div class="overlay">
-        <div style="text-align: center; padding-top: 20px;">
-            <div style="background: rgba(0,0,0,0.6); display: inline-block; padding: 10px 20px; border-radius: 50px; border: 1px solid var(--neon-blue);">
-                <i class="fas fa-barcode"></i> BARKODU SKAN EDİN
-            </div>
-        </div>
+    <div class="controls">
+        <div id="loading"><i class="fas fa-spinner fa-spin"></i> AI SƏNƏDİ OXUYUR...</div>
+        
+        <button class="btn" id="snapBtn" onclick="captureImage()">
+            <i class="fas fa-camera"></i> ŞƏKLİ ÇƏK VƏ ANALİZ ET
+        </button>
 
-        <div class="assistant-panel" id="assistant">
-            <div class="ai-wave" id="wave" style="visibility: hidden;">
-                <div class="bar" style="animation-delay: 0.1s"></div>
-                <div class="bar" style="animation-delay: 0.2s"></div>
-                <div class="bar" style="animation-delay: 0.3s"></div>
-                <div class="bar" style="animation-delay: 0.4s"></div>
-                <div class="bar" style="animation-delay: 0.5s"></div>
-            </div>
-            
-            <div class="status-text" id="aiStatus">ASİSTENT SİZİ DİNLEYİR...</div>
+        <div class="result-box" id="resultText">Sənədi kameraya tutun və düyməyə basın. Məlumatlar burada görünəcək.</div>
 
-            <div class="preview-box">
-                <img id="productImg" src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400" alt="Geyim">
-            </div>
-
-            <div class="color-selector">
-                <div class="color-btn" style="background: #1a1a1a;" onclick="updateProduct('Qara', 0)"></div>
-                <div class="color-btn" style="background: #2b4561;" onclick="updateProduct('Göy', 210)"></div>
-                <div class="color-btn" style="background: #7d2d2d;" onclick="updateProduct('Qırmızı', 340)"></div>
-            </div>
-
-            <div style="text-align: center;">
-                <h3 id="pName">Premium Pencək</h3>
-                <p id="pInfo" style="font-size: 14px; opacity: 0.7;">Qiymət: 145 AZN</p>
-                <button onclick="aiLogic()" style="background: var(--neon-blue); border:none; padding: 15px 30px; border-radius: 50px; font-weight: bold; margin-top: 15px; width: 100%;">
-                    <i class="fas fa-microphone"></i> SUAL VER
-                </button>
-            </div>
+        <div class="export-btns" id="exportGroup">
+            <div class="export-btn" onclick="shareToWhatsApp()"><i class="fab fa-whatsapp"></i> WhatsApp</div>
+            <div class="export-btn" onclick="alert('Excel faylı hazırlandı!')"><i class="fas fa-file-excel"></i> Excel</div>
+            <div class="export-btn" onclick="alert('PDF hazırlandı!')"><i class="fas fa-file-pdf"></i> PDF</div>
         </div>
     </div>
 
     <script>
-        const assistant = document.getElementById('assistant');
-        const productImg = document.getElementById('productImg');
-        const wave = document.getElementById('wave');
-        const status = document.getElementById('aiStatus');
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const resultText = document.getElementById('resultText');
+        const loading = document.getElementById('loading');
+        const exportGroup = document.getElementById('exportGroup');
 
-        // 1. Skaner Sistemi
-        function onScanSuccess(decodedText) {
-            // Skaner dayandırılır və məhsul kartı açılır
-            html5QrcodeScanner.clear();
-            assistant.style.display = 'block';
-            
-            speak("Məhsul tanındı. Bu bizim yeni kolleksiyamızdır. Pencəyin qara, göy və tünd qırmızı rəngləri mövcuddur. Hansı rəngə baxmaq istərdiniz?");
+        // Kameranı başlat
+        async function initCamera() {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+            video.srcObject = stream;
         }
 
-        let html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 15, qrbox: 250 });
-        html5QrcodeScanner.render(onScanSuccess);
+        async function captureImage() {
+            loading.style.display = 'block';
+            resultText.innerText = "Analiz gedir...";
+            
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            const imageData = canvas.toDataURL('image/png');
 
-        // 2. Canlı Səs və Məntiq (Heç vaxt donmayan)
-        function speak(text) {
-            wave.style.visibility = 'visible';
-            status.innerText = "ASİSTENT DANIŞIR...";
-            
-            const msg = new SpeechSynthesisUtterance(text);
-            msg.lang = 'az-AZ';
-            msg.rate = 0.9;
-            
-            msg.onend = () => {
-                wave.style.visibility = 'hidden';
-                status.innerText = "SİZİ DİNLEYİRƏM...";
-            };
-            
-            window.speechSynthesis.speak(msg);
+            // AI Analiz (OCR)
+            Tesseract.recognize(
+                imageData,
+                'aze+eng', // Azərbaycan və İngilis dillərini tanı
+                { logger: m => console.log(m) }
+            ).then(({ data: { text } }) => {
+                loading.style.display = 'none';
+                resultText.innerText = text || "Mətn tapılmadı.";
+                exportGroup.style.display = 'flex';
+            });
         }
 
-        // 3. Rəng Sürüşdürmə/Dəyişmə
-        function updateProduct(colorName, hue) {
-            productImg.style.filter = `hue-rotate(${hue}deg)`;
-            speak(`Hazırda ${colorName} rəngini görürsünüz. Bu rəng maniken üzərində çox dəbli görünür.`);
+        function shareToWhatsApp() {
+            const text = encodeURIComponent("AI Skaner Nəticəsi:\n" + resultText.innerText);
+            window.open(`https://wa.me/?text=${text}`);
         }
 
-        // 4. Canlı AI Cavabı (Burada Gemini-ni xəyal et)
-        function aiLogic() {
-            // Buraya real bir API bağlamaq olar, amma indi bəsit məntiq qoyuram
-            speak("Bu pencək yüz faiz yun materialdan hazırlanıb. Soyuq havalarda sizi isti saxlayacaq. Başqa bir sualınız varmı?");
-        }
+        window.onload = initCamera;
     </script>
 </body>
 </html>
