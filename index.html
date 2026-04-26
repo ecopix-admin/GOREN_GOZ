@@ -2,28 +2,25 @@
 <html lang="az">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sehrli Oyuncaq AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Canlı Oyuncaq</title>
     <style>
-        body { margin: 0; background: #000; font-family: sans-serif; overflow: hidden; color: white; text-align: center; }
-        #cam { width: 100%; height: 100vh; object-fit: cover; position: fixed; top:0; left:0; }
-        .ui { position: absolute; bottom: 40px; width: 100%; z-index: 10; }
+        body { margin: 0; background: #000; font-family: sans-serif; overflow: hidden; color: white; }
+        #cam { width: 100%; height: 100vh; object-fit: cover; position: fixed; }
+        .ui { position: absolute; bottom: 30px; width: 100%; text-align: center; z-index: 10; }
         #talkBtn { 
-            background: #ff00ff; border: 4px solid white; border-radius: 50%; width: 90px; height: 90px; 
-            box-shadow: 0 0 20px #ff00ff; cursor: pointer; animation: pulse 2s infinite;
+            background: #ff00ff; border: 5px solid white; border-radius: 50%; width: 90px; height: 90px; 
+            box-shadow: 0 0 20px #ff00ff; cursor: pointer;
         }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-        #status { background: rgba(0,0,0,0.7); padding: 15px; border-radius: 10px; margin: 0 20px 20px 20px; font-size: 18px; }
-        
-        /* Ağız effekti daha görünən olsun */
+        #status { background: rgba(0,0,0,0.8); padding: 15px; border-radius: 10px; margin: 0 20px 15px; font-size: 18px; min-height: 40px; }
         #mouth {
-            position: fixed; top: 55%; left: 50%; transform: translate(-50%, -50%);
-            width: 120px; height: 40px; background: #ff1a1a; border-radius: 50%;
-            display: none; border: 4px solid #fff; z-index: 20;
-            box-shadow: 0 0 15px red;
-            animation: moveMouth 0.4s infinite alternate;
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 130px; height: 40px; background: #ff0000; border-radius: 50%;
+            display: none; border: 5px solid white; z-index: 20;
+            box-shadow: 0 0 30px red;
+            animation: talkAnim 0.3s infinite alternate;
         }
-        @keyframes moveMouth { from { height: 10px; } to { height: 60px; } }
+        @keyframes talkAnim { from { height: 15px; } to { height: 70px; } }
     </style>
 </head>
 <body>
@@ -33,77 +30,65 @@
     <div id="mouth"></div>
 
     <div class="ui">
-        <div id="status">OYUNCAĞINI GÖSTƏR VƏ DÜYMƏYƏ BAS!</div>
+        <div id="status">Oyuncağı göstər və düyməyə bas!</div>
         <button id="talkBtn" onclick="awakenToy()"></button>
     </div>
 
     <script>
-        // Sənin API Key-in artıq buradadır
-        const API_KEY = 'AIzaSyCbGLOBDKi6qj5KzKuLe5G1-8cVEY092S4'; 
-        const URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
-
+        const API_KEY = 'AIzaSyCbGLOBDKi6qj5KzKuLe5G1-8cVEY092S4'; // API Key-in buradadır
+        
         const video = document.getElementById('cam');
         const canvas = document.getElementById('canvas');
-        const mouth = document.getElementById('mouth');
         const status = document.getElementById('status');
+        const mouth = document.getElementById('mouth');
 
         navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-            .then(s => { video.srcObject = s; })
-            .catch(e => { status.innerText = "Kameraya icazə verilmədi!"; });
+            .then(s => video.srcObject = s);
 
         async function awakenToy() {
-            status.innerText = "AI ŞƏKLİ ANALİZ EDİR...";
+            status.innerText = "Düşünürəm... (AI Baxır)";
             
             try {
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
                 canvas.getContext('2d').drawImage(video, 0, 0);
-                const base64Img = canvas.toDataURL('image/jpeg', 0.7).split(',')[1];
+                const imgData = canvas.toDataURL('image/jpeg', 0.5).split(',')[1];
 
-                const response = await fetch(URL, {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{
-                            parts: [
-                                { text: "Sən şəkildəki oyuncaqsan. Uşaqla Azərbaycan dilində çox şən və qısa danış (maksimum 1 cümlə)." },
-                                { inline_data: { mime_type: "image/jpeg", data: base64Img } }
-                            ]
-                        }]
+                        contents: [{ parts: [
+                            { text: "Sən bu şəkildəki obyekt və ya oyuncaqsan. Uşaqla Azərbaycan dilində cəmi 5-10 sözlə salamlaş." },
+                            { inline_data: { mime_type: "image/jpeg", data: imgData } }
+                        ]}]
                     })
                 });
 
-                const data = await response.json();
+                const data = await res.json();
+                const text = data.candidates[0].content.parts[0].text;
                 
-                if (data.candidates && data.candidates[0].content.parts[0].text) {
-                    const aiText = data.candidates[0].content.parts[0].text;
-                    sayIt(aiText);
-                } else {
-                    status.innerText = "AI oyuncağı tanıya bilmədi. Yenidən yoxla.";
-                }
+                status.innerText = text;
+                speakText(text);
 
-            } catch (error) {
-                console.error(error);
-                status.innerText = "XƏTA: İnternet və ya API problemi!";
+            } catch (e) {
+                status.innerText = "Xəta! İnterneti yoxla.";
+                console.log(e);
             }
         }
 
-        function sayIt(text) {
-            status.innerText = text;
-            const utter = new SpeechSynthesisUtterance(text);
+        function speakText(text) {
+            window.speechSynthesis.cancel();
+            const speech = new SpeechSynthesisUtterance(text);
+            speech.lang = 'tr-TR'; // Azərbaycan dili yoxdursa Türk dili səsi ilə oxusun (çox bənzəyir)
             
-            // Azərbaycan səsini tapmağa çalış, yoxdursa standart səs
-            utter.lang = 'az-AZ';
-            
-            utter.onstart = () => { mouth.style.display = 'block'; };
-            utter.onend = () => {
-                mouth.style.display = 'none';
-                status.innerText = "YENİDƏN DANIŞMAQ ÜÇÜN BAS!";
+            speech.onstart = () => { mouth.style.display = 'block'; };
+            speech.onend = () => { 
+                mouth.style.display = 'none'; 
+                status.innerText = "Yenidən danışmaq üçün bas!";
             };
-            
-            // Bəzi cihazlarda səsin çıxması üçün bu vacibdir
-            window.speechSynthesis.cancel(); 
-            window.speechSynthesis.speak(utter);
+
+            window.speechSynthesis.speak(speech);
         }
     </script>
 </body>
