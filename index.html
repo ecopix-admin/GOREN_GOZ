@@ -2,119 +2,93 @@
 <html lang="az">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AR Virtual Satıcı | DEMO</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Drive AI | Professional AR Assistant</title>
+    
+    <script src="https://code.responsivevoice.org/responsivevoice.js?key=YOUR_FREE_KEY"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { margin: 0; background: #000; font-family: 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; }
-        
-        /* Kamera Fon */
-        #video-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
-        
-        /* UI Qatı */
-        .app-ui { position: relative; z-index: 10; height: 100%; display: flex; flex-direction: column; padding: 20px; }
+        :root { --neon-blue: #00f2ff; --bg-glass: rgba(10, 10, 10, 0.9); }
+        * { box-sizing: border-box; tap-highlight-color: transparent; margin: 0; padding: 0; }
+        body { background: #000; font-family: 'Segoe UI', sans-serif; color: #fff; overflow: hidden; height: 100vh; }
 
-        /* Üst Panel: Hoşgeldiniz */
-        .welcome-panel { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px); padding: 15px; border-radius: 15px; border: 2px solid #00f2ff; text-align: center; margin-top: 10px; }
-        .welcome-title { font-size: 18px; font-weight: bold; color: #00f2ff; margin-bottom: 5px; }
-        .welcome-text { font-size: 12px; color: #fff; opacity: 0.8; }
+        #mainCam { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: brightness(0.6); }
+        .ui-layer { position: relative; z-index: 10; height: 100%; display: flex; flex-direction: column; padding: 15px; }
 
-        /* Orta Hissə: Virtual Satıcı Düyməsi */
-        .v-assistant-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
-        .v-assistant-btn { width: 100px; height: 100px; background: rgba(0, 242, 255, 0.2); border: 4px solid #00f2ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; animation: pulse 2s infinite; }
-        .v-assistant-btn i { font-size: 50px; color: #00f2ff; }
-        .v-status { margin-top: 10px; font-size: 14px; color: #00f2ff; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
-
-        /* Alt Panel: Məhsul Məlumatı (Məsələn) */
-        .product-panel { background: rgba(0, 0, 0, 0.8); border-radius: 20px 20px 0 0; padding: 20px; border-top: 3px solid #00f2ff; margin: auto -20px 0 -20px; display: none; }
-        .p-title { font-size: 20px; font-weight: bold; margin-bottom: 5px; }
-        .p-price { font-size: 18px; color: #ffcc00; font-weight: bold; margin-bottom: 10px; }
-        .p-desc { font-size: 14px; color: #fff; opacity: 0.8; line-height: 1.4; margin-bottom: 15px; }
-        .p-actions { display: flex; gap: 10px; }
-        .btn-call { flex: 1; padding: 12px; background: #00f2ff; color: #000; border: none; border-radius: 10px; font-weight: bold; }
-
-        /* Animasiya */
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(0, 242, 255, 0.7); }
-            70% { box-shadow: 0 0 0 20px rgba(0, 242, 255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(0, 242, 255, 0); }
+        /* Avatarr Paneli */
+        .avatarr-container { 
+            position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); 
+            z-index: 100; display: none; text-align: center; 
         }
+        #avatarr-img { width: 200px; filter: drop-shadow(0 0 20px var(--neon-blue)); }
+
+        /* Məhsul Paneli */
+        .product-panel { margin-top: auto; background: var(--bg-glass); border-radius: 25px; padding: 25px; border-top: 3px solid var(--neon-blue); }
+        .p-title { font-size: 22px; font-weight: bold; margin-bottom: 5px; }
+        .p-price { font-size: 18px; color: #ffcc00; margin-bottom: 15px; }
+        .ask-btn { width: 100%; padding: 18px; background: var(--neon-blue); color: #000; border: none; border-radius: 15px; font-weight: bold; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+
+        /* Yüklənir effekti */
+        .pulse-ring { position: absolute; width: 220px; height: 220px; border: 2px solid var(--neon-blue); border-radius: 50%; animation: pulse 2s infinite; display: none; }
+        @keyframes pulse { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(1.2); opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <video id="video-bg" autoplay playsinline muted></video>
+    <video id="mainCam" autoplay playsinline muted></video>
 
-    <div class="app-ui">
-        <div class="welcome-panel">
-            <div class="welcome-title">Hoş Gəldiniz!</div>
-            <div class="welcome-text">Mağazamızın virtual köməkçisi ilə tanış olun.</div>
-        </div>
+    <div class="avatarr-container" id="avatarrBox">
+        <div class="pulse-ring" id="ring"></div>
+        <img id="avatarr-img" src="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3ZpdHppbzR2OXBhajdyZXM3bnlsNjdjMzk2ZWJvZnN6ejE2cXdzZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3ornk57KwDXfghfv4Q/giphy.gif">
+        <div style="margin-top:10px; color:var(--neon-blue); font-weight:bold; letter-spacing:2px;">AI ASSISTANT</div>
+    </div>
 
-        <div class="v-assistant-container">
-            <div class="v-assistant-btn" onclick="activateAssistant()">
-                <i class="fas fa-robot"></i>
-            </div>
-            <div class="v-status">Satıcı Oflayn</div>
-        </div>
-
-        <div class="product-panel" id="productPanel">
-            <div class="p-title">Smartfon GALAXY S24</div>
+    <div class="ui-layer">
+        <div class="product-panel">
+            <div class="p-title">Samsung Galaxy S24 Ultra</div>
             <div class="p-price">2499 AZN</div>
-            <div class="p-desc">
-                Ən yeni süni intellekt funksiyaları, 200MP kamera və 5000mAh batareya. Mağazamızda bu həftə xüsusi endirim var!
-            </div>
-            <div class="p-actions">
-                <button class="btn-call" onclick="askAI('Qiymət')">Süni İntellektə Soruş</button>
-            </div>
+            <p style="font-size:13px; opacity:0.7; margin-bottom:20px;">AI Kamera, 200MP sensor və üstün performans.</p>
+            <button class="ask-btn" onclick="assistantTalk()">
+                <i class="fas fa-comment-dots"></i> VİRTUAL SATICIYA SORUŞ
+            </button>
         </div>
     </div>
 
     <script>
-        // Kamera Giriş
-        async function initCamera() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "environment" } 
-                });
-                document.getElementById('video-bg').srcObject = stream;
-            } catch (err) {
-                console.error("Kamera xətası: ", err);
-                alert("Kameraya icazə verilmədi!");
-            }
+        // Kameranı başlat
+        async function startCamera() {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+            document.getElementById('mainCam').srcObject = stream;
         }
 
-        // Virtual Satıcını Aktivləşdir
-        function activateAssistant() {
-            const status = document.querySelector('.v-status');
-            const panel = document.getElementById('productPanel');
+        function assistantTalk() {
+            const box = document.getElementById('avatarrBox');
+            const ring = document.getElementById('ring');
+            const btn = document.querySelector('.ask-btn');
 
-            if (panel.style.display === 'none' || panel.style.display === '') {
-                // Aktivləşdir
-                status.innerText = "Satıcı Aktiv";
-                status.style.color = "#00f2ff";
-                panel.style.display = 'block';
-                speak("Salam! Mən sizin virtual köməkçinizəm. Mağazamızın ən yeni smartfonu ilə maraqlanırsınız?");
-            } else {
-                // Deaktivləşdir
-                status.innerText = "Satıcı Oflayn";
-                status.style.color = "#ffcc00";
-                panel.style.display = 'none';
-            }
+            box.style.display = 'block';
+            ring.style.display = 'block';
+            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> SATICI DANIŞIR...`;
+
+            // Professional Azərbaycan Səsi (Google/ResponsiveVoice tərəfindən)
+            responsiveVoice.speak(
+                "Salam! Mən sizin virtual köməkçinizəm. Bu smartfon hazırda mağazamızda ən çox satılan modeldir. Səksən giqabayt daxili yaddaşı və süni intellektli kamerası var. Nağd alışda sizə özəl on faiz endirim edə bilərik. Başqa nəyi bilmək istərdiniz?", 
+                "Turkish Male", // Azərbaycan dili üçün ən yaxın və təmiz səs budur (və ya "Turkish Female")
+                {
+                    pitch: 1, 
+                    rate: 1, 
+                    volume: 1,
+                    onend: function() {
+                        box.style.display = 'none';
+                        ring.style.display = 'none';
+                        btn.innerHTML = `<i class="fas fa-comment-dots"></i> YENİDƏN SORUŞ`;
+                    }
+                }
+            );
         }
 
-        function askAI(topic) {
-            // Test üçün bəsit səsli cavab
-            speak("Bu məhsulun rəsmi qiyməti 2499 AZN-dir, lakin bizdə nağd alışda 10 faiz endirim mövcuddur.");
-        }
-
-        function speak(text) {
-            const msg = new SpeechSynthesisUtterance(text);
-            msg.lang = 'az-AZ'; // Azərbaycan dili
-            window.speechSynthesis.speak(msg);
-        }
-
-        window.onload = initCamera;
+        window.onload = startCamera;
     </script>
 </body>
 </html>
