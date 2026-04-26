@@ -3,92 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Drive AI | Professional AR Assistant</title>
+    <title>Drive AI | Pro-Assistant</title>
     
-    <script src="https://code.responsivevoice.org/responsivevoice.js?key=YOUR_FREE_KEY"></script>
+    <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        :root { --neon-blue: #00f2ff; --bg-glass: rgba(10, 10, 10, 0.9); }
+        :root { --neon-blue: #00f2ff; --bg-glass: rgba(10, 10, 10, 0.95); }
         * { box-sizing: border-box; tap-highlight-color: transparent; margin: 0; padding: 0; }
         body { background: #000; font-family: 'Segoe UI', sans-serif; color: #fff; overflow: hidden; height: 100vh; }
 
         #mainCam { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: brightness(0.6); }
-        .ui-layer { position: relative; z-index: 10; height: 100%; display: flex; flex-direction: column; padding: 15px; }
+        .ui-layer { position: relative; z-index: 10; height: 100%; display: flex; flex-direction: column; padding: 20px; }
 
-        /* Avatarr Paneli */
-        .avatarr-container { 
+        /* AI Vizualizasiya (Şəkil yoxdur, kodla yığılıb) */
+        .ai-avatar-box { 
             position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); 
-            z-index: 100; display: none; text-align: center; 
+            z-index: 100; text-align: center; display: none;
         }
-        #avatarr-img { width: 200px; filter: drop-shadow(0 0 20px var(--neon-blue)); }
+        
+        .ai-core {
+            width: 150px; height: 150px; border-radius: 50%;
+            background: radial-gradient(circle, var(--neon-blue) 0%, transparent 70%);
+            box-shadow: 0 0 50px var(--neon-blue);
+            display: flex; align-items: center; justify-content: center;
+            animation: breathe 2s infinite ease-in-out;
+        }
+
+        @keyframes breathe {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            50% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 80px var(--neon-blue); }
+            100% { transform: scale(0.9); opacity: 0.6; }
+        }
 
         /* Məhsul Paneli */
-        .product-panel { margin-top: auto; background: var(--bg-glass); border-radius: 25px; padding: 25px; border-top: 3px solid var(--neon-blue); }
-        .p-title { font-size: 22px; font-weight: bold; margin-bottom: 5px; }
-        .p-price { font-size: 18px; color: #ffcc00; margin-bottom: 15px; }
-        .ask-btn { width: 100%; padding: 18px; background: var(--neon-blue); color: #000; border: none; border-radius: 15px; font-weight: bold; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .product-panel { margin-top: auto; background: var(--bg-glass); border-radius: 30px; padding: 25px; border: 1px solid rgba(0, 242, 255, 0.3); box-shadow: 0 -10px 40px rgba(0,0,0,0.8); }
+        .p-title { font-size: 22px; font-weight: bold; margin-bottom: 5px; color: #fff; }
+        .p-price { font-size: 24px; color: #ffcc00; font-weight: 800; margin-bottom: 15px; }
+        .ask-btn { 
+            width: 100%; padding: 20px; background: var(--neon-blue); color: #000; 
+            border: none; border-radius: 20px; font-weight: 900; font-size: 16px; 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px;
+            box-shadow: 0 10px 20px rgba(0, 242, 255, 0.3);
+        }
 
-        /* Yüklənir effekti */
-        .pulse-ring { position: absolute; width: 220px; height: 220px; border: 2px solid var(--neon-blue); border-radius: 50%; animation: pulse 2s infinite; display: none; }
-        @keyframes pulse { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(1.2); opacity: 0; } }
+        .status-text { margin-top: 15px; font-size: 12px; color: var(--neon-blue); letter-spacing: 2px; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <video id="mainCam" autoplay playsinline muted></video>
 
-    <div class="avatarr-container" id="avatarrBox">
-        <div class="pulse-ring" id="ring"></div>
-        <img id="avatarr-img" src="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3ZpdHppbzR2OXBhajdyZXM3bnlsNjdjMzk2ZWJvZnN6ejE2cXdzZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3ornk57KwDXfghfv4Q/giphy.gif">
-        <div style="margin-top:10px; color:var(--neon-blue); font-weight:bold; letter-spacing:2px;">AI ASSISTANT</div>
+    <div class="ai-avatar-box" id="aiBox">
+        <div class="ai-core">
+            <i class="fas fa-robot fa-4x" style="color: #000; opacity: 0.7;"></i>
+        </div>
+        <div class="status-text" id="aiStatus">AI ANALİZ EDİR...</div>
     </div>
 
     <div class="ui-layer">
         <div class="product-panel">
             <div class="p-title">Samsung Galaxy S24 Ultra</div>
             <div class="p-price">2499 AZN</div>
-            <p style="font-size:13px; opacity:0.7; margin-bottom:20px;">AI Kamera, 200MP sensor və üstün performans.</p>
-            <button class="ask-btn" onclick="assistantTalk()">
-                <i class="fas fa-comment-dots"></i> VİRTUAL SATICIYA SORUŞ
+            <p style="font-size:14px; opacity:0.7; margin-bottom:20px; line-height: 1.5;">200 MP kamera və Galaxy AI dəstəyi ilə mağazamızda satışdadır.</p>
+            <button class="ask-btn" id="talkBtn" onclick="startAiProcess()">
+                <i class="fas fa-play-circle"></i> VİRTUAL SATICIYA QULAQ AS
             </button>
         </div>
     </div>
 
     <script>
-        // Kameranı başlat
-        async function startCamera() {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-            document.getElementById('mainCam').srcObject = stream;
+        // Kameranı aktiv etmək üçün funksiya
+        async function initCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "environment" },
+                    audio: false 
+                });
+                document.getElementById('mainCam').srcObject = stream;
+            } catch (err) {
+                console.error("Camera error:", err);
+                alert("Zəhmət olmasa, yuxarıdakı ünvan panelindən kameraya icazə verin.");
+            }
         }
 
-        function assistantTalk() {
-            const box = document.getElementById('avatarrBox');
-            const ring = document.getElementById('ring');
-            const btn = document.querySelector('.ask-btn');
+        function startAiProcess() {
+            const box = document.getElementById('aiBox');
+            const btn = document.getElementById('talkBtn');
+            const status = document.getElementById('aiStatus');
 
+            // Brauzerin səsi bloklamaması üçün kliklə həmən aktivləşdiririk
             box.style.display = 'block';
-            ring.style.display = 'block';
-            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> SATICI DANIŞIR...`;
+            btn.innerHTML = `<i class="fas fa-volume-up"></i> SATICI DANIŞIR...`;
+            btn.style.opacity = '0.5';
+            btn.disabled = true;
 
-            // Professional Azərbaycan Səsi (Google/ResponsiveVoice tərəfindən)
+            // Professional Azərbaycan səsi
+            // "Turkish Female" Azərbaycan dilinə ən yaxın və qırılmayan səsdir
             responsiveVoice.speak(
-                "Salam! Mən sizin virtual köməkçinizəm. Bu smartfon hazırda mağazamızda ən çox satılan modeldir. Səksən giqabayt daxili yaddaşı və süni intellektli kamerası var. Nağd alışda sizə özəl on faiz endirim edə bilərik. Başqa nəyi bilmək istərdiniz?", 
-                "Turkish Male", // Azərbaycan dili üçün ən yaxın və təmiz səs budur (və ya "Turkish Female")
+                "Salam! Mən sizin virtual köməkçinizəm. Samsung Galaxy S24 Ultra modelində hazırda xüsusi kampaniyamız var. Bu cihaz iki yüz meqapiksel kameraya və üstün süni intellekt funksiyalarına malikdir. Əgər indi alsanız, sizə qoruyucu şüşə və kabura hədiyyə olunacaq. Başqa nəyi bilmək istərdiniz?", 
+                "Turkish Female", 
                 {
                     pitch: 1, 
-                    rate: 1, 
+                    rate: 0.95, // Bir az yavaş ki, anlaşıqlı olsun
                     volume: 1,
                     onend: function() {
                         box.style.display = 'none';
-                        ring.style.display = 'none';
-                        btn.innerHTML = `<i class="fas fa-comment-dots"></i> YENİDƏN SORUŞ`;
+                        btn.innerHTML = `<i class="fas fa-play-circle"></i> YENİDƏN QULAQ AS`;
+                        btn.style.opacity = '1';
+                        btn.disabled = false;
                     }
                 }
             );
         }
 
-        window.onload = startCamera;
+        // Səhifə açılan kimi kameranı başlat
+        window.onload = initCamera;
     </script>
 </body>
 </html>
