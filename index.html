@@ -3,37 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Drive AI | Smart Boutique</title>
+    <title>AI Smart Seller</title>
     
     <script src="https://unpkg.com/html5-qrcode"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        :root { --neon-blue: #00f2ff; --bg-glass: rgba(0, 0, 0, 0.85); }
+        :root { --neon-blue: #00f2ff; --dark-bg: #0a0a0a; }
         body { margin: 0; background: #000; font-family: 'Inter', sans-serif; color: #fff; overflow: hidden; }
 
-        /* Kamera Fonu */
+        /* Skaner Fonu */
         #reader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
         
-        .overlay { position: relative; z-index: 10; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; pointer-events: none; }
-        .overlay * { pointer-events: auto; }
+        /* UI Qatı */
+        .overlay { position: relative; z-index: 10; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; }
 
-        /* Skaner Çərçivəsi */
-        .scan-box { align-self: center; width: 250px; height: 250px; border: 2px solid var(--neon-blue); border-radius: 20px; position: relative; box-shadow: 0 0 20px var(--neon-blue); margin-top: 50px; }
-        .scan-line { position: absolute; width: 100%; height: 2px; background: var(--neon-blue); animation: scan 2s infinite linear; }
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+        /* Canlı AI Satıcı Paneli (Aşağıda Sabit) */
+        .assistant-panel {
+            background: rgba(10, 10, 10, 0.95);
+            border-radius: 30px 30px 0 0;
+            padding: 25px;
+            border-top: 2px solid var(--neon-blue);
+            margin: 0 -20px;
+            display: none; /* Barkod oxunanda açılacaq */
+            animation: slideUp 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        }
 
-        /* Məhsul Kartı (Müştəri geyimi görsün) */
-        #productCard { background: var(--bg-glass); border-radius: 30px; padding: 20px; border: 1px solid var(--neon-blue); display: none; animation: slideUp 0.5s ease-out; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-        .image-slider { position: relative; width: 100%; height: 200px; border-radius: 20px; overflow: hidden; margin-bottom: 15px; background: #fff; }
-        #garmentImg { width: 100%; height: 100%; object-fit: contain; transition: 0.3s; }
+        /* Məhsulun Rəng Dəyişmə Hissəsi */
+        .preview-box {
+            width: 100%; height: 250px; background: #fff; border-radius: 20px;
+            margin-bottom: 20px; display: flex; align-items: center; justify-content: center;
+            position: relative; overflow: hidden;
+        }
+        #productImg { height: 90%; transition: all 0.5s ease; }
 
-        .color-dots { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; }
-        .dot { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; }
+        .color-selector { display: flex; justify-content: center; gap: 15px; margin: 15px 0; }
+        .color-btn { width: 35px; height: 35px; border-radius: 50%; border: 3px solid #fff; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
-        .action-btn { width: 100%; padding: 15px; background: var(--neon-blue); color: #000; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        /* AI Danışıq Dalğası */
+        .ai-wave { display: flex; justify-content: center; gap: 5px; height: 30px; align-items: center; margin-bottom: 10px; }
+        .bar { width: 4px; height: 10px; background: var(--neon-blue); border-radius: 10px; animation: wave 1s infinite ease-in-out; }
+        @keyframes wave { 0%, 100% { height: 10px; } 50% { height: 30px; } }
+
+        .status-text { text-align: center; font-size: 14px; color: var(--neon-blue); font-weight: bold; margin-bottom: 15px; }
     </style>
 </head>
 <body>
@@ -41,74 +55,88 @@
     <div id="reader"></div>
 
     <div class="overlay">
-        <div class="scan-box" id="scanBox">
-            <div class="scan-line"></div>
-            <p style="position:absolute; bottom:-40px; width:100%; text-align:center; color:var(--neon-blue); font-size:12px;">BARKODU SKAN EDİN</p>
+        <div style="text-align: center; padding-top: 20px;">
+            <div style="background: rgba(0,0,0,0.6); display: inline-block; padding: 10px 20px; border-radius: 50px; border: 1px solid var(--neon-blue);">
+                <i class="fas fa-barcode"></i> BARKODU SKAN EDİN
+            </div>
         </div>
 
-        <div id="productCard">
-            <h2 id="pName">İtalyan Pencəyi</h2>
-            <p style="opacity:0.7; font-size:14px;">Qiymət: <span id="pPrice">120 AZN</span></p>
+        <div class="assistant-panel" id="assistant">
+            <div class="ai-wave" id="wave" style="visibility: hidden;">
+                <div class="bar" style="animation-delay: 0.1s"></div>
+                <div class="bar" style="animation-delay: 0.2s"></div>
+                <div class="bar" style="animation-delay: 0.3s"></div>
+                <div class="bar" style="animation-delay: 0.4s"></div>
+                <div class="bar" style="animation-delay: 0.5s"></div>
+            </div>
             
-            <div class="image-slider">
-                <img id="garmentImg" src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400" alt="Geyim">
+            <div class="status-text" id="aiStatus">ASİSTENT SİZİ DİNLEYİR...</div>
+
+            <div class="preview-box">
+                <img id="productImg" src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400" alt="Geyim">
             </div>
 
-            <p style="text-align:center; font-size:12px; margin-bottom:10px;">Rəngi seçin:</p>
-            <div class="color-dots">
-                <div class="dot" style="background: #333;" onclick="changeColor('black')"></div>
-                <div class="dot" style="background: #000080;" onclick="changeColor('navy')"></div>
-                <div class="dot" style="background: #8B0000;" onclick="changeColor('darkred')"></div>
+            <div class="color-selector">
+                <div class="color-btn" style="background: #1a1a1a;" onclick="updateProduct('Qara', 0)"></div>
+                <div class="color-btn" style="background: #2b4561;" onclick="updateProduct('Göy', 210)"></div>
+                <div class="color-btn" style="background: #7d2d2d;" onclick="updateProduct('Qırmızı', 340)"></div>
             </div>
 
-            <button class="action-btn" onclick="askAI()">ASİSTENTİ DİNLƏ</button>
+            <div style="text-align: center;">
+                <h3 id="pName">Premium Pencək</h3>
+                <p id="pInfo" style="font-size: 14px; opacity: 0.7;">Qiymət: 145 AZN</p>
+                <button onclick="aiLogic()" style="background: var(--neon-blue); border:none; padding: 15px 30px; border-radius: 50px; font-weight: bold; margin-top: 15px; width: 100%;">
+                    <i class="fas fa-microphone"></i> SUAL VER
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
-        const pName = document.getElementById('pName');
-        const pPrice = document.getElementById('pPrice');
-        const pImg = document.getElementById('garmentImg');
-        const card = document.getElementById('productCard');
-        const scanBox = document.getElementById('scanBox');
+        const assistant = document.getElementById('assistant');
+        const productImg = document.getElementById('productImg');
+        const wave = document.getElementById('wave');
+        const status = document.getElementById('aiStatus');
 
-        // 1. Skaner Funksiyası
-        function onScanSuccess(decodedText, decodedResult) {
-            // Barkod oxunduqda işə düşür
-            scanBox.style.display = 'none';
-            card.style.display = 'block';
+        // 1. Skaner Sistemi
+        function onScanSuccess(decodedText) {
+            // Skaner dayandırılır və məhsul kartı açılır
+            html5QrcodeScanner.clear();
+            assistant.style.display = 'block';
             
-            // Simulyasiya: Barkod nömrəsinə görə məhsul gətiririk
-            pName.innerText = "Premium Yun Pencək";
-            pPrice.innerText = "185 AZN";
-            speak("Məhsul tapıldı. Bu bizim yeni kolleksiyamızdan olan premium yun pencəkdir. Nağd alışda sizə on beş faiz endirim edə bilərik.");
+            speak("Məhsul tanındı. Bu bizim yeni kolleksiyamızdır. Pencəyin qara, göy və tünd qırmızı rəngləri mövcuddur. Hansı rəngə baxmaq istərdiniz?");
         }
 
-        const html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+        let html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 15, qrbox: 250 });
         html5QrcodeScanner.render(onScanSuccess);
 
-        // 2. Rəng Dəyişmə Funksiyası
-        function changeColor(color) {
-            pImg.style.filter = `hue-rotate(${color === 'black' ? '0' : (color === 'navy' ? '220' : '350')}deg) brightness(${color === 'black' ? '0.5' : '1'})`;
-            speak("Bu rəng hal hazırda anbarda mövcuddur.");
-        }
-
-        // 3. Təmiz Azərbaycan Səsi
+        // 2. Canlı Səs və Məntiq (Heç vaxt donmayan)
         function speak(text) {
-            if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+            wave.style.visibility = 'visible';
+            status.innerText = "ASİSTENT DANIŞIR...";
             
-            const utterance = new SpeechSynthesisUtterance(text);
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'az-AZ';
+            msg.rate = 0.9;
             
-            // Azərbaycan dilini məcburi təyin edirik
-            utterance.lang = 'az-AZ';
-            utterance.rate = 0.9; // Daha təbii danışması üçün yavaşladırıq
-            utterance.pitch = 1;
-
-            window.speechSynthesis.speak(utterance);
+            msg.onend = () => {
+                wave.style.visibility = 'hidden';
+                status.innerText = "SİZİ DİNLEYİRƏM...";
+            };
+            
+            window.speechSynthesis.speak(msg);
         }
 
-        function askAI() {
-            speak("Bu geyim tamamilə təbii materialdan hazırlanıb və iki il zəmanət verilir. Razmerlərimiz mövcuddur.");
+        // 3. Rəng Sürüşdürmə/Dəyişmə
+        function updateProduct(colorName, hue) {
+            productImg.style.filter = `hue-rotate(${hue}deg)`;
+            speak(`Hazırda ${colorName} rəngini görürsünüz. Bu rəng maniken üzərində çox dəbli görünür.`);
+        }
+
+        // 4. Canlı AI Cavabı (Burada Gemini-ni xəyal et)
+        function aiLogic() {
+            // Buraya real bir API bağlamaq olar, amma indi bəsit məntiq qoyuram
+            speak("Bu pencək yüz faiz yun materialdan hazırlanıb. Soyuq havalarda sizi isti saxlayacaq. Başqa bir sualınız varmı?");
         }
     </script>
 </body>
