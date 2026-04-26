@@ -3,135 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HoloOrchestra PRO | 3-Meter Air Drums</title>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Sehrli Oyuncaq AI</title>
     <style>
-        body { background: #020617; overflow: hidden; touch-action: none; font-family: 'Inter', sans-serif; }
-        canvas { transform: scaleX(-1); border-radius: 30px; border: 4px solid #1e293b; }
-        .inst-zone { position: absolute; border: 2px dashed rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; color: rgba(255,255,255,0.3); transition: all 0.1s; }
-        .hit-effect { background: rgba(59, 130, 246, 0.4) !important; border-color: #3b82f6 !important; color: white !important; transform: scale(1.1); }
+        body { margin: 0; background: #000; font-family: 'Comic Sans MS', cursive; overflow: hidden; color: white; }
+        #cam { width: 100%; height: 100vh; object-fit: cover; position: fixed; }
+        .ui { position: absolute; bottom: 50px; width: 100%; text-align: center; z-index: 10; }
+        #talkBtn { 
+            background: #ff00ff; border: 5px solid white; border-radius: 50%; width: 100px; height: 100px; 
+            box-shadow: 0 0 20px #ff00ff; cursor: pointer; animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        #status { font-size: 20px; text-shadow: 2px 2px 5px black; margin-bottom: 20px; }
+        .mouth-effect { 
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 150px; height: 50px; border: 10px solid red; border-radius: 50%;
+            display: none; z-index: 5; background: black;
+        }
     </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen p-4">
+<body>
 
-    <div class="absolute top-8 text-center z-50">
-        <h1 class="text-4xl font-black text-white italic tracking-tighter">HOLO<span class="text-blue-500">ORCHESTRA</span></h1>
-        <p class="text-slate-400 text-xs mt-1 uppercase tracking-widest">3M Range Motion Engine</p>
+    <video id="cam" autoplay playsinline></video>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <div class="mouth-effect" id="mouth"></div>
+
+    <div class="ui">
+        <div id="status">OYUNCAĞINI GÖSTƏR VƏ DÜYMƏYƏ BAS!</div>
+        <button id="talkBtn" onclick="awakenToy()"></button>
     </div>
-
-    <div class="relative w-full max-w-5xl">
-        <canvas id="output_canvas" class="w-full h-auto bg-slate-950 shadow-2xl"></canvas>
-        <video id="input_video" class="hidden"></video>
-
-        <div id="zone-0" class="inst-zone w-32 h-32 top-[20%] left-[15%]">NAĞARA</div>
-        <div id="zone-1" class="inst-zone w-40 h-40 bottom-[25%] left-[35%]">QOŞA NAĞARA</div>
-        <div id="zone-2" class="inst-zone w-32 h-32 top-[20%] right-[15%]">TARELKA</div>
-    </div>
-
-    <button id="startBtn" class="mt-10 bg-blue-600 hover:bg-blue-500 text-white px-10 py-5 rounded-2xl font-black text-xl transition-all active:scale-90">ORKESTRİ BAŞLAT</button>
 
     <script>
-        const videoElement = document.getElementById('input_video');
-        const canvasElement = document.getElementById('output_canvas');
-        const canvasCtx = canvasElement.getContext('2d');
-        const startBtn = document.getElementById('startBtn');
+        // --- AYARLAR ---
+        const API_KEY = 'AIzaSyCbGLOBDKi6qj5KzKuLe5G1-8cVEY092S4'; // Öz API Key-ini bura yapışdır!
+        const URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
-        let audioCtx;
-        let isReady = false;
-        let lastY = [0, 0]; // Hər iki əlin son Y koordinatı
-        let lastTime = Date.now();
+        const video = document.getElementById('cam');
+        const canvas = document.getElementById('canvas');
+        const mouth = document.getElementById('mouth');
+        const status = document.getElementById('status');
 
-        // Alət zonalarının koordinatları (Faizlə)
-        const zones = [
-            { id: 'zone-0', x: 0.85, y: 0.25, freq: 100, type: 'sine' },  // Nağara (Bas)
-            { id: 'zone-1', x: 0.50, y: 0.75, freq: 200, type: 'triangle' }, // Qoşa Nağara
-            { id: 'zone-2', x: 0.15, y: 0.25, freq: 800, type: 'hi-hat' }  // Tarelka
-        ];
+        // Kameranı aç
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+            .then(s => video.srcObject = s);
 
-        startBtn.onclick = () => {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            isReady = true;
-            startBtn.style.display = 'none';
-        };
-
-        function playDrum(freq, type, velocity) {
-            if (!isReady) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
+        async function awakenToy() {
+            status.innerText = "OYUNCAĞINLA DANIŞIRAM...";
             
-            osc.type = type === 'hi-hat' ? 'square' : type;
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            // Şəkli çək
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            const base64Img = canvas.toDataURL('image/jpeg').split(',')[1];
 
-            // Zərbə gücü (velocity) səsin yüksəkliyinə təsir edir
-            const vol = Math.min(velocity / 10, 1); 
-            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+            // Gemini-yə göndər
+            const response = await fetch(URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [
+                            { text: "Sən uşaqlar üçün sehrli bir köməkçisən. Bu şəkildəki oyuncağı və ya cızma-qaranı tanı. Onun xarakterinə uyğun olaraq uşağa çox mehriban, qısa (maksimum 2 cümlə) və maraqlı bir salam de. Azərbaycan dilində danış." },
+                            { inline_data: { mime_type: "image/jpeg", data: base64Img } }
+                        ]
+                    }]
+                })
+            });
 
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.2);
+            const data = await response.json();
+            const aiText = data.candidates[0].content.parts[0].text;
+            sayIt(aiText);
         }
 
-        function onResults(results) {
-            canvasCtx.save();
-            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-            canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
-
-            if (results.multiHandLandmarks) {
-                results.multiHandLandmarks.forEach((hand, index) => {
-                    const wrist = hand[0]; // Bilək (daha stabil izləmə üçün)
-                    const x = wrist.x;
-                    const y = wrist.y;
-
-                    // Sürəti hesablayırıq (Zərbə anını tutmaq üçün)
-                    const dy = y - lastY[index];
-                    const velocity = dy / (Date.now() - lastTime) * 1000;
-                    
-                    lastY[index] = y;
-                    lastTime = Date.now();
-
-                    // Əgər sürətli bir "aşağı zərbə" hərəkəti varsa
-                    if (velocity > 1.5) { 
-                        zones.forEach(zone => {
-                            const dx = Math.abs(x - zone.x);
-                            const dy_zone = Math.abs(y - zone.y);
-                            
-                            if (dx < 0.15 && dy_zone < 0.15) {
-                                playDrum(zone.freq, zone.type, velocity);
-                                const el = document.getElementById(zone.id);
-                                el.classList.add('hit-effect');
-                                setTimeout(() => el.classList.remove('hit-effect'), 100);
-                            }
-                        });
-                    }
-
-                    // Marker çək
-                    canvasCtx.fillStyle = "#3b82f6";
-                    canvasCtx.beginPath();
-                    canvasCtx.arc((1-x) * canvasElement.width, y * canvasElement.height, 15, 0, 2*Math.PI);
-                    canvasCtx.fill();
-                });
-            }
-            canvasCtx.restore();
+        function sayIt(text) {
+            status.innerText = text;
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'az-AZ';
+            
+            // Səs gələndə "ağız" tərpənsin
+            utter.onstart = () => mouth.style.display = 'block';
+            utter.onend = () => {
+                mouth.style.display = 'none';
+                status.innerText = "YENİDƏN DANIŞMAQ ÜÇÜN BAS!";
+            };
+            
+            window.speechSynthesis.speak(utter);
         }
-
-        const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-        hands.setOptions({ maxNumHands: 2, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
-        hands.onResults(onResults);
-
-        const camera = new Camera(videoElement, {
-            onFrame: async () => {
-                canvasElement.width = videoElement.videoWidth;
-                canvasElement.height = videoElement.videoHeight;
-                await hands.send({image: videoElement});
-            },
-            width: 1280, height: 720
-        });
-        camera.start();
     </script>
 </body>
 </html>
