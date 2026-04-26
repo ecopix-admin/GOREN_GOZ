@@ -2,144 +2,119 @@
 <html lang="az">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Drive AI | Ultimate Co-Pilot</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AR Virtual Satıcı | DEMO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --neon-blue: #00f2ff; --neon-red: #ff004c; --bg-glass: rgba(10, 10, 10, 0.9); }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        body { background: #000; font-family: 'Segoe UI', sans-serif; color: #fff; overflow: hidden; height: 100vh; }
+        body { margin: 0; background: #000; font-family: 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; }
+        
+        /* Kamera Fon */
+        #video-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
+        
+        /* UI Qatı */
+        .app-ui { position: relative; z-index: 10; height: 100%; display: flex; flex-direction: column; padding: 20px; }
 
-        #mainCam { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
-        .ui-layer { position: relative; z-index: 10; height: 100%; display: flex; flex-direction: column; padding: 15px; }
+        /* Üst Panel: Hoşgeldiniz */
+        .welcome-panel { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px); padding: 15px; border-radius: 15px; border: 2px solid #00f2ff; text-align: center; margin-top: 10px; }
+        .welcome-title { font-size: 18px; font-weight: bold; color: #00f2ff; margin-bottom: 5px; }
+        .welcome-text { font-size: 12px; color: #fff; opacity: 0.8; }
 
-        /* Üst HUD */
-        .hud-top { background: var(--bg-glass); padding: 15px; border-radius: 20px; border-bottom: 2px solid var(--neon-blue); display: flex; justify-content: space-between; align-items: center; }
-        .speed-val { font-size: 50px; font-weight: 900; color: var(--neon-blue); }
+        /* Orta Hissə: Virtual Satıcı Düyməsi */
+        .v-assistant-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+        .v-assistant-btn { width: 100px; height: 100px; background: rgba(0, 242, 255, 0.2); border: 4px solid #00f2ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; animation: pulse 2s infinite; }
+        .v-assistant-btn i { font-size: 50px; color: #00f2ff; }
+        .v-status { margin-top: 10px; font-size: 14px; color: #00f2ff; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Radar və Yuxu Xəbərdarlığı */
-        #criticalAlert { 
-            display: none; position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
-            width: 80%; background: var(--neon-red); color: white; padding: 30px; 
-            border-radius: 30px; text-align: center; font-size: 24px; font-weight: bold;
-            box-shadow: 0 0 50px rgba(255, 0, 76, 0.8); z-index: 100;
+        /* Alt Panel: Məhsul Məlumatı (Məsələn) */
+        .product-panel { background: rgba(0, 0, 0, 0.8); border-radius: 20px 20px 0 0; padding: 20px; border-top: 3px solid #00f2ff; margin: auto -20px 0 -20px; display: none; }
+        .p-title { font-size: 20px; font-weight: bold; margin-bottom: 5px; }
+        .p-price { font-size: 18px; color: #ffcc00; font-weight: bold; margin-bottom: 10px; }
+        .p-desc { font-size: 14px; color: #fff; opacity: 0.8; line-height: 1.4; margin-bottom: 15px; }
+        .p-actions { display: flex; gap: 10px; }
+        .btn-call { flex: 1; padding: 12px; background: #00f2ff; color: #000; border: none; border-radius: 10px; font-weight: bold; }
+
+        /* Animasiya */
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 242, 255, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(0, 242, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 242, 255, 0); }
         }
-
-        /* Naviqasiya Paneli */
-        .nav-panel { margin-top: auto; background: var(--bg-glass); border-radius: 25px; padding: 20px; border: 1px solid var(--neon-blue); }
-        .search-row { display: flex; gap: 10px; margin-bottom: 15px; }
-        input { flex: 1; padding: 12px; border-radius: 10px; border: none; background: #222; color: #fff; outline: none; }
-        button { background: var(--neon-blue); color: #000; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; }
-
-        .nav-info { display: flex; justify-content: space-between; align-items: center; }
-        .dist-text { font-size: 22px; font-weight: bold; color: var(--neon-blue); }
-
-        #selfiePreview { position: absolute; bottom: 180px; right: 20px; width: 80px; height: 110px; border-radius: 10px; border: 2px solid var(--neon-blue); overflow: hidden; background: #000; }
-        #selfieVideo { width: 100%; height: 100%; object-fit: cover; }
     </style>
 </head>
 <body>
 
-    <video id="mainCam" autoplay playsinline muted></video>
+    <video id="video-bg" autoplay playsinline muted></video>
 
-    <div id="criticalAlert">DİQQƏT: YUXU TƏHLÜKƏSİ!</div>
-
-    <div class="ui-layer">
-        <div class="hud-top">
-            <div><i class="fas fa-circle" id="statusDot"></i> AKTİV</div>
-            <div style="text-align:center;"><span class="speed-val" id="speed">0</span><br><small>KM/H</small></div>
-            <div id="clock">00:00</div>
+    <div class="app-ui">
+        <div class="welcome-panel">
+            <div class="welcome-title">Hoş Gəldiniz!</div>
+            <div class="welcome-text">Mağazamızın virtual köməkçisi ilə tanış olun.</div>
         </div>
 
-        <div id="selfiePreview">
-            <video id="selfieVideo" autoplay playsinline muted></video>
-        </div>
-
-        <div class="nav-panel">
-            <div class="search-row">
-                <input type="text" id="dest" placeholder="Ünvanı daxil edin...">
-                <button onclick="startNav()">GET</button>
+        <div class="v-assistant-container">
+            <div class="v-assistant-btn" onclick="activateAssistant()">
+                <i class="fas fa-robot"></i>
             </div>
-            <div class="nav-info">
-                <div>
-                    <div id="streetName" style="font-weight:bold;">Yol izlənilir...</div>
-                    <div id="turnInfo" style="font-size:14px; opacity:0.7;">Düz davam edin</div>
-                </div>
-                <div class="dist-text" id="distDisplay">0 m</div>
+            <div class="v-status">Satıcı Oflayn</div>
+        </div>
+
+        <div class="product-panel" id="productPanel">
+            <div class="p-title">Smartfon GALAXY S24</div>
+            <div class="p-price">2499 AZN</div>
+            <div class="p-desc">
+                Ən yeni süni intellekt funksiyaları, 200MP kamera və 5000mAh batareya. Mağazamızda bu həftə xüsusi endirim var!
+            </div>
+            <div class="p-actions">
+                <button class="btn-call" onclick="askAI('Qiymət')">Süni İntellektə Soruş</button>
             </div>
         </div>
     </div>
 
     <script>
-        let lastSpeed = 0;
-        let sleepCounter = 0;
-
-        async function init() {
-            // Kameraları ardıcıl açırıq
+        // Kamera Giriş
+        async function initCamera() {
             try {
-                const stream1 = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-                document.getElementById('mainCam').srcObject = stream1;
-                
-                const stream2 = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-                document.getElementById('selfieVideo').srcObject = stream2;
-            } catch (e) {
-                console.log("Dual kamera dəstəklənmir, tək kameraya keçilir.");
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "environment" } 
+                });
+                document.getElementById('video-bg').srcObject = stream;
+            } catch (err) {
+                console.error("Kamera xətası: ", err);
+                alert("Kameraya icazə verilmədi!");
             }
-            
-            startGPS();
-            updateClock();
         }
 
-        function startGPS() {
-            navigator.geolocation.watchPosition(p => {
-                let s = p.coords.speed ? Math.round(p.coords.speed * 3.6) : 0;
-                document.getElementById('speed').innerText = s;
-                
-                // Məsafə formatı: 1000m-dən azsa "m", çoxsa "km"
-                updateDistanceDisplay(1200); // Test üçün sabit rəqəm
-            }, null, {enableHighAccuracy: true});
-        }
+        // Virtual Satıcını Aktivləşdir
+        function activateAssistant() {
+            const status = document.querySelector('.v-status');
+            const panel = document.getElementById('productPanel');
 
-        function updateDistanceDisplay(meters) {
-            const el = document.getElementById('distDisplay');
-            if(meters < 1000) {
-                el.innerText = meters + " m";
+            if (panel.style.display === 'none' || panel.style.display === '') {
+                // Aktivləşdir
+                status.innerText = "Satıcı Aktiv";
+                status.style.color = "#00f2ff";
+                panel.style.display = 'block';
+                speak("Salam! Mən sizin virtual köməkçinizəm. Mağazamızın ən yeni smartfonu ilə maraqlanırsınız?");
             } else {
-                el.innerText = (meters / 1000).toFixed(1) + " km";
+                // Deaktivləşdir
+                status.innerText = "Satıcı Oflayn";
+                status.style.color = "#ffcc00";
+                panel.style.display = 'none';
             }
         }
 
-        function startNav() {
-            const target = document.getElementById('dest').value;
-            if(!target) return;
-            document.getElementById('streetName').innerText = target;
-            speak(target + " istiqamətinə naviqasiya başladı. 500 metr sonra sağa dönün.");
+        function askAI(topic) {
+            // Test üçün bəsit səsli cavab
+            speak("Bu məhsulun rəsmi qiyməti 2499 AZN-dir, lakin bizdə nağd alışda 10 faiz endirim mövcuddur.");
         }
 
-        // Yuxu Analizi (Pixel-based simple detection)
-        function analyzeEyes() {
-            // Bu hissədə bəsit bir qaralma analizi aparırıq
-            // Əgər sürücü gözünü yumarsa (ekran qaralarsa və ya üz hərəkəti dayanarsa)
-            setInterval(() => {
-                // Sürücü nəzarəti simulyasiyası
-                // Real AI üçün BlazeFace kitabxanası lazımdır, amma donmaması üçün bəsit saxladım
-            }, 1000);
+        function speak(text) {
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'az-AZ'; // Azərbaycan dili
+            window.speechSynthesis.speak(msg);
         }
 
-        function speak(t) {
-            const u = new SpeechSynthesisUtterance(t);
-            u.lang = 'az-AZ';
-            window.speechSynthesis.speak(u);
-        }
-
-        function updateClock() {
-            setInterval(() => {
-                let d = new Date();
-                document.getElementById('clock').innerText = d.getHours() + ":" + String(d.getMinutes()).padStart(2, '0');
-            }, 1000);
-        }
-
-        window.onload = init;
+        window.onload = initCamera;
     </script>
 </body>
 </html>
