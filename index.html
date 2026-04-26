@@ -3,99 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Document Intelligence</title>
-    
-    <script src='https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js'></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <title>HoloOrchestra PRO | 3-Meter Air Drums</title>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { --accent: #00f2ff; --bg: #0a0a0a; }
-        body { background: var(--bg); font-family: 'Segoe UI', sans-serif; color: white; margin: 0; padding: 0; overflow: hidden; }
-        
-        #video { width: 100%; height: 50vh; object-fit: cover; border-bottom: 2px solid var(--accent); }
-        .controls { padding: 20px; text-align: center; }
-        
-        .result-box { 
-            background: rgba(255,255,255,0.05); border-radius: 15px; padding: 15px; 
-            height: 25vh; overflow-y: auto; margin: 10px; border: 1px solid #333;
-            font-size: 14px; white-space: pre-wrap;
-        }
-
-        .btn {
-            background: var(--accent); color: black; border: none; padding: 15px 30px;
-            border-radius: 50px; font-weight: bold; cursor: pointer; width: 80%;
-            margin: 10px 0; font-size: 16px; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-        }
-
-        .export-btns { display: flex; justify-content: center; gap: 10px; padding: 0 20px; display: none; }
-        .export-btn { background: #333; color: white; padding: 10px; border-radius: 10px; font-size: 12px; cursor: pointer; flex: 1; border: 1px solid #444; }
-        
-        #loading { display: none; color: var(--accent); font-weight: bold; margin: 10px; }
+        body { background: #020617; overflow: hidden; touch-action: none; font-family: 'Inter', sans-serif; }
+        canvas { transform: scaleX(-1); border-radius: 30px; border: 4px solid #1e293b; }
+        .inst-zone { position: absolute; border: 2px dashed rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; color: rgba(255,255,255,0.3); transition: all 0.1s; }
+        .hit-effect { background: rgba(59, 130, 246, 0.4) !important; border-color: #3b82f6 !important; color: white !important; transform: scale(1.1); }
     </style>
 </head>
-<body>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
 
-    <video id="video" autoplay playsinline></video>
-    <canvas id="canvas" style="display:none;"></canvas>
-
-    <div class="controls">
-        <div id="loading"><i class="fas fa-spinner fa-spin"></i> AI SƏNƏDİ OXUYUR...</div>
-        
-        <button class="btn" id="snapBtn" onclick="captureImage()">
-            <i class="fas fa-camera"></i> ŞƏKLİ ÇƏK VƏ ANALİZ ET
-        </button>
-
-        <div class="result-box" id="resultText">Sənədi kameraya tutun və düyməyə basın. Məlumatlar burada görünəcək.</div>
-
-        <div class="export-btns" id="exportGroup">
-            <div class="export-btn" onclick="shareToWhatsApp()"><i class="fab fa-whatsapp"></i> WhatsApp</div>
-            <div class="export-btn" onclick="alert('Excel faylı hazırlandı!')"><i class="fas fa-file-excel"></i> Excel</div>
-            <div class="export-btn" onclick="alert('PDF hazırlandı!')"><i class="fas fa-file-pdf"></i> PDF</div>
-        </div>
+    <div class="absolute top-8 text-center z-50">
+        <h1 class="text-4xl font-black text-white italic tracking-tighter">HOLO<span class="text-blue-500">ORCHESTRA</span></h1>
+        <p class="text-slate-400 text-xs mt-1 uppercase tracking-widest">3M Range Motion Engine</p>
     </div>
 
+    <div class="relative w-full max-w-5xl">
+        <canvas id="output_canvas" class="w-full h-auto bg-slate-950 shadow-2xl"></canvas>
+        <video id="input_video" class="hidden"></video>
+
+        <div id="zone-0" class="inst-zone w-32 h-32 top-[20%] left-[15%]">NAĞARA</div>
+        <div id="zone-1" class="inst-zone w-40 h-40 bottom-[25%] left-[35%]">QOŞA NAĞARA</div>
+        <div id="zone-2" class="inst-zone w-32 h-32 top-[20%] right-[15%]">TARELKA</div>
+    </div>
+
+    <button id="startBtn" class="mt-10 bg-blue-600 hover:bg-blue-500 text-white px-10 py-5 rounded-2xl font-black text-xl transition-all active:scale-90">ORKESTRİ BAŞLAT</button>
+
     <script>
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const resultText = document.getElementById('resultText');
-        const loading = document.getElementById('loading');
-        const exportGroup = document.getElementById('exportGroup');
+        const videoElement = document.getElementById('input_video');
+        const canvasElement = document.getElementById('output_canvas');
+        const canvasCtx = canvasElement.getContext('2d');
+        const startBtn = document.getElementById('startBtn');
 
-        // Kameranı başlat
-        async function initCamera() {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-            video.srcObject = stream;
-        }
+        let audioCtx;
+        let isReady = false;
+        let lastY = [0, 0]; // Hər iki əlin son Y koordinatı
+        let lastTime = Date.now();
 
-        async function captureImage() {
-            loading.style.display = 'block';
-            resultText.innerText = "Analiz gedir...";
+        // Alət zonalarının koordinatları (Faizlə)
+        const zones = [
+            { id: 'zone-0', x: 0.85, y: 0.25, freq: 100, type: 'sine' },  // Nağara (Bas)
+            { id: 'zone-1', x: 0.50, y: 0.75, freq: 200, type: 'triangle' }, // Qoşa Nağara
+            { id: 'zone-2', x: 0.15, y: 0.25, freq: 800, type: 'hi-hat' }  // Tarelka
+        ];
+
+        startBtn.onclick = () => {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            isReady = true;
+            startBtn.style.display = 'none';
+        };
+
+        function playDrum(freq, type, velocity) {
+            if (!isReady) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
             
-            const context = canvas.getContext('2d');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            
-            const imageData = canvas.toDataURL('image/png');
+            osc.type = type === 'hi-hat' ? 'square' : type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
 
-            // AI Analiz (OCR)
-            Tesseract.recognize(
-                imageData,
-                'aze+eng', // Azərbaycan və İngilis dillərini tanı
-                { logger: m => console.log(m) }
-            ).then(({ data: { text } }) => {
-                loading.style.display = 'none';
-                resultText.innerText = text || "Mətn tapılmadı.";
-                exportGroup.style.display = 'flex';
-            });
+            // Zərbə gücü (velocity) səsin yüksəkliyinə təsir edir
+            const vol = Math.min(velocity / 10, 1); 
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.2);
         }
 
-        function shareToWhatsApp() {
-            const text = encodeURIComponent("AI Skaner Nəticəsi:\n" + resultText.innerText);
-            window.open(`https://wa.me/?text=${text}`);
+        function onResults(results) {
+            canvasCtx.save();
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+            canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+            if (results.multiHandLandmarks) {
+                results.multiHandLandmarks.forEach((hand, index) => {
+                    const wrist = hand[0]; // Bilək (daha stabil izləmə üçün)
+                    const x = wrist.x;
+                    const y = wrist.y;
+
+                    // Sürəti hesablayırıq (Zərbə anını tutmaq üçün)
+                    const dy = y - lastY[index];
+                    const velocity = dy / (Date.now() - lastTime) * 1000;
+                    
+                    lastY[index] = y;
+                    lastTime = Date.now();
+
+                    // Əgər sürətli bir "aşağı zərbə" hərəkəti varsa
+                    if (velocity > 1.5) { 
+                        zones.forEach(zone => {
+                            const dx = Math.abs(x - zone.x);
+                            const dy_zone = Math.abs(y - zone.y);
+                            
+                            if (dx < 0.15 && dy_zone < 0.15) {
+                                playDrum(zone.freq, zone.type, velocity);
+                                const el = document.getElementById(zone.id);
+                                el.classList.add('hit-effect');
+                                setTimeout(() => el.classList.remove('hit-effect'), 100);
+                            }
+                        });
+                    }
+
+                    // Marker çək
+                    canvasCtx.fillStyle = "#3b82f6";
+                    canvasCtx.beginPath();
+                    canvasCtx.arc((1-x) * canvasElement.width, y * canvasElement.height, 15, 0, 2*Math.PI);
+                    canvasCtx.fill();
+                });
+            }
+            canvasCtx.restore();
         }
 
-        window.onload = initCamera;
+        const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
+        hands.setOptions({ maxNumHands: 2, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+        hands.onResults(onResults);
+
+        const camera = new Camera(videoElement, {
+            onFrame: async () => {
+                canvasElement.width = videoElement.videoWidth;
+                canvasElement.height = videoElement.videoHeight;
+                await hands.send({image: videoElement});
+            },
+            width: 1280, height: 720
+        });
+        camera.start();
     </script>
 </body>
 </html>
