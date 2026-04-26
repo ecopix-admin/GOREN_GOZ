@@ -2,125 +2,219 @@
 <html lang="az">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Drive AI Professional</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Drive AI | Ultimate Co-Pilot</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --neon-blue: #00f2ff; --neon-red: #ff004c; --warning: #ffcc00; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; background: #000; font-family: 'Inter', sans-serif; color: #fff; overflow: hidden; }
+        :root {
+            --neon-blue: #00f2ff;
+            --neon-red: #ff004c;
+            --bg-glass: rgba(10, 10, 10, 0.85);
+            --border-glow: 1px solid rgba(0, 242, 255, 0.4);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         
-        /* Arxa Fon Kamerası */
-        #mainCam { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: brightness(0.7); }
-        
-        /* UI Qatları */
-        .overlay { position: relative; z-index: 10; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom); }
+        body { 
+            background: #000; 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            color: #fff; 
+            overflow: hidden; 
+            height: 100vh;
+        }
 
-        /* HUD: Sürət və GPS */
-        .hud-top { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); padding: 15px; border-radius: 20px; border: 1px solid rgba(0, 242, 255, 0.3); }
-        .speed-display { text-align: center; }
-        .speed-value { font-size: 55px; font-weight: 900; color: var(--neon-blue); line-height: 1; }
-        .speed-unit { font-size: 14px; color: var(--neon-blue); opacity: 0.8; display: block; }
+        /* Arxa Fon Kamerası - Real Yol Görüntüsü */
+        #mainCam { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            object-fit: cover; z-index: 1; filter: brightness(0.7); 
+        }
 
-        /* Radar Alert: KRİTİK */
-        #radarBox { display: none; background: rgba(255, 0, 76, 0.9); border: 4px solid #fff; border-radius: 20px; padding: 20px; text-align: center; animation: pulse 0.5s infinite alternate; margin: 10px 0; }
-        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
-        .radar-dist { font-size: 32px; font-weight: bold; }
+        /* Əsas Konteynır */
+        .app-ui { 
+            position: relative; z-index: 10; height: 100%; 
+            display: flex; flex-direction: column; 
+            padding: env(safe-area-inset-top) 15px env(safe-area-inset-bottom);
+        }
 
-        /* Yuxu və Diqqət */
-        .face-monitor { position: fixed; bottom: 120px; right: 20px; width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--neon-blue); overflow: hidden; background: #000; }
+        /* HUD - Üst Panel */
+        .top-hud { 
+            display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: center;
+            background: var(--bg-glass); backdrop-filter: blur(15px);
+            padding: 15px; border-radius: 20px; border: var(--border-glow);
+            margin-top: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .status-pill { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 6px; }
+        .status-dot { width: 8px; height: 8px; background: var(--neon-blue); border-radius: 50%; box-shadow: 0 0 10px var(--neon-blue); }
+
+        .speed-box { text-align: center; }
+        .speed-value { font-size: 50px; font-weight: 800; color: var(--neon-blue); line-height: 1; font-variant-numeric: tabular-nums; }
+        .speed-unit { font-size: 12px; opacity: 0.6; display: block; margin-top: 2px; }
+
+        .time-box { text-align: right; font-weight: 500; opacity: 0.9; }
+
+        /* Radar Xəbərdarlığı - Orta Ekran */
+        #radarAlert { 
+            display: none; align-self: center; width: 90%;
+            background: rgba(255, 0, 76, 0.9); border: 3px solid #fff;
+            border-radius: 25px; padding: 25px; text-align: center;
+            box-shadow: 0 0 40px rgba(255, 0, 76, 0.6);
+            animation: pulseAlert 0.4s infinite alternate;
+        }
+
+        @keyframes pulseAlert { from { transform: scale(0.98); } to { transform: scale(1.03); } }
+        .radar-dist { font-size: 36px; font-weight: 900; }
+        .radar-limit { font-size: 18px; font-weight: 600; opacity: 0.9; }
+
+        /* Sürücü Monitoru - Sağ Alt */
+        .driver-preview { 
+            position: absolute; bottom: 130px; right: 15px;
+            width: 90px; height: 120px; border-radius: 15px;
+            border: 2px solid var(--neon-blue); overflow: hidden;
+            background: #111; box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+        }
         #selfieCam { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
 
-        /* Naviqasiya Alt Panel */
-        .nav-panel { background: rgba(0,0,0,0.85); border-radius: 25px 25px 0 0; padding: 20px; border-top: 3px solid var(--neon-blue); }
-        .instruction { font-size: 22px; font-weight: bold; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; }
+        /* Naviqasiya - Alt Panel */
+        .bottom-nav { 
+            background: var(--bg-glass); border-radius: 25px 25px 0 0;
+            padding: 25px; border-top: 3px solid var(--neon-blue);
+            margin: 0 -15px; margin-top: auto; backdrop-filter: blur(20px);
+        }
+
+        .nav-street { font-size: 22px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+        .nav-icon { color: var(--neon-blue); font-size: 24px; }
+        .nav-meta { display: flex; justify-content: space-between; opacity: 0.7; font-size: 14px; }
+
+        /* İcazə Düyməsi (Başlanğıc üçün) */
+        #startOverlay {
+            position: fixed; inset: 0; z-index: 999; background: #000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .start-btn {
+            padding: 20px 40px; background: var(--neon-blue); color: #000;
+            border: none; border-radius: 50px; font-size: 18px; font-weight: bold;
+            cursor: pointer; box-shadow: 0 0 20px var(--neon-blue);
+        }
     </style>
 </head>
 <body>
 
+    <div id="startOverlay">
+        <h2 style="margin-bottom: 20px;">DRIVE AI READY</h2>
+        <button class="start-btn" onclick="initializeSystem()">SİSTEMİ BAŞLAT</button>
+        <p style="margin-top: 20px; font-size: 12px; opacity: 0.5;">Kamera və GPS icazəsi tələb olunur</p>
+    </div>
+
     <video id="mainCam" autoplay playsinline muted></video>
     
-    <div class="overlay">
-        <div class="hud-top">
-            <div id="status"><i class="fas fa-circle" style="color:var(--neon-blue)"></i> SİSTEM AKTİV</div>
-            <div class="speed-display">
+    <div class="app-ui">
+        <div class="top-hud">
+            <div class="status-pill"><div class="status-dot"></div> Aktiv</div>
+            <div class="speed-box">
                 <span class="speed-value" id="currentSpeed">0</span>
                 <span class="speed-unit">KM/H</span>
             </div>
-            <div id="clock">00:00</div>
+            <div class="time-box" id="currentTime">00:00</div>
         </div>
 
-        <div id="radarBox">
-            <i class="fas fa-camera-retro fa-2x"></i>
-            <div class="radar-dist"><span id="distVal">300</span> METR</div>
-            <div id="radarInfo">RADAR: 90 KM/H</div>
+        <div id="radarAlert">
+            <i class="fas fa-video fa-3x" style="margin-bottom: 10px;"></i>
+            <div class="radar-dist"><span id="distVal">--</span> M</div>
+            <div class="radar-limit" id="radarText">RADAR: 90 KM/H</div>
         </div>
 
-        <div class="face-monitor">
+        <div class="driver-preview">
             <video id="selfieCam" autoplay playsinline muted></video>
         </div>
 
-        <div class="nav-panel">
-            <div class="instruction">
-                <i class="fas fa-arrow-up-right-from-square" style="color:var(--neon-blue)"></i>
-                <span id="targetStreet">Zığ Şossesi istiqaməti</span>
+        <div class="bottom-nav">
+            <div class="nav-street">
+                <i class="fas fa-location-arrow nav-icon"></i>
+                <span id="targetName">Zığ Şossesi istiqaməti</span>
             </div>
-            <div style="opacity: 0.7; font-size: 14px;">Məsafə: 1.2 km | Tahmini: 4 dəq</div>
+            <div class="nav-meta">
+                <span><i class="far fa-clock"></i> 4 dəq</span>
+                <span><i class="fas fa-road"></i> 1.2 km</span>
+                <span><i class="fas fa-signal"></i> GPS Sabit</span>
+            </div>
         </div>
     </div>
 
-    <audio id="alertSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
-
     <script>
-        // RADAR BAZASI (Koordinatlar)
         const radars = [
-            { id: 1, name: "Zığ Şossesi", lat: 40.370, lng: 49.940, limit: 90 },
-            { id: 2, name: "Aeroport Yolu", lat: 40.450, lng: 50.050, limit: 110 },
-            { id: 3, name: "Yasamal", lat: 40.385, lng: 49.810, limit: 60 }
+            { name: "Zığ Şossesi", lat: 40.370, lng: 49.940, limit: 90 },
+            { name: "Aeroport Yolu", lat: 40.450, lng: 50.050, limit: 110 },
+            { name: "Yasamal", lat: 40.385, lng: 49.810, limit: 60 },
+            { name: "Babək Pr.", lat: 40.388, lng: 49.895, limit: 80 }
         ];
 
-        const speedEl = document.getElementById('currentSpeed');
-        const radarBox = document.getElementById('radarBox');
-        const alertSnd = document.getElementById('alertSound');
+        let voiceReady = false;
+        window.speechSynthesis.onvoiceschanged = () => { voiceReady = true; };
 
-        // 1. GPS VƏ SÜRAT (Gecikməsiz)
-        if ("geolocation" in navigator) {
-            navigator.geolocation.watchPosition(position => {
-                const { latitude, longitude, speed } = position.coords;
-                
-                // Sürəti göstər (m/s to km/h)
-                const kmh = speed ? Math.round(speed * 3.6) : 0;
-                speedEl.innerText = kmh;
+        async function initializeSystem() {
+            document.getElementById('startOverlay').style.display = 'none';
+            
+            // 1. Arxa Kamera
+            try {
+                const backStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "environment", frameRate: { ideal: 30 } } 
+                });
+                document.getElementById('mainCam').srcObject = backStream;
+            } catch (e) { console.error("Arxa kamera xətası"); }
 
-                // Radar yoxlanışı
-                checkRadars(latitude, longitude);
-            }, err => console.error(err), { 
-                enableHighAccuracy: true, 
-                maximumAge: 0, 
-                timeout: 5000 
-            });
+            // 2. Ön Kamera (Selfie)
+            setTimeout(async () => {
+                try {
+                    const frontStream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { facingMode: "user" } 
+                    });
+                    document.getElementById('selfieCam').srcObject = frontStream;
+                } catch (e) { console.error("Ön kamera xətası"); }
+            }, 1000);
+
+            startGPS();
+            startTime();
         }
 
-        function checkRadars(myLat, myLng) {
-            radars.forEach(radar => {
-                const dist = getDistance(myLat, myLng, radar.lat, radar.lng);
-                if (dist < 400) { // 400 metr qalmış xəbərdarlıq
-                    radarBox.style.display = 'block';
-                    document.getElementById('distVal').innerText = Math.round(dist);
-                    document.getElementById('radarInfo').innerText = `RADAR: ${radar.limit} KM/H`;
+        function startGPS() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.watchPosition(position => {
+                    const { latitude, longitude, speed } = position.coords;
                     
-                    if (dist < 350 && !window.isBeeping) {
-                        playVoice(`Diqqət! ${radar.limit} radarı yaxınlaşır.`);
-                        window.isBeeping = true;
-                    }
-                } else {
-                    radarBox.style.display = 'none';
-                    window.isBeeping = false;
+                    // Sürət hesablama
+                    const kmh = speed ? Math.round(speed * 3.6) : 0;
+                    document.getElementById('currentSpeed').innerText = kmh;
+
+                    // Radar yoxlanışı
+                    checkRadars(latitude, longitude);
+                }, null, { enableHighAccuracy: true });
+            }
+        }
+
+        function checkRadars(lat, lng) {
+            let found = false;
+            radars.forEach(radar => {
+                const dist = getDistance(lat, lng, radar.lat, radar.lng);
+                if (dist < 450) {
+                    found = true;
+                    updateRadarUI(Math.round(dist), radar.limit, radar.name);
                 }
             });
+            if (!found) document.getElementById('radarAlert').style.display = 'none';
         }
 
-        // Riyazi Məsafə Formulası (Haversine)
+        function updateRadarUI(dist, limit, name) {
+            const alert = document.getElementById('radarAlert');
+            alert.style.display = 'block';
+            document.getElementById('distVal').innerText = dist;
+            document.getElementById('radarText').innerText = `RADAR: ${limit} KM/H (${name})`;
+            
+            if (dist < 400 && dist > 380) {
+                speak(`Diqqət, 400 metr sonra ${limit} radarı.`);
+            }
+        }
+
         function getDistance(lat1, lon1, lat2, lon2) {
             const R = 6371e3;
             const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -129,31 +223,21 @@
             return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         }
 
-        // 2. KAMERALAR (Dual Camera Support)
-        async function startCams() {
-            try {
-                const backStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-                document.getElementById('mainCam').srcObject = backStream;
-
-                const frontStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-                document.getElementById('selfieCam').srcObject = frontStream;
-            } catch (e) { alert("Kameralara icazə verilmədi!"); }
-        }
-
-        // 3. SƏSLİ XƏBƏRDARLIQ
-        function playVoice(text) {
+        function speak(text) {
+            if (window.speechSynthesis.speaking) return;
             const ut = new SpeechSynthesisUtterance(text);
             ut.lang = 'az-AZ';
             window.speechSynthesis.speak(ut);
         }
 
-        // Saatı yenilə
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
-        }, 1000);
-
-        window.onload = startCams;
+        function startTime() {
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('currentTime').innerText = 
+                    String(now.getHours()).padStart(2, '0') + ":" + 
+                    String(now.getMinutes()).padStart(2, '0');
+            }, 1000);
+        }
     </script>
 </body>
 </html>
