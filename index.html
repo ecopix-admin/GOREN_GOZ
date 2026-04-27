@@ -2,103 +2,148 @@
 <html lang="az">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Magic Toy AI</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sham-Light Auto-Chat</title>
     <style>
-        .pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
-        #mouth { transition: all 0.1s ease-in-out; }
+        :root { --primary: #00ff88; --bg: #0f0f0f; --dark-card: #1a1a1a; }
+        body { margin: 0; background: var(--bg); color: white; font-family: 'Inter', sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        /* Header */
+        .header { padding: 15px; background: var(--dark-card); display: flex; align-items: center; border-bottom: 1px solid #333; }
+        .status-dot { width: 10px; height: 10px; background: var(--primary); border-radius: 50%; margin-right: 10px; box-shadow: 0 0 10px var(--primary); }
+        .header h2 { margin: 0; font-size: 1.1rem; }
+
+        /* Mesaj Ekranı */
+        #chatBox { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { max-width: 80%; padding: 12px 18px; border-radius: 20px; font-size: 1rem; line-height: 1.4; }
+        .msg.sent { align-self: flex-end; background: var(--primary); color: #000; border-bottom-right-radius: 2px; }
+        .msg.received { align-self: flex-start; background: #333; color: white; border-bottom-left-radius: 2px; }
+
+        /* Kamera Önizləmə (Kiçik) */
+        #previewContainer { position: fixed; top: 70px; right: 10px; width: 100px; height: 130px; border-radius: 12px; overflow: hidden; border: 2px solid var(--primary); z-index: 100; background: #000; }
+        video { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Giriş Hissəsi */
+        .input-area { padding: 20px; background: var(--dark-card); display: flex; gap: 10px; border-top: 1px solid #333; }
+        input { flex: 1; padding: 15px; border-radius: 25px; border: 1px solid #444; background: #222; color: white; outline: none; }
+        button { width: 50px; height: 50px; border-radius: 50%; border: none; background: var(--primary); color: #000; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button:active { transform: scale(0.9); }
+
+        canvas { display: none; }
     </style>
 </head>
-<body class="bg-black h-screen flex flex-col items-center justify-between overflow-hidden">
+<body>
 
-    <video id="video" autoplay playsinline class="absolute inset-0 w-full h-full object-cover opacity-60"></video>
-    <canvas id="canvas" class="hidden"></canvas>
-
-    <div id="statusBox" class="z-10 mt-10 p-4 bg-black/80 border border-magenta-500 rounded-xl text-white text-center w-4/5 text-sm font-bold">
-        OYUNCAĞINI GÖSTƏR VƏ DÜYMƏYƏ BAS
+    <div class="header">
+        <div class="status-dot"></div>
+        <h2>SHAM-LIGHT AUTO-CHANNAL</h2>
     </div>
 
-    <div id="mouth" class="z-20 w-32 h-10 bg-red-600 rounded-full border-4 border-white hidden shadow-[0_0_50px_rgba(255,0,0,0.8)]"></div>
+    <div id="previewContainer">
+        <video id="video" autoplay playsinline></video>
+        <canvas id="canvas"></canvas>
+    </div>
 
-    <div class="z-10 mb-12 flex flex-col items-center">
-        <button id="actionBtn" class="w-24 h-24 bg-gradient-to-tr from-purple-600 to-pink-500 rounded-full border-4 border-white shadow-2xl flex items-center justify-center active:scale-90 transition-transform">
-            <div class="w-8 h-8 bg-white rounded-sm rotate-45"></div>
-        </button>
-        <p class="text-white/50 text-[10px] mt-4 uppercase tracking-widest">AI Powered by Gemini</p>
+    <div id="chatBox">
+        <div class="msg received">Sistem aktivdir. Kameranı qarşı tərəfin flaşına tuşlayın və yazın.</div>
+    </div>
+
+    <div class="input-area">
+        <input type="text" id="msgInput" placeholder="Mesaj yazın...">
+        <button onclick="sendMsg()">➤</button>
     </div>
 
     <script>
-        const API_KEY = "AIzaSyCbGLOBDKi6qj5KzKuLe5G1-8cVEY092S4";
+        const chatBox = document.getElementById('chatBox');
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
-        const statusBox = document.getElementById('statusBox');
-        const mouth = document.getElementById('mouth');
-        const btn = document.getElementById('actionBtn');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        let track;
+        let binBuffer = "";
 
-        // Kameranı ən yüksək keyfiyyətdə aç
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment", focusMode: "continuous" } })
-            .then(stream => video.srcObject = stream);
-
-        async function processVision() {
-            statusBox.innerText = "OYUNCAĞI ANALİZ EDİRƏM...";
-            statusBox.classList.add('pulse');
-            
-            // Şəkli yüksək sürətlə çək
-            const context = canvas.getContext('2d');
-            canvas.width = video.videoWidth / 2; // Sürət üçün optimizasiya
-            canvas.height = video.videoHeight / 2;
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const base64 = canvas.toDataURL('image/jpeg', 0.6).split(',')[1];
-
+        // 1. Kameranı və Dinləməni Başlat (Avtomatik)
+        async function initSystem() {
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        contents: [{ parts: [
-                            { text: "Sən bu şəkildəki kuklasan. Çox şən və uşaq dili ilə Azərbaycan dilində salam de. Maksimum 7 söz olsun." },
-                            { inline_data: { mime_type: "image/jpeg", data: base64 } }
-                        ]}]
-                    })
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "environment", width: 128, height: 128 } 
                 });
-
-                const data = await response.json();
-                const aiText = data.candidates[0].content.parts[0].text;
-                talk(aiText);
+                video.srcObject = stream;
+                track = stream.getVideoTracks()[0];
+                startListening();
             } catch (err) {
-                statusBox.innerText = "İNTERNET GECİKDİ, BİR DAHA CƏHD ET!";
-                statusBox.classList.remove('pulse');
+                addMessage("Xəta: Kameraya icazə verilmədi.", 'received');
             }
         }
 
-        function talk(text) {
-            statusBox.innerText = text;
-            statusBox.classList.remove('pulse');
-            const speech = new SpeechSynthesisUtterance(text);
-            speech.lang = 'az-AZ';
+        // 2. Mesaj Göndərmə (TX)
+        async function sendMsg() {
+            const input = document.getElementById('msgInput');
+            const text = input.value;
+            if(!text || !track) return;
+
+            addMessage(text, 'sent');
+            input.value = "";
+
+            const binary = text.split('').map(c => c.charCodeAt(0).toString(2).padStart(8, '0')).join('') + '00000000'; // Sonda bitirmə baytı
             
-            speech.onstart = () => {
-                mouth.style.display = 'block';
-                animateMouth();
-            };
-            speech.onend = () => {
-                mouth.style.display = 'none';
-                statusBox.innerText = "YENİDƏN DANIŞDIR!";
-            };
-            
-            window.speechSynthesis.speak(speech);
+            for (let bit of binary) {
+                const val = bit === "1";
+                await track.applyConstraints({ advanced: [{ torch: val }] });
+                await new Promise(r => setTimeout(r, 100)); // Ötürmə sürəti (100ms)
+            }
+            await track.applyConstraints({ advanced: [{ torch: false }] });
         }
 
-        function animateMouth() {
-            if (mouth.style.display === 'block') {
-                mouth.style.height = (Math.random() * 50 + 10) + 'px';
-                setTimeout(animateMouth, 100);
+        // 3. Avtomatik Qəbul Etmə (RX)
+        function startListening() {
+            setInterval(() => {
+                canvas.width = 32;
+                canvas.height = 32;
+                ctx.drawImage(video, 0, 0, 32, 32);
+                const data = ctx.getImageData(0, 0, 32, 32).data;
+                
+                let brightness = 0;
+                for (let i = 0; i < data.length; i += 4) {
+                    brightness += (data[i] + data[i+1] + data[i+2]) / 3;
+                }
+                brightness /= (data.length / 4);
+
+                const bit = brightness > 150 ? "1" : "0";
+                processBit(bit);
+            }, 100);
+        }
+
+        let lastBit = "";
+        let bitCount = 0;
+        function processBit(bit) {
+            binBuffer += bit;
+            if(binBuffer.length >= 8) {
+                const byte = binBuffer.slice(-8);
+                if(byte === "00000000" && binBuffer.length > 16) {
+                    decodeBuffer();
+                }
             }
         }
 
-        btn.onclick = processVision;
+        function decodeBuffer() {
+            let text = "";
+            for(let i=0; i < binBuffer.length - 8; i+=8) {
+                const byte = binBuffer.substr(i, 8);
+                text += String.fromCharCode(parseInt(byte, 2));
+            }
+            if(text.trim().length > 0) addMessage(text, 'received');
+            binBuffer = "";
+        }
+
+        function addMessage(text, type) {
+            const div = document.createElement('div');
+            div.className = `msg ${type}`;
+            div.innerText = text;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        window.onload = initSystem;
     </script>
 </body>
 </html>
