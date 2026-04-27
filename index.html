@@ -3,147 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sham-Light Auto-Chat</title>
+    <title>Sham-Light Professional</title>
     <style>
-        :root { --primary: #00ff88; --bg: #0f0f0f; --dark-card: #1a1a1a; }
-        body { margin: 0; background: var(--bg); color: white; font-family: 'Inter', sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        
-        /* Header */
-        .header { padding: 15px; background: var(--dark-card); display: flex; align-items: center; border-bottom: 1px solid #333; }
-        .status-dot { width: 10px; height: 10px; background: var(--primary); border-radius: 50%; margin-right: 10px; box-shadow: 0 0 10px var(--primary); }
-        .header h2 { margin: 0; font-size: 1.1rem; }
-
-        /* Mesaj Ekranı */
+        :root { --primary: #00ff88; --bg: #0f0f0f; }
+        body { margin: 0; background: var(--bg); color: white; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; }
+        .header { padding: 15px; background: #1a1a1a; display: flex; align-items: center; border-bottom: 1px solid #333; justify-content: space-between; }
         #chatBox { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .msg { max-width: 80%; padding: 12px 18px; border-radius: 20px; font-size: 1rem; line-height: 1.4; }
-        .msg.sent { align-self: flex-end; background: var(--primary); color: #000; border-bottom-right-radius: 2px; }
-        .msg.received { align-self: flex-start; background: #333; color: white; border-bottom-left-radius: 2px; }
-
-        /* Kamera Önizləmə (Kiçik) */
-        #previewContainer { position: fixed; top: 70px; right: 10px; width: 100px; height: 130px; border-radius: 12px; overflow: hidden; border: 2px solid var(--primary); z-index: 100; background: #000; }
+        .msg { max-width: 80%; padding: 12px; border-radius: 15px; font-size: 0.95rem; }
+        .sent { align-self: flex-end; background: var(--primary); color: #000; }
+        .received { align-self: flex-start; background: #333; }
+        #preview { position: fixed; top: 70px; right: 10px; width: 90px; height: 120px; border: 2px solid var(--primary); border-radius: 10px; overflow: hidden; z-index: 100; }
         video { width: 100%; height: 100%; object-fit: cover; }
-
-        /* Giriş Hissəsi */
-        .input-area { padding: 20px; background: var(--dark-card); display: flex; gap: 10px; border-top: 1px solid #333; }
-        input { flex: 1; padding: 15px; border-radius: 25px; border: 1px solid #444; background: #222; color: white; outline: none; }
-        button { width: 50px; height: 50px; border-radius: 50%; border: none; background: var(--primary); color: #000; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        button:active { transform: scale(0.9); }
-
-        canvas { display: none; }
+        .input-area { padding: 15px; background: #1a1a1a; display: flex; gap: 10px; }
+        input { flex: 1; padding: 12px; border-radius: 20px; border: 1px solid #444; background: #222; color: white; }
+        button { width: 45px; height: 45px; border-radius: 50%; border: none; background: var(--primary); font-weight: bold; cursor: pointer; }
+        #sync { font-size: 0.7rem; color: #888; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="status-dot"></div>
-        <h2>SHAM-LIGHT AUTO-CHANNAL</h2>
-    </div>
+<div class="header">
+    <div><h2>SHAM-LIGHT PRO</h2></div>
+    <div id="sync">SİNKRONİZASİYA: GÖZLƏNİLİR</div>
+</div>
 
-    <div id="previewContainer">
-        <video id="video" autoplay playsinline></video>
-        <canvas id="canvas"></canvas>
-    </div>
+<div id="preview"><video id="video" autoplay playsinline></video></div>
+<div id="chatBox"></div>
 
-    <div id="chatBox">
-        <div class="msg received">Sistem aktivdir. Kameranı qarşı tərəfin flaşına tuşlayın və yazın.</div>
-    </div>
+<div class="input-area">
+    <input type="text" id="msgInput" placeholder="Mesajınızı yazın...">
+    <button id="sendBtn">➤</button>
+</div>
 
-    <div class="input-area">
-        <input type="text" id="msgInput" placeholder="Mesaj yazın...">
-        <button onclick="sendMsg()">➤</button>
-    </div>
+<canvas id="canvas" style="display:none;"></canvas>
 
-    <script>
-        const chatBox = document.getElementById('chatBox');
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        let track;
-        let binBuffer = "";
+<script>
+    const chatBox = document.getElementById('chatBox');
+    const msgInput = document.getElementById('msgInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let videoTrack;
 
-        // 1. Kameranı və Dinləməni Başlat (Avtomatik)
-        async function initSystem() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "environment", width: 128, height: 128 } 
-                });
-                video.srcObject = stream;
-                track = stream.getVideoTracks()[0];
-                startListening();
-            } catch (err) {
-                addMessage("Xəta: Kameraya icazə verilmədi.", 'received');
+    // SİSTEMİ BAŞLAT (İstifadəçi toxunuşu ilə fənər icazəsi almaq üçün)
+    async function init() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: "environment", focusMode: "continuous" } 
+            });
+            video.srcObject = stream;
+            videoTrack = stream.getVideoTracks()[0];
+            startReceiver();
+        } catch (e) { alert("Kamera xətası: " + e); }
+    }
+
+    // FƏNƏRİ İDARƏ EDƏN FUNKSİYA (Məhz bu hissə A32-də işləməlidir)
+    async function toggleTorch(state) {
+        if (!videoTrack) return;
+        try {
+            await videoTrack.applyConstraints({
+                advanced: [{ torch: state }]
+            });
+        } catch (e) { console.error("Flaş xətası:", e); }
+    }
+
+    // MESAJ GÖNDƏRMƏ (TX)
+    sendBtn.addEventListener('click', async () => {
+        const text = msgInput.value;
+        if (!text || !videoTrack) return;
+        
+        addMsg(text, 'sent');
+        msgInput.value = "";
+
+        // Start Sequence (3 sürətli yanıb sönmə - Qəbuledici bununla tanıyacaq)
+        for(let i=0; i<3; i++) {
+            await toggleTorch(true); await new Promise(r => setTimeout(r, 50));
+            await toggleTorch(false); await new Promise(r => setTimeout(r, 50));
+        }
+
+        const binary = text.split('').map(c => c.charCodeAt(0).toString(2).padStart(8, '0')).join('');
+        
+        for (let bit of binary) {
+            await toggleTorch(bit === "1");
+            await new Promise(r => setTimeout(r, 200)); // Sürəti bir az azaltdıq ki, dəqiq olsun
+        }
+        await toggleTorch(false);
+    });
+
+    // QƏBULEDİCİ (RX) - Küy filtrli
+    let bitStream = "";
+    function startReceiver() {
+        setInterval(() => {
+            canvas.width = 20; canvas.height = 20;
+            ctx.drawImage(video, 0, 0, 20, 20);
+            const d = ctx.getImageData(0, 0, 20, 20).data;
+            let bright = 0;
+            for (let i=0; i<d.length; i+=4) bright += (d[i]+d[i+1]+d[i+2])/3;
+            bright /= (d.length/4);
+
+            // Dinamik küy filtri (Yalnız çox parlaq işığı qəbul edir)
+            const bit = bright > 200 ? "1" : "0";
+            processBit(bit);
+        }, 200);
+    }
+
+    function processBit(bit) {
+        bitStream += bit;
+        if (bitStream.length >= 8) {
+            const byte = bitStream.slice(-8);
+            const code = parseInt(byte, 2);
+            if (code > 31 && code < 127) { // Yalnız oxunaqlı hərflər
+                addMsg(String.fromCharCode(code), 'received');
+                bitStream = ""; // Buffer təmizlə
+            } else if (bitStream.length > 32) {
+                bitStream = bitStream.slice(1); // Küyü sürüşdür
             }
         }
+    }
 
-        // 2. Mesaj Göndərmə (TX)
-        async function sendMsg() {
-            const input = document.getElementById('msgInput');
-            const text = input.value;
-            if(!text || !track) return;
+    function addMsg(t, type) {
+        const d = document.createElement('div');
+        d.className = `msg ${type}`;
+        d.innerText = t;
+        chatBox.appendChild(d);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
 
-            addMessage(text, 'sent');
-            input.value = "";
-
-            const binary = text.split('').map(c => c.charCodeAt(0).toString(2).padStart(8, '0')).join('') + '00000000'; // Sonda bitirmə baytı
-            
-            for (let bit of binary) {
-                const val = bit === "1";
-                await track.applyConstraints({ advanced: [{ torch: val }] });
-                await new Promise(r => setTimeout(r, 100)); // Ötürmə sürəti (100ms)
-            }
-            await track.applyConstraints({ advanced: [{ torch: false }] });
-        }
-
-        // 3. Avtomatik Qəbul Etmə (RX)
-        function startListening() {
-            setInterval(() => {
-                canvas.width = 32;
-                canvas.height = 32;
-                ctx.drawImage(video, 0, 0, 32, 32);
-                const data = ctx.getImageData(0, 0, 32, 32).data;
-                
-                let brightness = 0;
-                for (let i = 0; i < data.length; i += 4) {
-                    brightness += (data[i] + data[i+1] + data[i+2]) / 3;
-                }
-                brightness /= (data.length / 4);
-
-                const bit = brightness > 150 ? "1" : "0";
-                processBit(bit);
-            }, 100);
-        }
-
-        let lastBit = "";
-        let bitCount = 0;
-        function processBit(bit) {
-            binBuffer += bit;
-            if(binBuffer.length >= 8) {
-                const byte = binBuffer.slice(-8);
-                if(byte === "00000000" && binBuffer.length > 16) {
-                    decodeBuffer();
-                }
-            }
-        }
-
-        function decodeBuffer() {
-            let text = "";
-            for(let i=0; i < binBuffer.length - 8; i+=8) {
-                const byte = binBuffer.substr(i, 8);
-                text += String.fromCharCode(parseInt(byte, 2));
-            }
-            if(text.trim().length > 0) addMessage(text, 'received');
-            binBuffer = "";
-        }
-
-        function addMessage(text, type) {
-            const div = document.createElement('div');
-            div.className = `msg ${type}`;
-            div.innerText = text;
-            chatBox.appendChild(div);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        window.onload = initSystem;
-    </script>
+    // İlk toxunuşda sistemi aktivləşdir
+    window.addEventListener('touchstart', init, {once: true});
+    window.addEventListener('click', init, {once: true});
+</script>
 </body>
 </html>
