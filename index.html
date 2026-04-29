@@ -1,138 +1,23 @@
 <!DOCTYPE html>
-<html lang="az">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sham-Light Professional</title>
-    <style>
-        :root { --primary: #00ff88; --bg: #0f0f0f; }
-        body { margin: 0; background: var(--bg); color: white; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; }
-        .header { padding: 15px; background: #1a1a1a; display: flex; align-items: center; border-bottom: 1px solid #333; justify-content: space-between; }
-        #chatBox { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .msg { max-width: 80%; padding: 12px; border-radius: 15px; font-size: 0.95rem; }
-        .sent { align-self: flex-end; background: var(--primary); color: #000; }
-        .received { align-self: flex-start; background: #333; }
-        #preview { position: fixed; top: 70px; right: 10px; width: 90px; height: 120px; border: 2px solid var(--primary); border-radius: 10px; overflow: hidden; z-index: 100; }
-        video { width: 100%; height: 100%; object-fit: cover; }
-        .input-area { padding: 15px; background: #1a1a1a; display: flex; gap: 10px; }
-        input { flex: 1; padding: 12px; border-radius: 20px; border: 1px solid #444; background: #222; color: white; }
-        button { width: 45px; height: 45px; border-radius: 50%; border: none; background: var(--primary); font-weight: bold; cursor: pointer; }
-        #sync { font-size: 0.7rem; color: #888; }
-    </style>
-</head>
-<body>
+<html>
+  <head>
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    </head>
+  <body style="margin: 0; overflow: hidden;">
+    
+    <a-scene webxr="optionalFeatures: hit-test;">
+      
+      <a-sky src="https://raw.githack.com/aframevr/aframe/master/examples/boilerplate/panorama/puydesancy.jpg" rotation="0 -90 0"></a-sky>
 
-<div class="header">
-    <div><h2>SHAM-LIGHT PRO</h2></div>
-    <div id="sync">SİNKRONİZASİYA: GÖZLƏNİLİR</div>
-</div>
+      <a-assets>
+        </a-assets>
 
-<div id="preview"><video id="video" autoplay playsinline></video></div>
-<div id="chatBox"></div>
+      <a-entity position="0 1 -3">
+         <a-text value="Butov Divar Safari" align="center" color="#FFF" width="6"></a-text>
+      </a-entity>
 
-<div class="input-area">
-    <input type="text" id="msgInput" placeholder="Mesajınızı yazın...">
-    <button id="sendBtn">➤</button>
-</div>
-
-<canvas id="canvas" style="display:none;"></canvas>
-
-<script>
-    const chatBox = document.getElementById('chatBox');
-    const msgInput = document.getElementById('msgInput');
-    const sendBtn = document.getElementById('sendBtn');
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    let videoTrack;
-
-    // SİSTEMİ BAŞLAT (İstifadəçi toxunuşu ilə fənər icazəsi almaq üçün)
-    async function init() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: "environment", focusMode: "continuous" } 
-            });
-            video.srcObject = stream;
-            videoTrack = stream.getVideoTracks()[0];
-            startReceiver();
-        } catch (e) { alert("Kamera xətası: " + e); }
-    }
-
-    // FƏNƏRİ İDARƏ EDƏN FUNKSİYA (Məhz bu hissə A32-də işləməlidir)
-    async function toggleTorch(state) {
-        if (!videoTrack) return;
-        try {
-            await videoTrack.applyConstraints({
-                advanced: [{ torch: state }]
-            });
-        } catch (e) { console.error("Flaş xətası:", e); }
-    }
-
-    // MESAJ GÖNDƏRMƏ (TX)
-    sendBtn.addEventListener('click', async () => {
-        const text = msgInput.value;
-        if (!text || !videoTrack) return;
-        
-        addMsg(text, 'sent');
-        msgInput.value = "";
-
-        // Start Sequence (3 sürətli yanıb sönmə - Qəbuledici bununla tanıyacaq)
-        for(let i=0; i<3; i++) {
-            await toggleTorch(true); await new Promise(r => setTimeout(r, 50));
-            await toggleTorch(false); await new Promise(r => setTimeout(r, 50));
-        }
-
-        const binary = text.split('').map(c => c.charCodeAt(0).toString(2).padStart(8, '0')).join('');
-        
-        for (let bit of binary) {
-            await toggleTorch(bit === "1");
-            await new Promise(r => setTimeout(r, 200)); // Sürəti bir az azaltdıq ki, dəqiq olsun
-        }
-        await toggleTorch(false);
-    });
-
-    // QƏBULEDİCİ (RX) - Küy filtrli
-    let bitStream = "";
-    function startReceiver() {
-        setInterval(() => {
-            canvas.width = 20; canvas.height = 20;
-            ctx.drawImage(video, 0, 0, 20, 20);
-            const d = ctx.getImageData(0, 0, 20, 20).data;
-            let bright = 0;
-            for (let i=0; i<d.length; i+=4) bright += (d[i]+d[i+1]+d[i+2])/3;
-            bright /= (d.length/4);
-
-            // Dinamik küy filtri (Yalnız çox parlaq işığı qəbul edir)
-            const bit = bright > 200 ? "1" : "0";
-            processBit(bit);
-        }, 200);
-    }
-
-    function processBit(bit) {
-        bitStream += bit;
-        if (bitStream.length >= 8) {
-            const byte = bitStream.slice(-8);
-            const code = parseInt(byte, 2);
-            if (code > 31 && code < 127) { // Yalnız oxunaqlı hərflər
-                addMsg(String.fromCharCode(code), 'received');
-                bitStream = ""; // Buffer təmizlə
-            } else if (bitStream.length > 32) {
-                bitStream = bitStream.slice(1); // Küyü sürüşdür
-            }
-        }
-    }
-
-    function addMsg(t, type) {
-        const d = document.createElement('div');
-        d.className = `msg ${type}`;
-        d.innerText = t;
-        chatBox.appendChild(d);
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    // İlk toxunuşda sistemi aktivləşdir
-    window.addEventListener('touchstart', init, {once: true});
-    window.addEventListener('click', init, {once: true});
-</script>
-</body>
+      <a-entity camera look-controls wasd-controls></a-entity>
+      
+    </a-scene>
+  </body>
 </html>
