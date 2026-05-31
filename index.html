@@ -2,243 +2,80 @@
 <html lang="az">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mobil Damar Göstərici Sistem</title>
+    <title>BioPulse: Real-Time Heart Visualization</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #121212;
-            color: #ffffff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            min-height: 100vh;
-            overflow: hidden;
-        }
-        header {
-            width: 100%;
-            padding: 15px;
-            text-align: center;
-            background: rgba(30, 30, 30, 0.8);
-            backdrop-filter: blur(10px);
-            font-weight: bold;
-            font-size: 1.1rem;
-            border-bottom: 1px solid #333;
-            z-index: 10;
-        }
-        .container {
-            position: relative;
-            width: 100%;
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #000;
-        }
-        video {
-            display: none; /* Arxa fonda emal edildiyi üçün gizlədirik */
-        }
-        canvas {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            max-width: 100%;
-            max-height: 80vh;
-        }
-        .controls {
-            width: 100%;
-            padding: 20px;
-            background: rgba(30, 30, 30, 0.9);
-            border-top: 1px solid #333;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            z-index: 10;
-        }
-        .slider-group {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 15px;
-        }
-        .slider-group label {
-            font-size: 0.9rem;
-            min-width: 80px;
-            color: #ccc;
-        }
-        input[type="range"] {
-            flex: 1;
-            accent-color: #00ffcc;
-        }
-        .btn-group {
-            display: flex;
-            gap: 10px;
-        }
-        button {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            background: #00ffcc;
-            color: #000;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        button:active {
-            background: #00ccaa;
-        }
-        .disclaimer {
-            font-size: 0.7rem;
-            color: #888;
-            text-align: center;
-            margin-top: 5px;
-            line-height: 1.2;
-        }
+        body { background: #000; color: #0f0; font-family: monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        canvas { border: 1px solid #333; width: 90vw; height: 50vh; background: #050505; }
+        .ui { margin-top: 20px; text-align: center; }
+        button { padding: 15px 30px; font-size: 1.2rem; cursor: pointer; background: #0f0; border: none; border-radius: 5px; }
     </style>
 </head>
 <body>
 
-    <header>Damar Vizualizasiya Sistemi</header>
-
-    <div class="container">
-        <video id="video" autoplay playsinline></video>
-        <canvas id="canvas"></canvas>
+    <canvas id="visualizer"></canvas>
+    <div class="ui">
+        <h3 id="status">Sensoru işə salmaq üçün toxun</h3>
+        <button id="startBtn">Qeydiyyatı Başla</button>
     </div>
 
-    <div class="controls">
-        <div class="slider-group">
-            <label for="contrast">Kontrast:</label>
-            <input type="range" id="contrast" min="1" max="5" step="0.1" value="2.5">
-        </div>
+<script>
+    const canvas = document.getElementById('visualizer');
+    const ctx = canvas.getContext('2d');
+    const startBtn = document.getElementById('startBtn');
+    let chunks = [];
+    let mediaRecorder;
 
-        <div class="slider-group">
-            <label for="brightness">Parlaqlıq:</label>
-            <input type="range" id="brightness" min="-50" max="50" step="1" value="0">
-        </div>
+    // Sensor datası
+    let history = new Array(200).fill(0);
 
-        <div class="btn-group">
-            <button id="toggleFlash">Flaş (Yandır/Söndür)</button>
-        </div>
-
-        <div class="disclaimer">
-            DƏQİQ TİBBİ CİHAZ DEYİLDİR. Yalnız vizual kömək və test məqsədlidir. Müdaxilə zamanı peşəkar tibbi avadanlıqlara güvənin.
-        </div>
-    </div>
-
-    <script>
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const contrastSlider = document.getElementById('contrast');
-        const brightnessSlider = document.getElementById('brightness');
-        const toggleFlashBtn = document.getElementById('toggleFlash');
-
-        let streamRef = null;
-        let trackRef = null;
-        let flashOn = false;
-
-        // Kameranı işə salırıq (Arxa kameraya üstünlük verilir)
-        async function startCamera() {
-            try {
-                const constraints = {
-                    video: {
-                        facingMode: { ideal: "environment" },
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    },
-                    audio: false
-                };
-                
-                streamRef = await navigator.mediaDevices.getUserMedia(constraints);
-                video.srcObject = streamRef;
-                trackRef = streamRef.getVideoTracks()[0];
-                
-                video.addEventListener('loadedmetadata', () => {
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    requestAnimationFrame(processFrame);
-                });
-            } catch (err) {
-                alert("Kameraya giriş icazəsi verilmədi və ya cihaz dəstəkləmir: " + err.message);
-            }
+    // 1. Giroskopu işə sal
+    async function initSensors() {
+        if (typeof DeviceMotionEvent.requestPermission === 'function') {
+            const permission = await DeviceMotionEvent.requestPermission();
+            if (permission !== 'granted') return alert("İcazə lazımdır!");
         }
 
-        // Real vaxtda piksel emalı funksiyası
-        function processFrame() {
-            if (video.paused || video.ended) return;
-
-            // Kameradan gələn kadrı canvasa çəkirik
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            // Canvasdakı piksel datalarını götürürük
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const data = imageData.data;
-
-            const contrast = parseFloat(contrastSlider.value);
-            const brightness = parseInt(brightnessSlider.value);
-
-            // Hər bir pikseli tək-tək analiz və emal edirik (RGB)
-            for (let i = 0; i < data.length; i += 4) {
-                let r = data[i];
-                let g = data[i + 1];
-                let b = data[i + 2];
-
-                // 1. Yaşıl kanalı əsas götürürük (Çünki deoksigen qan yaşıl/mavi spektri udur və kontrast yaradır)
-                // İnsan dərisinin qırmızı fonunu sıfırlamaq üçün xüsusi filtr riyaziyyatı:
-                let veinValue = g * 1.5 - r * 0.5; 
-
-                // 2. Parlaqlıq tətbiqi
-                veinValue += brightness;
-
-                // 3. Kontrastın kəskinləşdirilməsi
-                veinValue = (veinValue - 128) * contrast + 128;
-
-                // Sərhədləri qoruyuruq (0-255 arası)
-                if (veinValue < 0) veinValue = 0;
-                if (veinValue > 255) veinValue = 255;
-
-                // Ekrana monoxrom/yüksək kontrastlı yaşıl-göy tonlarda görüntü veririk (Damarlar tünd görünəcək)
-                data[i] = veinValue * 0.2;       // Qırmızı zəiflədilir
-                data[i + 1] = veinValue;         // Yaşıl gücləndirilir
-                data[i + 2] = veinValue * 0.9;   // Mavi balanslaşdırılır
-            }
-
-            // Yenilənmiş pikselləri yenidən canvasa yazırıq
-            ctx.putImageData(imageData, 0, 0);
-
-            // Növbəti kadr üçün rekursiv çağırış (Loop)
-            requestAnimationFrame(processFrame);
-        }
-
-        // Flaş funksiyası (Əgər brauzer və cihazın arxa kamerası dəstəkləyirsə)
-        toggleFlashBtn.addEventListener('click', async () => {
-            if (!trackRef) return;
-            
-            const capabilities = trackRef.getCapabilities();
-            if (capabilities.torch) {
-                try {
-                    flashOn = !flashOn;
-                    await trackRef.applyConstraints({
-                        advanced: [{ torch: flashOn }]
-                    });
-                } catch (err) {
-                    console.error("Flaş idarə edilə bilmədi:", err);
-                }
-            } else {
-                alert("Bu cihazın flaşı brauzer tərəfindən birbaşa idarə edilə bilmir. Zəhmət olmasa telefonun öz fənərini yandırın.");
-            }
+        window.addEventListener('devicemotion', (event) => {
+            const z = event.acceleration.z || 0;
+            history.push(z);
+            history.shift();
+            draw();
         });
+    }
 
-        // Səhifə yüklənəndə kameranı aç
-        window.addEventListener('DOMContentLoaded', startCamera);
-    </script>
+    // 2. Vizualizasiya (Ürək ritminin dalğası)
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = '#0f0';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        for (let i = 0; i < history.length; i++) {
+            let x = (i / history.length) * canvas.width;
+            let y = canvas.height / 2 + (history[i] * 50);
+            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+    }
+
+    // 3. Videoya qeyd alma
+    startBtn.onclick = () => {
+        const stream = canvas.captureStream(30);
+        mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+        mediaRecorder.ondataavailable = e => chunks.push(e.data);
+        mediaRecorder.onstop = () => {
+            const blob = new Blob(chunks, { type: 'video/webm' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'urek_analizi.webm';
+            a.click();
+        };
+        mediaRecorder.start();
+        document.getElementById('status').innerText = "Qeyd olunur... Ürəyinizin üzərinə qoyun.";
+        setTimeout(() => mediaRecorder.stop(), 10000); // 10 saniyə qeyd
+    };
+
+    window.onclick = initSensors;
+</script>
 </body>
 </html>
