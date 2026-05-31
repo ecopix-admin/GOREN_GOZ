@@ -2,80 +2,307 @@
 <html lang="az">
 <head>
     <meta charset="UTF-8">
-    <title>BioPulse: Real-Time Heart Visualization</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioPulse Pro - Klinik Prototip</title>
     <style>
-        body { background: #000; color: #0f0; font-family: monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        canvas { border: 1px solid #333; width: 90vw; height: 50vh; background: #050505; }
-        .ui { margin-top: 20px; text-align: center; }
-        button { padding: 15px 30px; font-size: 1.2rem; cursor: pointer; background: #0f0; border: none; border-radius: 5px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: #050505;
+            color: #00ff66;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            width: 100%;
+            border-bottom: 1px dashed #00ff66;
+            padding-bottom: 10px;
+        }
+        .status-box {
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 5px;
+        }
+        .main-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        canvas {
+            width: 100%;
+            height: 220px;
+            background: #000;
+            border: 1px solid #00ff66;
+            border-radius: 4px;
+        }
+        .metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            background: #111;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #222;
+        }
+        .metric-card {
+            font-size: 0.85rem;
+        }
+        .metric-card span {
+            display: block;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fff;
+            margin-top: 5px;
+        }
+        .controls {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        button {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            background: #00ff66;
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0,255,102,0.3);
+            transition: all 0.2s;
+        }
+        button:active {
+            transform: scale(0.98);
+            background: #00cc55;
+        }
+        .recording {
+            background: #ff3333 !important;
+            color: #fff !important;
+            box-shadow: 0 0 15px rgba(255,51,51,0.5) !important;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
     </style>
 </head>
 <body>
 
-    <canvas id="visualizer"></canvas>
-    <div class="ui">
-        <h3 id="status">Sensoru işə salmaq üçün toxun</h3>
-        <button id="startBtn">Qeydiyyatı Başla</button>
+    <header>
+        <h2>BIOPULSE CORE v2.0</h2>
+        <div id="status" class="status-box">Skaneri aktivləşdirmək üçün aşağıdakı düyməyə basın</div>
+    </header>
+
+    <div class="main-container">
+        <div style="font-size:0.8rem; color:#aaa;">AKUSTİK SEYSMIK DALĞA (SCG)</div>
+        <canvas id="scgCanvas"></canvas>
+
+        <div style="font-size:0.8rem; color:#aaa;">KLAPAN SƏS SPEKTRİ (PCG)</div>
+        <canvas id="pcgCanvas"></canvas>
+
+        <div class="metrics">
+            <div class="metric-card">Seysmik Güc:<span id="seismicPower">0.00 m/s²</span></div>
+            <div class="metric-card">Akustik Tezlik:<span id="acousticFreq">0 Hz</span></div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="actionBtn">SİSTEMİ AKTİVLƏŞDİR</button>
     </div>
 
 <script>
-    const canvas = document.getElementById('visualizer');
-    const ctx = canvas.getContext('2d');
-    const startBtn = document.getElementById('startBtn');
-    let chunks = [];
-    let mediaRecorder;
+    const scgCanvas = document.getElementById('scgCanvas');
+    const pcgCanvas = document.getElementById('pcgCanvas');
+    const scgCtx = scgCanvas.getContext('2d');
+    const pcgCtx = pcgCanvas.getContext('2d');
+    const actionBtn = document.getElementById('actionBtn');
+    const statusTxt = document.getElementById('status');
+    
+    let isInitialized = false;
+    let isRecording = false;
+    let scgHistory = new Array(300).fill(0);
+    let audioContext, analyser, dataArray, source;
+    let animationId;
+    let recordedChunks = [];
+    let canvasStream, mediaRecorder;
 
-    // Sensor datası
-    let history = new Array(200).fill(0);
-
-    // 1. Giroskopu işə sal
-    async function initSensors() {
-        if (typeof DeviceMotionEvent.requestPermission === 'function') {
-            const permission = await DeviceMotionEvent.requestPermission();
-            if (permission !== 'granted') return alert("İcazə lazımdır!");
-        }
-
-        window.addEventListener('devicemotion', (event) => {
-            const z = event.acceleration.z || 0;
-            history.push(z);
-            history.shift();
-            draw();
-        });
+    // Ölçüləri ekrana uyğunlaşdırırıq
+    function resizeCanvases() {
+        scgCanvas.width = scgCanvas.clientWidth;
+        scgCanvas.height = scgCanvas.clientHeight;
+        pcgCanvas.width = pcgCanvas.clientWidth;
+        pcgCanvas.height = pcgCanvas.clientHeight;
     }
+    window.addEventListener('resize', resizeCanvases);
+    resizeCanvases();
 
-    // 2. Vizualizasiya (Ürək ritminin dalğası)
-    function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = '#0f0';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        for (let i = 0; i < history.length; i++) {
-            let x = (i / history.length) * canvas.width;
-            let y = canvas.height / 2 + (history[i] * 50);
-            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    // Düymə idarəçisi
+    actionBtn.onclick = async () => {
+        if (!isInitialized) {
+            await initializeSystem();
+            return;
         }
-        ctx.stroke();
-    }
-
-    // 3. Videoya qeyd alma
-    startBtn.onclick = () => {
-        const stream = canvas.captureStream(30);
-        mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
-        mediaRecorder.ondataavailable = e => chunks.push(e.data);
-        mediaRecorder.onstop = () => {
-            const blob = new Blob(chunks, { type: 'video/webm' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'urek_analizi.webm';
-            a.click();
-        };
-        mediaRecorder.start();
-        document.getElementById('status').innerText = "Qeyd olunur... Ürəyinizin üzərinə qoyun.";
-        setTimeout(() => mediaRecorder.stop(), 10000); // 10 saniyə qeyd
+        
+        if (!isRecording) {
+            startScan();
+        } else {
+            stopScan();
+        }
     };
 
-    window.onclick = initSensors;
+    // Sistemi (Kamera/Mikrofon/Sensorlar) Aktiv Et
+    async function initializeSystem() {
+        statusTxt.innerText = "İcazələr yoxlanılır...";
+        
+        // 1. Hərəkət sensorları icazəsi (iOS üçün kritikdir)
+        if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+            try {
+                const permission = await DeviceMotionEvent.requestPermission();
+                if (permission !== 'granted') throw new Error("Sensor icazəsi rədd edildi.");
+            } catch (e) {
+                alert(e.message);
+                return;
+            }
+        }
+
+        // 2. Mikrofon icazəsi
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256;
+            source = audioContext.createMediaStreamSource(stream);
+            source.connect(analyser);
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+        } catch (e) {
+            alert("Mikrofon icazəsi mütləqdir: " + e.message);
+            return;
+        }
+
+        // Hərəkət dinləyicisi
+        window.addEventListener('devicemotion', (event) => {
+            const acc = event.acceleration || event.accelerationIncludingGravity;
+            if (acc) {
+                // 3 oxun (X, Y, Z) birləşmiş gücü (Vektor uzunluğu)
+                const totalAcc = Math.sqrt((acc.x||0)**2 + (acc.y||0)**2 + (acc.z||0)**2);
+                // Yerçəkimi qüvvəsini (fona düşən sabit küyü) çıxarmaq üçün sadə filtr
+                const filtered = totalAcc - 9.8; 
+                
+                scgHistory.push(filtered);
+                scgHistory.shift();
+                
+                document.getElementById('seismicPower').innerText = Math.abs(filtered).toFixed(2) + " m/s²";
+            }
+        });
+
+        isInitialized = true;
+        actionBtn.innerText = "SKAN ET VƏ VİDEO YAZ";
+        statusTxt.innerText = "Sistem hazır. Telefonu sinənizə qoyub düyməyə basın.";
+        resizeCanvases();
+        loop();
+    }
+
+    // Skanı və Video Qeydiyyatı Başlat
+    function startScan() {
+        isRecording = true;
+        recordedChunks = [];
+        actionBtn.innerText = "SKANI DAYANDIR (10s)";
+        actionBtn.classList.add('recording');
+        statusTxt.innerText = "ANALİZ GEDİR... Telefonu tərpətməyin və danışmayın.";
+
+        // Canvas görüntüsünü videoya çevirmək üçün axın (Stream) götürürük
+        const streamX = scgCanvas.captureStream(30); 
+        mediaRecorder = new MediaRecorder(streamX, { mimeType: 'video/webm' });
+        mediaRecorder.ondataavailable = e => { if(e.data.size > 0) recordedChunks.push(e.data); };
+        mediaRecorder.onstop = exportVideo;
+        mediaRecorder.start();
+
+        // 10 saniyə sonra avtomatik dayandır
+        setTimeout(() => { if(isRecording) stopScan(); }, 10000);
+    }
+
+    // Skanı Dayandır
+    function stopScan() {
+        isRecording = false;
+        actionBtn.innerText = "SKAN ET VƏ VİDEO YAZ";
+        actionBtn.classList.remove('recording');
+        statusTxt.innerText = "Analiz bitdi. Video hazırlanır...";
+        if(mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+    }
+
+    // Videonu MP4/WebM olaraq ixrac et (Yüklə)
+    function exportVideo() {
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        
+        // Avtomatik yükləmə linki yaradırıq
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `biopulse_urek_analizi_${Date.now()}.webm`;
+        a.click();
+        
+        statusTxt.innerText = "Video uğurla endirildi. Həkiminizə göndərə bilərsiniz.";
+    }
+
+    // Əsas Render Dövrü (Daimi rəsm çəkmə)
+    function loop() {
+        animationId = requestAnimationFrame(loop);
+
+        // 1. SCG (Hərəkət) Canvasını Çək
+        scgCtx.clearRect(0, 0, scgCanvas.width, scgCanvas.height);
+        scgCtx.strokeStyle = isRecording ? '#ff3333' : '#00ff66';
+        scgCtx.lineWidth = 2;
+        scgCtx.beginPath();
+        for (let i = 0; i < scgHistory.length; i++) {
+            let x = (i / scgHistory.length) * scgCanvas.width;
+            // Dalğanı canvasın ortasına mərkəzləşdiririk
+            let y = (scgCanvas.height / 2) + (scgHistory[i] * 40); 
+            if (i === 0) scgCtx.moveTo(x, y); else scgCtx.lineTo(x, y);
+        }
+        scgCtx.stroke();
+
+        // 2. PCG (Səs Spektri) Canvasını Çək
+        if (analyser) {
+            analyser.getByteFrequencyData(dataArray);
+            pcgCtx.clearRect(0, 0, pcgCanvas.width, pcgCanvas.height);
+            
+            let barWidth = (pcgCanvas.width / analyser.frequencyBinCount) * 1.5;
+            let barHeight;
+            let x = 0;
+            let maxFreq = 0;
+            let maxVal = 0;
+
+            for (let i = 0; i < analyser.frequencyBinCount; i++) {
+                barHeight = dataArray[i] * 0.7;
+                
+                if(dataArray[i] > maxVal) {
+                    maxVal = dataArray[i];
+                    maxFreq = i * (audioContext.sampleRate / analyser.fftSize);
+                }
+
+                pcgCtx.fillStyle = `rgb(0, ${dataArray[i] + 100}, 100)`;
+                pcgCtx.fillRect(x, pcgCanvas.height - barHeight, barWidth - 1, barHeight);
+                x += barWidth;
+            }
+            if(maxVal > 30) {
+                document.getElementById('acousticFreq').innerText = Math.round(maxFreq) + " Hz";
+            }
+        }
+    }
 </script>
 </body>
 </html>
