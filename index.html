@@ -3,306 +3,284 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BioPulse Pro - Klinik Prototip</title>
+    <title>Sham-Cell | Ultra Military Shield</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background: #050505;
-            color: #00ff66;
-            font-family: 'Courier New', Courier, monospace;
+            background-color: #000;
+            color: #00ffaa;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        header {
-            text-align: center;
-            width: 100%;
-            border-bottom: 1px dashed #00ff66;
-            padding-bottom: 10px;
-        }
-        .status-box {
-            font-size: 0.9rem;
-            color: #888;
-            margin-top: 5px;
-        }
-        .main-container {
-            position: relative;
-            width: 100%;
-            max-width: 600px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
             justify-content: center;
-            gap: 15px;
-            margin: 20px 0;
-        }
-        canvas {
-            width: 100%;
-            height: 220px;
-            background: #000;
-            border: 1px solid #00ff66;
-            border-radius: 4px;
-        }
-        .metrics {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            background: #111;
-            padding: 15px;
-            border-radius: 4px;
-            border: 1px solid #222;
-        }
-        .metric-card {
-            font-size: 0.85rem;
-        }
-        .metric-card span {
-            display: block;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #fff;
-            margin-top: 5px;
-        }
-        .controls {
-            width: 100%;
-            max-width: 600px;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
             text-align: center;
         }
-        button {
-            width: 100%;
-            padding: 16px;
-            font-size: 1.1rem;
+
+        .shield-container {
+            border: 2px solid #00ffaa;
+            padding: 40px 30px;
+            border-radius: 25px;
+            background: radial-gradient(circle, #051a10 0%, #000000 100%);
+            box-shadow: 0 0 40px rgba(0, 255, 170, 0.2);
+            width: 85%;
+            max-width: 420px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            letter-spacing: 3px;
+            margin: 0 0 5px 0;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(0, 255, 170, 0.5);
+        }
+
+        .version {
+            font-size: 0.7rem;
+            color: #00ffaa;
             font-weight: bold;
-            background: #00ff66;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+
+        .radar-box {
+            width: 120px;
+            height: 120px;
+            border: 2px dashed #00ffaa;
+            border-radius: 50%;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .radar-line {
+            width: 50%;
+            height: 2px;
+            background: #00ffaa;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform-origin: left center;
+            display: none;
+        }
+
+        @keyframes rotateRadar {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .telemetry {
+            background: #080808;
+            border: 1px solid #111;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 0.85rem;
+            text-align: left;
+        }
+
+        .telemetry-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            color: #888;
+        }
+
+        .telemetry-value { color: #fff; font-weight: bold; }
+
+        button {
+            background: #00ffaa;
             color: #000;
             border: none;
-            border-radius: 6px;
+            padding: 20px;
+            font-size: 1.2rem;
+            font-weight: 900;
             cursor: pointer;
-            box-shadow: 0 0 15px rgba(0,255,102,0.3);
-            transition: all 0.2s;
+            border-radius: 50px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        button:active {
-            transform: scale(0.98);
-            background: #00cc55;
+
+        button.active {
+            background: #ff2244;
+            color: #fff;
+            box-shadow: 0 0 30px rgba(255, 34, 68, 0.5);
         }
-        .recording {
-            background: #ff3333 !important;
-            color: #fff !important;
-            box-shadow: 0 0 15px rgba(255,51,51,0.5) !important;
-            animation: pulse 1s infinite;
-        }
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { opacity: 1; }
+
+        .footer-text {
+            font-size: 0.65rem;
+            color: #444;
+            margin-top: 20px;
+            line-height: 1.4;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h2>BIOPULSE CORE v2.0</h2>
-        <div id="status" class="status-box">Skaneri aktivləşdirmək üçün aşağıdakı düyməyə basın</div>
-    </header>
+<div class="shield-container">
+    <h1>SHAM-CELL SYSTEM</h1>
+    <div class="version">ULTRA MILITARY DEFENSE v3.0</div>
+    
+    <div class="radar-box" id="radar">
+        <div class="radar-line" id="radarLine"></div>
+        <span id="shieldStatus" style="font-size: 0.8rem; font-weight: bold; color: #888;">STANDBY</span>
+    </div>
 
-    <div class="main-container">
-        <div style="font-size:0.8rem; color:#aaa;">AKUSTİK SEYSMIK DALĞA (SCG)</div>
-        <canvas id="scgCanvas"></canvas>
-
-        <div style="font-size:0.8rem; color:#aaa;">KLAPAN SƏS SPEKTRİ (PCG)</div>
-        <canvas id="pcgCanvas"></canvas>
-
-        <div class="metrics">
-            <div class="metric-card">Seysmik Güc:<span id="seismicPower">0.00 m/s²</span></div>
-            <div class="metric-card">Akustik Tezlik:<span id="acousticFreq">0 Hz</span></div>
+    <div class="telemetry">
+        <div class="telemetry-row">
+            <span>Mühərrik 1 (Yarasa):</span>
+            <span class="telemetry-value" id="m1Freq">0 Hz</span>
+        </div>
+        <div class="telemetry-row">
+            <span>Mühərrik 2 (Baryer):</span>
+            <span class="telemetry-value" id="m2Freq">0 Hz</span>
+        </div>
+        <div class="telemetry-row">
+            <span>Müdafiə Rejimi:</span>
+            <span class="telemetry-value" id="shieldMode" style="color: #00ffaa;">OFF</span>
         </div>
     </div>
-
-    <div class="controls">
-        <button id="actionBtn">SİSTEMİ AKTİVLƏŞDİR</button>
+    
+    <button id="triggerBtn">Müdafiəni Blokla</button>
+    
+    <div class="footer-text">
+        Cüt Fazalı Audio Alqoritmi. Arxa fonda işləmə və ekran kilidi qorunması tam aktivdir.
     </div>
+</div>
 
 <script>
-    const scgCanvas = document.getElementById('scgCanvas');
-    const pcgCanvas = document.getElementById('pcgCanvas');
-    const scgCtx = scgCanvas.getContext('2d');
-    const pcgCtx = pcgCanvas.getContext('2d');
-    const actionBtn = document.getElementById('actionBtn');
-    const statusTxt = document.getElementById('status');
-    
-    let isInitialized = false;
-    let isRecording = false;
-    let scgHistory = new Array(300).fill(0);
-    let audioContext, analyser, dataArray, source;
-    let animationId;
-    let recordedChunks = [];
-    let canvasStream, mediaRecorder;
+    let audioCtx;
+    let osc1, osc2;
+    let gain1, gain2;
+    let isRunning = false;
+    let militaryEngineInterval;
+    let wakeLock = null;
 
-    // Ölçüləri ekrana uyğunlaşdırırıq
-    function resizeCanvases() {
-        scgCanvas.width = scgCanvas.clientWidth;
-        scgCanvas.height = scgCanvas.clientHeight;
-        pcgCanvas.width = pcgCanvas.clientWidth;
-        pcgCanvas.height = pcgCanvas.clientHeight;
+    const triggerBtn = document.getElementById('triggerBtn');
+    const shieldStatus = document.getElementById('shieldStatus');
+    const shieldMode = document.getElementById('shieldMode');
+    const m1Freq = document.getElementById('m1Freq');
+    const m2Freq = document.getElementById('m2Freq');
+    const radarLine = document.getElementById('radarLine');
+
+    async function activateWakeLock() {
+        try {
+            if ('wakeLock' in navigator) {
+                wakeLock = await navigator.wakeLock.request('screen');
+            }
+        } catch (err) { console.log("WakeLock Xətası:", err.message); }
     }
-    window.addEventListener('resize', resizeCanvases);
-    resizeCanvases();
 
-    // Düymə idarəçisi
-    actionBtn.onclick = async () => {
-        if (!isInitialized) {
-            await initializeSystem();
-            return;
-        }
-        
-        if (!isRecording) {
-            startScan();
+    function runMilitaryEngine() {
+        let sweepFreq = 16000;
+        let step = 250;
+
+        militaryEngineInterval = setInterval(() => {
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+
+            // 1. MÜHƏRRİK: Yarasa Radarı (Davamlı xaotik sıçrayışlar)
+            sweepFreq += step;
+            if (sweepFreq >= 22000 || sweepFreq <= 16000) step = -step;
+            
+            // Təsadüfi kiçik tezlik sürüşmələri əlavə edirik (Ağcaqanadın yaddaşını tam iflic etmək üçün)
+            let jitter = Math.floor(Math.random() * 150) - 75;
+            let finalM1 = sweepFreq + jitter;
+            
+            osc1.frequency.setValueAtTime(finalM1, now);
+            m1Freq.innerText = finalM1 + " Hz";
+
+            // Aqressiv yarasa çıqqıltı impulsu
+            gain1.gain.setValueAtTime(0.01, now);
+            gain1.gain.exponentialRampToValueAtTime(0.8, now + 0.01);
+            gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+
+            // 2. MÜHƏRRİK: Sabit Baryer (İnsanın ətrafını qoruyan divar)
+            // 19.5 kHz - bunu insan əsla eşitmir, amma həşəratın naviqasiyasını tamamilə kor edir
+            let finalM2 = 19500 + (jitter * 0.5);
+            osc2.frequency.setValueAtTime(finalM2, now);
+            m2Freq.innerText = Math.round(finalM2) + " Hz";
+            
+            // Sabit divar səs gücü (Mikroskopik dalğalanma ilə)
+            gain2.gain.setValueAtTime(0.08, now);
+
+        }, 180); // Daha sürətli impuls (180ms) - Sıfır Şans!
+    }
+
+    triggerBtn.onclick = async function() {
+        if (!isRunning) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Mühərrik 1 Quraşdırılması
+            osc1 = audioCtx.createOscillator();
+            gain1 = audioCtx.createGain();
+            osc1.type = 'sine';
+            osc1.connect(gain1);
+            gain1.connect(audioCtx.destination);
+            
+            // Mühərrik 2 Quraşdırılması
+            osc2 = audioCtx.createOscillator();
+            gain2 = audioCtx.createGain();
+            osc2.type = 'triangle'; // Daha kəsici dalğa forması
+            osc2.connect(gain2);
+            gain2.connect(audioCtx.destination);
+
+            osc1.start();
+            osc2.start();
+            
+            runMilitaryEngine();
+            await activateWakeLock();
+
+            // UI Aktivasiya
+            this.innerText = "Müdafiəni Söndür";
+            this.classList.add('active');
+            shieldStatus.innerText = "SHIELD ON";
+            shieldStatus.style.color = "#00ffaa";
+            shieldMode.innerText = "MAXIMUM MILITARY";
+            shieldMode.style.color = "#ff2244";
+            radarLine.style.display = 'block';
+            radarLine.style.animation = 'rotateRadar 2s linear infinite';
+            
+            isRunning = true;
         } else {
-            stopScan();
+            clearInterval(militaryEngineInterval);
+            if (osc1) osc1.stop();
+            if (osc2) osc2.stop();
+            if (audioCtx) audioCtx.close();
+            if (wakeLock !== null) {
+                wakeLock.release();
+                wakeLock = null;
+            }
+
+            // UI Deaktivasiya
+            this.innerText = "Müdafiəni Blokla";
+            this.classList.remove('active');
+            shieldStatus.innerText = "STANDBY";
+            shieldStatus.style.color = "#888";
+            shieldMode.innerText = "OFF";
+            shieldMode.style.color = "#00ffaa";
+            m1Freq.innerText = "0 Hz";
+            m2Freq.innerText = "0 Hz";
+            radarLine.style.display = 'none';
+            radarLine.style.animation = 'none';
+            
+            isRunning = false;
         }
     };
 
-    // Sistemi (Kamera/Mikrofon/Sensorlar) Aktiv Et
-    async function initializeSystem() {
-        statusTxt.innerText = "İcazələr yoxlanılır...";
-        
-        // 1. Hərəkət sensorları icazəsi (iOS üçün kritikdir)
-        if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
-            try {
-                const permission = await DeviceMotionEvent.requestPermission();
-                if (permission !== 'granted') throw new Error("Sensor icazəsi rədd edildi.");
-            } catch (e) {
-                alert(e.message);
-                return;
-            }
+    document.addEventListener('visibilitychange', async () => {
+        if (wakeLock !== null && document.visibilityState === 'visible') {
+            await activateWakeLock();
         }
-
-        // 2. Mikrofon icazəsi
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            analyser = audioContext.createAnalyser();
-            analyser.fftSize = 256;
-            source = audioContext.createMediaStreamSource(stream);
-            source.connect(analyser);
-            dataArray = new Uint8Array(analyser.frequencyBinCount);
-        } catch (e) {
-            alert("Mikrofon icazəsi mütləqdir: " + e.message);
-            return;
-        }
-
-        // Hərəkət dinləyicisi
-        window.addEventListener('devicemotion', (event) => {
-            const acc = event.acceleration || event.accelerationIncludingGravity;
-            if (acc) {
-                // 3 oxun (X, Y, Z) birləşmiş gücü (Vektor uzunluğu)
-                const totalAcc = Math.sqrt((acc.x||0)**2 + (acc.y||0)**2 + (acc.z||0)**2);
-                // Yerçəkimi qüvvəsini (fona düşən sabit küyü) çıxarmaq üçün sadə filtr
-                const filtered = totalAcc - 9.8; 
-                
-                scgHistory.push(filtered);
-                scgHistory.shift();
-                
-                document.getElementById('seismicPower').innerText = Math.abs(filtered).toFixed(2) + " m/s²";
-            }
-        });
-
-        isInitialized = true;
-        actionBtn.innerText = "SKAN ET VƏ VİDEO YAZ";
-        statusTxt.innerText = "Sistem hazır. Telefonu sinənizə qoyub düyməyə basın.";
-        resizeCanvases();
-        loop();
-    }
-
-    // Skanı və Video Qeydiyyatı Başlat
-    function startScan() {
-        isRecording = true;
-        recordedChunks = [];
-        actionBtn.innerText = "SKANI DAYANDIR (10s)";
-        actionBtn.classList.add('recording');
-        statusTxt.innerText = "ANALİZ GEDİR... Telefonu tərpətməyin və danışmayın.";
-
-        // Canvas görüntüsünü videoya çevirmək üçün axın (Stream) götürürük
-        const streamX = scgCanvas.captureStream(30); 
-        mediaRecorder = new MediaRecorder(streamX, { mimeType: 'video/webm' });
-        mediaRecorder.ondataavailable = e => { if(e.data.size > 0) recordedChunks.push(e.data); };
-        mediaRecorder.onstop = exportVideo;
-        mediaRecorder.start();
-
-        // 10 saniyə sonra avtomatik dayandır
-        setTimeout(() => { if(isRecording) stopScan(); }, 10000);
-    }
-
-    // Skanı Dayandır
-    function stopScan() {
-        isRecording = false;
-        actionBtn.innerText = "SKAN ET VƏ VİDEO YAZ";
-        actionBtn.classList.remove('recording');
-        statusTxt.innerText = "Analiz bitdi. Video hazırlanır...";
-        if(mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
-    }
-
-    // Videonu MP4/WebM olaraq ixrac et (Yüklə)
-    function exportVideo() {
-        const blob = new Blob(recordedChunks, { type: 'video/webm' });
-        const url = URL.createObjectURL(blob);
-        
-        // Avtomatik yükləmə linki yaradırıq
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `biopulse_urek_analizi_${Date.now()}.webm`;
-        a.click();
-        
-        statusTxt.innerText = "Video uğurla endirildi. Həkiminizə göndərə bilərsiniz.";
-    }
-
-    // Əsas Render Dövrü (Daimi rəsm çəkmə)
-    function loop() {
-        animationId = requestAnimationFrame(loop);
-
-        // 1. SCG (Hərəkət) Canvasını Çək
-        scgCtx.clearRect(0, 0, scgCanvas.width, scgCanvas.height);
-        scgCtx.strokeStyle = isRecording ? '#ff3333' : '#00ff66';
-        scgCtx.lineWidth = 2;
-        scgCtx.beginPath();
-        for (let i = 0; i < scgHistory.length; i++) {
-            let x = (i / scgHistory.length) * scgCanvas.width;
-            // Dalğanı canvasın ortasına mərkəzləşdiririk
-            let y = (scgCanvas.height / 2) + (scgHistory[i] * 40); 
-            if (i === 0) scgCtx.moveTo(x, y); else scgCtx.lineTo(x, y);
-        }
-        scgCtx.stroke();
-
-        // 2. PCG (Səs Spektri) Canvasını Çək
-        if (analyser) {
-            analyser.getByteFrequencyData(dataArray);
-            pcgCtx.clearRect(0, 0, pcgCanvas.width, pcgCanvas.height);
-            
-            let barWidth = (pcgCanvas.width / analyser.frequencyBinCount) * 1.5;
-            let barHeight;
-            let x = 0;
-            let maxFreq = 0;
-            let maxVal = 0;
-
-            for (let i = 0; i < analyser.frequencyBinCount; i++) {
-                barHeight = dataArray[i] * 0.7;
-                
-                if(dataArray[i] > maxVal) {
-                    maxVal = dataArray[i];
-                    maxFreq = i * (audioContext.sampleRate / analyser.fftSize);
-                }
-
-                pcgCtx.fillStyle = `rgb(0, ${dataArray[i] + 100}, 100)`;
-                pcgCtx.fillRect(x, pcgCanvas.height - barHeight, barWidth - 1, barHeight);
-                x += barWidth;
-            }
-            if(maxVal > 30) {
-                document.getElementById('acousticFreq').innerText = Math.round(maxFreq) + " Hz";
-            }
-        }
-    }
+    });
 </script>
+
 </body>
 </html>
