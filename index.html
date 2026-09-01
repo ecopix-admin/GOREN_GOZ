@@ -1,286 +1,236 @@
 <!DOCTYPE html>
 <html lang="az">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sham-Cell | Ultra Military Shield</title>
-    <style>
-        body {
-            background-color: #000;
-            color: #00ffaa;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-            text-align: center;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aura - Mind & Motivation Frequency</title>
+  <style>
+    :root {
+      --bg-color: #0b0d17;
+      --accent-color: #7b2cbf;
+      --glow-color: #9d4edd;
+      --text-color: #e0e1dd;
+    }
 
-        .shield-container {
-            border: 2px solid #00ffaa;
-            padding: 40px 30px;
-            border-radius: 25px;
-            background: radial-gradient(circle, #051a10 0%, #000000 100%);
-            box-shadow: 0 0 40px rgba(0, 255, 170, 0.2);
-            width: 85%;
-            max-width: 420px;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
 
-        h1 {
-            font-size: 1.5rem;
-            letter-spacing: 3px;
-            margin: 0 0 5px 0;
-            color: #ffffff;
-            text-shadow: 0 0 10px rgba(0, 255, 170, 0.5);
-        }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+      padding: 20px;
+    }
 
-        .version {
-            font-size: 0.7rem;
-            color: #00ffaa;
-            font-weight: bold;
-            letter-spacing: 1px;
-            margin-bottom: 20px;
-        }
+    .container {
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+      z-index: 2;
+    }
 
-        .radar-box {
-            width: 120px;
-            height: 120px;
-            border: 2px dashed #00ffaa;
-            border-radius: 50%;
-            margin: 20px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: linear-gradient(45deg, #c77dff, #e0e1dd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-        .radar-line {
-            width: 50%;
-            height: 2px;
-            background: #00ffaa;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform-origin: left center;
-            display: none;
-        }
+    p.subtitle {
+      font-size: 1rem;
+      color: #9a8c98;
+      margin-bottom: 30px;
+    }
 
-        @keyframes rotateRadar {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+    /* Vizual Tezlik Halqası */
+    .visualizer-container {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      margin: 0 auto 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-        .telemetry {
-            background: #080808;
-            border: 1px solid #111;
-            padding: 15px;
-            border-radius: 12px;
-            margin: 20px 0;
-            font-family: monospace;
-            font-size: 0.85rem;
-            text-align: left;
-        }
+    .circle {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(123,44,191,0.4) 0%, rgba(11,13,23,0) 70%);
+      border: 2px solid var(--glow-color);
+      box-shadow: 0 0 20px var(--glow-color);
+      transition: all 0.5s ease;
+    }
 
-        .telemetry-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-            color: #888;
-        }
+    .circle.active {
+      animation: pulse 4s infinite ease-in-out;
+    }
 
-        .telemetry-value { color: #fff; font-weight: bold; }
+    @keyframes pulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 15px var(--glow-color); }
+      50% { transform: scale(1.15); box-shadow: 0 0 40px #c77dff; }
+      100% { transform: scale(0.95); box-shadow: 0 0 15px var(--glow-color); }
+    }
 
-        button {
-            background: #00ffaa;
-            color: #000;
-            border: none;
-            padding: 20px;
-            font-size: 1.2rem;
-            font-weight: 900;
-            cursor: pointer;
-            border-radius: 50px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            width: 100%;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+    .btn-play {
+      background: linear-gradient(135deg, var(--accent-color), var(--glow-color));
+      border: none;
+      color: white;
+      padding: 15px 40px;
+      font-size: 1.1rem;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(123, 44, 191, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+      z-index: 10;
+      position: relative;
+    }
 
-        button.active {
-            background: #ff2244;
-            color: #fff;
-            box-shadow: 0 0 30px rgba(255, 34, 68, 0.5);
-        }
+    .btn-play:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(157, 78, 221, 0.6);
+    }
 
-        .footer-text {
-            font-size: 0.65rem;
-            color: #444;
-            margin-top: 20px;
-            line-height: 1.4;
-        }
-    </style>
+    .btn-play:active {
+      transform: translateY(1px);
+    }
+
+    /* İsteək/Motivasiya Bölməsi */
+    .intent-box {
+      margin-top: 40px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 20px;
+      border-radius: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(5px);
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 15px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--accent-color);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    input[type="text"]::placeholder {
+      color: #6c757d;
+    }
+
+    .note {
+      font-size: 0.8rem;
+      color: #6c757d;
+      margin-top: 15px;
+    }
+  </style>
 </head>
 <body>
 
-<div class="shield-container">
-    <h1>SHAM-CELL SYSTEM</h1>
-    <div class="version">ULTRA MILITARY DEFENSE v3.0</div>
-    
-    <div class="radar-box" id="radar">
-        <div class="radar-line" id="radarLine"></div>
-        <span id="shieldStatus" style="font-size: 0.8rem; font-weight: bold; color: #888;">STANDBY</span>
+  <div class="container">
+    <h1>Aura Frequency</h1>
+    <p class="subtitle">528 Hz Solfeggio & 8 Hz Alpha Binaural Beat</p>
+
+    <div class="visualizer-container">
+      <div class="circle" id="visualCircle"></div>
     </div>
 
-    <div class="telemetry">
-        <div class="telemetry-row">
-            <span>Mühərrik 1 (Yarasa):</span>
-            <span class="telemetry-value" id="m1Freq">0 Hz</span>
-        </div>
-        <div class="telemetry-row">
-            <span>Mühərrik 2 (Baryer):</span>
-            <span class="telemetry-value" id="m2Freq">0 Hz</span>
-        </div>
-        <div class="telemetry-row">
-            <span>Müdafiə Rejimi:</span>
-            <span class="telemetry-value" id="shieldMode" style="color: #00ffaa;">OFF</span>
-        </div>
-    </div>
-    
-    <button id="triggerBtn">Müdafiəni Blokla</button>
-    
-    <div class="footer-text">
-        Cüt Fazalı Audio Alqoritmi. Arxa fonda işləmə və ekran kilidi qorunması tam aktivdir.
-    </div>
-</div>
+    <button class="btn-play" id="playBtn">Tezliyi Başlat</button>
 
-<script>
+    <div class="intent-box">
+      <label for="intentInput">Bu gün nəyi reallaşdırmaq istəyirsən?</label>
+      <input type="text" id="intentInput" placeholder="Niyyətini yaz və tezliyə fokuslan...">
+    </div>
+
+    <p class="note">⚠️ Ən yüksək effekti almaq üçün stereo qulaqlıq istifadə edin.</p>
+  </div>
+
+  <script>
     let audioCtx;
-    let osc1, osc2;
-    let gain1, gain2;
-    let isRunning = false;
-    let militaryEngineInterval;
-    let wakeLock = null;
+    let oscLeft, oscRight, gainNode;
+    let isPlaying = false;
 
-    const triggerBtn = document.getElementById('triggerBtn');
-    const shieldStatus = document.getElementById('shieldStatus');
-    const shieldMode = document.getElementById('shieldMode');
-    const m1Freq = document.getElementById('m1Freq');
-    const m2Freq = document.getElementById('m2Freq');
-    const radarLine = document.getElementById('radarLine');
+    const playBtn = document.getElementById('playBtn');
+    const visualCircle = document.getElementById('visualCircle');
 
-    async function activateWakeLock() {
-        try {
-            if ('wakeLock' in navigator) {
-                wakeLock = await navigator.wakeLock.request('screen');
-            }
-        } catch (err) { console.log("WakeLock Xətası:", err.message); }
+    function toggleAudio() {
+      if (!isPlaying) {
+        startAudio();
+      } else {
+        stopAudio();
+      }
     }
 
-    function runMilitaryEngine() {
-        let sweepFreq = 16000;
-        let step = 250;
+    function startAudio() {
+      // AudioContext yaradılması
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-        militaryEngineInterval = setInterval(() => {
-            if (!audioCtx) return;
-            const now = audioCtx.currentTime;
+      // Sol qulaq (528 Hz)
+      oscLeft = audioCtx.createOscillator();
+      const pannerLeft = audioCtx.createStereoPanner();
+      oscLeft.type = 'sine';
+      oscLeft.frequency.setValueAtTime(528, audioCtx.currentTime);
+      pannerLeft.pan.value = -1;
 
-            // 1. MÜHƏRRİK: Yarasa Radarı (Davamlı xaotik sıçrayışlar)
-            sweepFreq += step;
-            if (sweepFreq >= 22000 || sweepFreq <= 16000) step = -step;
-            
-            // Təsadüfi kiçik tezlik sürüşmələri əlavə edirik (Ağcaqanadın yaddaşını tam iflic etmək üçün)
-            let jitter = Math.floor(Math.random() * 150) - 75;
-            let finalM1 = sweepFreq + jitter;
-            
-            osc1.frequency.setValueAtTime(finalM1, now);
-            m1Freq.innerText = finalM1 + " Hz";
+      // Sağ qulaq (536 Hz -> 8 Hz fərq yaratmaq üçün)
+      oscRight = audioCtx.createOscillator();
+      const pannerRight = audioCtx.createStereoPanner();
+      oscRight.type = 'sine';
+      oscRight.frequency.setValueAtTime(536, audioCtx.currentTime);
+      pannerRight.pan.value = 1;
 
-            // Aqressiv yarasa çıqqıltı impulsu
-            gain1.gain.setValueAtTime(0.01, now);
-            gain1.gain.exponentialRampToValueAtTime(0.8, now + 0.01);
-            gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+      // Səs səviyyəsi nəzarəti
+      gainNode = audioCtx.createGain();
+      gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime); // Mülayim səs
 
-            // 2. MÜHƏRRİK: Sabit Baryer (İnsanın ətrafını qoruyan divar)
-            // 19.5 kHz - bunu insan əsla eşitmir, amma həşəratın naviqasiyasını tamamilə kor edir
-            let finalM2 = 19500 + (jitter * 0.5);
-            osc2.frequency.setValueAtTime(finalM2, now);
-            m2Freq.innerText = Math.round(finalM2) + " Hz";
-            
-            // Sabit divar səs gücü (Mikroskopik dalğalanma ilə)
-            gain2.gain.setValueAtTime(0.08, now);
+      // Zənciri bağlayırıq
+      oscLeft.connect(pannerLeft);
+      pannerLeft.connect(gainNode);
 
-        }, 180); // Daha sürətli impuls (180ms) - Sıfır Şans!
+      oscRight.connect(pannerRight);
+      pannerRight.connect(gainNode);
+
+      gainNode.connect(audioCtx.destination);
+
+      // Başlat
+      oscLeft.start();
+      oscRight.start();
+
+      isPlaying = true;
+      playBtn.innerText = "Tezliyi Dayandır";
+      visualCircle.classList.add('active');
     }
 
-    triggerBtn.onclick = async function() {
-        if (!isRunning) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            
-            // Mühərrik 1 Quraşdırılması
-            osc1 = audioCtx.createOscillator();
-            gain1 = audioCtx.createGain();
-            osc1.type = 'sine';
-            osc1.connect(gain1);
-            gain1.connect(audioCtx.destination);
-            
-            // Mühərrik 2 Quraşdırılması
-            osc2 = audioCtx.createOscillator();
-            gain2 = audioCtx.createGain();
-            osc2.type = 'triangle'; // Daha kəsici dalğa forması
-            osc2.connect(gain2);
-            gain2.connect(audioCtx.destination);
+    function stopAudio() {
+      if (audioCtx) {
+        oscLeft.stop();
+        oscRight.stop();
+        audioCtx.close();
+      }
+      isPlaying = false;
+      playBtn.innerText = "Tezliyi Başlat";
+      visualCircle.classList.remove('active');
+    }
 
-            osc1.start();
-            osc2.start();
-            
-            runMilitaryEngine();
-            await activateWakeLock();
-
-            // UI Aktivasiya
-            this.innerText = "Müdafiəni Söndür";
-            this.classList.add('active');
-            shieldStatus.innerText = "SHIELD ON";
-            shieldStatus.style.color = "#00ffaa";
-            shieldMode.innerText = "MAXIMUM MILITARY";
-            shieldMode.style.color = "#ff2244";
-            radarLine.style.display = 'block';
-            radarLine.style.animation = 'rotateRadar 2s linear infinite';
-            
-            isRunning = true;
-        } else {
-            clearInterval(militaryEngineInterval);
-            if (osc1) osc1.stop();
-            if (osc2) osc2.stop();
-            if (audioCtx) audioCtx.close();
-            if (wakeLock !== null) {
-                wakeLock.release();
-                wakeLock = null;
-            }
-
-            // UI Deaktivasiya
-            this.innerText = "Müdafiəni Blokla";
-            this.classList.remove('active');
-            shieldStatus.innerText = "STANDBY";
-            shieldStatus.style.color = "#888";
-            shieldMode.innerText = "OFF";
-            shieldMode.style.color = "#00ffaa";
-            m1Freq.innerText = "0 Hz";
-            m2Freq.innerText = "0 Hz";
-            radarLine.style.display = 'none';
-            radarLine.style.animation = 'none';
-            
-            isRunning = false;
-        }
-    };
-
-    document.addEventListener('visibilitychange', async () => {
-        if (wakeLock !== null && document.visibilityState === 'visible') {
-            await activateWakeLock();
-        }
-    });
-</script>
-
+    playBtn.addEventListener('click', toggleAudio);
+  </script>
 </body>
 </html>
