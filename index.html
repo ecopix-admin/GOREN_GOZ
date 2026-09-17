@@ -1,236 +1,111 @@
 <!DOCTYPE html>
 <html lang="az">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aura - Mind & Motivation Frequency</title>
-  <style>
-    :root {
-      --bg-color: #0b0d17;
-      --accent-color: #7b2cbf;
-      --glow-color: #9d4edd;
-      --text-color: #e0e1dd;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      overflow-x: hidden;
-      padding: 20px;
-    }
-
-    .container {
-      max-width: 600px;
-      width: 100%;
-      text-align: center;
-      z-index: 2;
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 10px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      background: linear-gradient(45deg, #c77dff, #e0e1dd);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    p.subtitle {
-      font-size: 1rem;
-      color: #9a8c98;
-      margin-bottom: 30px;
-    }
-
-    /* Vizual Tezlik Halqası */
-    .visualizer-container {
-      position: relative;
-      width: 200px;
-      height: 200px;
-      margin: 0 auto 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .circle {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(123,44,191,0.4) 0%, rgba(11,13,23,0) 70%);
-      border: 2px solid var(--glow-color);
-      box-shadow: 0 0 20px var(--glow-color);
-      transition: all 0.5s ease;
-    }
-
-    .circle.active {
-      animation: pulse 4s infinite ease-in-out;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(0.95); box-shadow: 0 0 15px var(--glow-color); }
-      50% { transform: scale(1.15); box-shadow: 0 0 40px #c77dff; }
-      100% { transform: scale(0.95); box-shadow: 0 0 15px var(--glow-color); }
-    }
-
-    .btn-play {
-      background: linear-gradient(135deg, var(--accent-color), var(--glow-color));
-      border: none;
-      color: white;
-      padding: 15px 40px;
-      font-size: 1.1rem;
-      border-radius: 30px;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(123, 44, 191, 0.4);
-      transition: transform 0.2s, box-shadow 0.2s;
-      z-index: 10;
-      position: relative;
-    }
-
-    .btn-play:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(157, 78, 221, 0.6);
-    }
-
-    .btn-play:active {
-      transform: translateY(1px);
-    }
-
-    /* İsteək/Motivasiya Bölməsi */
-    .intent-box {
-      margin-top: 40px;
-      background: rgba(255, 255, 255, 0.03);
-      padding: 20px;
-      border-radius: 15px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(5px);
-    }
-
-    input[type="text"] {
-      width: 100%;
-      padding: 12px 15px;
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid var(--accent-color);
-      border-radius: 8px;
-      color: #fff;
-      font-size: 1rem;
-      outline: none;
-      margin-top: 10px;
-      text-align: center;
-    }
-
-    input[type="text"]::placeholder {
-      color: #6c757d;
-    }
-
-    .note {
-      font-size: 0.8rem;
-      color: #6c757d;
-      margin-top: 15px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anonim.az - WhatsApp Dizayn</title>
+<style>
+*{font-family: 'Segoe UI', sans-serif;}
+body{margin:0;background:#111b21;color:white}
+.header{background:#202c33;padding:15px;display:flex;justify-content:space-between}
+.header h3{margin:0}
+.chat-list{background:#111b21;height:100vh}
+.contact{display:flex;padding:12px;border-bottom:1px solid #222;cursor:pointer}
+.contact:hover{background:#202c33}
+.avatar{width:45px;height:45px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;margin-right:12px}
+.name{font-weight:500}
+.last{color:#8696a0;font-size:13px}
+.chat-window{display:none;flex-direction:column;height:100vh;background:#0b141a}
+.messages{flex:1;padding:15px;overflow:auto}
+.bubble{background:#202c33;padding:8px 12px;border-radius:8px;margin:8px 0;max-width:70%}
+.me{background:#005c4b;margin-left:auto}
+.input-area{display:flex;padding:10px;background:#202c33}
+.input-area input{flex:1;padding:12px;border-radius:20px;border:none;background:#2a3942;color:white}
+.input-area button{background:#25D366;border:none;border-radius:50%;width:45px;height:45px;margin-left:8px;color:white;font-size:20px}
+.ad-top{background:#182229;text-align:center;padding:8px;color:#8696a0;font-size:12px;border-bottom:1px solid #222}
+</style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>Aura Frequency</h1>
-    <p class="subtitle">528 Hz Solfeggio & 8 Hz Alpha Binaural Beat</p>
+<div id="listPage">
+<div class="header"><h3>Anonim.az</h3><span>👻</span></div>
+<div class="ad-top">REKLAM - Hər klik sənə pul qazandırır</div>
+<div class="chat-list" id="contacts"></div>
+</div>
 
-    <div class="visualizer-container">
-      <div class="circle" id="visualCircle"></div>
-    </div>
+<div id="chatPage" class="chat-window">
+<div class="header">
+<button onclick="back()" style="background:none;border:none;color:white;font-size:20px">←</button>
+<div id="chatName" style="margin-left:10px"></div>
+</div>
+<div class="ad-top">Anonim mesajlar bu pəncərədə gizli qalır</div>
+<div class="messages" id="msgs"></div>
+<div class="input-area">
+<input id="msgInput" placeholder="Anonim mesaj yaz... Ə, Ş, Ç, Ö, Ü dəstəklənir">
+<button onclick="send()">➤</button>
+</div>
+</div>
 
-    <button class="btn-play" id="playBtn">Tezliyi Başlat</button>
+<script>
+// Azərbaycan kontaktları
+let contacts = [
+{name:"Elvin Əliyev", last:"Sənə anonim mesaj gəldi...", letter:"E"},
+{name:"Şəbnəm Quliyeva", last:"Gizli pərəstişkarın var 👻", letter:"Ş"},
+{name:"Çingiz Öztürk", last:"Bu gün çox gözəl görünürsən", letter:"Ç"},
+{name:"Aysel Məmmədova", last:"Səni bəyənən biri var", letter:"A"},
+{name:"Ülvi Hüseynov", last:"Anonim etirafın var", letter:"Ü"}
+];
 
-    <div class="intent-box">
-      <label for="intentInput">Bu gün nəyi reallaşdırmaq istəyirsən?</label>
-      <input type="text" id="intentInput" placeholder="Niyyətini yaz və tezliyə fokuslan...">
-    </div>
+let current = null;
+let store = JSON.parse(localStorage.getItem('anon_chats')||'{}');
 
-    <p class="note">⚠️ Ən yüksək effekti almaq üçün stereo qulaqlıq istifadə edin.</p>
-  </div>
+function renderContacts(){
+ document.getElementById('contacts').innerHTML = contacts.map((c,i)=>`
+  <div class="contact" onclick="openChat(${i})">
+   <div class="avatar">${c.letter}</div>
+   <div><div class="name">${c.name}</div><div class="last">${c.last}</div></div>
+  </div>`).join('');
+}
 
-  <script>
-    let audioCtx;
-    let oscLeft, oscRight, gainNode;
-    let isPlaying = false;
+function openChat(i){
+ current = contacts[i].name;
+ document.getElementById('listPage').style.display='none';
+ document.getElementById('chatPage').style.display='flex';
+ document.getElementById('chatName').innerText=current + ' (Anonim)';
+ renderMsgs();
+}
 
-    const playBtn = document.getElementById('playBtn');
-    const visualCircle = document.getElementById('visualCircle');
+function back(){
+ document.getElementById('chatPage').style.display='none';
+ document.getElementById('listPage').style.display='block';
+ current=null;
+}
 
-    function toggleAudio() {
-      if (!isPlaying) {
-        startAudio();
-      } else {
-        stopAudio();
-      }
-    }
+function renderMsgs(){
+ let m = store[current] || [];
+ document.getElementById('msgs').innerHTML = m.map(x=>`<div class="bubble ${x.me?'me':''}">${x.text}</div>`).join('');
+}
 
-    function startAudio() {
-      // AudioContext yaradılması
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function send(){
+ let txt = document.getElementById('msgInput').value.trim();
+ if(!txt) return;
+ // Reklam simulyasiyası
+ alert('Reklam izləndi ✓ 0.10 AZN qazandın - Mesaj anonim getdi!');
+ if(!store[current]) store[current]=[];
+ store[current].push({text:txt, me:true});
+ localStorage.setItem('anon_chats', JSON.stringify(store));
+ document.getElementById('msgInput').value='';
+ renderMsgs();
+ // Cavab simulyasiyası
+ setTimeout(()=>{
+   if(!store[current]) store[current]=[];
+   store[current].push({text:'Mesajın anonim çatdı, təşəkkürlər! 👻', me:false});
+   localStorage.setItem('anon_chats', JSON.stringify(store));
+   renderMsgs();
+ },1000);
+}
 
-      // Sol qulaq (528 Hz)
-      oscLeft = audioCtx.createOscillator();
-      const pannerLeft = audioCtx.createStereoPanner();
-      oscLeft.type = 'sine';
-      oscLeft.frequency.setValueAtTime(528, audioCtx.currentTime);
-      pannerLeft.pan.value = -1;
-
-      // Sağ qulaq (536 Hz -> 8 Hz fərq yaratmaq üçün)
-      oscRight = audioCtx.createOscillator();
-      const pannerRight = audioCtx.createStereoPanner();
-      oscRight.type = 'sine';
-      oscRight.frequency.setValueAtTime(536, audioCtx.currentTime);
-      pannerRight.pan.value = 1;
-
-      // Səs səviyyəsi nəzarəti
-      gainNode = audioCtx.createGain();
-      gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime); // Mülayim səs
-
-      // Zənciri bağlayırıq
-      oscLeft.connect(pannerLeft);
-      pannerLeft.connect(gainNode);
-
-      oscRight.connect(pannerRight);
-      pannerRight.connect(gainNode);
-
-      gainNode.connect(audioCtx.destination);
-
-      // Başlat
-      oscLeft.start();
-      oscRight.start();
-
-      isPlaying = true;
-      playBtn.innerText = "Tezliyi Dayandır";
-      visualCircle.classList.add('active');
-    }
-
-    function stopAudio() {
-      if (audioCtx) {
-        oscLeft.stop();
-        oscRight.stop();
-        audioCtx.close();
-      }
-      isPlaying = false;
-      playBtn.innerText = "Tezliyi Başlat";
-      visualCircle.classList.remove('active');
-    }
-
-    playBtn.addEventListener('click', toggleAudio);
-  </script>
+renderContacts();
+</script>
 </body>
 </html>
