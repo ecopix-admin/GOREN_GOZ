@@ -2,110 +2,88 @@
 <html lang="az">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Anonim.az - WhatsApp Dizayn</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>WhatsApp</title>
 <style>
-*{font-family: 'Segoe UI', sans-serif;}
-body{margin:0;background:#111b21;color:white}
-.header{background:#202c33;padding:15px;display:flex;justify-content:space-between}
-.header h3{margin:0}
-.chat-list{background:#111b21;height:100vh}
-.contact{display:flex;padding:12px;border-bottom:1px solid #222;cursor:pointer}
-.contact:hover{background:#202c33}
-.avatar{width:45px;height:45px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;margin-right:12px}
-.name{font-weight:500}
-.last{color:#8696a0;font-size:13px}
-.chat-window{display:none;flex-direction:column;height:100vh;background:#0b141a}
-.messages{flex:1;padding:15px;overflow:auto}
-.bubble{background:#202c33;padding:8px 12px;border-radius:8px;margin:8px 0;max-width:70%}
-.me{background:#005c4b;margin-left:auto}
-.input-area{display:flex;padding:10px;background:#202c33}
-.input-area input{flex:1;padding:12px;border-radius:20px;border:none;background:#2a3942;color:white}
-.input-area button{background:#25D366;border:none;border-radius:50%;width:45px;height:45px;margin-left:8px;color:white;font-size:20px}
-.ad-top{background:#182229;text-align:center;padding:8px;color:#8696a0;font-size:12px;border-bottom:1px solid #222}
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
+* { margin:0; padding:0; box-sizing:border-box; font-family: Roboto, Helvetica, Arial, sans-serif; }
+body { background:#111b21; color:#e9edef; overflow:hidden; }
+.app { max-width:430px; margin:0 auto; height:100vh; background:#111b21; position:relative; display:flex; flex-direction:column; }
+
+/* HEADER - WhatsApp exact */
+.wa-header { background:#202c33; height:59px; display:flex; align-items:center; padding:0 16px; gap:12px; }
+.wa-header .back { font-size:24px; }
+.wa-header img { width:40px; height:40px; border-radius:50%; }
+.wa-header .info { flex:1; }
+.wa-header .info b { font-size:16px; font-weight:500; display:block; }
+.wa-header .info span { font-size:13px; color:#8696a0; }
+.wa-header .icons { display:flex; gap:24px; font-size:20px; color:#aebac1; }
+
+/* CHAT BG */
+.chat-bg { flex:1; background:#0b141a url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-blend-mode: overlay; padding:10px 8px; overflow-y:auto; }
+
+.msg-row { display:flex; margin:2px 0; }
+.msg-row.me { justify-content:flex-end; }
+.bubble { max-width:75%; padding:6px 7px 8px 9px; border-radius:7.5px; position:relative; font-size:14.2px; line-height:19px; box-shadow:0 1px 0.5px rgba(0,0,0,0.13); }
+.bubble.other { background:#202c33; border-top-left-radius:0; }
+.bubble.me { background:#005c4b; border-top-right-radius:0; }
+.bubble .time { font-size:11px; color:#8696a0; float:right; margin:6px 0 0 10px; display:flex; align-items:center; gap:3px; }
+.bubble.me .time { color:#53bdeb; }
+.ticks { color:#53bdeb; font-size:14px; }
+
+/* INPUT - WhatsApp exact */
+.input-bar { background:#202c33; padding:5px 10px; display:flex; align-items:center; gap:8px; }
+.input-box { flex:1; background:#2a3942; border-radius:21px; display:flex; align-items:center; padding:9px 12px; gap:10px; }
+.input-box input { flex:1; background:transparent; border:none; color:#d1d7db; font-size:15px; outline:none; }
+.input-box input::placeholder { color:#8696a0; }
+.send-btn { width:45px; height:45px; background:#00a884; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:22px; color:white; border:none; }
+
+.ad-label { background:#182229; text-align:center; font-size:11px; color:#00a884; padding:4px; letter-spacing:0.5px; }
 </style>
 </head>
 <body>
+<div class="app">
+  <div class="ad-label">👻 ANONİM MOD AKTİVDİR - Qarşı tərəf nömrəni görmür</div>
+  <div class="wa-header">
+    <span class="back">←</span>
+    <img src="https://i.pravatar.cc/100?img=5">
+    <div class="info"><b>Şəbnəm Quliyeva</b><span>onlayn</span></div>
+    <div class="icons"><span>📹</span><span>📞</span><span>⋮</span></div>
+  </div>
 
-<div id="listPage">
-<div class="header"><h3>Anonim.az</h3><span>👻</span></div>
-<div class="ad-top">REKLAM - Hər klik sənə pul qazandırır</div>
-<div class="chat-list" id="contacts"></div>
-</div>
+  <div class="chat-bg" id="chat">
+    <div class="msg-row"><div class="bubble other">Salam, necəsən? Sənə bir söz deyim? <span class="time">14:30</span></div></div>
+    <div class="msg-row me"><div class="bubble me">Salam Şəbnəm, buyur eşitirəm. Ə, Ş, Ç hərfləri var.<span class="time">14:31 <span class="ticks">✓✓</span></span></div></div>
+    <div class="msg-row"><div class="bubble other">Məncə bu layihə çox əla olacaq, səncə necə? <span class="time">14:31</span></div></div>
+    <div class="msg-row me"><div class="bubble me">Bəli, tam WhatsApp kimidir. İndi yoxla, gördün? Ö, Ü, Ğ, İ hamısı var.<span class="time">14:32 <span class="ticks">✓✓</span></span></div></div>
+  </div>
 
-<div id="chatPage" class="chat-window">
-<div class="header">
-<button onclick="back()" style="background:none;border:none;color:white;font-size:20px">←</button>
-<div id="chatName" style="margin-left:10px"></div>
-</div>
-<div class="ad-top">Anonim mesajlar bu pəncərədə gizli qalır</div>
-<div class="messages" id="msgs"></div>
-<div class="input-area">
-<input id="msgInput" placeholder="Anonim mesaj yaz... Ə, Ş, Ç, Ö, Ü dəstəklənir">
-<button onclick="send()">➤</button>
-</div>
+  <div class="input-bar">
+    <div class="input-box">
+      <span style="color:#8696a0; font-size:22px;">☺</span>
+      <input id="inp" placeholder="Mesaj yazın" onkeypress="if(event.key==='Enter')send()">
+      <span style="color:#8696a0; font-size:20px;">📎</span>
+      <span style="color:#8696a0; font-size:20px;">📷</span>
+    </div>
+    <button class="send-btn" onclick="send()">➤</button>
+  </div>
 </div>
 
 <script>
-// Azərbaycan kontaktları
-let contacts = [
-{name:"Elvin Əliyev", last:"Sənə anonim mesaj gəldi...", letter:"E"},
-{name:"Şəbnəm Quliyeva", last:"Gizli pərəstişkarın var 👻", letter:"Ş"},
-{name:"Çingiz Öztürk", last:"Bu gün çox gözəl görünürsən", letter:"Ç"},
-{name:"Aysel Məmmədova", last:"Səni bəyənən biri var", letter:"A"},
-{name:"Ülvi Hüseynov", last:"Anonim etirafın var", letter:"Ü"}
-];
-
-let current = null;
-let store = JSON.parse(localStorage.getItem('anon_chats')||'{}');
-
-function renderContacts(){
- document.getElementById('contacts').innerHTML = contacts.map((c,i)=>`
-  <div class="contact" onclick="openChat(${i})">
-   <div class="avatar">${c.letter}</div>
-   <div><div class="name">${c.name}</div><div class="last">${c.last}</div></div>
-  </div>`).join('');
-}
-
-function openChat(i){
- current = contacts[i].name;
- document.getElementById('listPage').style.display='none';
- document.getElementById('chatPage').style.display='flex';
- document.getElementById('chatName').innerText=current + ' (Anonim)';
- renderMsgs();
-}
-
-function back(){
- document.getElementById('chatPage').style.display='none';
- document.getElementById('listPage').style.display='block';
- current=null;
-}
-
-function renderMsgs(){
- let m = store[current] || [];
- document.getElementById('msgs').innerHTML = m.map(x=>`<div class="bubble ${x.me?'me':''}">${x.text}</div>`).join('');
-}
-
 function send(){
- let txt = document.getElementById('msgInput').value.trim();
- if(!txt) return;
- // Reklam simulyasiyası
- alert('Reklam izləndi ✓ 0.10 AZN qazandın - Mesaj anonim getdi!');
- if(!store[current]) store[current]=[];
- store[current].push({text:txt, me:true});
- localStorage.setItem('anon_chats', JSON.stringify(store));
- document.getElementById('msgInput').value='';
- renderMsgs();
- // Cavab simulyasiyası
- setTimeout(()=>{
-   if(!store[current]) store[current]=[];
-   store[current].push({text:'Mesajın anonim çatdı, təşəkkürlər! 👻', me:false});
-   localStorage.setItem('anon_chats', JSON.stringify(store));
-   renderMsgs();
- },1000);
+ let v=document.getElementById('inp').value.trim();
+ if(!v) return;
+ let chat=document.getElementById('chat');
+ chat.innerHTML+=`<div class="msg-row me"><div class="bubble me">${v}<span class="time">${new Date().getHours()}:${String(new Date().getMinutes()).padStart(2,'0')} <span class="ticks">✓✓</span></span></div></div>`;
+ document.getElementById('inp').value='';
+ chat.scrollTop=chat.scrollHeight;
+ // reklam simulyasiya
+ setTimeout(()=>{ 
+   chat.innerHTML+=`<div class="msg-row"><div class="bubble other">Anonim mesajın çatdı! (Reklam izləndi, 0.12 AZN qazandın)<span class="time">${new Date().getHours()}:${String(new Date().getMinutes()).padStart(2,'0')}</span></div></div>`;
+   chat.scrollTop=chat.scrollHeight;
+ },600);
 }
-
-renderContacts();
 </script>
+</div>
 </body>
 </html>
