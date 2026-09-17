@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Secret</title>
+    <title>WhatsApp Secret Pro</title>
     <style>
         * {
             box-sizing: border-box;
@@ -39,9 +39,12 @@
             padding: 12px 16px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: space-between;
             box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            z-index: 10;
         }
+
+        .user-meta { display: flex; align-items: center; gap: 12px; }
 
         .avatar {
             width: 40px;
@@ -54,9 +57,16 @@
             font-size: 20px;
         }
 
-        .user-info { flex: 1; }
         .user-name { font-size: 16px; font-weight: 600; }
         .user-status { font-size: 12px; color: #00a884; }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: #aebac1;
+            font-size: 20px;
+            cursor: pointer;
+        }
 
         /* Chat Body */
         .chat-body {
@@ -84,13 +94,9 @@
             margin-bottom: 10px;
         }
 
-        .anon-tag {
-            color: #00a884;
-            font-size: 13px;
-            font-weight: bold;
-        }
+        .anon-tag { color: #00a884; font-size: 13px; font-weight: bold; }
 
-        /* Scratch Canvas Container */
+        /* Scratch Box */
         .scratch-container {
             position: relative;
             width: 100%;
@@ -126,7 +132,7 @@
             z-index: 2;
         }
 
-        /* Viral Buttons */
+        /* Buttons */
         .btn {
             background-color: #00a884;
             color: #111b21;
@@ -145,58 +151,87 @@
             gap: 8px;
         }
 
-        .btn-story {
-            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
-            color: #fff;
-        }
+        .btn-secondary { background-color: #2a3942; color: #00a884; }
 
-        .btn-hint {
-            background-color: #2a3942;
-            color: #00a884;
-        }
-
-        /* Safety Notice */
-        .safety-text {
-            font-size: 11px;
-            color: #8696a0;
-            text-align: center;
-            margin-top: 12px;
-        }
-
-        /* Story Modal Overlay */
-        .story-card {
+        /* CONTACTS MODAL (WhatsApp Style) */
+        .modal {
             display: none;
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 100;
+            background-color: #111b21;
+            z-index: 1000;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
         }
 
-        .story-box {
-            background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
-            padding: 30px 20px;
-            border-radius: 16px;
-            text-align: center;
-            width: 100%;
-            max-width: 320px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        .modal-header {
+            background-color: #202c33;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
+
+        .search-bar {
+            background-color: #202c33;
+            padding: 8px 16px;
+        }
+
+        .search-input {
+            width: 100%;
+            background-color: #111b21;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            color: #fff;
+            outline: none;
+        }
+
+        .contacts-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-bottom: 1px solid #222d34;
+            cursor: pointer;
+        }
+
+        .contact-item:active { background-color: #202c33; }
+
+        .contact-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: #6b7c85;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #fff;
+        }
+
+        .contact-info { flex: 1; }
+        .contact-name { font-size: 16px; color: #e9edef; font-weight: 500; }
+        .contact-phone { font-size: 13px; color: #8696a0; margin-top: 2px; }
     </style>
 </head>
 <body>
 
 <div class="chat-container">
     <div class="header">
-        <div class="avatar">👻</div>
-        <div class="user-info">
-            <div class="user-name">Anonim Qutu</div>
-            <div class="user-status">● Tam Məxfi & Qorunan</div>
+        <div class="user-meta">
+            <div class="avatar">👻</div>
+            <div>
+                <div class="user-name">Anonim Qutu</div>
+                <div class="user-status">● Tam Məxfi & Qorunan</div>
+            </div>
         </div>
+        <button class="icon-btn" onclick="openContactsModal()">💬</button>
     </div>
 
     <div class="chat-body">
@@ -210,82 +245,70 @@
                 👇 Mesajı oxumaq üçün barmağınla üstünü kazı:
             </p>
 
-            <!-- Scratch Container -->
             <div class="scratch-container">
                 <div class="secret-text-behind" id="secret-text">
-                    <!-- Mesaj bura düşəcək -->
+                    <!-- Mesaj buraya yüklənəcək -->
                 </div>
                 <canvas id="scratch-canvas"></canvas>
             </div>
 
-            <!-- Action Buttons -->
-            <button class="btn btn-story" onclick="openStoryModal()">
-                📸 Bu Mesajı Story-də Paylaş
+            <button class="btn" onclick="openContactsModal()">
+                📲 Kontaktdan Birini Seç və Anonim Mesaj Yolla
             </button>
-            <button class="btn btn-hint" onclick="getHint()">
+            <button class="btn btn-secondary" onclick="getHint()">
                 💡 Göndərənin İpucunu Al (0.50 ₼)
             </button>
-            <button class="btn" onclick="createNewLink()">
-                🔗 Sən də Öz Anonim Linkini Yarad
-            </button>
-        </div>
-
-        <div class="safety-text">
-            🛡️ Təhlükəsizlik AI filteri aktivdir. Təhqir və şantaj kontentləri IP səviyyəsində bloklanır.
         </div>
     </div>
 </div>
 
-<!-- Story Preview Modal -->
-<div class="story-card" id="storyModal">
-    <div class="story-box">
-        <h3 style="color:#fff; font-size:16px; margin-bottom:15px;">Mənə gələn anonim mesaj:</h3>
-        <div style="background:rgba(0,0,0,0.4); padding:15px; border-radius:10px; color:#fff; font-size:18px; font-weight:bold;" id="storyText">
-            ""
+<!-- WhatsApp Kontaktlar Modalı -->
+<div class="modal" id="contactsModal">
+    <div class="modal-header">
+        <button class="icon-btn" onclick="closeContactsModal()">←</button>
+        <div>
+            <div style="font-size: 16px; font-weight: 600;">Kontakt Seçin</div>
+            <div style="font-size: 12px; color: #8696a0;" id="contact-count">WhatsApp Kontaktları</div>
         </div>
-        <p style="color:#fff; font-size:12px; margin-top:15px;">Sizcə bunu kim yazib? 😂<br><b>sual.az/anonim</b></p>
     </div>
-    <button class="btn" style="width:200px; margin-top:20px;" onclick="closeStoryModal()">Ekran Şəkli Çək və Bağla</button>
+
+    <div class="search-bar">
+        <input type="text" class="search-input" id="searchContact" placeholder="Ad və ya nömrə axtarın..." onkeyup="filterContacts()">
+    </div>
+
+    <div class="contacts-list" id="contactsList">
+        <!-- Kontaktlar dinamik bura yüklənəcək -->
+    </div>
 </div>
 
 <script>
-    // 1. Qanuni və Təhlükəsizlik Filteri (Söyüş/Təhqir əleyhinə)
-    const badWords = ["söyüş1", "söyüş2", "təhqir"]; // Gələcəkdə böyük siyahı ilə əvəzlənəcək
-    
-    function filterText(text) {
-        let cleanText = text;
-        badWords.forEach(word => {
-            let reg = new RegExp(word, "gi");
-            cleanText = cleanText.replace(reg, "***");
-        });
-        return cleanText;
-    }
+    // 1. WhatsApp Örnək Kontaktlar Siyahısı
+    const sampleContacts = [
+        { name: "Elvin (Dost)", phone: "+994501234567" },
+        { name: "Leyla", phone: "+994559876543" },
+        { name: "Rauf Əliyev", phone: "+994703332211" },
+        { name: "Aysel Qasımova", phone: "+994514445566" },
+        { name: "Kamran", phone: "+994998887766" }
+    ];
 
-    // 2. URL-dən mesajı almaq
+    // 2. URL-dən mesaj oxumaq
     function getMessage() {
         const urlParams = new URLSearchParams(window.location.search);
         const rawMsg = urlParams.get('m');
-        if (rawMsg) {
-            return filterText(decodeURIComponent(rawMsg));
-        }
-        return "Sən çox maraqlı birisən, ama kim olduğumu deməyəcəyəm! 😜";
+        return rawMsg ? decodeURIComponent(rawMsg) : "Sən çox maraqlı birisən, ama kim olduğumu deməyəcəyəm! 😜";
     }
 
-    const messageContent = getMessage();
-    document.getElementById('secret-text').innerText = messageContent;
+    document.getElementById('secret-text').innerText = getMessage();
 
-    // 3. Scratch (Kazı-Qazan) Canvas Məntiqləri
+    // 3. Scratch Canvas (Kazı-Qazan)
     const canvas = document.getElementById('scratch-canvas');
     const ctx = canvas.getContext('2d');
 
     function initScratch() {
         canvas.width = canvas.offsetWidth;
         canvas.height = canvas.offsetHeight;
-        
-        // Üst gümüşü təbəqə
         ctx.fillStyle = '#6b7c85';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
         ctx.font = '14px sans-serif';
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
@@ -314,29 +337,94 @@
 
     window.onload = initScratch;
 
-    // 4. İpucu Alma Modulu
-    function getHint() {
-        alert("💡 İpucu: Bu mesaj Bakı şəhərindən və iOS cihazından göndərilib.");
+    // 4. Kontaktlar Modalı Funksiyaları
+    async function openContactsModal() {
+        const modal = document.getElementById('contactsModal');
+        modal.style.display = 'flex';
+        
+        // Təhlükəsizlik şərtdir: Əgər brauzer Web Contacts API dəstəkləyirsə cihazın öz kontaktlarını çəkir
+        if ('contacts' in navigator && 'ContactsManager' in window) {
+            try {
+                const props = ['name', 'tel'];
+                const opts = { multiple: true };
+                const contacts = await navigator.contacts.select(props, opts);
+                if (contacts.length > 0) {
+                    renderDeviceContacts(contacts);
+                    return;
+                }
+            } catch (err) {
+                console.log("Cihaz kontakt icazəsi verilmədi, standart siyahı göstərilir.");
+            }
+        }
+        
+        // Dəstəkləməzsə və ya rədd edilərsə simulyasiya kontaktlarını göstər
+        renderContacts(sampleContacts);
     }
 
-    // 5. Viral Link Generator
-    function createNewLink() {
-        let userMsg = prompt("WhatsApp üçün öz anonim mesajını yaz:");
-        if (userMsg) {
-            let finalLink = window.location.origin + window.location.pathname + "?m=" + encodeURIComponent(userMsg);
-            navigator.clipboard.writeText(finalLink);
-            alert("Sənin anonim linkin kopyalandı! WhatsApp-da paylaşa bilərsən:\n" + finalLink);
+    function closeContactsModal() {
+        document.getElementById('contactsModal').style.display = 'none';
+    }
+
+    function renderContacts(contacts) {
+        const list = document.getElementById('contactsList');
+        list.innerHTML = "";
+        contacts.forEach(c => {
+            list.innerHTML += `
+                <div class="contact-item" onclick="sendAnonToPhone('${c.phone}', '${c.name}')">
+                    <div class="contact-avatar">${c.name.charAt(0)}</div>
+                    <div class="contact-info">
+                        <div class="contact-name">${c.name}</div>
+                        <div class="contact-phone">${c.phone}</div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function renderDeviceContacts(contacts) {
+        const list = document.getElementById('contactsList');
+        list.innerHTML = "";
+        contacts.forEach(c => {
+            let name = c.name ? c.name[0] : "İstifadəçi";
+            let phone = c.tel ? c.tel[0] : "";
+            list.innerHTML += `
+                <div class="contact-item" onclick="sendAnonToPhone('${phone}', '${name}')">
+                    <div class="contact-avatar">${name.charAt(0)}</div>
+                    <div class="contact-info">
+                        <div class="contact-name">${name}</div>
+                        <div class="contact-phone">${phone}</div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function filterContacts() {
+        const query = document.getElementById('searchContact').value.toLowerCase();
+        const filtered = sampleContacts.filter(c => 
+            c.name.toLowerCase().includes(query) || c.phone.includes(query)
+        );
+        renderContacts(filtered);
+    }
+
+    // 5. Seçilən Kontakta Anonim Mesaj Yönləndirmə
+    function sendAnonToPhone(phone, name) {
+        let msg = prompt(`${name} üçün anonim mesajınızı yazın:`);
+        if (msg) {
+            let cleanPhone = phone.replace(/[^0-9]/g, '');
+            let link = window.location.origin + window.location.pathname + "?m=" + encodeURIComponent(msg);
+            
+            // WhatsApp-ın rəsmi wa.me API-si
+            let waText = encodeURIComponent(`Sənə anonim mesaj var 👻 Baxmaq üçün kliklə:\n${link}`);
+            let waUrl = `https://wa.me/${cleanPhone}?text=${waText}`;
+            
+            window.open(waUrl, '_blank');
+            closeContactsModal();
         }
     }
 
-    // 6. Story Modalı
-    function openStoryModal() {
-        document.getElementById('storyText').innerText = `"${messageContent}"`;
-        document.getElementById('storyModal').style.display = 'flex';
-    }
-
-    function closeStoryModal() {
-        document.getElementById('storyModal').style.display = 'none';
+    function getHint() {
+        alert("💡 İpucu: Bu mesaj Bakı şəhərindən daxil olan istifadəçi tərəfindən yazılıb.");
     }
 </script>
 
