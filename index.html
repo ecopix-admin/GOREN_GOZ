@@ -1,89 +1,314 @@
 <!DOCTYPE html>
 <html lang="az">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>WhatsApp</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
-* { margin:0; padding:0; box-sizing:border-box; font-family: Roboto, Helvetica, Arial, sans-serif; }
-body { background:#111b21; color:#e9edef; overflow:hidden; }
-.app { max-width:430px; margin:0 auto; height:100vh; background:#111b21; position:relative; display:flex; flex-direction:column; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
 
-/* HEADER - WhatsApp exact */
-.wa-header { background:#202c33; height:59px; display:flex; align-items:center; padding:0 16px; gap:12px; }
-.wa-header .back { font-size:24px; }
-.wa-header img { width:40px; height:40px; border-radius:50%; }
-.wa-header .info { flex:1; }
-.wa-header .info b { font-size:16px; font-weight:500; display:block; }
-.wa-header .info span { font-size:13px; color:#8696a0; }
-.wa-header .icons { display:flex; gap:24px; font-size:20px; color:#aebac1; }
+        body {
+            background-color: #0b141a;
+            color: #e9edef;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
 
-/* CHAT BG */
-.chat-bg { flex:1; background:#0b141a url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-blend-mode: overlay; padding:10px 8px; overflow-y:auto; }
+        .chat-container {
+            width: 100%;
+            max-width: 450px;
+            height: 100vh;
+            background-color: #0b141a;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 0);
+            background-size: 20px 20px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
 
-.msg-row { display:flex; margin:2px 0; }
-.msg-row.me { justify-content:flex-end; }
-.bubble { max-width:75%; padding:6px 7px 8px 9px; border-radius:7.5px; position:relative; font-size:14.2px; line-height:19px; box-shadow:0 1px 0.5px rgba(0,0,0,0.13); }
-.bubble.other { background:#202c33; border-top-left-radius:0; }
-.bubble.me { background:#005c4b; border-top-right-radius:0; }
-.bubble .time { font-size:11px; color:#8696a0; float:right; margin:6px 0 0 10px; display:flex; align-items:center; gap:3px; }
-.bubble.me .time { color:#53bdeb; }
-.ticks { color:#53bdeb; font-size:14px; }
+        /* WhatsApp Header */
+        .header {
+            background-color: #202c33;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
 
-/* INPUT - WhatsApp exact */
-.input-bar { background:#202c33; padding:5px 10px; display:flex; align-items:center; gap:8px; }
-.input-box { flex:1; background:#2a3942; border-radius:21px; display:flex; align-items:center; padding:9px 12px; gap:10px; }
-.input-box input { flex:1; background:transparent; border:none; color:#d1d7db; font-size:15px; outline:none; }
-.input-box input::placeholder { color:#8696a0; }
-.send-btn { width:45px; height:45px; background:#00a884; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:22px; color:white; border:none; }
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #6b7c85;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
 
-.ad-label { background:#182229; text-align:center; font-size:11px; color:#00a884; padding:4px; letter-spacing:0.5px; }
-</style>
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #e9edef;
+        }
+
+        .user-status {
+            font-size: 12px;
+            color: #8696a0;
+        }
+
+        /* Main Chat Area */
+        .chat-body {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message-box {
+            align-self: flex-start;
+            background-color: #202c33;
+            border-radius: 0px 8px 8px 8px;
+            padding: 10px 14px;
+            max-width: 85%;
+            position: relative;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .anon-tag {
+            color: #00a884;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .message-content {
+            font-size: 15px;
+            line-height: 1.4;
+            color: #d1d7db;
+            word-wrap: break-word;
+        }
+
+        .time-stamp {
+            font-size: 10px;
+            color: #8696a0;
+            text-align: right;
+            margin-top: 4px;
+        }
+
+        /* Interactive Locked Card */
+        .locked-card {
+            background: #111b21;
+            border: 1px solid #222d34;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .btn {
+            background-color: #00a884;
+            color: #111b21;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+            transition: 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background-color: #2a3942;
+            color: #00a884;
+            margin-top: 6px;
+        }
+
+        /* Ad Banner Section */
+        .ad-banner {
+            background-color: #182229;
+            border: 1px dashed #00a884;
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 10px;
+            text-align: center;
+            font-size: 12px;
+            color: #8696a0;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #00a884;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Footer Input Area */
+        .footer {
+            background-color: #202c33;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-box {
+            flex: 1;
+            background-color: #2a3942;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #d1d7db;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .send-btn {
+            background-color: #00a884;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: #111b21;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
 </head>
 <body>
-<div class="app">
-  <div class="ad-label">👻 ANONİM MOD AKTİVDİR - Qarşı tərəf nömrəni görmür</div>
-  <div class="wa-header">
-    <span class="back">←</span>
-    <img src="https://i.pravatar.cc/100?img=5">
-    <div class="info"><b>Şəbnəm Quliyeva</b><span>onlayn</span></div>
-    <div class="icons"><span>📹</span><span>📞</span><span>⋮</span></div>
-  </div>
 
-  <div class="chat-bg" id="chat">
-    <div class="msg-row"><div class="bubble other">Salam, necəsən? Sənə bir söz deyim? <span class="time">14:30</span></div></div>
-    <div class="msg-row me"><div class="bubble me">Salam Şəbnəm, buyur eşitirəm. Ə, Ş, Ç hərfləri var.<span class="time">14:31 <span class="ticks">✓✓</span></span></div></div>
-    <div class="msg-row"><div class="bubble other">Məncə bu layihə çox əla olacaq, səncə necə? <span class="time">14:31</span></div></div>
-    <div class="msg-row me"><div class="bubble me">Bəli, tam WhatsApp kimidir. İndi yoxla, gördün? Ö, Ü, Ğ, İ hamısı var.<span class="time">14:32 <span class="ticks">✓✓</span></span></div></div>
-  </div>
-
-  <div class="input-bar">
-    <div class="input-box">
-      <span style="color:#8696a0; font-size:22px;">☺</span>
-      <input id="inp" placeholder="Mesaj yazın" onkeypress="if(event.key==='Enter')send()">
-      <span style="color:#8696a0; font-size:20px;">📎</span>
-      <span style="color:#8696a0; font-size:20px;">📷</span>
+<div class="chat-container">
+    <!-- Header -->
+    <div class="header">
+        <div class="avatar">👻</div>
+        <div class="user-info">
+            <div class="user-name">Məxfi Qutu</div>
+            <div class="user-status">Anonim Mesajlaşma</div>
+        </div>
     </div>
-    <button class="send-btn" onclick="send()">➤</button>
-  </div>
+
+    <!-- Chat Body -->
+    <div class="chat-body">
+        
+        <div class="message-box">
+            <div class="anon-tag">🔒 Gizli Göndərən</div>
+            
+            <div id="locked-state" class="locked-card">
+                <p style="font-size: 13px; color: #8696a0;">Sənə yeni bir anonim mesaj var!</p>
+                <div class="spinner" id="loader"></div>
+                <button class="btn" id="open-btn" onclick="revealMessage()">Mesajı Aç (3 san)</button>
+            </div>
+
+            <div id="unlocked-state" style="display: none;">
+                <p class="message-content" id="secret-text">
+                    <!-- Mesaj buraya yüklənəcək -->
+                </p>
+                <div class="time-stamp" id="current-time">12:00</div>
+
+                <!-- Ad Unit Place -->
+                <div class="ad-banner">
+                    📢 <b>REKLAM SAHƏSİ</b><br>
+                    (AdSense və ya PropellerAds kodu bura yerləşdirilir)
+                </div>
+
+                <!-- Monetization: Hint Button -->
+                <button class="btn btn-secondary" onclick="getHint()">💡 Göndərənin İpucunu Al (0.50 ₼)</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer Reply Area -->
+    <div class="footer">
+        <input type="text" class="input-box" id="reply-input" placeholder="Sən də anonim cavab yaz...">
+        <button class="send-btn" onclick="sendReply()">➤</button>
+    </div>
 </div>
 
 <script>
-function send(){
- let v=document.getElementById('inp').value.trim();
- if(!v) return;
- let chat=document.getElementById('chat');
- chat.innerHTML+=`<div class="msg-row me"><div class="bubble me">${v}<span class="time">${new Date().getHours()}:${String(new Date().getMinutes()).padStart(2,'0')} <span class="ticks">✓✓</span></span></div></div>`;
- document.getElementById('inp').value='';
- chat.scrollTop=chat.scrollHeight;
- // reklam simulyasiya
- setTimeout(()=>{ 
-   chat.innerHTML+=`<div class="msg-row"><div class="bubble other">Anonim mesajın çatdı! (Reklam izləndi, 0.12 AZN qazandın)<span class="time">${new Date().getHours()}:${String(new Date().getMinutes()).padStart(2,'0')}</span></div></div>`;
-   chat.scrollTop=chat.scrollHeight;
- },600);
-}
+    // 1. Dinamik URL Parametrindən Mesajı Oxumaq
+    function getMessageFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const msg = urlParams.get('m');
+        if (msg) {
+            return decodeURIComponent(msg);
+        }
+        return "Sən çox maraqlı birisən, amma kim olduğunu bilmirəm! 😊"; // Standart test mesajı
+    }
+
+    // 2. Mesajı Taymerlə Açmaq (Reklam baxışı Simulyasiyası)
+    function revealMessage() {
+        const btn = document.getElementById('open-btn');
+        const loader = document.getElementById('loader');
+        
+        btn.style.display = 'none';
+        loader.style.display = 'block';
+
+        setTimeout(() => {
+            document.getElementById('locked-state').style.display = 'none';
+            document.getElementById('unlocked-state').style.display = 'block';
+            document.getElementById('secret-text').innerText = getMessageFromURL();
+            
+            // Vaxtı yenilə
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('current-time').innerText = `${hours}:${minutes}`;
+        }, 2000); // 2 saniyəlik gözləmə
+    }
+
+    // 3. İpucu Alma Funksiyası (Gəlir Modulu)
+    function getHint() {
+        alert("💡 İpucu: Göndərən cihaz 'Samsung' şəbəkəsindən daxil olub və Bakı şəhərindədir.");
+    }
+
+    // 4. Cavab Göndərmə
+    function sendReply() {
+        const input = document.getElementById('reply-input');
+        if (input.value.trim() !== "") {
+            alert("Anonim cavabınız göndərildi!");
+            input.value = "";
+        }
+    }
 </script>
-</div>
+
 </body>
 </html>
