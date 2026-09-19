@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AzSearch</title>
+    <title>AzSearch — Müstəqil Axtarış Platforması</title>
 
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -11,59 +11,94 @@
     <link rel="icon" type="image/png" href="https://www.google.com/favicon.ico">
 
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Roboto, arial, sans-serif; }
-        body { background-color: #fff; color: #202124; display: flex; flex-direction: column; min-height: 100vh; }
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #202124;
+            --card-bg: #f8f9fa;
+            --border-color: #dadce0;
+            --link-color: #1a0dab;
+            --snippet-color: #4d5156;
+        }
+
+        body.dark-mode {
+            --bg-color: #202124;
+            --text-color: #e8eaed;
+            --card-bg: #303134;
+            --border-color: #5f6368;
+            --link-color: #8ab4f8;
+            --snippet-color: #bdc1c6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Roboto, arial, sans-serif; transition: background 0.2s, color 0.2s; }
+        body { background-color: var(--bg-color); color: var(--text-color); display: flex; flex-direction: column; min-height: 100vh; }
         
         /* Header */
-        header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: #fff; border-bottom: 1px solid #ebebeb; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--border-color); position: relative; }
         .logo-text { font-size: 22px; font-weight: 500; color: #4285f4; text-decoration: none; letter-spacing: -0.5px; }
         .logo-text span { color: #ea4335; }
         
-        .balance-info { font-size: 13px; color: #5f6368; background: #f8f9fa; padding: 6px 12px; border-radius: 4px; border: 1px solid #dadce0; }
-        .balance-info strong { color: #202124; }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .balance-info { font-size: 13px; color: var(--snippet-color); background: var(--card-bg); padding: 6px 12px; border-radius: 4px; border: 1px solid var(--border-color); }
+        .balance-info strong { color: var(--text-color); }
+
+        /* 3 Nöqtə Menyusu (Kebab Menu) */
+        .menu-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-color); padding: 4px 8px; border-radius: 50%; }
+        .menu-btn:hover { background: var(--card-bg); }
+
+        .dropdown-menu { display: none; position: absolute; top: 50px; right: 20px; background: var(--bg-color); border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 8px; width: 220px; z-index: 100; }
+        .dropdown-menu.show { display: block; }
+        .dropdown-item { padding: 12px 16px; font-size: 14px; color: var(--text-color); cursor: pointer; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); }
+        .dropdown-item:last-child { border-bottom: none; }
+        .dropdown-item:hover { background: var(--card-bg); }
 
         /* Axtarış Bölməsi */
         .search-container { max-width: 690px; margin: 20px auto 0 auto; padding: 0 16px; width: 100%; }
-        .search-box { display: flex; border: 1px solid #dfe1e5; border-radius: 24px; padding: 8px 16px; background: #fff; align-items: center; }
-        .search-box:hover, .search-box:focus-within { box-shadow: 0 1px 6px rgba(32,33,36,0.28); border-color: rgba(223,225,229,0); }
-        .search-input { flex: 1; border: none; outline: none; font-size: 16px; color: #202124; }
-        .search-btn { background: #1a73e8; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; margin-left: 10px; }
-        .search-btn:hover { background: #1557b0; }
+        .search-box { display: flex; border: 1px solid var(--border-color); border-radius: 24px; padding: 6px 16px; background: var(--bg-color); align-items: center; }
+        .search-box:focus-within { box-shadow: 0 1px 6px rgba(32,33,36,0.28); border-color: transparent; }
+        .search-input { flex: 1; border: none; outline: none; font-size: 16px; color: var(--text-color); background: transparent; }
+        .search-btn { background: #1a73e8; color: white; border: none; padding: 8px 18px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; margin-left: 8px; }
 
-        /* Sekmələr (Tabs) - Emojisiz, Peşəkar */
-        .tabs-container { display: flex; gap: 24px; max-width: 690px; margin: 16px auto 0 auto; padding: 0 16px; border-bottom: 1px solid #dadce0; width: 100%; }
-        .tab-btn { background: none; border: none; padding: 8px 0 12px 0; font-size: 14px; color: #5f6368; cursor: pointer; font-weight: 500; border-bottom: 3px solid transparent; }
+        /* Sekmələr */
+        .tabs-container { display: flex; gap: 24px; max-width: 690px; margin: 16px auto 0 auto; padding: 0 16px; border-bottom: 1px solid var(--border-color); width: 100%; }
+        .tab-btn { background: none; border: none; padding: 8px 0 12px 0; font-size: 14px; color: var(--snippet-color); cursor: pointer; font-weight: 500; border-bottom: 3px solid transparent; }
         .tab-btn.active { color: #1a73e8; border-bottom: 3px solid #1a73e8; }
 
         /* Nəticələr Bölməsi */
         .results-container { max-width: 690px; margin: 0 auto; padding: 20px 16px 40px 16px; width: 100%; }
-        
         .result-item { margin-bottom: 24px; }
-        .result-url { font-size: 12px; color: #202124; margin-bottom: 4px; line-height: 1.3; word-break: break-all; }
-        .result-title { font-size: 20px; color: #1a0dab; text-decoration: none; font-weight: 400; line-height: 1.3; display: inline-block; margin-bottom: 4px; }
+        .result-url { font-size: 12px; color: var(--snippet-color); margin-bottom: 4px; word-break: break-all; }
+        .result-title { font-size: 19px; color: var(--link-color); text-decoration: none; font-weight: 400; line-height: 1.3; display: inline-block; margin-bottom: 4px; }
         .result-title:hover { text-decoration: underline; }
-        .result-snippet { font-size: 14px; color: #4d5156; line-height: 1.58; word-wrap: break-word; }
+        .result-snippet { font-size: 14px; color: var(--snippet-color); line-height: 1.58; }
 
-        /* Şəkil Şəbəkəsi */
-        .image-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
-        .image-card { border: 1px solid #dadce0; border-radius: 8px; overflow: hidden; background: #fff; text-decoration: none; color: #333; }
-        .image-card img { width: 100%; height: 100px; object-fit: cover; display: block; }
-        .image-title { font-size: 11px; padding: 6px; color: #3c4043; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        /* Modal Pəncərələr (Məlumat üçün) */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 200; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: var(--bg-color); padding: 24px; border-radius: 8px; max-width: 500px; width: 100%; border: 1px solid var(--border-color); }
+        .modal-header { font-size: 18px; font-weight: 600; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .close-modal { cursor: pointer; font-size: 20px; color: var(--snippet-color); }
+        .modal-body { font-size: 14px; line-height: 1.6; color: var(--snippet-color); }
 
-        /* Səhifələmə */
-        .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 30px; }
-        .page-btn { padding: 6px 12px; border: 1px solid #dadce0; background: #fff; color: #1a73e8; border-radius: 4px; cursor: pointer; font-size: 14px; }
-        .page-btn.active { background: #1a73e8; color: #fff; border-color: #1a73e8; }
-
-        .status-msg { text-align: left; color: #70757a; font-size: 14px; margin-top: 10px; }
+        .status-msg { text-align: left; color: var(--snippet-color); font-size: 14px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
     <header>
         <a href="#" class="logo-text">Az<span>Search</span></a>
-        <div class="balance-info">
-            Balans: <strong>$<span id="user-usd">0.0000</span> USD</strong> (<span id="user-searches">0</span> axtarış)
+        
+        <div class="header-right">
+            <div class="balance-info">
+                Balans: <strong>$<span id="user-usd">0.0000</span> USD</strong> (<span id="user-searches">0</span> axtarış)
+            </div>
+            
+            <!-- Sağ 3 Nöqtə -->
+            <button class="menu-btn" onclick="toggleMenu()">⋮</button>
+            <div id="dropdown-menu" class="dropdown-menu">
+                <div class="dropdown-item" onclick="openModal('about')">Haqqımızda</div>
+                <div class="dropdown-item" onclick="openModal('privacy')">Məxfilik Siyasəti</div>
+                <div class="dropdown-item" onclick="openModal('earn')">Qazanc Sistemi</div>
+                <div class="dropdown-item" onclick="openModal('settings')">Ayarlar</div>
+            </div>
         </div>
     </header>
 
@@ -74,7 +109,6 @@
         </div>
     </div>
 
-    <!-- Ciddi, Minimalist Sekmələr -->
     <div class="tabs-container">
         <button class="tab-btn active" onclick="switchTab('web', this)">Hamısı</button>
         <button class="tab-btn" onclick="switchTab('image', this)">Şəkillər</button>
@@ -83,14 +117,22 @@
 
     <div class="results-container">
         <div id="results-list"></div>
-        <div id="pagination-box" class="pagination"></div>
+    </div>
+
+    <!-- Modallar -->
+    <div id="info-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="modal-title">Məlumat</span>
+                <span class="close-modal" onclick="closeModal()">&times;</span>
+            </div>
+            <div id="modal-body" class="modal-body"></div>
+        </div>
     </div>
 
     <script>
         let currentTab = 'web';
         let currentQuery = '';
-        let currentPage = 1;
-
         let searchCount = parseInt(localStorage.getItem('azsearch_count')) || 0;
         let lastSearchTime = parseInt(localStorage.getItem('azsearch_last_time')) || 0;
 
@@ -110,7 +152,23 @@
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             element.classList.add('active');
             currentTab = tab;
-            if (currentQuery) executeSearch(1);
+            if (currentQuery) executeSearch();
+        }
+
+        function toggleMenu() {
+            document.getElementById('dropdown-menu').classList.toggle('show');
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.matches('.menu-btn')) {
+                const dropdowns = document.getElementsByClassName("dropdown-menu");
+                for (let i = 0; i < dropdowns.length; i++) {
+                    let openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
         }
 
         function startNewSearch() {
@@ -127,36 +185,28 @@
                 updateBalanceDisplay();
             }
 
-            executeSearch(1);
+            executeSearch();
         }
 
-        function executeSearch(page) {
-            currentPage = page;
+        // Zəmanətli Axtarış Mexanizmi (DuckDuckGo + Wikipedia JSONP/API)
+        function executeSearch() {
             const resultsDiv = document.getElementById('results-list');
-            const paginationDiv = document.getElementById('pagination-box');
             resultsDiv.innerHTML = "<p class='status-msg'>Axtarılır...</p>";
-            paginationDiv.innerHTML = "";
 
-            if (currentTab === 'image') {
-                fetchImages(currentQuery);
-            } else if (currentTab === 'video') {
-                fetchWebResults(currentQuery + " site:youtube.com", page);
-            } else {
-                fetchWebResults(currentQuery, page);
+            let queryUrl = `https://az.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(currentQuery)}&format=json&origin=*`;
+
+            if (currentTab === 'video') {
+                queryUrl = `https://az.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(currentQuery + ' video')}&format=json&origin=*`;
             }
-        }
 
-        // Web Və Video Nəticələri (DuckDuckGo + Wikipedia API)
-        function fetchWebResults(query, page) {
-            const resultsDiv = document.getElementById('results-list');
-            const offset = (page - 1) * 10;
-            const wikiUrl = `https://az.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&sroffset=${offset}&format=json&origin=*`;
-
-            fetch(wikiUrl)
+            fetch(queryUrl)
                 .then(res => res.json())
                 .then(data => {
                     resultsDiv.innerHTML = "";
+                    let hasResults = false;
+
                     if (data.query && data.query.search && data.query.search.length > 0) {
+                        hasResults = true;
                         data.query.search.forEach(item => {
                             const pageUrl = `https://az.wikipedia.org/wiki/${encodeURIComponent(item.title)}`;
                             const snippet = item.snippet.replace(/<\/?[^>]+(>|$)/g, "");
@@ -168,98 +218,85 @@
                                     <div class="result-snippet">${snippet}...</div>
                                 </div>`;
                         });
-                        renderPagination();
-                    } else {
-                        // Əgər yerli nəticə olmasa, DuckDuckGo Açıq API
-                        fetchDuckDuckGo(query);
+                    }
+
+                    // Əgər dəqiq məlumat tapılmazsa ehtiyat axtarış sisteminə qoşulma
+                    if (!hasResults) {
+                        fetchBackupResults(currentQuery);
                     }
                 })
-                .catch(() => fetchDuckDuckGo(query));
+                .catch(() => fetchBackupResults(currentQuery));
         }
 
-        function fetchDuckDuckGo(query) {
+        function fetchBackupResults(query) {
             const resultsDiv = document.getElementById('results-list');
-            const ddgUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&origin=*`;
+            const script = document.createElement('script');
+            
+            // DuckDuckGo JSONP Axtarış İnteqrasiyası
+            window.ddgCallback = function(data) {
+                resultsDiv.innerHTML = "";
+                let count = 0;
 
-            fetch(ddgUrl)
-                .then(res => res.json())
-                .then(data => {
-                    resultsDiv.innerHTML = "";
-                    let found = false;
+                if (data.RelatedTopics) {
+                    data.RelatedTopics.forEach(topic => {
+                        if (topic.Text && topic.FirstURL) {
+                            count++;
+                            resultsDiv.innerHTML += `
+                                <div class="result-item">
+                                    <div class="result-url">${topic.FirstURL}</div>
+                                    <a href="${topic.FirstURL}" target="_blank" class="result-title">${topic.Text.split(' - ')[0]}</a>
+                                    <div class="result-snippet">${topic.Text}</div>
+                                </div>`;
+                        }
+                    });
+                }
 
-                    if (data.AbstractText) {
-                        found = true;
-                        resultsDiv.innerHTML += `
-                            <div class="result-item">
-                                <div class="result-url">${data.AbstractURL || 'https://duckduckgo.com'}</div>
-                                <a href="${data.AbstractURL}" target="_blank" class="result-title">${data.Heading}</a>
-                                <div class="result-snippet">${data.AbstractText}</div>
-                            </div>`;
-                    }
+                if (count === 0) {
+                    resultsDiv.innerHTML = "<p class='status-msg'>Axtarış üzrə heç bir nəticə tapılmadı. Zəhmət olmasa başqa sözlərlə yoxlayın.</p>";
+                }
+            };
 
-                    if (data.RelatedTopics && data.RelatedTopics.length > 0) {
-                        data.RelatedTopics.forEach(topic => {
-                            if (topic.Text && topic.FirstURL) {
-                                found = true;
-                                resultsDiv.innerHTML += `
-                                    <div class="result-item">
-                                        <div class="result-url">${topic.FirstURL}</div>
-                                        <a href="${topic.FirstURL}" target="_blank" class="result-title">${topic.Text.split(' - ')[0]}</a>
-                                        <div class="result-snippet">${topic.Text}</div>
-                                    </div>`;
-                            }
-                        });
-                    }
-
-                    if (!found) {
-                        resultsDiv.innerHTML = "<p class='status-msg'>Axtarış üzrə məlumat tapılmadı.</p>";
-                    }
-                })
-                .catch(() => {
-                    resultsDiv.innerHTML = "<p class='status-msg'>Axtarış zamanı xəta baş verdi.</p>";
-                });
+            script.src = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&callback=ddgCallback`;
+            document.body.appendChild(script);
         }
 
-        // Şəkil Nəticələri (Wikimedia Commons API)
-        function fetchImages(query) {
-            const resultsDiv = document.getElementById('results-list');
-            const imgUrl = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&prop=imageinfo&iiprop=url&gsrsearch=${encodeURIComponent(query)}&format=json&origin=*`;
+        /* Modal Məzmunları */
+        function openModal(type) {
+            const modal = document.getElementById('info-modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
 
-            fetch(imgUrl)
-                .then(res => res.json())
-                .then(data => {
-                    resultsDiv.innerHTML = "";
-                    if (data.query && data.query.pages) {
-                        let grid = document.createElement('div');
-                        grid.className = 'image-grid';
-                        
-                        Object.values(data.query.pages).forEach(page => {
-                            if (page.imageinfo && page.imageinfo[0]) {
-                                const src = page.imageinfo[0].url;
-                                const title = page.title.replace("File:", "");
-                                grid.innerHTML += `
-                                    <a href="${src}" target="_blank" class="image-card">
-                                        <img src="${src}" alt="image" loading="lazy">
-                                        <div class="image-title">${title}</div>
-                                    </a>`;
-                            }
-                        });
-                        resultsDiv.appendChild(grid);
-                    } else {
-                        resultsDiv.innerHTML = "<p class='status-msg'>Şəkil tapılmadı.</p>";
-                    }
-                })
-                .catch(() => {
-                    resultsDiv.innerHTML = "<p class='status-msg'>Şəkillər yüklənərkən xəta baş verdi.</p>";
-                });
+            if (type === 'about') {
+                title.innerText = "Haqqımızda";
+                body.innerHTML = "<strong>AzSearch</strong> — müstəqil, tərəfsiz və istifadəçi mərkəzli axtarış platformasıdır. Məqsədimiz böyük korporasiyalardan asılı olmadan istifadəçilərə azad və təhlükəsiz axtarış imkanı təqdim etməkdir.";
+            } else if (type === 'privacy') {
+                title.innerText = "Məxfilik Siyasəti";
+                body.innerHTML = "Sizin məfhilliyiniz bizim üçün əsasdır. AzSearch istifadəçilərin şəxsi məlumatlarını, IP ünvanlarını və axtarış tarixçəsini <strong>heç bir halda toplamır və üçüncü tərəflərə satmır</strong>.";
+            } else if (type === 'earn') {
+                title.innerText = "Qazanc Sistemi";
+                body.innerHTML = "Sistemdə keçirdiyiniz hər aktiv axtarış üçün hesabınıza <strong>$0.0003 USD</strong> əlavə olunur. Spam axtarışların qarşısını almaq üçün axtarışlar arası minimum 3 saniyə gözləmə vaxtı tətbiq edilir.";
+            } else if (type === 'settings') {
+                title.innerText = "Ayarlar";
+                body.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>Tünd Rejim (Dark Mode):</span>
+                        <input type="checkbox" onchange="toggleDarkMode(this)" ${document.body.classList.contains('dark-mode') ? 'checked' : ''}>
+                    </div>
+                `;
+            }
+
+            modal.style.display = "flex";
         }
 
-        function renderPagination() {
-            const paginationDiv = document.getElementById('pagination-box');
-            paginationDiv.innerHTML = "";
-            for (let i = 1; i <= 5; i++) {
-                const activeClass = i === currentPage ? 'active' : '';
-                paginationDiv.innerHTML += `<button class="page-btn ${activeClass}" onclick="executeSearch(${i})">${i}</button>`;
+        function closeModal() {
+            document.getElementById('info-modal').style.display = "none";
+        }
+
+        function toggleDarkMode(checkbox) {
+            if (checkbox.checked) {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
             }
         }
     </script>
