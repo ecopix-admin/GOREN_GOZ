@@ -1,134 +1,47 @@
-<!DOCTYPE html>
-<html lang="az">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canlı Axtarış Motoru Portalı</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-        body { background-color: #f8f9fa; color: #202124; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        
-        .header { margin-top: 30px; text-align: center; margin-bottom: 25px; }
-        .header h1 { font-size: 40px; color: #4285f4; font-weight: bold; }
-        .header h1 span { color: #ea4335; }
-        .header h1 span.g { color: #fbbc05; }
-        .header h1 span.l { color: #34a853; }
-        
-        .search-box { width: 100%; max-width: 650px; display: flex; margin-bottom: 25px; }
-        .search-box input { width: 100%; padding: 14px 20px; font-size: 16px; border: 1px solid #dfe1e5; border-radius: 24px 0 0 24px; outline: none; box-shadow: 0 1px 6px rgba(32,33,36,0.1); }
-        .search-box button { padding: 14px 24px; font-size: 16px; border: none; background: #1a73e8; color: white; border-radius: 0 24px 24px 0; cursor: pointer; font-weight: bold; }
-        .search-box button:hover { background: #1558b0; }
+// Açıq mənşəli Avto-Crawler Boti
+const fs = require('fs');
+const https = require('https');
 
-        .results-container { width: 100%; max-width: 650px; }
-        
-        /* Sponsorlu Reklam Kartları */
-        .ad-card { background: #fef8e7; border: 1px solid #fce8e6; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-        .ad-badge { background: #fbbc05; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 3px; font-weight: bold; margin-bottom: 5px; display: inline-block; }
-        
-        /* İnternetdən gələn Real Nəticə Kartları */
-        .result-card { background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e0e0e0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .result-title { font-size: 18px; color: #1a0dab; text-decoration: none; font-weight: bold; }
-        .result-title:hover { text-decoration: underline; }
-        .result-url { font-size: 12px; color: #006621; margin-top: 3px; margin-bottom: 6px; word-break: break-all; }
-        .result-snippet { font-size: 14px; color: #4d5156; line-height: 1.4; }
-        
-        .loading { text-align: center; color: #1a73e8; font-weight: bold; margin-top: 20px; }
-        .no-results { text-align: center; color: #70757a; margin-top: 20px; }
-    </style>
-</head>
-<body>
+// İndekslənəcək ilkin saytlar və qaynaqlar (Seed URLs)
+const targetSites = [
+    { url: 'https://az.wikipedia.org/wiki/Avtomobil', category: 'Məlumat' }
+];
 
-    <div class="header">
-        <h1>Axtar<span>ı</span><span class="g">ş</span><span>M</span><span class="l">o</span>toru</h1>
-    </div>
+let localDatabase = [];
 
-    <div class="search-box">
-        <input type="text" id="searchInput" placeholder="İnternetdə istənilən sözü axtarın..." onkeyup="if(event.key==='Enter') startSearch()">
-        <button onclick="startSearch()">Axtar</button>
-    </div>
+// Saytın mətnini çəkən funksiya
+function scrapeSite(site) {
+    console.log(`[BOT] Sayt taranır: ${site.url}`);
+    
+    https.get(site.url, (res) => {
+        let html = '';
+        res.on('data', chunk => html += chunk);
+        res.on('end', () => {
+            // HTML teqlərini təmizləyirik və mətni çıxarırıq
+            const textContent = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ');
+            
+            // Avto ehtiyat hissələri və usta açar sözlərini analiz edirik
+            const keywords = ['mühərrik', 'yağ', 'təkər', 'akümulyator', 'ustası', 'ehtiyat hissəsi', 'bamper', 'korobka'];
+            const foundKeywords = keywords.filter(word => textContent.toLowerCase().includes(word));
 
-    <div class="results-container" id="resultsContainer">
-        <!-- Nəticələr buraya yüklənəcək -->
-    </div>
+            const entry = {
+                title: `Axtarış Tapıntısı: ${site.url}`,
+                url: site.url,
+                snippet: textContent.substring(0, 200) + '...',
+                keywords: foundKeywords,
+                timestamp: new Date().toISOString()
+            };
 
-    <script>
-        // Sizin Özel Sponsorlu Reklam Baza (İstədiyiniz pullu elanı bura əlavə edə bilərsiniz)
-        const customAds = [
-            {
-                title: "TopTikinti - Təmir və Tikinti Materialları Satışı",
-                url: "https://toptikinti.example.com",
-                snippet: "Sement, alçipan, şpatlyovka və bütün usta alətlərinin sərfəli satış portalı.",
-                keywords: ["tikinti", "təmir", "alçipan", "şpatlyovka", "sement", "usta"]
-            }
-        ];
+            localDatabase.push(entry);
+            
+            // Məlumatı yerli JSON faylına saxlayırıq (P2P Paylaşım üçün)
+            fs.writeFileSync('auto_index.json', JSON.stringify(localDatabase, null, 2));
+            console.log('[BOT] Məlumat uğurla bazaya yazıldı.');
+        });
+    }).on('error', (err) => {
+        console.error(`[XƏTA] ${site.url} taranarkən xəta baş verdi:`, err.message);
+    });
+}
 
-        async function startSearch() {
-            const query = document.getElementById('searchInput').value.toLowerCase().trim();
-            const container = document.getElementById('resultsContainer');
-            container.innerHTML = '';
-
-            if (query === '') {
-                container.innerHTML = '<p class="no-results">Zəhmət olmasa axtarış sözü daxil edin.</p>';
-                return;
-            }
-
-            container.innerHTML = '<p class="loading">İnternet üzrə canlı axtarış aparılır...</p>';
-
-            // 1. Öncə Daxili Sponsorlu Reklamları Yoxlayırıq
-            const matchedAds = customAds.filter(ad => 
-                ad.keywords.some(kw => kw.includes(query)) || ad.title.toLowerCase().includes(query)
-            );
-
-            // 2. Wikipedia / Pulsuz Açıq API vasitəsilə İnternetdə Canlı Axtarış
-            try {
-                const apiUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&utf8=&format=json&origin=*`;
-                const response = await fetch(apiUrl);
-                const data = await response.json();
-                
-                container.innerHTML = ''; // Yüklənir yazısını silirik
-
-                // Əgər Sponsorlu Reklam varsa, ən üstə çıxarırıq (Gəlir Yeri)
-                matchedAds.forEach(ad => {
-                    const adDiv = document.createElement('div');
-                    adDiv.className = 'ad-card';
-                    adDiv.innerHTML = `
-                        <span class="ad-badge">Sponsorlu / Reklam</span>
-                        <div>
-                            <a href="${ad.url}" target="_blank" class="result-title">${ad.title}</a>
-                            <div class="result-url">${ad.url}</div>
-                            <div class="result-snippet">${ad.snippet}</div>
-                        </div>
-                    `;
-                    container.appendChild(adDiv);
-                });
-
-                // İnternetdən gələn canlı nəticələri sırayla düzürük
-                if (data.query && data.query.search.length > 0) {
-                    data.query.search.forEach(item => {
-                        const card = document.createElement('div');
-                        card.className = 'result-card';
-                        
-                        const title = item.title;
-                        const snippet = item.snippet.replace(/<\/?[^>]+(>|$)/g, ""); // HTML teqlərini təmizləyirik
-                        const pageUrl = `https://az.wikipedia.org/wiki/${encodeURIComponent(title)}`;
-
-                        card.innerHTML = `
-                            <div>
-                                <a href="${pageUrl}" target="_blank" class="result-title">${title}</a>
-                                <div class="result-url">${pageUrl}</div>
-                                <div class="result-snippet">${snippet}...</div>
-                            </div>
-                        `;
-                        container.appendChild(card);
-                    });
-                } else if (matchedAds.length === 0) {
-                    container.innerHTML = '<p class="no-results">Heç bir canlı nəticə tapılmadı.</p>';
-                }
-
-            } catch (error) {
-                container.innerHTML = '<p class="no-results">Məlumat gətirilərkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.</p>';
-            }
-        }
-    </script>
-</body>
-</html>
+// Boti işə salırıq
+targetSites.forEach(scrapeSite);
