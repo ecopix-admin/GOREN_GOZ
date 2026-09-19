@@ -18,7 +18,7 @@
         body { background-color: #f8f9fa; color: #202124; display: flex; flex-direction: column; min-height: 100vh; }
         
         /* Naviqasiya Paneli */
-        header { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #ffffff; box-shadow: 0 1px 6px rgba(32,33,36,0.1); sticky: top; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #ffffff; box-shadow: 0 1px 6px rgba(32,33,36,0.1); }
         .logo-text { font-size: 22px; font-weight: bold; color: #4285f4; text-decoration: none; display: flex; align-items: center; gap: 5px; }
         .logo-text span { color: #ea4335; }
         
@@ -28,28 +28,28 @@
 
         /* Axtarış Zolağı */
         .search-container { text-align: center; margin: 30px auto 15px auto; width: 100%; max-width: 650px; padding: 0 15px; }
-        .search-box { display: flex; border: 1px solid #dfe1e5; border-radius: 24px; padding: 8px 16px; background: #fff; box-shadow: 0 1px 6px rgba(32,33,36,0.08); align-items: center; }
+        .search-box { display: flex; border: 1px solid #dfe1e5; border-radius: 24px; padding: 6px 12px 6px 18px; background: #fff; box-shadow: 0 1px 6px rgba(32,33,36,0.08); align-items: center; }
         .search-box:focus-within { box-shadow: 0 1px 6px rgba(32,33,36,0.28); border-color: rgba(223,225,229,0); }
-        .search-input { flex: 1; border: none; outline: none; font-size: 16px; padding: 4px 8px; }
-        .search-btn { background: none; border: none; cursor: pointer; font-size: 18px; color: #5f6368; padding: 0 5px; }
+        .search-input { flex: 1; border: none; outline: none; font-size: 16px; padding: 6px 0; }
+        .search-btn { background: #1a73e8; color: white; border: none; padding: 8px 16px; border-radius: 18px; cursor: pointer; font-size: 14px; font-weight: 600; }
+        .search-btn:hover { background: #1557b0; }
 
-        /* Məlumat və Təlimat Paneli */
+        /* Məlumat Paneli */
         .earn-info { font-size: 12px; color: #5f6368; margin-top: 10px; line-height: 1.4; }
         .install-guide { background: #e3f2fd; color: #0d47a1; font-size: 11px; padding: 8px 12px; border-radius: 8px; margin-top: 10px; display: inline-block; }
 
-        /* Reklam Şəbəkəsi Sahəsi */
+        /* Reklam Sahəsi */
         .ad-container { max-width: 700px; margin: 10px auto; padding: 0 15px; width: 100%; }
         .ad-banner { background: #fffde7; border: 1px dashed #ffd54f; padding: 12px; text-align: center; border-radius: 8px; font-size: 12px; color: #f57f17; }
 
-        /* Axtarış Nəticələri */
+        /* Nəticələr */
         .results-container { max-width: 700px; margin: 0 auto; padding: 10px 15px 40px 15px; width: 100%; }
         .result-item { background: #fff; padding: 16px; border-radius: 8px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid #f1f3f4; }
-        .result-url { font-size: 12px; color: #202124; margin-bottom: 4px; word-break: break-all; }
+        .result-url { font-size: 12px; color: #006621; margin-bottom: 4px; word-break: break-all; }
         .result-title { font-size: 17px; color: #1a0dab; text-decoration: none; font-weight: 500; display: block; margin-bottom: 6px; }
         .result-title:hover { text-decoration: underline; }
         .result-snippet { font-size: 13px; color: #4d5156; line-height: 1.5; }
 
-        /* Status bildirişi */
         .status-msg { text-align: center; color: #70757a; font-size: 14px; margin-top: 20px; }
     </style>
 </head>
@@ -60,30 +60,30 @@
         <div class="header-right">
             <button id="install-btn" class="pwa-btn" onclick="installPWA()">📲 Ekrana Əlavə Et</button>
             <div class="balance-card">
-                💰 <span id="user-points">0</span> Xal (<span id="user-azn">0.00</span> AZN)
+                💰 Balans: $<span id="user-usd">0.0000</span> USD (<span id="user-searches">0</span> axtarış)
             </div>
         </div>
     </header>
 
     <div class="search-container">
         <div class="search-box">
-            <input type="text" id="search-query" class="search-input" placeholder="Google kimi axtarış edin..." onkeypress="handleKeyPress(event)">
-            <button class="search-btn" onclick="executeSearch()">🔍</button>
+            <input type="text" id="search-query" class="search-input" placeholder="Axtarış sözünü yazın..." onkeypress="handleKeyPress(event)">
+            <button class="search-btn" onclick="executeSearch()">Axtarış et</button>
         </div>
         
         <p class="earn-info">
-            💡 Hər unikal axtarış üçün <b>+10 Xal</b> qazanırsınız! (Gündəlik limit: 20 axtarış)
+            💡 Hər axtarış üçün <b>+$0.0003 USD</b> qazanırsınız! (1000 axtarış = $0.30)
         </p>
         
         <div class="install-guide">
-            📲 <b>Google kimi istifadə et:</b> Brauzerin 3 nöqtə (⋮) menyusundan <b>"Əsas ekrana əlavə et"</b> seçin.
+            📲 Rahat istifadə üçün brauzerin 3 nöqtə (⋮) menyusundan <b>"Əsas ekrana əlavə et"</b> seçin.
         </div>
     </div>
 
     <!-- Reklam Sahəsi -->
     <div class="ad-container">
         <div class="ad-banner" id="ad-space">
-            📢 <b>Reklam Sahəsi:</b> Buraya Google AdSense və ya digər reklam şəbəkələrinin kodları yerləşdiriləcək.
+            📢 <b>Reklam Sahəsi:</b> Buraya reklam kodları yerləşdiriləcək.
         </div>
     </div>
 
@@ -92,26 +92,17 @@
     </div>
 
     <script>
-        // LocalStorage vasitəsilə istifadəçi balansının idarə olunması
-        let points = parseInt(localStorage.getItem('azsearch_points')) || 0;
+        // İstifadəçi Məlumatları
+        let searchCount = parseInt(localStorage.getItem('azsearch_count')) || 0;
         let lastSearchTime = parseInt(localStorage.getItem('azsearch_last_time')) || 0;
-        let todaySearches = parseInt(localStorage.getItem('azsearch_today_count')) || 0;
-        let lastSearchDate = localStorage.getItem('azsearch_last_date') || "";
-
-        // Gün dəyişdikdə gündəlik axtarış limitini sıfırlamaq
-        const currentDate = new Date().toDateString();
-        if (lastSearchDate !== currentDate) {
-            todaySearches = 0;
-            localStorage.setItem('azsearch_today_count', 0);
-            localStorage.setItem('azsearch_last_date', currentDate);
-        }
 
         updateBalanceDisplay();
 
         function updateBalanceDisplay() {
-            document.getElementById('user-points').innerText = points;
-            // Məzənnə: 1000 Xal = 1.00 AZN
-            document.getElementById('user-azn').innerText = (points / 1000).toFixed(2);
+            // Hər axtarış = 0.0003 USD
+            let totalUsd = (searchCount * 0.0003).toFixed(4);
+            document.getElementById('user-usd').innerText = totalUsd;
+            document.getElementById('user-searches').innerText = searchCount;
         }
 
         function handleKeyPress(e) {
@@ -124,73 +115,60 @@
             const query = document.getElementById('search-query').value.trim();
             if (!query) return;
 
-            // Axtarış Nəticələrini Gətir
+            // Canlı Axtarış Nəticələrini Gətir
             fetchResults(query);
 
-            // Anti-Bot və Axtar-Qazan Mexanizmi
+            // Axtar-Qazan Mexanizmi (İki axtarış arası 5 saniyə)
             const currentTime = new Date().getTime();
-            
-            // İki axtarış arasında minimum 10 saniyə gözləmə şərti
-            if (currentTime - lastSearchTime > 10000) {
-                if (todaySearches < 20) {
-                    points += 10;
-                    todaySearches += 1;
-                    lastSearchTime = currentTime;
+            if (currentTime - lastSearchTime > 5000) {
+                searchCount += 1;
+                lastSearchTime = currentTime;
 
-                    localStorage.setItem('azsearch_points', points);
-                    localStorage.setItem('azsearch_last_time', lastSearchTime);
-                    localStorage.setItem('azsearch_today_count', todaySearches);
+                localStorage.setItem('azsearch_count', searchCount);
+                localStorage.setItem('azsearch_last_time', lastSearchTime);
 
-                    updateBalanceDisplay();
-                }
+                updateBalanceDisplay();
             }
         }
 
         function fetchResults(query) {
             const resultsDiv = document.getElementById('results-list');
-            resultsDiv.innerHTML = "<p class='status-msg'>Axtarılır...</p>";
+            resultsDiv.innerHTML = "<p class='status-msg'>Canlı nəticələr axtarılır...</p>";
 
-            // DuckDuckGo API
-            const apiUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&origin=*`;
+            // Canlı Wikipedia / Web Axtarış API-si
+            const apiUrl = `https://az.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&origin=*`;
 
             fetch(apiUrl)
                 .then(response => response.json())
                 .then(data => {
                     resultsDiv.innerHTML = "";
                     
-                    let found = false;
+                    if (data.query && data.query.search && data.query.search.length > 0) {
+                        data.query.search.forEach(item => {
+                            const card = document.createElement('div');
+                            card.className = 'result-item';
+                            const pageUrl = `https://az.wikipedia.org/wiki/${encodeURIComponent(item.title)}`;
+                            
+                            // Mətndəki HTML teqlərini təmizləmək
+                            let cleanSnippet = item.snippet.replace(/<\/?[^>]+(>|$)/g, "");
 
-                    // Əsas Nəticələr
-                    if (data.RelatedTopics && data.RelatedTopics.length > 0) {
-                        data.RelatedTopics.forEach(item => {
-                            if (item.Text && item.FirstURL) {
-                                found = true;
-                                const card = document.createElement('div');
-                                card.className = 'result-item';
-                                card.innerHTML = `
-                                    <div class="result-url">${item.FirstURL}</div>
-                                    <a href="${item.FirstURL}" target="_blank" class="result-title">${item.Text.split(' - ')[0] || item.Text}</a>
-                                    <div class="result-snippet">${item.Text}</div>
-                                `;
-                                resultsDiv.appendChild(card);
-                            }
+                            card.innerHTML = `
+                                <div class="result-url">${pageUrl}</div>
+                                <a href="${pageUrl}" target="_blank" class="result-title">${item.title}</a>
+                                <div class="result-snippet">${cleanSnippet}...</div>
+                            `;
+                            resultsDiv.appendChild(card);
                         });
-                    }
-
-                    if (!found) {
-                        resultsDiv.innerHTML = `
-                            <p class='status-msg'>
-                                Məlumat tapılmadı. Google üzərindən axtarın: <br><br>
-                                <a href="https://www.google.com/search?q=${encodeURIComponent(query)}" target="_blank" style="color:#1a0dab; font-weight:bold;">"${query}" Google-da Axtar 🔍</a>
-                            </p>`;
+                    } else {
+                        resultsDiv.innerHTML = `<p class='status-msg'>"${query}" üzrə məlumat tapılmadı.</p>`;
                     }
                 })
                 .catch(err => {
-                    resultsDiv.innerHTML = "<p class='status-msg' style='color:red;'>Axtarış zamanı xəta baş verdi. Yenidən cəhd edin.</p>";
+                    resultsDiv.innerHTML = "<p class='status-msg' style='color:red;'>Nəticələri yükləyərkən xəta baş verdi.</p>";
                 });
         }
 
-        // PWA (Əsas Ekrana Əlavə Et) İdarəetməsi
+        // PWA Dəstəyi
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
