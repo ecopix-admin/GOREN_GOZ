@@ -4,43 +4,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AzSearch — Axtar və Qazan</title>
+
+    <!-- PWA və Mobil Əsas Ekran Dəstəyi -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="AzSearch">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2991/2991148.png">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2991/2991148.png">
+
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         body { background-color: #f8f9fa; color: #202124; display: flex; flex-direction: column; min-height: 100vh; }
         
-        /* Header & Balans Paneli */
-        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background: #ffffff; box-shadow: 0 1px 6px rgba(32,33,36,0.1); }
-        .logo-text { font-size: 22px; font-weight: bold; color: #4285f4; text-decoration: none; }
+        /* Naviqasiya Paneli */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #ffffff; box-shadow: 0 1px 6px rgba(32,33,36,0.1); sticky: top; }
+        .logo-text { font-size: 22px; font-weight: bold; color: #4285f4; text-decoration: none; display: flex; align-items: center; gap: 5px; }
         .logo-text span { color: #ea4335; }
-        .balance-card { background: #e8f0fe; color: #1a73e8; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 14px; border: 1px solid #aecbfa; }
+        
+        .header-right { display: flex; align-items: center; gap: 10px; }
+        .balance-card { background: #e8f0fe; color: #1a73e8; padding: 6px 14px; border-radius: 20px; font-weight: 600; font-size: 13px; border: 1px solid #aecbfa; }
+        .pwa-btn { background: #34a853; color: white; border: none; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; display: none; }
 
         /* Axtarış Zolağı */
-        .search-container { text-align: center; margin: 40px auto 20px auto; width: 100%; max-width: 600px; padding: 0 20px; }
-        .search-box { display: flex; border: 1px solid #dfe1e5; border-radius: 24px; padding: 10px 20px; background: #fff; box-shadow: 0 1px 6px rgba(32,33,36,0.08); }
-        .search-box:hover { box-shadow: 0 1px 6px rgba(32,33,36,0.28); border-color: rgba(223,225,229,0); }
-        .search-input { flex: 1; border: none; outline: none; font-size: 16px; }
-        .search-btn { background: none; border: none; cursor: pointer; font-size: 18px; color: #5f6368; }
+        .search-container { text-align: center; margin: 30px auto 15px auto; width: 100%; max-width: 650px; padding: 0 15px; }
+        .search-box { display: flex; border: 1px solid #dfe1e5; border-radius: 24px; padding: 8px 16px; background: #fff; box-shadow: 0 1px 6px rgba(32,33,36,0.08); align-items: center; }
+        .search-box:focus-within { box-shadow: 0 1px 6px rgba(32,33,36,0.28); border-color: rgba(223,225,229,0); }
+        .search-input { flex: 1; border: none; outline: none; font-size: 16px; padding: 4px 8px; }
+        .search-btn { background: none; border: none; cursor: pointer; font-size: 18px; color: #5f6368; padding: 0 5px; }
 
-        /* Info Mesajı */
-        .earn-info { font-size: 13px; color: #5f6368; margin-top: 10px; }
+        /* Məlumat və Təlimat Paneli */
+        .earn-info { font-size: 12px; color: #5f6368; margin-top: 10px; line-height: 1.4; }
+        .install-guide { background: #e3f2fd; color: #0d47a1; font-size: 11px; padding: 8px 12px; border-radius: 8px; margin-top: 10px; display: inline-block; }
+
+        /* Reklam Şəbəkəsi Sahəsi */
+        .ad-container { max-width: 700px; margin: 10px auto; padding: 0 15px; width: 100%; }
+        .ad-banner { background: #fffde7; border: 1px dashed #ffd54f; padding: 12px; text-align: center; border-radius: 8px; font-size: 12px; color: #f57f17; }
 
         /* Axtarış Nəticələri */
-        .results-container { max-width: 700px; margin: 0 auto; padding: 0 20px 40px 20px; width: 100%; }
-        .result-item { background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .result-title { font-size: 18px; color: #1a0dab; text-decoration: none; display: block; margin-bottom: 5px; }
+        .results-container { max-width: 700px; margin: 0 auto; padding: 10px 15px 40px 15px; width: 100%; }
+        .result-item { background: #fff; padding: 16px; border-radius: 8px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid #f1f3f4; }
+        .result-url { font-size: 12px; color: #202124; margin-bottom: 4px; word-break: break-all; }
+        .result-title { font-size: 17px; color: #1a0dab; text-decoration: none; font-weight: 500; display: block; margin-bottom: 6px; }
         .result-title:hover { text-decoration: underline; }
-        .result-snippet { font-size: 14px; color: #4d5156; line-height: 1.4; }
+        .result-snippet { font-size: 13px; color: #4d5156; line-height: 1.5; }
 
-        /* Reklam Paneli (Placeholder) */
-        .ad-banner { background: #fff8e1; border: 1px dashed #ffe082; padding: 10px; text-align: center; border-radius: 8px; margin-bottom: 20px; font-size: 12px; color: #f57f17; }
+        /* Status bildirişi */
+        .status-msg { text-align: center; color: #70757a; font-size: 14px; margin-top: 20px; }
     </style>
 </head>
 <body>
 
     <header>
         <a href="#" class="logo-text">Az<span>Search</span></a>
-        <div class="balance-card">
-            💰 Balans: <span id="user-points">0</span> Xal (<span id="user-azn">0.00</span> AZN)
+        <div class="header-right">
+            <button id="install-btn" class="pwa-btn" onclick="installPWA()">📲 Ekrana Əlavə Et</button>
+            <div class="balance-card">
+                💰 <span id="user-points">0</span> Xal (<span id="user-azn">0.00</span> AZN)
+            </div>
         </div>
     </header>
 
@@ -49,30 +70,47 @@
             <input type="text" id="search-query" class="search-input" placeholder="Google kimi axtarış edin..." onkeypress="handleKeyPress(event)">
             <button class="search-btn" onclick="executeSearch()">🔍</button>
         </div>
-        <p class="earn-info">💡 Hər unikal axtarış üçün <b>+10 Xal</b> qazanırsınız! (Gündəlik limit: 20 axtarış)</p>
+        
+        <p class="earn-info">
+            💡 Hər unikal axtarış üçün <b>+10 Xal</b> qazanırsınız! (Gündəlik limit: 20 axtarış)
+        </p>
+        
+        <div class="install-guide">
+            📲 <b>Google kimi istifadə et:</b> Brauzerin 3 nöqtə (⋮) menyusundan <b>"Əsas ekrana əlavə et"</b> seçin.
+        </div>
+    </div>
+
+    <!-- Reklam Sahəsi -->
+    <div class="ad-container">
+        <div class="ad-banner" id="ad-space">
+            📢 <b>Reklam Sahəsi:</b> Buraya Google AdSense və ya digər reklam şəbəkələrinin kodları yerləşdiriləcək.
+        </div>
     </div>
 
     <div class="results-container">
-        <!-- Reklam Sahəsi -->
-        <div class="ad-banner">
-            📢 Reklam Sahəsi (Siz bura Google AdSense və ya yerli reklam kodları əlavə edəcəksiniz)
-        </div>
-
-        <!-- Nəticələr Bura Yüklənəcək -->
         <div id="results-list"></div>
     </div>
 
     <script>
-        // İstifadəçi Məlumatlarını Yükləmək (LocalStorage)
+        // LocalStorage vasitəsilə istifadəçi balansının idarə olunması
         let points = parseInt(localStorage.getItem('azsearch_points')) || 0;
         let lastSearchTime = parseInt(localStorage.getItem('azsearch_last_time')) || 0;
         let todaySearches = parseInt(localStorage.getItem('azsearch_today_count')) || 0;
+        let lastSearchDate = localStorage.getItem('azsearch_last_date') || "";
+
+        // Gün dəyişdikdə gündəlik axtarış limitini sıfırlamaq
+        const currentDate = new Date().toDateString();
+        if (lastSearchDate !== currentDate) {
+            todaySearches = 0;
+            localStorage.setItem('azsearch_today_count', 0);
+            localStorage.setItem('azsearch_last_date', currentDate);
+        }
 
         updateBalanceDisplay();
 
         function updateBalanceDisplay() {
             document.getElementById('user-points').innerText = points;
-            // Məzənnə: 1000 Xal = 1 AZN
+            // Məzənnə: 1000 Xal = 1.00 AZN
             document.getElementById('user-azn').innerText = (points / 1000).toFixed(2);
         }
 
@@ -86,15 +124,15 @@
             const query = document.getElementById('search-query').value.trim();
             if (!query) return;
 
-            // Nəticələri Gətir
+            // Axtarış Nəticələrini Gətir
             fetchResults(query);
 
-            // Axtar-Qazan Məntiqi (Anti-Bot Sistemi ilə)
+            // Anti-Bot və Axtar-Qazan Mexanizmi
             const currentTime = new Date().getTime();
             
-            // İki axtarış arasında 10 saniyə gözləmə şərti
+            // İki axtarış arasında minimum 10 saniyə gözləmə şərti
             if (currentTime - lastSearchTime > 10000) {
-                if (todaySearches < 20) { // Gündəlik limit 20 axtarış
+                if (todaySearches < 20) {
                     points += 10;
                     todaySearches += 1;
                     lastSearchTime = currentTime;
@@ -110,9 +148,9 @@
 
         function fetchResults(query) {
             const resultsDiv = document.getElementById('results-list');
-            resultsDiv.innerHTML = "<p style='text-align:center;'>Axtarılır...</p>";
+            resultsDiv.innerHTML = "<p class='status-msg'>Axtarılır...</p>";
 
-            // DuckDuckGo API üzərindən axtarış
+            // DuckDuckGo API
             const apiUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&origin=*`;
 
             fetch(apiUrl)
@@ -120,25 +158,56 @@
                 .then(data => {
                     resultsDiv.innerHTML = "";
                     
+                    let found = false;
+
+                    // Əsas Nəticələr
                     if (data.RelatedTopics && data.RelatedTopics.length > 0) {
                         data.RelatedTopics.forEach(item => {
                             if (item.Text && item.FirstURL) {
+                                found = true;
                                 const card = document.createElement('div');
                                 card.className = 'result-item';
                                 card.innerHTML = `
+                                    <div class="result-url">${item.FirstURL}</div>
                                     <a href="${item.FirstURL}" target="_blank" class="result-title">${item.Text.split(' - ')[0] || item.Text}</a>
                                     <div class="result-snippet">${item.Text}</div>
                                 `;
                                 resultsDiv.appendChild(card);
                             }
                         });
-                    } else {
-                        resultsDiv.innerHTML = `<p style='text-align:center; color:#70757a;'>Məlumat tapılmadı. Google-da birbaşa baxın: <a href="https://www.google.com/search?q=${encodeURIComponent(query)}" target="_blank">Google Axtarış</a></p>`;
+                    }
+
+                    if (!found) {
+                        resultsDiv.innerHTML = `
+                            <p class='status-msg'>
+                                Məlumat tapılmadı. Google üzərindən axtarın: <br><br>
+                                <a href="https://www.google.com/search?q=${encodeURIComponent(query)}" target="_blank" style="color:#1a0dab; font-weight:bold;">"${query}" Google-da Axtar 🔍</a>
+                            </p>`;
                     }
                 })
                 .catch(err => {
-                    resultsDiv.innerHTML = "<p style='text-align:center; color:red;'>Axtarış zamanı xəta baş verdi.</p>";
+                    resultsDiv.innerHTML = "<p class='status-msg' style='color:red;'>Axtarış zamanı xəta baş verdi. Yenidən cəhd edin.</p>";
                 });
+        }
+
+        // PWA (Əsas Ekrana Əlavə Et) İdarəetməsi
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('install-btn').style.display = 'block';
+        });
+
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        document.getElementById('install-btn').style.display = 'none';
+                    }
+                    deferredPrompt = null;
+                });
+            }
         }
     </script>
 </body>
