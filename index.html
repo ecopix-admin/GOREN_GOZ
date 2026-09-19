@@ -3,188 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AzSearch — Axtar və Qazan</title>
+    <title>AzSearch — Peşəkar Axtarış Motoru</title>
 
-    <!-- PWA və Mobil Əsas Ekran Dəstəyi -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="AzSearch">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2991/2991148.png">
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2991/2991148.png">
 
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: #f8f9fa; color: #202124; display: flex; flex-direction: column; min-height: 100vh; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+        body { background-color: #fff; color: #202124; display: flex; flex-direction: column; min-height: 100vh; }
         
-        /* Naviqasiya Paneli */
-        header { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #ffffff; box-shadow: 0 1px 6px rgba(32,33,36,0.1); }
-        .logo-text { font-size: 22px; font-weight: bold; color: #4285f4; text-decoration: none; display: flex; align-items: center; gap: 5px; }
+        /* Naviqasiya & Header */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #fff; border-bottom: 1px solid #ebebeb; }
+        .logo-text { font-size: 24px; font-weight: bold; color: #4285f4; text-decoration: none; }
         .logo-text span { color: #ea4335; }
-        
-        .header-right { display: flex; align-items: center; gap: 10px; }
         .balance-card { background: #e8f0fe; color: #1a73e8; padding: 6px 14px; border-radius: 20px; font-weight: 600; font-size: 13px; border: 1px solid #aecbfa; }
-        .pwa-btn { background: #34a853; color: white; border: none; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; display: none; }
 
         /* Axtarış Zolağı */
-        .search-container { text-align: center; margin: 30px auto 15px auto; width: 100%; max-width: 650px; padding: 0 15px; }
-        .search-box { display: flex; border: 1px solid #dfe1e5; border-radius: 24px; padding: 6px 12px 6px 18px; background: #fff; box-shadow: 0 1px 6px rgba(32,33,36,0.08); align-items: center; }
-        .search-box:focus-within { box-shadow: 0 1px 6px rgba(32,33,36,0.28); border-color: rgba(223,225,229,0); }
+        .search-container { max-width: 650px; margin: 20px auto 10px auto; padding: 0 15px; width: 100%; }
+        .search-box { display: flex; border: 1px solid #dfe1e5; border-radius: 24px; padding: 6px 12px 6px 18px; background: #fff; box-shadow: 0 1px 6px rgba(32,33,36,0.1); align-items: center; }
+        .search-box:focus-within { box-shadow: 0 1px 6px rgba(32,33,36,0.28); }
         .search-input { flex: 1; border: none; outline: none; font-size: 16px; padding: 6px 0; }
-        .search-btn { background: #1a73e8; color: white; border: none; padding: 8px 16px; border-radius: 18px; cursor: pointer; font-size: 14px; font-weight: 600; }
-        .search-btn:hover { background: #1557b0; }
+        .search-btn { background: #1a73e8; color: white; border: none; padding: 8px 18px; border-radius: 18px; cursor: pointer; font-size: 14px; font-weight: 600; }
 
-        /* Məlumat Paneli */
-        .earn-info { font-size: 12px; color: #5f6368; margin-top: 10px; line-height: 1.4; }
-        .install-guide { background: #e3f2fd; color: #0d47a1; font-size: 11px; padding: 8px 12px; border-radius: 8px; margin-top: 10px; display: inline-block; }
+        /* Google-Style Tabs (Sekmələr) */
+        .tabs-container { display: flex; gap: 20px; max-width: 700px; margin: 10px auto 0 auto; padding: 0 15px; border-bottom: 1px solid #dadce0; width: 100%; }
+        .tab-btn { background: none; border: none; padding: 8px 12px; font-size: 14px; color: #5f6368; cursor: pointer; font-weight: 500; border-bottom: 3px solid transparent; }
+        .tab-btn.active { color: #1a73e8; border-bottom: 3px solid #1a73e8; font-weight: 600; }
 
         /* Reklam Sahəsi */
-        .ad-container { max-width: 700px; margin: 10px auto; padding: 0 15px; width: 100%; }
-        .ad-banner { background: #fffde7; border: 1px dashed #ffd54f; padding: 12px; text-align: center; border-radius: 8px; font-size: 12px; color: #f57f17; }
+        .ad-container { max-width: 700px; margin: 15px auto 5px auto; padding: 0 15px; width: 100%; }
+        .ad-banner { background: #fffde7; border: 1px dashed #ffd54f; padding: 10px; text-align: center; border-radius: 8px; font-size: 12px; color: #f57f17; }
 
         /* Nəticələr */
-        .results-container { max-width: 700px; margin: 0 auto; padding: 10px 15px 40px 15px; width: 100%; }
-        .result-item { background: #fff; padding: 16px; border-radius: 8px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid #f1f3f4; }
-        .result-url { font-size: 12px; color: #006621; margin-bottom: 4px; word-break: break-all; }
-        .result-title { font-size: 17px; color: #1a0dab; text-decoration: none; font-weight: 500; display: block; margin-bottom: 6px; }
+        .results-container { max-width: 700px; margin: 0 auto; padding: 10px 15px 30px 15px; width: 100%; }
+        
+        /* Mətn Nəticəsi */
+        .result-item { margin-bottom: 20px; }
+        .result-url { font-size: 12px; color: #202124; margin-bottom: 4px; word-break: break-all; }
+        .result-title { font-size: 18px; color: #1a0dab; text-decoration: none; font-weight: 400; display: block; margin-bottom: 4px; }
         .result-title:hover { text-decoration: underline; }
-        .result-snippet { font-size: 13px; color: #4d5156; line-height: 1.5; }
+        .result-snippet { font-size: 14px; color: #4d5156; line-height: 1.58; }
 
-        .status-msg { text-align: center; color: #70757a; font-size: 14px; margin-top: 20px; }
+        /* Şəkil Nəticəsi (Grid) */
+        .image-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+        .image-card { border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background: #fff; text-decoration: none; color: #333; }
+        .image-card img { width: 100%; height: 110px; object-fit: cover; }
+        .image-title { font-size: 11px; padding: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Səhifələmə (Pagination) */
+        .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 25px; }
+        .page-btn { padding: 8px 12px; border: 1px solid #dadce0; background: #fff; color: #1a73e8; border-radius: 4px; cursor: pointer; font-weight: 600; }
+        .page-btn:hover { background: #f1f3f4; }
+
+        .status-msg { text-align: center; color: #70757a; font-size: 14px; margin-top: 30px; }
     </style>
 </head>
 <body>
 
     <header>
         <a href="#" class="logo-text">Az<span>Search</span></a>
-        <div class="header-right">
-            <button id="install-btn" class="pwa-btn" onclick="installPWA()">📲 Ekrana Əlavə Et</button>
-            <div class="balance-card">
-                💰 Balans: $<span id="user-usd">0.0000</span> USD (<span id="user-searches">0</span> axtarış)
-            </div>
+        <div class="balance-card">
+            💰 Balans: $<span id="user-usd">0.0000</span> USD (<span id="user-searches">0</span> axtarış)
         </div>
     </header>
 
     <div class="search-container">
         <div class="search-box">
             <input type="text" id="search-query" class="search-input" placeholder="Axtarış sözünü yazın..." onkeypress="handleKeyPress(event)">
-            <button class="search-btn" onclick="executeSearch()">Axtarış et</button>
-        </div>
-        
-        <p class="earn-info">
-            💡 Hər axtarış üçün <b>+$0.0003 USD</b> qazanırsınız! (1000 axtarış = $0.30)
-        </p>
-        
-        <div class="install-guide">
-            📲 Rahat istifadə üçün brauzerin 3 nöqtə (⋮) menyusundan <b>"Əsas ekrana əlavə et"</b> seçin.
+            <button class="search-btn" onclick="startNewSearch()">Axtarış et</button>
         </div>
     </div>
 
-    <!-- Reklam Sahəsi -->
+    <!-- Google Sekmələri (Tabs) -->
+    <div class="tabs-container">
+        <button class="tab-btn active" onclick="switchTab('web', this)">🔍 Saytlar</button>
+        <button class="tab-btn" onclick="switchTab('image', this)">🖼️ Şəkillər</button>
+        <button class="tab-btn" onclick="switchTab('video', this)">🎥 Videolar</button>
+    </div>
+
     <div class="ad-container">
-        <div class="ad-banner" id="ad-space">
-            📢 <b>Reklam Sahəsi:</b> Buraya reklam kodları yerləşdiriləcək.
-        </div>
+        <div class="ad-banner">📢 Reklam Sahəsi (Sizin AdSense / Banner Kodunuz)</div>
     </div>
 
     <div class="results-container">
         <div id="results-list"></div>
+        <div id="pagination-box" class="pagination"></div>
     </div>
 
     <script>
-        // İstifadəçi Məlumatları
+        // MÜHÜM: Google Custom Search API Məlumatları
+        // Tam sonsuz Google nəticələri üçün öz Pulsuz API Key və CX ID-nizi daxil edin.
+        const GOOGLE_API_KEY = "YOUR_GOOGLE_API_KEY"; 
+        const GOOGLE_CX = "YOUR_CUSTOM_SEARCH_CX";
+
+        let currentTab = 'web';
+        let currentQuery = '';
+        let currentPage = 1;
+
         let searchCount = parseInt(localStorage.getItem('azsearch_count')) || 0;
         let lastSearchTime = parseInt(localStorage.getItem('azsearch_last_time')) || 0;
 
         updateBalanceDisplay();
 
         function updateBalanceDisplay() {
-            // Hər axtarış = 0.0003 USD
             let totalUsd = (searchCount * 0.0003).toFixed(4);
             document.getElementById('user-usd').innerText = totalUsd;
             document.getElementById('user-searches').innerText = searchCount;
         }
 
         function handleKeyPress(e) {
-            if (e.key === 'Enter') {
-                executeSearch();
-            }
+            if (e.key === 'Enter') startNewSearch();
         }
 
-        function executeSearch() {
+        function switchTab(tab, element) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            currentTab = tab;
+            if (currentQuery) executeSearch(1);
+        }
+
+        function startNewSearch() {
             const query = document.getElementById('search-query').value.trim();
             if (!query) return;
+            currentQuery = query;
 
-            // Canlı Axtarış Nəticələrini Gətir
-            fetchResults(query);
-
-            // Axtar-Qazan Mexanizmi (İki axtarış arası 5 saniyə)
+            // Balans Hesablanması (5 saniyə anti-bot)
             const currentTime = new Date().getTime();
             if (currentTime - lastSearchTime > 5000) {
                 searchCount += 1;
                 lastSearchTime = currentTime;
-
                 localStorage.setItem('azsearch_count', searchCount);
                 localStorage.setItem('azsearch_last_time', lastSearchTime);
-
                 updateBalanceDisplay();
+            }
+
+            executeSearch(1);
+        }
+
+        function executeSearch(page) {
+            currentPage = page;
+            const resultsDiv = document.getElementById('results-list');
+            const paginationDiv = document.getElementById('pagination-box');
+            resultsDiv.innerHTML = "<p class='status-msg'>Google nəticələri yüklənir...</p>";
+            paginationDiv.innerHTML = "";
+
+            const startIndex = (page - 1) * 10 + 1;
+
+            // Əgər siz öz Google API düymənizi qoymamısınızsa, Avtomatik Fallback Sistem işləyəcək
+            if (GOOGLE_API_KEY === "YOUR_GOOGLE_API_KEY") {
+                fetchFallbackResults(currentQuery, page);
+                return;
+            }
+
+            let searchTypeParam = currentTab === 'image' ? '&searchType=image' : '';
+            let queryParam = currentTab === 'video' ? encodeURIComponent(currentQuery + ' video site:youtube.com') : encodeURIComponent(currentQuery);
+
+            const url = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${GOOGLE_CX}&q=${queryParam}&start=${startIndex}${searchTypeParam}`;
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    resultsDiv.innerHTML = "";
+                    if (data.items && data.items.length > 0) {
+                        if (currentTab === 'image') {
+                            let grid = document.createElement('div');
+                            grid.className = 'image-grid';
+                            data.items.forEach(item => {
+                                grid.innerHTML += `
+                                    <a href="${item.link}" target="_blank" class="image-card">
+                                        <img src="${item.link}" alt="image" onerror="this.src='https://via.placeholder.com/150'">
+                                        <div class="image-title">${item.title}</div>
+                                    </a>`;
+                            });
+                            resultsDiv.appendChild(grid);
+                        } else {
+                            data.items.forEach(item => {
+                                resultsDiv.innerHTML += `
+                                    <div class="result-item">
+                                        <div class="result-url">${item.link}</div>
+                                        <a href="${item.link}" target="_blank" class="result-title">${item.title}</a>
+                                        <div class="result-snippet">${item.snippet || ''}</div>
+                                    </div>`;
+                            });
+                        }
+                        renderPagination();
+                    } else {
+                        resultsDiv.innerHTML = "<p class='status-msg'>Məlumat tapılmadı.</p>";
+                    }
+                })
+                .catch(() => {
+                    fetchFallbackResults(currentQuery, page);
+                });
+        }
+
+        // Pulsuz Google Web Scraping İnteqrasiyası (API Key yazılmadıqda ehtiyat sistem)
+        function fetchFallbackResults(query, page) {
+            const resultsDiv = document.getElementById('results-list');
+            
+            if (currentTab === 'image') {
+                const imgApi = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&prop=imageinfo&iiprop=url&gsrsearch=${encodeURIComponent(query)}&format=json&origin=*`;
+                fetch(imgApi).then(r => r.json()).then(data => {
+                    resultsDiv.innerHTML = "";
+                    if (data.query && data.query.pages) {
+                        let grid = document.createElement('div');
+                        grid.className = 'image-grid';
+                        Object.values(data.query.pages).forEach(p => {
+                            if (p.imageinfo && p.imageinfo[0]) {
+                                grid.innerHTML += `
+                                    <a href="${p.imageinfo[0].url}" target="_blank" class="image-card">
+                                        <img src="${p.imageinfo[0].url}">
+                                        <div class="image-title">${p.title}</div>
+                                    </a>`;
+                            }
+                        });
+                        resultsDiv.appendChild(grid);
+                    } else { resultsDiv.innerHTML = "<p class='status-msg'>Şəkil tapılmadı.</p>"; }
+                });
+            } else {
+                const webApi = `https://az.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&sroffset=${(page-1)*10}&format=json&origin=*`;
+                fetch(webApi).then(r => r.json()).then(data => {
+                    resultsDiv.innerHTML = "";
+                    if (data.query && data.query.search.length > 0) {
+                        data.query.search.forEach(item => {
+                            let url = `https://az.wikipedia.org/wiki/${encodeURIComponent(item.title)}`;
+                            resultsDiv.innerHTML += `
+                                <div class="result-item">
+                                    <div class="result-url">${url}</div>
+                                    <a href="${url}" target="_blank" class="result-title">${item.title}</a>
+                                    <div class="result-snippet">${item.snippet.replace(/<\/?[^>]+(>|$)/g, "")}...</div>
+                                </div>`;
+                        });
+                        renderPagination();
+                    } else { resultsDiv.innerHTML = "<p class='status-msg'>Nəticə tapılmadı.</p>"; }
+                });
             }
         }
 
-        function fetchResults(query) {
-            const resultsDiv = document.getElementById('results-list');
-            resultsDiv.innerHTML = "<p class='status-msg'>Canlı nəticələr axtarılır...</p>";
-
-            // Canlı Wikipedia / Web Axtarış API-si
-            const apiUrl = `https://az.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&origin=*`;
-
-            fetch(apiUrl)
-                .then(response => response.json())
-                .then(data => {
-                    resultsDiv.innerHTML = "";
-                    
-                    if (data.query && data.query.search && data.query.search.length > 0) {
-                        data.query.search.forEach(item => {
-                            const card = document.createElement('div');
-                            card.className = 'result-item';
-                            const pageUrl = `https://az.wikipedia.org/wiki/${encodeURIComponent(item.title)}`;
-                            
-                            // Mətndəki HTML teqlərini təmizləmək
-                            let cleanSnippet = item.snippet.replace(/<\/?[^>]+(>|$)/g, "");
-
-                            card.innerHTML = `
-                                <div class="result-url">${pageUrl}</div>
-                                <a href="${pageUrl}" target="_blank" class="result-title">${item.title}</a>
-                                <div class="result-snippet">${cleanSnippet}...</div>
-                            `;
-                            resultsDiv.appendChild(card);
-                        });
-                    } else {
-                        resultsDiv.innerHTML = `<p class='status-msg'>"${query}" üzrə məlumat tapılmadı.</p>`;
-                    }
-                })
-                .catch(err => {
-                    resultsDiv.innerHTML = "<p class='status-msg' style='color:red;'>Nəticələri yükləyərkən xəta baş verdi.</p>";
-                });
-        }
-
-        // PWA Dəstəyi
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            document.getElementById('install-btn').style.display = 'block';
-        });
-
-        function installPWA() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        document.getElementById('install-btn').style.display = 'none';
-                    }
-                    deferredPrompt = null;
-                });
+        function renderPagination() {
+            const paginationDiv = document.getElementById('pagination-box');
+            paginationDiv.innerHTML = "";
+            for (let i = 1; i <= 5; i++) {
+                paginationDiv.innerHTML += `<button class="page-btn" onclick="executeSearch(${i})" style="${i === currentPage ? 'background:#1a73e8; color:white;' : ''}">${i}</button>`;
             }
         }
     </script>
