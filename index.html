@@ -3,95 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AzSearch — Müstəqil Axtarış Motoru</title>
+    <title>AzSearch</title>
 
-    <!-- PWA və Mobil Əsas Ekran Dəstəyi -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="AzSearch">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2991/2991148.png">
-    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2991/2991148.png">
+    <link rel="icon" type="image/png" href="https://www.google.com/favicon.ico">
 
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Roboto, arial, sans-serif; }
         body { background-color: #fff; color: #202124; display: flex; flex-direction: column; min-height: 100vh; }
         
-        /* Naviqasiya Paneli */
-        header { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #fff; border-bottom: 1px solid #ebebeb; }
-        .logo-text { font-size: 24px; font-weight: bold; color: #4285f4; text-decoration: none; display: flex; align-items: center; gap: 4px; }
+        /* Header */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: #fff; border-bottom: 1px solid #ebebeb; }
+        .logo-text { font-size: 22px; font-weight: 500; color: #4285f4; text-decoration: none; letter-spacing: -0.5px; }
         .logo-text span { color: #ea4335; }
         
-        .header-right { display: flex; align-items: center; gap: 10px; }
-        .balance-card { background: #e8f0fe; color: #1a73e8; padding: 6px 14px; border-radius: 20px; font-weight: 600; font-size: 13px; border: 1px solid #aecbfa; }
-        .pwa-btn { background: #34a853; color: white; border: none; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; display: none; }
+        .balance-info { font-size: 13px; color: #5f6368; background: #f8f9fa; padding: 6px 12px; border-radius: 4px; border: 1px solid #dadce0; }
+        .balance-info strong { color: #202124; }
 
-        /* Axtarış Zolağı */
-        .search-container { max-width: 650px; margin: 20px auto 10px auto; padding: 0 15px; width: 100%; }
-        .search-box { display: flex; border: 1px solid #dfe1e5; border-radius: 24px; padding: 6px 12px 6px 18px; background: #fff; box-shadow: 0 1px 6px rgba(32,33,36,0.1); align-items: center; }
-        .search-box:focus-within { box-shadow: 0 1px 6px rgba(32,33,36,0.28); }
-        .search-input { flex: 1; border: none; outline: none; font-size: 16px; padding: 6px 0; }
-        .search-btn { background: #1a73e8; color: white; border: none; padding: 8px 18px; border-radius: 18px; cursor: pointer; font-size: 14px; font-weight: 600; }
+        /* Axtarış Bölməsi */
+        .search-container { max-width: 690px; margin: 20px auto 0 auto; padding: 0 16px; width: 100%; }
+        .search-box { display: flex; border: 1px solid #dfe1e5; border-radius: 24px; padding: 8px 16px; background: #fff; align-items: center; }
+        .search-box:hover, .search-box:focus-within { box-shadow: 0 1px 6px rgba(32,33,36,0.28); border-color: rgba(223,225,229,0); }
+        .search-input { flex: 1; border: none; outline: none; font-size: 16px; color: #202124; }
+        .search-btn { background: #1a73e8; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; margin-left: 10px; }
+        .search-btn:hover { background: #1557b0; }
 
-        /* Sekmələr (Tabs) */
-        .tabs-container { display: flex; gap: 20px; max-width: 700px; margin: 10px auto 0 auto; padding: 0 15px; border-bottom: 1px solid #dadce0; width: 100%; }
-        .tab-btn { background: none; border: none; padding: 8px 12px; font-size: 14px; color: #5f6368; cursor: pointer; font-weight: 500; border-bottom: 3px solid transparent; }
-        .tab-btn.active { color: #1a73e8; border-bottom: 3px solid #1a73e8; font-weight: 600; }
+        /* Sekmələr (Tabs) - Emojisiz, Peşəkar */
+        .tabs-container { display: flex; gap: 24px; max-width: 690px; margin: 16px auto 0 auto; padding: 0 16px; border-bottom: 1px solid #dadce0; width: 100%; }
+        .tab-btn { background: none; border: none; padding: 8px 0 12px 0; font-size: 14px; color: #5f6368; cursor: pointer; font-weight: 500; border-bottom: 3px solid transparent; }
+        .tab-btn.active { color: #1a73e8; border-bottom: 3px solid #1a73e8; }
 
-        /* Reklam Sahəsi */
-        .ad-container { max-width: 700px; margin: 15px auto 5px auto; padding: 0 15px; width: 100%; }
-        .ad-banner { background: #fffde7; border: 1px dashed #ffd54f; padding: 10px; text-align: center; border-radius: 8px; font-size: 12px; color: #f57f17; }
-
-        /* Nəticələr */
-        .results-container { max-width: 700px; margin: 0 auto; padding: 10px 15px 30px 15px; width: 100%; }
+        /* Nəticələr Bölməsi */
+        .results-container { max-width: 690px; margin: 0 auto; padding: 20px 16px 40px 16px; width: 100%; }
         
-        .result-item { margin-bottom: 20px; }
-        .result-url { font-size: 12px; color: #202124; margin-bottom: 4px; word-break: break-all; }
-        .result-title { font-size: 18px; color: #1a0dab; text-decoration: none; font-weight: 400; display: block; margin-bottom: 4px; }
+        .result-item { margin-bottom: 24px; }
+        .result-url { font-size: 12px; color: #202124; margin-bottom: 4px; line-height: 1.3; word-break: break-all; }
+        .result-title { font-size: 20px; color: #1a0dab; text-decoration: none; font-weight: 400; line-height: 1.3; display: inline-block; margin-bottom: 4px; }
         .result-title:hover { text-decoration: underline; }
-        .result-snippet { font-size: 14px; color: #4d5156; line-height: 1.58; }
+        .result-snippet { font-size: 14px; color: #4d5156; line-height: 1.58; word-wrap: break-word; }
 
-        /* Şəkil Grid Siyahısı */
-        .image-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
-        .image-card { border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background: #fff; text-decoration: none; color: #333; }
-        .image-card img { width: 100%; height: 110px; object-fit: cover; }
-        .image-title { font-size: 11px; padding: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        /* Şəkil Şəbəkəsi */
+        .image-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
+        .image-card { border: 1px solid #dadce0; border-radius: 8px; overflow: hidden; background: #fff; text-decoration: none; color: #333; }
+        .image-card img { width: 100%; height: 100px; object-fit: cover; display: block; }
+        .image-title { font-size: 11px; padding: 6px; color: #3c4043; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Səhifələmə (Pagination) */
-        .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 25px; }
-        .page-btn { padding: 8px 12px; border: 1px solid #dadce0; background: #fff; color: #1a73e8; border-radius: 4px; cursor: pointer; font-weight: 600; }
-        .page-btn:hover { background: #f1f3f4; }
+        /* Səhifələmə */
+        .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 30px; }
+        .page-btn { padding: 6px 12px; border: 1px solid #dadce0; background: #fff; color: #1a73e8; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .page-btn.active { background: #1a73e8; color: #fff; border-color: #1a73e8; }
 
-        .status-msg { text-align: center; color: #70757a; font-size: 14px; margin-top: 30px; }
+        .status-msg { text-align: left; color: #70757a; font-size: 14px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
     <header>
         <a href="#" class="logo-text">Az<span>Search</span></a>
-        <div class="header-right">
-            <button id="install-btn" class="pwa-btn" onclick="installPWA()">📲 Ekrana Əlavə Et</button>
-            <div class="balance-card">
-                💰 Balans: $<span id="user-usd">0.0000</span> USD (<span id="user-searches">0</span> axtarış)
-            </div>
+        <div class="balance-info">
+            Balans: <strong>$<span id="user-usd">0.0000</span> USD</strong> (<span id="user-searches">0</span> axtarış)
         </div>
     </header>
 
     <div class="search-container">
         <div class="search-box">
-            <input type="text" id="search-query" class="search-input" placeholder="Axtarış sözünü yazın..." onkeypress="handleKeyPress(event)">
-            <button class="search-btn" onclick="startNewSearch()">Axtarış et</button>
+            <input type="text" id="search-query" class="search-input" placeholder="Axtarın..." onkeypress="handleKeyPress(event)">
+            <button class="search-btn" onclick="startNewSearch()">Axtar</button>
         </div>
     </div>
 
-    <!-- Sekmələr -->
+    <!-- Ciddi, Minimalist Sekmələr -->
     <div class="tabs-container">
-        <button class="tab-btn active" onclick="switchTab('web', this)">🔍 Saytlar</button>
-        <button class="tab-btn" onclick="switchTab('image', this)">🖼️ Şəkillər</button>
-        <button class="tab-btn" onclick="switchTab('video', this)">🎥 Videolar</button>
-    </div>
-
-    <div class="ad-container">
-        <div class="ad-banner">📢 Reklam Sahəsi (Sizin AdSense / Banner Kodunuz)</div>
+        <button class="tab-btn active" onclick="switchTab('web', this)">Hamısı</button>
+        <button class="tab-btn" onclick="switchTab('image', this)">Şəkillər</button>
+        <button class="tab-btn" onclick="switchTab('video', this)">Videolar</button>
     </div>
 
     <div class="results-container">
@@ -131,9 +118,8 @@
             if (!query) return;
             currentQuery = query;
 
-            // Balans Hesablanması (5 saniyə anti-bot taymeri)
             const currentTime = new Date().getTime();
-            if (currentTime - lastSearchTime > 5000) {
+            if (currentTime - lastSearchTime > 3000) {
                 searchCount += 1;
                 lastSearchTime = currentTime;
                 localStorage.setItem('azsearch_count', searchCount);
@@ -148,90 +134,132 @@
             currentPage = page;
             const resultsDiv = document.getElementById('results-list');
             const paginationDiv = document.getElementById('pagination-box');
-            resultsDiv.innerHTML = "<p class='status-msg'>Canlı nəticələr axtarılır...</p>";
+            resultsDiv.innerHTML = "<p class='status-msg'>Axtarılır...</p>";
             paginationDiv.innerHTML = "";
 
-            // Primary və Backup Pulsuz SearXNG Serverləri
-            let queryParam = currentQuery;
-            if (currentTab === 'video') queryParam += ' site:youtube.com';
+            if (currentTab === 'image') {
+                fetchImages(currentQuery);
+            } else if (currentTab === 'video') {
+                fetchWebResults(currentQuery + " site:youtube.com", page);
+            } else {
+                fetchWebResults(currentQuery, page);
+            }
+        }
 
-            const searxUrl = `https://searx.be/search?q=${encodeURIComponent(queryParam)}&format=json&pageno=${page}`;
+        // Web Və Video Nəticələri (DuckDuckGo + Wikipedia API)
+        function fetchWebResults(query, page) {
+            const resultsDiv = document.getElementById('results-list');
+            const offset = (page - 1) * 10;
+            const wikiUrl = `https://az.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&sroffset=${offset}&format=json&origin=*`;
 
-            fetch(searxUrl)
+            fetch(wikiUrl)
                 .then(res => res.json())
                 .then(data => {
-                    renderResults(data);
+                    resultsDiv.innerHTML = "";
+                    if (data.query && data.query.search && data.query.search.length > 0) {
+                        data.query.search.forEach(item => {
+                            const pageUrl = `https://az.wikipedia.org/wiki/${encodeURIComponent(item.title)}`;
+                            const snippet = item.snippet.replace(/<\/?[^>]+(>|$)/g, "");
+                            
+                            resultsDiv.innerHTML += `
+                                <div class="result-item">
+                                    <div class="result-url">${pageUrl}</div>
+                                    <a href="${pageUrl}" target="_blank" class="result-title">${item.title}</a>
+                                    <div class="result-snippet">${snippet}...</div>
+                                </div>`;
+                        });
+                        renderPagination();
+                    } else {
+                        // Əgər yerli nəticə olmasa, DuckDuckGo Açıq API
+                        fetchDuckDuckGo(query);
+                    }
+                })
+                .catch(() => fetchDuckDuckGo(query));
+        }
+
+        function fetchDuckDuckGo(query) {
+            const resultsDiv = document.getElementById('results-list');
+            const ddgUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&origin=*`;
+
+            fetch(ddgUrl)
+                .then(res => res.json())
+                .then(data => {
+                    resultsDiv.innerHTML = "";
+                    let found = false;
+
+                    if (data.AbstractText) {
+                        found = true;
+                        resultsDiv.innerHTML += `
+                            <div class="result-item">
+                                <div class="result-url">${data.AbstractURL || 'https://duckduckgo.com'}</div>
+                                <a href="${data.AbstractURL}" target="_blank" class="result-title">${data.Heading}</a>
+                                <div class="result-snippet">${data.AbstractText}</div>
+                            </div>`;
+                    }
+
+                    if (data.RelatedTopics && data.RelatedTopics.length > 0) {
+                        data.RelatedTopics.forEach(topic => {
+                            if (topic.Text && topic.FirstURL) {
+                                found = true;
+                                resultsDiv.innerHTML += `
+                                    <div class="result-item">
+                                        <div class="result-url">${topic.FirstURL}</div>
+                                        <a href="${topic.FirstURL}" target="_blank" class="result-title">${topic.Text.split(' - ')[0]}</a>
+                                        <div class="result-snippet">${topic.Text}</div>
+                                    </div>`;
+                            }
+                        });
+                    }
+
+                    if (!found) {
+                        resultsDiv.innerHTML = "<p class='status-msg'>Axtarış üzrə məlumat tapılmadı.</p>";
+                    }
                 })
                 .catch(() => {
-                    // Ehtiyat Server İnteqrasiyası
-                    const backupUrl = `https://search.bus-hit.me/search?q=${encodeURIComponent(queryParam)}&format=json&pageno=${page}`;
-                    fetch(backupUrl)
-                        .then(res => res.json())
-                        .then(data => renderResults(data))
-                        .catch(() => {
-                            resultsDiv.innerHTML = "<p class='status-msg' style='color:red;'>Nəticələr yüklənmədi, yenidən cəhd edin.</p>";
-                        });
+                    resultsDiv.innerHTML = "<p class='status-msg'>Axtarış zamanı xəta baş verdi.</p>";
                 });
         }
 
-        function renderResults(data) {
+        // Şəkil Nəticələri (Wikimedia Commons API)
+        function fetchImages(query) {
             const resultsDiv = document.getElementById('results-list');
-            resultsDiv.innerHTML = "";
+            const imgUrl = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&prop=imageinfo&iiprop=url&gsrsearch=${encodeURIComponent(query)}&format=json&origin=*`;
 
-            if (data.results && data.results.length > 0) {
-                if (currentTab === 'image') {
-                    let grid = document.createElement('div');
-                    grid.className = 'image-grid';
-                    data.results.forEach(item => {
-                        let imgUrl = item.img_src || item.thumbnail_src || item.url;
-                        grid.innerHTML += `
-                            <a href="${item.url}" target="_blank" class="image-card">
-                                <img src="${imgUrl}" onerror="this.src='https://via.placeholder.com/150'">
-                                <div class="image-title">${item.title}</div>
-                            </a>`;
-                    });
-                    resultsDiv.appendChild(grid);
-                } else {
-                    data.results.forEach(item => {
-                        resultsDiv.innerHTML += `
-                            <div class="result-item">
-                                <div class="result-url">${item.url}</div>
-                                <a href="${item.url}" target="_blank" class="result-title">${item.title}</a>
-                                <div class="result-snippet">${item.content || ''}</div>
-                            </div>`;
-                    });
-                }
-                renderPagination();
-            } else {
-                resultsDiv.innerHTML = "<p class='status-msg'>Məlumat tapılmadı.</p>";
-            }
+            fetch(imgUrl)
+                .then(res => res.json())
+                .then(data => {
+                    resultsDiv.innerHTML = "";
+                    if (data.query && data.query.pages) {
+                        let grid = document.createElement('div');
+                        grid.className = 'image-grid';
+                        
+                        Object.values(data.query.pages).forEach(page => {
+                            if (page.imageinfo && page.imageinfo[0]) {
+                                const src = page.imageinfo[0].url;
+                                const title = page.title.replace("File:", "");
+                                grid.innerHTML += `
+                                    <a href="${src}" target="_blank" class="image-card">
+                                        <img src="${src}" alt="image" loading="lazy">
+                                        <div class="image-title">${title}</div>
+                                    </a>`;
+                            }
+                        });
+                        resultsDiv.appendChild(grid);
+                    } else {
+                        resultsDiv.innerHTML = "<p class='status-msg'>Şəkil tapılmadı.</p>";
+                    }
+                })
+                .catch(() => {
+                    resultsDiv.innerHTML = "<p class='status-msg'>Şəkillər yüklənərkən xəta baş verdi.</p>";
+                });
         }
 
         function renderPagination() {
             const paginationDiv = document.getElementById('pagination-box');
             paginationDiv.innerHTML = "";
             for (let i = 1; i <= 5; i++) {
-                paginationDiv.innerHTML += `<button class="page-btn" onclick="executeSearch(${i})" style="${i === currentPage ? 'background:#1a73e8; color:white;' : ''}">${i}</button>`;
-            }
-        }
-
-        // PWA Dəstəyi
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            document.getElementById('install-btn').style.display = 'block';
-        });
-
-        function installPWA() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        document.getElementById('install-btn').style.display = 'none';
-                    }
-                    deferredPrompt = null;
-                });
+                const activeClass = i === currentPage ? 'active' : '';
+                paginationDiv.innerHTML += `<button class="page-btn ${activeClass}" onclick="executeSearch(${i})">${i}</button>`;
             }
         }
     </script>
