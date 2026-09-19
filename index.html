@@ -1,47 +1,108 @@
-// Açıq mənşəli Avto-Crawler Boti
-const fs = require('fs');
-const https = require('https');
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAuto Search - Mərkəzsiz Avto Axtarış</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0f172a; color: #f8fafc; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        
+        .header { margin-top: 30px; text-align: center; margin-bottom: 25px; }
+        .header h1 { font-size: 36px; color: #38bdf8; font-weight: bold; }
+        .header p { color: #94a3b8; font-size: 14px; margin-top: 5px; }
+        
+        .search-container { width: 100%; max-width: 650px; display: flex; gap: 10px; margin-bottom: 25px; }
+        .search-container input { flex: 1; padding: 14px 20px; font-size: 16px; border: 1px solid #334155; background: #1e293b; color: #fff; border-radius: 12px; outline: none; }
+        .search-container button { padding: 14px 24px; font-size: 16px; border: none; background: #0284c7; color: white; border-radius: 12px; cursor: pointer; font-weight: bold; }
+        .search-container button:hover { background: #0369a1; }
 
-// İndekslənəcək ilkin saytlar və qaynaqlar (Seed URLs)
-const targetSites = [
-    { url: 'https://az.wikipedia.org/wiki/Avtomobil', category: 'Məlumat' }
-];
+        .results-container { width: 100%; max-width: 650px; }
+        
+        .result-card { background: #1e293b; padding: 18px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #334155; }
+        .result-title { font-size: 18px; color: #38bdf8; text-decoration: none; font-weight: bold; display: block; margin-bottom: 5px; }
+        .result-title:hover { text-decoration: underline; }
+        .result-url { font-size: 12px; color: #4ade80; margin-bottom: 8px; word-break: break-all; }
+        .result-snippet { font-size: 14px; color: #cbd5e1; line-height: 1.5; }
+        .tag { display: inline-block; background: #0369a1; color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 4px; margin-top: 10px; margin-right: 5px; }
+        
+        .no-results { text-align: center; color: #94a3b8; margin-top: 20px; }
+    </style>
+</head>
+<body>
 
-let localDatabase = [];
+    <div class="header">
+        <h1>🚗 OpenAuto Search</h1>
+        <p>Mərkəzsiz Ehtiyat Hissəsi və Usta Axtarış Sistemi</p>
+    </div>
 
-// Saytın mətnini çəkən funksiya
-function scrapeSite(site) {
-    console.log(`[BOT] Sayt taranır: ${site.url}`);
-    
-    https.get(site.url, (res) => {
-        let html = '';
-        res.on('data', chunk => html += chunk);
-        res.on('end', () => {
-            // HTML teqlərini təmizləyirik və mətni çıxarırıq
-            const textContent = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ');
-            
-            // Avto ehtiyat hissələri və usta açar sözlərini analiz edirik
-            const keywords = ['mühərrik', 'yağ', 'təkər', 'akümulyator', 'ustası', 'ehtiyat hissəsi', 'bamper', 'korobka'];
-            const foundKeywords = keywords.filter(word => textContent.toLowerCase().includes(word));
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Ehtiyat hissəsi, zapçast və ya usta axtarın..." onkeyup="if(event.key==='Enter') searchAuto()">
+        <button onclick="searchAuto()">Axtar</button>
+    </div>
 
-            const entry = {
-                title: `Axtarış Tapıntısı: ${site.url}`,
-                url: site.url,
-                snippet: textContent.substring(0, 200) + '...',
-                keywords: foundKeywords,
-                timestamp: new Date().toISOString()
-            };
+    <div class="results-container" id="resultsContainer"></div>
 
-            localDatabase.push(entry);
-            
-            // Məlumatı yerli JSON faylına saxlayırıq (P2P Paylaşım üçün)
-            fs.writeFileSync('auto_index.json', JSON.stringify(localDatabase, null, 2));
-            console.log('[BOT] Məlumat uğurla bazaya yazıldı.');
-        });
-    }).on('error', (err) => {
-        console.error(`[XƏTA] ${site.url} taranarkən xəta baş verdi:`, err.message);
-    });
-}
+    <script>
+        // Mərkəzsiz Avto Bazası (Bot tərəfindən toplanan və ya istifadəçilərin paylaşılan indeksi)
+        const autoDatabase = [
+            {
+                title: "BMW / Mercedes Mühərrik və Korobka Ustası - Əhməd Usta",
+                url: "https://example.com/ustalar/ahmed-bmw",
+                snippet: "Mühərriklərin sıfırdan yığılması, diaqnostika və yağ sızmalarının aradan qaldırılması. Ünvan: Babək prospekti.",
+                type: "Usta Xidməti",
+                keywords: ["bmw", "mercedes", "mühərrik", "motor", "korobka", "usta", "diaqnostika"]
+            },
+            {
+                title: "Toyota / Hyundai Orijinal Ehtiyat Hissələri (Zapçast)",
+                url: "https://example.com/zapcast/toyota-hyundai",
+                snippet: "Orijinal və firma nakladkaları, amartizatorlar, şamlar (sveça) və filtrlər. Çatdırılma var.",
+                type: "Ehtiyat Hissəsi",
+                keywords: ["toyota", "hyundai", "nakladka", "amartizator", "sveca", "filtr", "zapcast", "hissə"]
+            },
+            {
+                title: "Avto Elektrik və Kompüter Diaqnostikası",
+                url: "https://example.com/elektrit-yasamal",
+                snippet: "Akkumulyator problemləri, farsunka yuyulması, beyin yazılması və çeçidin söndürülməsi.",
+                type: "Elektrik",
+                keywords: ["elektrik", "akkumulyator", "farsunka", "beyin", "diaqnostika", "usta"]
+            }
+        ];
 
-// Boti işə salırıq
-targetSites.forEach(scrapeSite);
+        function searchAuto() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const container = document.getElementById('resultsContainer');
+            container.innerHTML = '';
+
+            if (query === '') {
+                container.innerHTML = '<p class="no-results">Zəhmət olmasa axtarış sözü daxil edin.</p>';
+                return;
+            }
+
+            // Axtarış alqoritmi: Açar sözlərə və mətnə görə uyğunluğu tapır
+            const filtered = autoDatabase.filter(item => {
+                return item.keywords.some(kw => kw.includes(query)) ||
+                       item.title.toLowerCase().includes(query) ||
+                       item.snippet.toLowerCase().includes(query);
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<p class="no-results">Bu sorğu üzrə usta və ya ehtiyat hissəsi tapılmadı.</p>';
+                return;
+            }
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                card.innerHTML = `
+                    <a href="${item.url}" target="_blank" class="result-title">${item.title}</a>
+                    <div class="result-url">${item.url}</div>
+                    <div class="result-snippet">${item.snippet}</div>
+                    <span class="tag">${item.type}</span>
+                `;
+                container.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
