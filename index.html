@@ -3,35 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Axtarış Motoru Prototipli</title>
+    <title>Canlı Axtarış Motoru Portalı</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
         body { background-color: #f8f9fa; color: #202124; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         
-        .header { margin-top: 40px; text-align: center; margin-bottom: 25px; }
-        .header h1 { font-size: 42px; color: #4285f4; font-weight: bold; }
+        .header { margin-top: 30px; text-align: center; margin-bottom: 25px; }
+        .header h1 { font-size: 40px; color: #4285f4; font-weight: bold; }
         .header h1 span { color: #ea4335; }
         .header h1 span.g { color: #fbbc05; }
         .header h1 span.l { color: #34a853; }
         
-        .search-box { width: 100%; max-width: 600px; display: flex; margin-bottom: 30px; }
+        .search-box { width: 100%; max-width: 650px; display: flex; margin-bottom: 25px; }
         .search-box input { width: 100%; padding: 14px 20px; font-size: 16px; border: 1px solid #dfe1e5; border-radius: 24px 0 0 24px; outline: none; box-shadow: 0 1px 6px rgba(32,33,36,0.1); }
         .search-box button { padding: 14px 24px; font-size: 16px; border: none; background: #1a73e8; color: white; border-radius: 0 24px 24px 0; cursor: pointer; font-weight: bold; }
         .search-box button:hover { background: #1558b0; }
 
         .results-container { width: 100%; max-width: 650px; }
         
-        /* Reklam və Sponsorlu Kartlar */
+        /* Sponsorlu Reklam Kartları */
         .ad-card { background: #fef8e7; border: 1px solid #fce8e6; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
         .ad-badge { background: #fbbc05; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 3px; font-weight: bold; margin-bottom: 5px; display: inline-block; }
         
-        /* Standart Nəticə Kartları */
+        /* İnternetdən gələn Real Nəticə Kartları */
         .result-card { background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e0e0e0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .result-title { font-size: 18px; color: #1a0dab; text-decoration: none; font-weight: bold; }
         .result-title:hover { text-decoration: underline; }
-        .result-url { font-size: 12px; color: #006621; margin-top: 3px; margin-bottom: 6px; }
+        .result-url { font-size: 12px; color: #006621; margin-top: 3px; margin-bottom: 6px; word-break: break-all; }
         .result-snippet { font-size: 14px; color: #4d5156; line-height: 1.4; }
         
+        .loading { text-align: center; color: #1a73e8; font-weight: bold; margin-top: 20px; }
         .no-results { text-align: center; color: #70757a; margin-top: 20px; }
     </style>
 </head>
@@ -42,80 +43,91 @@
     </div>
 
     <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Axtarış sözünü daxil edin..." onkeyup="if(event.key==='Enter') performSearch()">
-        <button onclick="performSearch()">Axtar</button>
+        <input type="text" id="searchInput" placeholder="İnternetdə istənilən sözü axtarın..." onkeyup="if(event.key==='Enter') startSearch()">
+        <button onclick="startSearch()">Axtar</button>
     </div>
 
     <div class="results-container" id="resultsContainer">
-        <!-- Nəticələr dinamik yüklənəcək -->
+        <!-- Nəticələr buraya yüklənəcək -->
     </div>
 
     <script>
-        // İndekslənmiş Məlumat Bazası (Real sistemdə bu baza serverdən və ya API-dən gəlir)
-        const database = [
+        // Sizin Özel Sponsorlu Reklam Baza (İstədiyiniz pullu elanı bura əlavə edə bilərsiniz)
+        const customAds = [
             {
-                title: "TopTikinti - Ən Ucuz Tikinti və Təmir Materialları",
+                title: "TopTikinti - Təmir və Tikinti Materialları Satışı",
                 url: "https://toptikinti.example.com",
-                snippet: "Sement, alçipan, şpatlyovka və usta alətlərinin topdan və pərakəndə satışı. Ünvana çatdırılma var.",
-                keywords: ["tikinti", "təmir", "alçipan", "şpatlyovka", "sement", "material"],
-                isAd: true // Sponsorlu Nəticə (PPC Reklam)
-            },
-            {
-                title: "Usta Tap - Peşəkar Usta Xidmətləri Portalı",
-                url: "https://ustatap.example.com",
-                snippet: "Mənzillərin təmiri, alçipan vurulması, malyar və elektrik xidmətləri. Zəmanətli ustalar.",
-                keywords: ["usta", "təmir", "malyar", "alçipan", "xidmət"],
-                isAd: false
-            },
-            {
-                title: "E-Ticarət Portalı - Elektronika və Məişət Əşyaları",
-                url: "https://bazar.example.com",
-                snippet: "Bütün növlərdə məişət avadanlıqları, telefonlar və alətlər endirimli qiymətə.",
-                keywords: ["elektronika", "telefon", "alət", "alış-veriş"],
-                isAd: false
+                snippet: "Sement, alçipan, şpatlyovka və bütün usta alətlərinin sərfəli satış portalı.",
+                keywords: ["tikinti", "təmir", "alçipan", "şpatlyovka", "sement", "usta"]
             }
         ];
 
-        function performSearch() {
+        async function startSearch() {
             const query = document.getElementById('searchInput').value.toLowerCase().trim();
             const container = document.getElementById('resultsContainer');
             container.innerHTML = '';
 
             if (query === '') {
-                container.innerHTML = '<p class="no-results">Zəhmət olmasa axtarış sözü yazın.</p>';
+                container.innerHTML = '<p class="no-results">Zəhmət olmasa axtarış sözü daxil edin.</p>';
                 return;
             }
 
-            // Axtarış sorğusuna uyğun gələn nəticələri tapmaq
-            const filteredResults = database.filter(item => {
-                return item.keywords.some(kw => kw.includes(query)) ||
-                       item.title.toLowerCase().includes(query) ||
-                       item.snippet.toLowerCase().includes(query);
-            });
+            container.innerHTML = '<p class="loading">İnternet üzrə canlı axtarış aparılır...</p>';
 
-            if (filteredResults.length === 0) {
-                container.innerHTML = '<p class="no-results">Axtarışınıza uyğun heç nə tapılmadı.</p>';
-                return;
+            // 1. Öncə Daxili Sponsorlu Reklamları Yoxlayırıq
+            const matchedAds = customAds.filter(ad => 
+                ad.keywords.some(kw => kw.includes(query)) || ad.title.toLowerCase().includes(query)
+            );
+
+            // 2. Wikipedia / Pulsuz Açıq API vasitəsilə İnternetdə Canlı Axtarış
+            try {
+                const apiUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&utf8=&format=json&origin=*`;
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                
+                container.innerHTML = ''; // Yüklənir yazısını silirik
+
+                // Əgər Sponsorlu Reklam varsa, ən üstə çıxarırıq (Gəlir Yeri)
+                matchedAds.forEach(ad => {
+                    const adDiv = document.createElement('div');
+                    adDiv.className = 'ad-card';
+                    adDiv.innerHTML = `
+                        <span class="ad-badge">Sponsorlu / Reklam</span>
+                        <div>
+                            <a href="${ad.url}" target="_blank" class="result-title">${ad.title}</a>
+                            <div class="result-url">${ad.url}</div>
+                            <div class="result-snippet">${ad.snippet}</div>
+                        </div>
+                    `;
+                    container.appendChild(adDiv);
+                });
+
+                // İnternetdən gələn canlı nəticələri sırayla düzürük
+                if (data.query && data.query.search.length > 0) {
+                    data.query.search.forEach(item => {
+                        const card = document.createElement('div');
+                        card.className = 'result-card';
+                        
+                        const title = item.title;
+                        const snippet = item.snippet.replace(/<\/?[^>]+(>|$)/g, ""); // HTML teqlərini təmizləyirik
+                        const pageUrl = `https://az.wikipedia.org/wiki/${encodeURIComponent(title)}`;
+
+                        card.innerHTML = `
+                            <div>
+                                <a href="${pageUrl}" target="_blank" class="result-title">${title}</a>
+                                <div class="result-url">${pageUrl}</div>
+                                <div class="result-snippet">${snippet}...</div>
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    });
+                } else if (matchedAds.length === 0) {
+                    container.innerHTML = '<p class="no-results">Heç bir canlı nəticə tapılmadı.</p>';
+                }
+
+            } catch (error) {
+                container.innerHTML = '<p class="no-results">Məlumat gətirilərkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.</p>';
             }
-
-            // Öncə sponsorlu (reklam) nəticələri göstərmək üçün sıralayırıq
-            filteredResults.sort((a, b) => b.isAd - a.isAd);
-
-            // Nəticələri ekrana çıxarmaq
-            filteredResults.forEach(item => {
-                const card = document.createElement('div');
-                card.className = item.isAd ? 'ad-card' : 'result-card';
-
-                card.innerHTML = `
-                    ${item.isAd ? '<span class="ad-badge">Sponsorlu / Reklam</span>' : ''}
-                    <div>
-                        <a href="${item.url}" target="_blank" class="result-title">${item.title}</a>
-                        <div class="result-url">${item.url}</div>
-                        <div class="result-snippet">${item.snippet}</div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
         }
     </script>
 </body>
