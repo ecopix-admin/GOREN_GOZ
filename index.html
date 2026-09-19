@@ -3,301 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AzSearch — Müstəqil Axtarış Platforması</title>
-
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="AzSearch">
-    <link rel="icon" type="image/png" href="https://www.google.com/favicon.ico">
-
+    <title>Axtarış Motoru Prototipli</title>
     <style>
-        :root {
-            --bg-color: #ffffff;
-            --text-color: #202124;
-            --card-bg: #f8f9fa;
-            --border-color: #dadce0;
-            --link-color: #1a0dab;
-            --snippet-color: #4d5156;
-        }
-
-        body.dark-mode {
-            --bg-color: #202124;
-            --text-color: #e8eaed;
-            --card-bg: #303134;
-            --border-color: #5f6368;
-            --link-color: #8ab4f8;
-            --snippet-color: #bdc1c6;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Roboto, arial, sans-serif; transition: background 0.2s, color 0.2s; }
-        body { background-color: var(--bg-color); color: var(--text-color); display: flex; flex-direction: column; min-height: 100vh; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        body { background-color: #f8f9fa; color: #202124; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         
-        /* Header */
-        header { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--border-color); position: relative; }
-        .logo-text { font-size: 22px; font-weight: 500; color: #4285f4; text-decoration: none; letter-spacing: -0.5px; }
-        .logo-text span { color: #ea4335; }
+        .header { margin-top: 40px; text-align: center; margin-bottom: 25px; }
+        .header h1 { font-size: 42px; color: #4285f4; font-weight: bold; }
+        .header h1 span { color: #ea4335; }
+        .header h1 span.g { color: #fbbc05; }
+        .header h1 span.l { color: #34a853; }
         
-        .header-right { display: flex; align-items: center; gap: 12px; }
-        .balance-info { font-size: 13px; color: var(--snippet-color); background: var(--card-bg); padding: 6px 12px; border-radius: 4px; border: 1px solid var(--border-color); }
-        .balance-info strong { color: var(--text-color); }
+        .search-box { width: 100%; max-width: 600px; display: flex; margin-bottom: 30px; }
+        .search-box input { width: 100%; padding: 14px 20px; font-size: 16px; border: 1px solid #dfe1e5; border-radius: 24px 0 0 24px; outline: none; box-shadow: 0 1px 6px rgba(32,33,36,0.1); }
+        .search-box button { padding: 14px 24px; font-size: 16px; border: none; background: #1a73e8; color: white; border-radius: 0 24px 24px 0; cursor: pointer; font-weight: bold; }
+        .search-box button:hover { background: #1558b0; }
 
-        /* 3 Nöqtə Menyusu (Kebab Menu) */
-        .menu-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-color); padding: 4px 8px; border-radius: 50%; }
-        .menu-btn:hover { background: var(--card-bg); }
-
-        .dropdown-menu { display: none; position: absolute; top: 50px; right: 20px; background: var(--bg-color); border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 8px; width: 220px; z-index: 100; }
-        .dropdown-menu.show { display: block; }
-        .dropdown-item { padding: 12px 16px; font-size: 14px; color: var(--text-color); cursor: pointer; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); }
-        .dropdown-item:last-child { border-bottom: none; }
-        .dropdown-item:hover { background: var(--card-bg); }
-
-        /* Axtarış Bölməsi */
-        .search-container { max-width: 690px; margin: 20px auto 0 auto; padding: 0 16px; width: 100%; }
-        .search-box { display: flex; border: 1px solid var(--border-color); border-radius: 24px; padding: 6px 16px; background: var(--bg-color); align-items: center; }
-        .search-box:focus-within { box-shadow: 0 1px 6px rgba(32,33,36,0.28); border-color: transparent; }
-        .search-input { flex: 1; border: none; outline: none; font-size: 16px; color: var(--text-color); background: transparent; }
-        .search-btn { background: #1a73e8; color: white; border: none; padding: 8px 18px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; margin-left: 8px; }
-
-        /* Sekmələr */
-        .tabs-container { display: flex; gap: 24px; max-width: 690px; margin: 16px auto 0 auto; padding: 0 16px; border-bottom: 1px solid var(--border-color); width: 100%; }
-        .tab-btn { background: none; border: none; padding: 8px 0 12px 0; font-size: 14px; color: var(--snippet-color); cursor: pointer; font-weight: 500; border-bottom: 3px solid transparent; }
-        .tab-btn.active { color: #1a73e8; border-bottom: 3px solid #1a73e8; }
-
-        /* Nəticələr Bölməsi */
-        .results-container { max-width: 690px; margin: 0 auto; padding: 20px 16px 40px 16px; width: 100%; }
-        .result-item { margin-bottom: 24px; }
-        .result-url { font-size: 12px; color: var(--snippet-color); margin-bottom: 4px; word-break: break-all; }
-        .result-title { font-size: 19px; color: var(--link-color); text-decoration: none; font-weight: 400; line-height: 1.3; display: inline-block; margin-bottom: 4px; }
+        .results-container { width: 100%; max-width: 650px; }
+        
+        /* Reklam və Sponsorlu Kartlar */
+        .ad-card { background: #fef8e7; border: 1px solid #fce8e6; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .ad-badge { background: #fbbc05; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 3px; font-weight: bold; margin-bottom: 5px; display: inline-block; }
+        
+        /* Standart Nəticə Kartları */
+        .result-card { background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e0e0e0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .result-title { font-size: 18px; color: #1a0dab; text-decoration: none; font-weight: bold; }
         .result-title:hover { text-decoration: underline; }
-        .result-snippet { font-size: 14px; color: var(--snippet-color); line-height: 1.58; }
-
-        /* Modal Pəncərələr (Məlumat üçün) */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 200; justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { background: var(--bg-color); padding: 24px; border-radius: 8px; max-width: 500px; width: 100%; border: 1px solid var(--border-color); }
-        .modal-header { font-size: 18px; font-weight: 600; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-        .close-modal { cursor: pointer; font-size: 20px; color: var(--snippet-color); }
-        .modal-body { font-size: 14px; line-height: 1.6; color: var(--snippet-color); }
-
-        .status-msg { text-align: left; color: var(--snippet-color); font-size: 14px; margin-top: 10px; }
+        .result-url { font-size: 12px; color: #006621; margin-top: 3px; margin-bottom: 6px; }
+        .result-snippet { font-size: 14px; color: #4d5156; line-height: 1.4; }
+        
+        .no-results { text-align: center; color: #70757a; margin-top: 20px; }
     </style>
 </head>
 <body>
 
-    <header>
-        <a href="#" class="logo-text">Az<span>Search</span></a>
-        
-        <div class="header-right">
-            <div class="balance-info">
-                Balans: <strong>$<span id="user-usd">0.0000</span> USD</strong> (<span id="user-searches">0</span> axtarış)
-            </div>
-            
-            <!-- Sağ 3 Nöqtə -->
-            <button class="menu-btn" onclick="toggleMenu()">⋮</button>
-            <div id="dropdown-menu" class="dropdown-menu">
-                <div class="dropdown-item" onclick="openModal('about')">Haqqımızda</div>
-                <div class="dropdown-item" onclick="openModal('privacy')">Məxfilik Siyasəti</div>
-                <div class="dropdown-item" onclick="openModal('earn')">Qazanc Sistemi</div>
-                <div class="dropdown-item" onclick="openModal('settings')">Ayarlar</div>
-            </div>
-        </div>
-    </header>
-
-    <div class="search-container">
-        <div class="search-box">
-            <input type="text" id="search-query" class="search-input" placeholder="Axtarın..." onkeypress="handleKeyPress(event)">
-            <button class="search-btn" onclick="startNewSearch()">Axtar</button>
-        </div>
+    <div class="header">
+        <h1>Axtar<span>ı</span><span class="g">ş</span><span>M</span><span class="l">o</span>toru</h1>
     </div>
 
-    <div class="tabs-container">
-        <button class="tab-btn active" onclick="switchTab('web', this)">Hamısı</button>
-        <button class="tab-btn" onclick="switchTab('image', this)">Şəkillər</button>
-        <button class="tab-btn" onclick="switchTab('video', this)">Videolar</button>
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Axtarış sözünü daxil edin..." onkeyup="if(event.key==='Enter') performSearch()">
+        <button onclick="performSearch()">Axtar</button>
     </div>
 
-    <div class="results-container">
-        <div id="results-list"></div>
-    </div>
-
-    <!-- Modallar -->
-    <div id="info-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span id="modal-title">Məlumat</span>
-                <span class="close-modal" onclick="closeModal()">&times;</span>
-            </div>
-            <div id="modal-body" class="modal-body"></div>
-        </div>
+    <div class="results-container" id="resultsContainer">
+        <!-- Nəticələr dinamik yüklənəcək -->
     </div>
 
     <script>
-        let currentTab = 'web';
-        let currentQuery = '';
-        let searchCount = parseInt(localStorage.getItem('azsearch_count')) || 0;
-        let lastSearchTime = parseInt(localStorage.getItem('azsearch_last_time')) || 0;
-
-        updateBalanceDisplay();
-
-        function updateBalanceDisplay() {
-            let totalUsd = (searchCount * 0.0003).toFixed(4);
-            document.getElementById('user-usd').innerText = totalUsd;
-            document.getElementById('user-searches').innerText = searchCount;
-        }
-
-        function handleKeyPress(e) {
-            if (e.key === 'Enter') startNewSearch();
-        }
-
-        function switchTab(tab, element) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            element.classList.add('active');
-            currentTab = tab;
-            if (currentQuery) executeSearch();
-        }
-
-        function toggleMenu() {
-            document.getElementById('dropdown-menu').classList.toggle('show');
-        }
-
-        window.onclick = function(event) {
-            if (!event.target.matches('.menu-btn')) {
-                const dropdowns = document.getElementsByClassName("dropdown-menu");
-                for (let i = 0; i < dropdowns.length; i++) {
-                    let openDropdown = dropdowns[i];
-                    if (openDropdown.classList.contains('show')) {
-                        openDropdown.classList.remove('show');
-                    }
-                }
+        // İndekslənmiş Məlumat Bazası (Real sistemdə bu baza serverdən və ya API-dən gəlir)
+        const database = [
+            {
+                title: "TopTikinti - Ən Ucuz Tikinti və Təmir Materialları",
+                url: "https://toptikinti.example.com",
+                snippet: "Sement, alçipan, şpatlyovka və usta alətlərinin topdan və pərakəndə satışı. Ünvana çatdırılma var.",
+                keywords: ["tikinti", "təmir", "alçipan", "şpatlyovka", "sement", "material"],
+                isAd: true // Sponsorlu Nəticə (PPC Reklam)
+            },
+            {
+                title: "Usta Tap - Peşəkar Usta Xidmətləri Portalı",
+                url: "https://ustatap.example.com",
+                snippet: "Mənzillərin təmiri, alçipan vurulması, malyar və elektrik xidmətləri. Zəmanətli ustalar.",
+                keywords: ["usta", "təmir", "malyar", "alçipan", "xidmət"],
+                isAd: false
+            },
+            {
+                title: "E-Ticarət Portalı - Elektronika və Məişət Əşyaları",
+                url: "https://bazar.example.com",
+                snippet: "Bütün növlərdə məişət avadanlıqları, telefonlar və alətlər endirimli qiymətə.",
+                keywords: ["elektronika", "telefon", "alət", "alış-veriş"],
+                isAd: false
             }
-        }
+        ];
 
-        function startNewSearch() {
-            const query = document.getElementById('search-query').value.trim();
-            if (!query) return;
-            currentQuery = query;
+        function performSearch() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const container = document.getElementById('resultsContainer');
+            container.innerHTML = '';
 
-            const currentTime = new Date().getTime();
-            if (currentTime - lastSearchTime > 3000) {
-                searchCount += 1;
-                lastSearchTime = currentTime;
-                localStorage.setItem('azsearch_count', searchCount);
-                localStorage.setItem('azsearch_last_time', lastSearchTime);
-                updateBalanceDisplay();
+            if (query === '') {
+                container.innerHTML = '<p class="no-results">Zəhmət olmasa axtarış sözü yazın.</p>';
+                return;
             }
 
-            executeSearch();
-        }
+            // Axtarış sorğusuna uyğun gələn nəticələri tapmaq
+            const filteredResults = database.filter(item => {
+                return item.keywords.some(kw => kw.includes(query)) ||
+                       item.title.toLowerCase().includes(query) ||
+                       item.snippet.toLowerCase().includes(query);
+            });
 
-        // Zəmanətli Axtarış Mexanizmi (DuckDuckGo + Wikipedia JSONP/API)
-        function executeSearch() {
-            const resultsDiv = document.getElementById('results-list');
-            resultsDiv.innerHTML = "<p class='status-msg'>Axtarılır...</p>";
-
-            let queryUrl = `https://az.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(currentQuery)}&format=json&origin=*`;
-
-            if (currentTab === 'video') {
-                queryUrl = `https://az.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(currentQuery + ' video')}&format=json&origin=*`;
+            if (filteredResults.length === 0) {
+                container.innerHTML = '<p class="no-results">Axtarışınıza uyğun heç nə tapılmadı.</p>';
+                return;
             }
 
-            fetch(queryUrl)
-                .then(res => res.json())
-                .then(data => {
-                    resultsDiv.innerHTML = "";
-                    let hasResults = false;
+            // Öncə sponsorlu (reklam) nəticələri göstərmək üçün sıralayırıq
+            filteredResults.sort((a, b) => b.isAd - a.isAd);
 
-                    if (data.query && data.query.search && data.query.search.length > 0) {
-                        hasResults = true;
-                        data.query.search.forEach(item => {
-                            const pageUrl = `https://az.wikipedia.org/wiki/${encodeURIComponent(item.title)}`;
-                            const snippet = item.snippet.replace(/<\/?[^>]+(>|$)/g, "");
-                            
-                            resultsDiv.innerHTML += `
-                                <div class="result-item">
-                                    <div class="result-url">${pageUrl}</div>
-                                    <a href="${pageUrl}" target="_blank" class="result-title">${item.title}</a>
-                                    <div class="result-snippet">${snippet}...</div>
-                                </div>`;
-                        });
-                    }
+            // Nəticələri ekrana çıxarmaq
+            filteredResults.forEach(item => {
+                const card = document.createElement('div');
+                card.className = item.isAd ? 'ad-card' : 'result-card';
 
-                    // Əgər dəqiq məlumat tapılmazsa ehtiyat axtarış sisteminə qoşulma
-                    if (!hasResults) {
-                        fetchBackupResults(currentQuery);
-                    }
-                })
-                .catch(() => fetchBackupResults(currentQuery));
-        }
-
-        function fetchBackupResults(query) {
-            const resultsDiv = document.getElementById('results-list');
-            const script = document.createElement('script');
-            
-            // DuckDuckGo JSONP Axtarış İnteqrasiyası
-            window.ddgCallback = function(data) {
-                resultsDiv.innerHTML = "";
-                let count = 0;
-
-                if (data.RelatedTopics) {
-                    data.RelatedTopics.forEach(topic => {
-                        if (topic.Text && topic.FirstURL) {
-                            count++;
-                            resultsDiv.innerHTML += `
-                                <div class="result-item">
-                                    <div class="result-url">${topic.FirstURL}</div>
-                                    <a href="${topic.FirstURL}" target="_blank" class="result-title">${topic.Text.split(' - ')[0]}</a>
-                                    <div class="result-snippet">${topic.Text}</div>
-                                </div>`;
-                        }
-                    });
-                }
-
-                if (count === 0) {
-                    resultsDiv.innerHTML = "<p class='status-msg'>Axtarış üzrə heç bir nəticə tapılmadı. Zəhmət olmasa başqa sözlərlə yoxlayın.</p>";
-                }
-            };
-
-            script.src = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&callback=ddgCallback`;
-            document.body.appendChild(script);
-        }
-
-        /* Modal Məzmunları */
-        function openModal(type) {
-            const modal = document.getElementById('info-modal');
-            const title = document.getElementById('modal-title');
-            const body = document.getElementById('modal-body');
-
-            if (type === 'about') {
-                title.innerText = "Haqqımızda";
-                body.innerHTML = "<strong>AzSearch</strong> — müstəqil, tərəfsiz və istifadəçi mərkəzli axtarış platformasıdır. Məqsədimiz böyük korporasiyalardan asılı olmadan istifadəçilərə azad və təhlükəsiz axtarış imkanı təqdim etməkdir.";
-            } else if (type === 'privacy') {
-                title.innerText = "Məxfilik Siyasəti";
-                body.innerHTML = "Sizin məfhilliyiniz bizim üçün əsasdır. AzSearch istifadəçilərin şəxsi məlumatlarını, IP ünvanlarını və axtarış tarixçəsini <strong>heç bir halda toplamır və üçüncü tərəflərə satmır</strong>.";
-            } else if (type === 'earn') {
-                title.innerText = "Qazanc Sistemi";
-                body.innerHTML = "Sistemdə keçirdiyiniz hər aktiv axtarış üçün hesabınıza <strong>$0.0003 USD</strong> əlavə olunur. Spam axtarışların qarşısını almaq üçün axtarışlar arası minimum 3 saniyə gözləmə vaxtı tətbiq edilir.";
-            } else if (type === 'settings') {
-                title.innerText = "Ayarlar";
-                body.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span>Tünd Rejim (Dark Mode):</span>
-                        <input type="checkbox" onchange="toggleDarkMode(this)" ${document.body.classList.contains('dark-mode') ? 'checked' : ''}>
+                card.innerHTML = `
+                    ${item.isAd ? '<span class="ad-badge">Sponsorlu / Reklam</span>' : ''}
+                    <div>
+                        <a href="${item.url}" target="_blank" class="result-title">${item.title}</a>
+                        <div class="result-url">${item.url}</div>
+                        <div class="result-snippet">${item.snippet}</div>
                     </div>
                 `;
-            }
-
-            modal.style.display = "flex";
-        }
-
-        function closeModal() {
-            document.getElementById('info-modal').style.display = "none";
-        }
-
-        function toggleDarkMode(checkbox) {
-            if (checkbox.checked) {
-                document.body.classList.add('dark-mode');
-            } else {
-                document.body.classList.remove('dark-mode');
-            }
+                container.appendChild(card);
+            });
         }
     </script>
 </body>
