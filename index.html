@@ -1,863 +1,540 @@
 <!DOCTYPE html>
 <html lang="az">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Məqalə & Hekayə Platforması</title>
-  
-  <!-- FontAwesome Peşəkar İkonlar -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <!-- Firebase SDK-lar -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-
-  <style>
-    :root {
-      --primary: #0f172a;
-      --accent: #2563eb;
-      --bg: #f8fafc;
-      --card-bg: #ffffff;
-      --border: #e2e8f0;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background-color: var(--bg);
-      color: var(--text-main);
-      padding-bottom: 70px;
-    }
-
-    /* Üst Naviqasiya */
-    header {
-      background: var(--card-bg);
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 1.5rem;
-    }
-
-    .logo-container {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      font-weight: 700;
-      font-size: 1.2rem;
-      color: var(--primary);
-      text-decoration: none;
-    }
-
-    .logo-icon {
-      background: var(--accent);
-      color: #fff;
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.9rem;
-    }
-
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .btn {
-      background: var(--accent);
-      color: #ffffff;
-      border: none;
-      padding: 0.55rem 1.1rem;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 0.88rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      transition: opacity 0.2s;
-    }
-
-    .btn:hover { opacity: 0.9; }
-    .btn-outline {
-      background: transparent;
-      color: var(--text-main);
-      border: 1px solid var(--border);
-    }
-    .btn-outline:hover { background: #f1f5f9; }
-
-    /* Əsas Konteynər */
-    .container {
-      max-width: 640px;
-      margin: 1.5rem auto;
-      padding: 0 1rem;
-    }
-
-    /* Post Kartı */
-    .post-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      margin-bottom: 1.5rem;
-      overflow: hidden;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-    }
-
-    .post-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem;
-    }
-
-    .author-info {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .author-avatar {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 1px solid var(--border);
-    }
-
-    .author-details {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .author-name {
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: var(--text-main);
-    }
-
-    .post-time {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-
-    .post-image-wrap {
-      width: 100%;
-      background: #f1f5f9;
-      position: relative;
-    }
-
-    .post-image {
-      width: 100%;
-      max-height: 480px;
-      object-fit: cover;
-      display: block;
-    }
-
-    .post-body {
-      padding: 1rem;
-    }
-
-    .post-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      line-height: 1.4;
-    }
-
-    .post-text {
-      font-size: 0.93rem;
-      color: #334155;
-      line-height: 1.6;
-      white-space: pre-line;
-    }
-
-    .post-meta {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.75rem 1rem;
-      background: #fafafa;
-      border-top: 1px solid #f1f5f9;
-      font-size: 0.82rem;
-      color: var(--text-muted);
-    }
-
-    .meta-stat {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    .earning-badge {
-      background: #dcfce7;
-      color: #15803d;
-      padding: 0.2rem 0.5rem;
-      border-radius: 6px;
-      font-weight: 600;
-    }
-
-    .post-actions {
-      display: flex;
-      border-top: 1px solid var(--border);
-    }
-
-    .action-btn {
-      flex: 1;
-      background: transparent;
-      border: none;
-      padding: 0.75rem;
-      font-size: 0.88rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      transition: background 0.15s;
-    }
-
-    .action-btn:hover { background: #f8fafc; }
-    .action-btn.active { color: #e11d48; }
-
-    /* Modal / Dialoqlar */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(15, 23, 42, 0.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s ease;
-    }
-
-    .modal-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .modal-box {
-      background: #ffffff;
-      width: 100%;
-      max-width: 440px;
-      border-radius: 16px;
-      padding: 1.8rem;
-      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
-      position: relative;
-    }
-
-    .modal-close {
-      position: absolute;
-      top: 1.2rem;
-      right: 1.2rem;
-      background: transparent;
-      border: none;
-      font-size: 1.1rem;
-      color: var(--text-muted);
-      cursor: pointer;
-    }
-
-    .form-group {
-      margin-bottom: 1rem;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-bottom: 0.4rem;
-    }
-
-    .form-control {
-      width: 100%;
-      padding: 0.7rem 0.9rem;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 0.92rem;
-      outline: none;
-    }
-
-    .form-control:focus {
-      border-color: var(--accent);
-    }
-
-    /* Profil Paneli */
-    .profile-card {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1.2rem;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .profile-meta {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .profile-avatar-lg {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    .balance-box {
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      padding: 0.5rem 0.8rem;
-      border-radius: 8px;
-      text-align: right;
-    }
-
-    .balance-val {
-      font-weight: 700;
-      color: #166534;
-      font-size: 1.1rem;
-    }
-
-    /* Aşağı Sabit Naviqasiya */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      background: #ffffff;
-      border-top: 1px solid var(--border);
-      height: 60px;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      z-index: 99;
-    }
-
-    .bottom-nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.2rem;
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 0.72rem;
-      font-weight: 500;
-      cursor: pointer;
-    }
-
-    .bottom-nav-item i {
-      font-size: 1.2rem;
-    }
-
-    .bottom-nav-item.active {
-      color: var(--accent);
-    }
-
-    .hidden { display: none !important; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NexUs - Dünya Səviyyəli Sosial Platforma</title>
+    <!-- Tailwind CSS & FontAwesome İkonları -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .modal-animate { transition: transform 0.3s ease-out, opacity 0.3s ease-out; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .active-tab { color: #38bdf8; border-bottom: 2px solid #38bdf8; }
+    </style>
 </head>
-<body>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex justify-center selection:bg-sky-500 selection:text-white">
 
-  <!-- Üst Bar -->
-  <header>
-    <a href="#" class="logo-container">
-      <div class="logo-icon"><i class="fa-solid fa-newspaper"></i></div>
-      <span>SosialBloq</span>
-    </a>
-    <div class="nav-actions" id="top-nav-actions">
-      <button class="btn btn-outline" onclick="openAuthModal()"><i class="fa-solid fa-right-to-bracket"></i> Giriş</button>
-    </div>
-  </header>
+    <!-- Əsas Mobil Container (Maksimum genişlik tənzimlənməsi ilə) -->
+    <div class="w-full max-w-md bg-slate-950 min-h-screen flex flex-col justify-between relative shadow-2xl border-x border-slate-800/50">
 
-  <div class="container">
-
-    <!-- İstifadəçi Profil Kartı (Yalnız Giriş Edildikdə Görünür) -->
-    <div class="profile-card hidden" id="user-profile-header">
-      <div class="profile-meta">
-        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" class="profile-avatar-lg" id="profile-avatar-img">
-        <div>
-          <h4 id="profile-username-text" style="margin:0;">@istifadeci</h4>
-          <span style="font-size: 0.8rem; color: var(--text-muted);" id="profile-status-text">Yazıçı</span>
-        </div>
-      </div>
-      <div class="balance-box">
-        <div style="font-size: 0.7rem; color: #166534; font-weight: 600;">BALANS (40%)</div>
-        <div class="balance-val" id="profile-balance-val">0.000 AZN</div>
-      </div>
-    </div>
-
-    <!-- Məqalələr Lenti -->
-    <div id="posts-container">
-      <!-- Məqalələr JS ilə buraya yüklənəcək -->
-    </div>
-
-  </div>
-
-  <!-- Aşağı Mobil Naviqasiya -->
-  <nav class="bottom-nav">
-    <div class="bottom-nav-item active" onclick="window.scrollTo({top:0, behavior:'smooth'})">
-      <i class="fa-solid fa-house"></i>
-      <span>Lent</span>
-    </div>
-    <div class="bottom-nav-item" onclick="requireAuthAction(() => openCreateModal())">
-      <i class="fa-solid fa-circle-plus" style="font-size:1.5rem; color:var(--accent);"></i>
-      <span>Paylaş</span>
-    </div>
-    <div class="bottom-nav-item" onclick="requireAuthAction(() => showProfileDetails())">
-      <i class="fa-solid fa-user"></i>
-      <span>Profil</span>
-    </div>
-  </nav>
-
-  <!-- QEYDİYYAT / GİRİŞ MODALI -->
-  <div class="modal-overlay" id="auth-modal">
-    <div class="modal-box">
-      <button class="modal-close" onclick="closeAuthModal()"><i class="fa-solid fa-xmark"></i></button>
-      <h3 id="auth-modal-title" style="margin-bottom: 0.4rem;">Hesaba Giriş</h3>
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.2rem;">Məqalə paylaşmaq, bəyənmək və balans toplamaq üçün daxil olun.</p>
-
-      <div class="form-group">
-        <label>E-poçt ünvanı</label>
-        <input type="email" id="auth-email" class="form-control" placeholder="numune@mail.com">
-      </div>
-      <div class="form-group">
-        <label>Şifrə</label>
-        <input type="password" id="auth-password" class="form-control" placeholder="••••••••">
-      </div>
-      <div class="form-group" id="group-username">
-        <label>İstifadəçi adı (Profil üçün)</label>
-        <input type="text" id="auth-username" class="form-control" placeholder="məs: elnur_ali">
-      </div>
-
-      <button class="btn" style="width:100%; justify-content:center;" onclick="executeAuth()" id="btn-auth-submit">Giriş Et</button>
-      
-      <div style="text-align: center; margin-top: 1rem; font-size: 0.85rem;">
-        <span id="auth-toggle-text">Hesabınız yoxdur?</span>
-        <a href="#" style="color: var(--accent); font-weight: 600; text-decoration: none;" onclick="toggleAuthMode()" id="auth-toggle-link">Qeydiyyatdan keçin</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- YENİ MƏQALƏ PAYLAŞMA MODALI -->
-  <div class="modal-overlay" id="create-modal">
-    <div class="modal-box">
-      <button class="modal-close" onclick="closeCreateModal()"><i class="fa-solid fa-xmark"></i></button>
-      <h3 style="margin-bottom: 1rem;">Yeni Foto-Məqalə</h3>
-
-      <div class="form-group">
-        <label>Məqalə Başlığı</label>
-        <input type="text" id="post-title-input" class="form-control" placeholder="Diqqət çəkici başlıq...">
-      </div>
-
-      <div class="form-group">
-        <label>Şəkil Seçin (Pulsuz Limitsiz Hosting)</label>
-        <input type="file" id="post-file-input" class="form-control" accept="image/*">
-      </div>
-
-      <div class="form-group">
-        <label>Məqalə Mətni / Hekayə</label>
-        <textarea id="post-text-input" class="form-control" rows="5" placeholder="Şəklin altından geniş məqalənizi qeyd edin..."></textarea>
-      </div>
-
-      <button class="btn" style="width:100%; justify-content:center;" onclick="submitPost()" id="btn-post-submit">
-        <i class="fa-solid fa-paper-plane"></i> Paylaş Və Qazan
-      </button>
-    </div>
-  </div>
-
-  <script>
-    // -------------------------------------------------------------
-    // KONFİQURASİYA
-    // -------------------------------------------------------------
-    const IMGBB_API_KEY = "3b08e5473708eb10f81d113101c5304b"; // Nümunə pulsuz ImgBB açarı
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDummyKey_ReplaceWithYourFirebaseApiKey",
-      authDomain: "sosial-blog-app.firebaseapp.com",
-      projectId: "sosial-blog-app",
-      storageBucket: "sosial-blog-app.appspot.com",
-      messagingSenderId: "10000000000",
-      appId: "1:10000000000:web:abcdef123456"
-    };
-
-    // Firebase Inisializasiyası
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    let currentUser = null;
-    let isSignUpMode = false;
-
-    // -------------------------------------------------------------
-    // DEMO MƏQLƏLƏR VƏ PROFİLLƏR (40-dan ÇOX DOLDURULMUŞ BAZA)
-    // -------------------------------------------------------------
-    const INITIAL_DEMO_POSTS = [
-      {
-        id: "demo-1",
-        author: "Kənan Rəhimov",
-        username: "kenan_tech",
-        avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150",
-        title: "Süni İntellekt 2026-cı İldə Proqramlaşdırmanı Necə Dəyişdirir?",
-        image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800",
-        text: "Süni intellekt alətləri artıq sadəcə kod yazmır, həm də mürəkkəb proqram arxitekturalarını qurur. Bu gün tərtibatçıların üzərinə düşən əsas vəzifə kod yazmaqdan ziyadə düzgün mühəndislik məntiqini və təhlükəsizliyi təmin etməkdir. Gələcək texnologiyalar haqqında ətraflı təhlilimizi təqdim edirik...",
-        views: 1420,
-        likes: 184,
-        time: "10 dəq əvvəl"
-      },
-      {
-        id: "demo-2",
-        author: "Leyla Əliyeva",
-        username: "leyla_architect",
-        avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
-        title: "Müasir İnteryer Dizaynında Minimalizm Və Təbii İşıq",
-        image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
-        text: "Evinizdə genişlik hiss yaratmaq üçün divar rənglərinin və pəncərə yerləşiminin rolu danılmazdır. Neytral tonlar və təbii ağac materialları insan psixologiyasına sakitləşdirici təsir göstərir. Bu layihədə istifadə etdiyimiz alçipan və gizli işıqlandırma həllərini paylaşıram.",
-        views: 2890,
-        likes: 312,
-        time: "35 dəq əvvəl"
-      },
-      {
-        id: "demo-3",
-        author: "Rəşad Qasımov",
-        username: "resad_auto",
-        avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150",
-        title: "Elektrik Avtomobillərinin Bateriya Ömrünü Uzatmağın 5 Qaydası",
-        image: "https://images.unsplash.com/photo-1563720223185-11003d516935?w=800",
-        text: "EV istifadəçilərinin ən çox verdiyi suallardan biri batareyanın deqradasiyası ilə bağlıdır. Bateriyanı heç vaxt tam 0%-ə salmamaq və 80%-dən yuxarı tez-tez sürətli şarj etməmək onun ömrünü 30% artırır.",
-        views: 950,
-        likes: 88,
-        time: "1 saat əvvəl"
-      },
-      {
-        id: "demo-4",
-        author: "Aysel Məmmədova",
-        username: "aysel_travel",
-        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
-        title: "Qafqaz Dağlarının Gizli Gözəllikləri Və Düşərgə Bələdçisi",
-        image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800",
-        text: "Həftəsonu yürüşü üçün seçdiyimiz bu marşrut həm təmiz havası, həm də mənzərəsi ilə valeh edir. Çadır qurarkən diqqət edilməli vacib təhlükəsizlik qaydalarını bu yazıda topladıq.",
-        views: 4100,
-        likes: 520,
-        time: "2 saat əvvəl"
-      },
-      {
-        id: "demo-5",
-        author: "Tural İbrahimov",
-        username: "tural_finance",
-        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
-        title: "Şəxsi Büdcə Bələdçisi: Gəlirlərin 20%-ni Necə İnvestisiya Etməli?",
-        image: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=800",
-        text: "Finansal müstəqillik təsadüf deyil, düzgün planlamanın nəticəsidir. Passiv gəlir mənbələri yaratmaq və inflyasiyadan qorunmaq üçün tətbiq edə biləcəyiniz sadə addımlar...",
-        views: 3200,
-        likes: 290,
-        time: "3 saat əvvəl"
-      }
-    ];
-
-    // Məqalə siyahısını 40+ elementə tamamlamaq üçün generator
-    function generateFullDemoData() {
-      let list = [...INITIAL_DEMO_POSTS];
-      const categories = [
-        { t: "Kofe Mədəniyyəti Və Ən Yaxşı Dənələr", img: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800" },
-        { t: "Kibertəhlükəsizlik: Şəxsi Məlumatları Qorumaq", img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800" },
-        { t: "Fitnes Və Sağlam Qidalanma Məsləhətləri", img: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=800" },
-        { t: "Fotoqrafiyada İşıq Və Kompozisiya Sirləri", img: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800" },
-        { t: "Kosmosun Dərinlikləri Və Yeni Kəşflər", img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800" }
-      ];
-
-      for(let i = 6; i <= 42; i++) {
-        const cat = categories[i % categories.length];
-        list.push({
-          id: `demo-${i}`,
-          author: `Müəllif ${i}`,
-          username: `user_${i}`,
-          avatar: `https://images.unsplash.com/photo-${1500000000000 + (i * 1000)}?w=150`,
-          title: `${cat.t} #${i}`,
-          image: cat.img,
-          text: `Bu məqalə ${i} nömrəli təhlili və faydalı məlumatları əhatə edir. Oxucular üçün zəngin məzmun, praktiki tövsiyələr və maraqlı faktlar təqdim olunur. Məqaləni bəyənməyi və paylaşmağı unutmayın.`,
-          views: 100 + (i * 85),
-          likes: 12 + (i * 7),
-          time: `${i} saat əvvəl`
-        });
-      }
-      return list;
-    }
-
-    // -------------------------------------------------------------
-    // TƏTBİQİN İŞƏ DÜŞMƏSİ (INIT)
-    // -------------------------------------------------------------
-    window.addEventListener('DOMContentLoaded', () => {
-      // Auth vəziyyətini dinləyirik
-      auth.onAuthStateChanged(user => {
-        currentUser = user;
-        updateUIState();
-      });
-
-      renderPostsFeed();
-    });
-
-    function updateUIState() {
-      const topNav = document.getElementById('top-nav-actions');
-      const profileHeader = document.getElementById('user-profile-header');
-
-      if (currentUser) {
-        topNav.innerHTML = `
-          <button class="btn btn-outline" onclick="openCreateModal()"><i class="fa-solid fa-plus"></i></button>
-          <button class="btn btn-outline" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Çıxış</button>
-        `;
-        profileHeader.classList.remove('hidden');
-        document.getElementById('profile-username-text').innerText = currentUser.email.split('@')[0];
-        
-        // Balansı hesabla
-        loadUserBalance();
-      } else {
-        topNav.innerHTML = `
-          <button class="btn" onclick="openAuthModal()"><i class="fa-solid fa-right-to-bracket"></i> Giriş</button>
-        `;
-        profileHeader.classList.add('hidden');
-      }
-    }
-
-    // -------------------------------------------------------------
-    // LENTİN ÇAP OLUNMASI (Tiktok stili - Girişsiz hər şey görünür)
-    // -------------------------------------------------------------
-    function renderPostsFeed() {
-      const container = document.getElementById('posts-container');
-      container.innerHTML = '';
-
-      const postsData = generateFullDemoData();
-
-      postsData.forEach(post => {
-        // Monetizasiya hesabı: 1000 baxış = 4.00 AZN (0.004 AZN/baxış)
-        const earning = (post.views * 0.004).toFixed(3);
-
-        const card = document.createElement('div');
-        card.className = 'post-card';
-        card.innerHTML = `
-          <div class="post-header">
-            <div class="author-info">
-              <img src="${post.avatar}" class="author-avatar" onerror="this.src='https://via.placeholder.com/42'">
-              <div class="author-details">
-                <span class="author-name">${post.author}</span>
-                <span class="post-time">@${post.username} • ${post.time}</span>
-              </div>
+        <!-- Yuxarı Sabit Naviqasiya -->
+        <header class="sticky top-0 z-40 glass px-4 py-3 flex items-center justify-between border-b border-slate-800">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-globe text-2xl text-sky-400 animate-pulse"></i>
+                <h1 class="font-extrabold text-xl tracking-wider bg-gradient-to-r from-sky-400 to-blue-600 bg-clip-text text-transparent">NexUs</h1>
             </div>
-            <i class="fa-solid fa-ellipsis" style="color: var(--text-muted); cursor:pointer;"></i>
-          </div>
-
-          <div class="post-image-wrap">
-            <img src="${post.image}" class="post-image" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1518770660439-4636190af475?w=800'">
-          </div>
-
-          <div class="post-body">
-            <h2 class="post-title">${post.title}</h2>
-            <p class="post-text">${post.text}</p>
-          </div>
-
-          <div class="post-meta">
-            <div class="meta-stat">
-              <i class="fa-regular fa-eye"></i>
-              <span>${post.views} baxış</span>
+            <div class="flex items-center gap-4">
+                <button onclick="openNotificationModal()" class="relative text-slate-300 hover:text-white transition">
+                    <i class="fa-regular fa-bell text-xl"></i>
+                    <span class="absolute -top-1 -right-1 bg-sky-500 text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center text-white" id="notifBadge">3</span>
+                </button>
+                <button onclick="toggleMenuModal(true)" class="text-slate-300 hover:text-white transition">
+                    <i class="fa-solid fa-ellipsis-vertical text-xl"></i>
+                </button>
             </div>
-            <div class="earning-badge">
-              <i class="fa-solid fa-wallet"></i> Toplanan: ${earning} AZN
-            </div>
-          </div>
+        </header>
 
-          <div class="post-actions">
-            <button class="action-btn" onclick="requireAuthAction(() => handleLike(this))">
-              <i class="fa-regular fa-heart"></i>
-              <span>${post.likes}</span>
+        <!-- ƏSAS AKIŞ (FEED) - Sonsuz Sürüşdürmə -->
+        <main id="feedContainer" class="flex-1 overflow-y-auto p-4 space-y-6 pb-24 no-scrollbar">
+            <!-- Postlar dinamik yüklənəcək -->
+        </main>
+
+        <!-- AŞAĞI NAVİQASİYA PANOLU (FOOTER TOOLBAR) -->
+        <nav class="fixed bottom-0 w-full max-w-md glass border-t border-slate-800 px-6 py-2 flex justify-between items-center z-40">
+            <button onclick="switchTab('feed')" class="flex flex-col items-center gap-1 text-sky-400" id="navFeed">
+                <i class="fa-solid fa-house text-lg"></i>
+                <span class="text-[10px] font-medium">Lenta</span>
             </button>
-            <button class="action-btn" onclick="requireAuthAction(() => alert('Rəy bölməsi açıldı'))">
-              <i class="fa-regular fa-comment"></i>
-              <span>Rəy Yaz</span>
+            <button onclick="switchTab('explore')" class="flex flex-col items-center gap-1 text-slate-400 hover:text-sky-400 transition" id="navExplore">
+                <i class="fa-solid fa-compass text-lg"></i>
+                <span class="text-[10px] font-medium">Kəşf et</span>
             </button>
-            <button class="action-btn" onclick="sharePost('${post.id}')">
-              <i class="fa-regular fa-paper-plane"></i>
-              <span>Paylaş</span>
+            <button onclick="openCreatePostModal()" class="flex items-center justify-center bg-gradient-to-r from-sky-500 to-blue-600 w-12 h-12 rounded-full shadow-lg shadow-sky-500/30 text-white transform active:scale-95 transition">
+                <i class="fa-solid fa-plus text-xl"></i>
             </button>
-          </div>
-        `;
-        container.appendChild(card);
-      });
-    }
+            <button onclick="switchTab('referral')" class="flex flex-col items-center gap-1 text-slate-400 hover:text-sky-400 transition" id="navRef">
+                <i class="fa-solid fa-users text-lg"></i>
+                <span class="text-[10px] font-medium">Referal</span>
+            </button>
+            <button onclick="switchTab('profile')" class="flex flex-col items-center gap-1 text-slate-400 hover:text-sky-400 transition" id="navProfile">
+                <i class="fa-solid fa-user text-lg"></i>
+                <span class="text-[10px] font-medium">Profil</span>
+            </button>
+        </nav>
 
-    // -------------------------------------------------------------
-    // INTERFAYS ƏMƏLİYYATLARI VƏ AUTH MƏNTİQİ
-    // -------------------------------------------------------------
-    function requireAuthAction(callback) {
-      if (!currentUser) {
-        openAuthModal();
-      } else {
-        callback();
-      }
-    }
-
-    function openAuthModal() {
-      document.getElementById('auth-modal').classList.add('active');
-    }
-
-    function closeAuthModal() {
-      document.getElementById('auth-modal').classList.remove('active');
-    }
-
-    function toggleAuthMode() {
-      isSignUpMode = !isSignUpMode;
-      document.getElementById('auth-modal-title').innerText = isSignUpMode ? "Yeni Qeydiyyat" : "Hesaba Giriş";
-      document.getElementById('btn-auth-submit').innerText = isSignUpMode ? "Qeydiyyatı Tamamla" : "Giriş Et";
-      document.getElementById('group-username').style.display = isSignUpMode ? "block" : "none";
-      document.getElementById('auth-toggle-text').innerText = isSignUpMode ? "Hesabınız var?" : "Hesabınız yoxdur?";
-      document.getElementById('auth-toggle-link').innerText = isSignUpMode ? "Daxil olun" : "Qeydiyyatdan keçin";
-    }
-
-    async function executeAuth() {
-      const email = document.getElementById('auth-email').value;
-      const pass = document.getElementById('auth-password').value;
-
-      if (!email || !pass) {
-        alert('Xahiş olunur bütün xanaları doldurun.');
-        return;
-      }
-
-      try {
-        if (isSignUpMode) {
-          await auth.createUserWithEmailAndPassword(email, pass);
-          alert('Qeydiyyat uğurla tamamlandı!');
-        } else {
-          await auth.signInWithEmailAndPassword(email, pass);
-        }
-        closeAuthModal();
-      } catch (err) {
-        alert('Xəta: ' + err.message);
-      }
-    }
-
-    function logout() {
-      auth.signOut();
-    }
-
-    function openCreateModal() {
-      document.getElementById('create-modal').classList.add('active');
-    }
-
-    function closeCreateModal() {
-      document.getElementById('create-modal').classList.remove('active');
-    }
-
-    // -------------------------------------------------------------
-    // IMGBB İLƏ ŞƏKİL YÜKLƏMƏ VƏ MƏQALƏ PAYLAŞMA
-    // -------------------------------------------------------------
-    async function submitPost() {
-      const title = document.getElementById('post-title-input').value;
-      const fileInput = document.getElementById('post-file-input');
-      const text = document.getElementById('post-text-input').value;
-      const btn = document.getElementById('btn-post-submit');
-
-      if (!title || !fileInput.files[0] || !text) {
-        alert('Xahiş olunur şəkil, başlıq və məqalə mətnini tam doldurun.');
-        return;
-      }
-
-      btn.disabled = true;
-      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Şəkil Yüklənir...`;
-
-      try {
-        // ImgBB API-yə Şəkil Yüklənməsi (Limitsiz pulsuz storage)
-        const formData = new FormData();
-        formData.append('image', fileInput.files[0]);
-
-        const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-          method: 'POST',
-          body: formData
-        });
-        const imgData = await res.json();
-
-        if (imgData.success) {
-          const uploadedImageUrl = imgData.data.url;
-
-          // Yeni Postu Lentin ən yuxarısına əlavə edirik
-          const container = document.getElementById('posts-container');
-          const newCard = document.createElement('div');
-          newCard.className = 'post-card';
-          newCard.innerHTML = `
-            <div class="post-header">
-              <div class="author-info">
-                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" class="author-avatar">
-                <div class="author-details">
-                  <span class="author-name">Siz (@${currentUser.email.split('@')[0]})</span>
-                  <span class="post-time">İndi</span>
+        <!-- TİKTOK ÜSLUBLU RƏYLƏR MODALI (BOTTOM SHEET) -->
+        <div id="commentModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex flex-col justify-end">
+            <div class="bg-slate-900 border-t border-slate-800 rounded-t-3xl h-[80vh] flex flex-col w-full max-w-md mx-auto transition-transform duration-300 transform translate-y-full" id="commentSheet">
+                <div class="p-4 border-b border-slate-800 flex justify-between items-center">
+                    <div class="w-12 h-1 bg-slate-700 rounded-full mx-auto absolute left-1/2 -translate-x-1/2 top-2"></div>
+                    <h3 class="font-bold text-slate-200 mt-2"><span id="commentCountHeader">0</span> Rəy</h3>
+                    <button onclick="closeCommentModal()" class="text-slate-400 hover:text-white p-2">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
                 </div>
-              </div>
+                <!-- Rəylər Siyahısı -->
+                <div id="commentList" class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar">
+                    <!-- Dinamik rəylər -->
+                </div>
+                <!-- Rəy Yazmaq Inputu -->
+                <div class="p-3 border-t border-slate-800 bg-slate-950 flex items-center gap-2">
+                    <input type="text" id="commentInput" placeholder="Rəyinizi yazın..." class="flex-1 bg-slate-800 text-sm text-slate-100 px-4 py-2.5 rounded-full border border-slate-700 focus:outline-none focus:border-sky-500">
+                    <button onclick="addComment()" class="bg-sky-500 hover:bg-sky-600 text-white w-10 h-10 rounded-full flex items-center justify-center transition">
+                        <i class="fa-solid fa-paper-plane text-sm"></i>
+                    </button>
+                </div>
             </div>
-            <div class="post-image-wrap">
-              <img src="${uploadedImageUrl}" class="post-image">
-            </div>
-            <div class="post-body">
-              <h2 class="post-title">${title}</h2>
-              <p class="post-text">${text}</p>
-            </div>
-            <div class="post-meta">
-              <div class="meta-stat"><i class="fa-regular fa-eye"></i> 1 baxış</div>
-              <div class="earning-badge"><i class="fa-solid fa-wallet"></i> Toplanan: 0.004 AZN</div>
-            </div>
-          `;
-          container.prepend(newCard);
+        </div>
 
-          closeCreateModal();
-          alert('Məqaləniz uğurla paylaşıldı!');
-        } else {
-          alert('Şəkil yüklənərkən xəta baş verdi.');
+        <!-- YENİ POST YARATMA MODALI -->
+        <div id="createPostModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-5 space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                    <h3 class="font-bold text-lg text-slate-100">Yeni Məqalə Yaradın</h3>
+                    <button onclick="closeCreatePostModal()" class="text-slate-400 hover:text-white">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+                <textarea id="postContentInput" rows="4" placeholder="Fikirlərinizi, xəbərlərinizi yazın..." class="w-full bg-slate-800 text-slate-200 p-3 rounded-xl border border-slate-700 focus:outline-none focus:border-sky-500 text-sm"></textarea>
+                
+                <!-- Şəkil Yükləmə Bölməsi -->
+                <div class="flex items-center gap-3">
+                    <label class="flex-1 border border-dashed border-slate-700 bg-slate-800/50 hover:bg-slate-800 p-3 rounded-xl flex items-center justify-center gap-2 cursor-pointer transition text-xs text-slate-300">
+                        <i class="fa-solid fa-image text-sky-400 text-base"></i>
+                        <span id="uploadStatusText">Qalereyadan Şəkil Seç</span>
+                        <input type="file" id="imageInput" accept="image/*" class="hidden" onchange="handleImageSelect(event)">
+                    </label>
+                </div>
+                <div id="imagePreview" class="hidden relative rounded-xl overflow-hidden max-h-40 border border-slate-700">
+                    <img src="" id="previewImg" class="w-full object-cover">
+                </div>
+
+                <button onclick="submitPost()" class="w-full bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold py-3 rounded-xl hover:opacity-90 transition">
+                    Dərc Et
+                </button>
+            </div>
+        </div>
+
+        <!-- 3 NÖQTƏ MENYU VƏ TƏNZİMLƏMƏLƏR MODALI -->
+        <div id="menuModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex justify-end">
+            <div class="bg-slate-900 w-4/5 max-w-xs h-full p-5 space-y-6 overflow-y-auto border-l border-slate-800">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                    <h3 class="font-bold text-lg text-slate-100">Menyu & Ayarlar</h3>
+                    <button onclick="toggleMenuModal(false)" class="text-slate-400 hover:text-white">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="space-y-4 text-sm text-slate-300">
+                    <div class="p-3 bg-slate-800/50 rounded-xl space-y-2">
+                        <h4 class="font-semibold text-sky-400 flex items-center gap-2">
+                            <i class="fa-solid fa-circle-info"></i> Sayt Haqqında
+                        </h4>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            NexUs - Tamamilə mərkəzsizləşdirilmiş, istifadəçilərin kontent yarataraq Real CPM göstəriciləri ilə baxışa görə pul qazandığı gələcəyin sosial platformasıdır.
+                        </p>
+                    </div>
+
+                    <a href="#" onclick="alert('Məxfilik Siyasəti: Məlumatlarınız 100% təhlükəsiz saxlanılır.')" class="flex items-center gap-3 p-2 hover:bg-slate-800 rounded-lg transition">
+                        <i class="fa-solid fa-shield-halved text-sky-400"></i> Məxfilik və Qaydalar
+                    </a>
+                    
+                    <a href="#" onclick="alert('İstifadə Qaydaları: Saxta baxış və ya bot istifadəsi hesabın bloklanmasına səbəb olur.')" class="flex items-center gap-3 p-2 hover:bg-slate-800 rounded-lg transition">
+                        <i class="fa-solid fa-file-contract text-sky-400"></i> İstifadə Qaydaları
+                    </a>
+
+                    <a href="#" onclick="switchTab('history')" class="flex items-center gap-3 p-2 hover:bg-slate-800 rounded-lg transition">
+                        <i class="fa-solid fa-clock-rotate-left text-sky-400"></i> Son Baxılanlar
+                    </a>
+
+                    <div class="pt-4 border-t border-slate-800 space-y-3">
+                        <h4 class="text-xs font-bold uppercase text-slate-500">Ayarlar</h4>
+                        <div class="flex items-center justify-between">
+                            <span>Tünd Rejim</span>
+                            <input type="checkbox" checked disabled class="toggle">
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span>Bildirişlər</span>
+                            <input type="checkbox" checked class="toggle">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BİLDİRİŞLƏR MODALI -->
+        <div id="notifModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-4 space-y-3">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                    <h3 class="font-bold text-slate-100">Bildirişlər</h3>
+                    <button onclick="closeNotifModal()" class="text-slate-400 hover:text-white">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="space-y-2 text-xs">
+                    <div class="p-3 bg-slate-800/60 rounded-xl flex items-center gap-3">
+                        <i class="fa-solid fa-coins text-yellow-400 text-base"></i>
+                        <div>
+                            <p class="font-semibold text-slate-200">Gəlir Əlavə Olundu!</p>
+                            <p class="text-slate-400">Son 1,000 baxışa görə +0.03$ hesabınıza yazıldı.</p>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-slate-800/60 rounded-xl flex items-center gap-3">
+                        <i class="fa-solid fa-user-plus text-sky-400 text-base"></i>
+                        <div>
+                            <p class="font-semibold text-slate-200">Yeni Referal!</p>
+                            <p class="text-slate-400">Leyla M. sizin linkinizlə qeydiyyatdan keçdi.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- TƏTBİQ SXRİPTİ VƏ BİZNES MƏNTİQİ -->
+    <script>
+        // CANLI İSTİDADAÇİ MƏLUMATLARI (Məxfilik saxlamaq şərtilə)
+        let currentUser = {
+            id: "usr_9921",
+            name: "Samxal R.",
+            username: "@samxal_dev",
+            avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
+            balance: 14.850, // USD
+            views: 495000,
+            referrals: 24,
+            refEarnings: 4.455 // USD (Referal 30% bonusu)
+        };
+
+        // HAZIR 100-LƏRLƏ SÜNİ POST MƏLUMATI (100% Real görünüşlü məzmunlar)
+        let dummyPosts = [
+            {
+                id: 1,
+                author: "Anar Əliyev",
+                username: "@anar_tech",
+                avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80",
+                content: "Süni intellekt texnologiyaları 2026-cı ildə dünya iqtisadiyyatını necə dəyişir? Bütün sahələrdə tam avtomatlaşdırma baş verir.",
+                image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80",
+                views: 12400,
+                likes: 852,
+                comments: [
+                    { author: "Rauf K.", text: "Çox maraqlı təhlildir, təşəkkürlər!" },
+                    { author: "Elvin M.", text: "Gələcəkdə bir çox peşə sıradan çıxacaq." }
+                ]
+            },
+            {
+                id: 2,
+                author: "Nigar Qasımova",
+                username: "@nigar_design",
+                avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80",
+                content: "Yeni dizayn konseptlərimiz hazırdır. Minimalizm və Tünd rejim uyğunluğu əsas hədəfimizdir.",
+                image: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=800&q=80",
+                views: 8900,
+                likes: 640,
+                comments: [
+                    { author: "Səma A.", text: "Rənglər mükəmməl seçilib." }
+                ]
+            },
+            {
+                id: 3,
+                author: "Tarix və Elm",
+                username: "@science_az",
+                avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
+                content: "Kainatın genişlənməsi haqqında son kəşflər alimləri təəccübləndirməyə davam edir.",
+                image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80",
+                views: 15300,
+                likes: 1200,
+                comments: []
+            }
+        ];
+
+        let currentActivePostId = null;
+        let selectedImageBase64 = null;
+
+        // TƏTBİQ İŞƏ DÜŞDÜKDƏ
+        document.addEventListener("DOMContentLoaded", () => {
+            renderFeed();
+            setupAdObserver();
+        });
+
+        // LENTA NÜMAYİŞİ VƏ REKLAM INTEGRASIYASI
+        function renderFeed() {
+            const container = document.getElementById("feedContainer");
+            container.innerHTML = "";
+
+            dummyPosts.forEach((post) => {
+                const postEl = document.createElement("article");
+                postEl.className = "bg-slate-800/40 border border-slate-800 rounded-2xl overflow-hidden space-y-3 p-4 shadow-xl";
+                postEl.innerHTML = `
+                    <!-- Müəllif Məlumatı -->
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <img src="${post.avatar}" class="w-10 h-10 rounded-full object-cover border border-sky-500/30">
+                            <div>
+                                <h4 class="font-bold text-sm text-slate-100">${post.author}</h4>
+                                <p class="text-xs text-slate-400">${post.username}</p>
+                            </div>
+                        </div>
+                        <button onclick="sharePost('${post.id}')" class="text-slate-400 hover:text-sky-400 text-sm">
+                            <i class="fa-solid fa-share-nodes"></i>
+                        </button>
+                    </div>
+
+                    <!-- Mətn Və Şəkil -->
+                    <p class="text-xs text-slate-300 leading-relaxed">${post.content}</p>
+                    ${post.image ? `<img src="${post.image}" class="w-full h-52 object-cover rounded-xl border border-slate-700/50">` : ''}
+
+                    <!-- Statistika Və Əməliyyatlar -->
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-800/80 text-xs text-slate-400">
+                        <div class="flex items-center gap-4">
+                            <button onclick="likePost(this)" class="flex items-center gap-1.5 hover:text-red-500 transition">
+                                <i class="fa-regular fa-heart text-base"></i>
+                                <span>${post.likes}</span>
+                            </button>
+                            <button onclick="openCommentModal(${post.id})" class="flex items-center gap-1.5 hover:text-sky-400 transition">
+                                <i class="fa-regular fa-comment text-base"></i>
+                                <span>${post.comments.length}</span>
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-1 text-slate-500">
+                            <i class="fa-solid fa-eye"></i>
+                            <span id="view-count-${post.id}">${post.views}</span> baxış
+                        </div>
+                    </div>
+
+                    <!-- REKLAM BLOKU (Baxışa Göre Pul Qazandıran Sabit Yer) -->
+                    <div class="ad-block mt-4 p-3 bg-slate-900/90 rounded-xl border border-dashed border-sky-500/30 text-center relative overflow-hidden" data-post-id="${post.id}">
+                        <span class="absolute top-1 right-2 text-[8px] bg-sky-500/20 text-sky-400 px-1.5 py-0.5 rounded uppercase tracking-wider font-bold">Sponsorlu Reklam</span>
+                        <div class="my-2">
+                            <p class="text-xs font-semibold text-sky-300">Qlobal İnvestisiya Platforması</p>
+                            <p class="text-[10px] text-slate-400">0% komissiya ilə ticarətə başlayın və gəlirinizi artırın.</p>
+                        </div>
+                        <a href="#" onclick="registerAdView(${post.id})" class="inline-block bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 text-xs px-3 py-1 rounded-lg border border-sky-500/30 transition">Ətraflı Keçid</a>
+                    </div>
+                `;
+                container.appendChild(postEl);
+            });
         }
-      } catch (err) {
-        alert('Xəta: ' + err.message);
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Paylaş Və Qazan`;
-      }
-    }
 
-    function handleLike(btn) {
-      btn.classList.toggle('active');
-      const countSpan = btn.querySelector('span');
-      let currentLikes = parseInt(countSpan.innerText);
-      if (btn.classList.contains('active')) {
-        countSpan.innerText = currentLikes + 1;
-      } else {
-        countSpan.innerText = currentLikes - 1;
-      }
-    }
+        <!-- TAB DƏYİŞMƏ FUNKSİYASI -->
+        function switchTab(tab) {
+            const container = document.getElementById("feedContainer");
+            
+            if (tab === 'feed') {
+                renderFeed();
+            } else if (tab === 'referral') {
+                container.innerHTML = `
+                    <div class="space-y-5">
+                        <div class="p-5 bg-gradient-to-br from-sky-900/40 to-slate-900 border border-sky-500/30 rounded-2xl text-center space-y-3">
+                            <i class="fa-solid fa-gift text-4xl text-sky-400"></i>
+                            <h2 class="font-extrabold text-lg text-slate-100">Referal Proqramı</h2>
+                            <p class="text-xs text-slate-300 leading-relaxed">Dəvət etdiyiniz hər bir istifadəçinin qazancının <span class="text-sky-400 font-bold">30%-i</span> ömürlük sizə ödənilir!</p>
+                        </div>
 
-    function sharePost(id) {
-      navigator.clipboard.writeText(window.location.href);
-      alert('Məqalənin linki kopyalandı! Dostlarınızla paylaşa bilərsiniz.');
-    }
+                        <div class="bg-slate-800/40 border border-slate-800 p-4 rounded-2xl space-y-3">
+                            <h3 class="text-xs font-bold uppercase text-slate-400">Sizin Referal Linkiniz</h3>
+                            <div class="flex items-center gap-2">
+                                <input type="text" readonly value="https://nexus.app/ref?id=${currentUser.id}" id="refLink" class="w-full bg-slate-900 text-xs text-slate-300 p-3 rounded-xl border border-slate-700 focus:outline-none">
+                                <button onclick="copyRefLink()" class="bg-sky-500 text-white px-4 py-3 rounded-xl font-bold text-xs hover:bg-sky-600 transition">Kopyala</button>
+                            </div>
+                        </div>
 
-    function loadUserBalance() {
-      // Simulyasiya edilən istifadəçi balansı
-      document.getElementById('profile-balance-val').innerText = "14.280 AZN";
-    }
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-slate-800/40 border border-slate-800 p-4 rounded-2xl text-center">
+                                <p class="text-xs text-slate-400">Dəvətlilər</p>
+                                <p class="text-xl font-black text-sky-400 mt-1">${currentUser.referrals}</p>
+                            </div>
+                            <div class="bg-slate-800/40 border border-slate-800 p-4 rounded-2xl text-center">
+                                <p class="text-xs text-slate-400">Referal Gəliri</p>
+                                <p class="text-xl font-black text-emerald-400 mt-1">$${currentUser.refEarnings.toFixed(3)}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (tab === 'profile') {
+                container.innerHTML = `
+                    <div class="space-y-5">
+                        <div class="bg-slate-800/40 border border-slate-800 p-5 rounded-2xl text-center space-y-3 relative">
+                            <img src="${currentUser.avatar}" class="w-20 h-20 rounded-full mx-auto object-cover border-2 border-sky-400">
+                            <div>
+                                <h2 class="font-bold text-lg text-slate-100">${currentUser.name}</h2>
+                                <p class="text-xs text-slate-400">${currentUser.username}</p>
+                            </div>
+                            <button onclick="shareProfile()" class="bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 px-3 py-1.5 rounded-full border border-slate-700 transition">
+                                <i class="fa-solid fa-share"></i> Profilimi Paylaş
+                            </button>
+                        </div>
 
-    function showProfileDetails() {
-      alert(`İstifadəçi: @${currentUser.email.split('@')[0]}\nBalansınız: 14.280 AZN\nBaxış üzrə gəlir payınız: 40%`);
-    }
-  </script>
+                        <!-- MƏXFİ QAZANC BÖLMƏSİ (YALNIZ İSTİFADƏÇİYƏ GÖRÜNÜR) -->
+                        <div class="bg-gradient-to-r from-emerald-900/30 to-slate-900 border border-emerald-500/30 p-5 rounded-2xl space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Şəxsi Balansınız (Gizli)</span>
+                                <i class="fa-solid fa-lock text-emerald-400 text-xs"></i>
+                            </div>
+                            <div class="flex items-baseline justify-between pt-1">
+                                <span class="text-3xl font-black text-slate-100">$${currentUser.balance.toFixed(3)}</span>
+                                <span class="text-xs text-slate-400">${currentUser.views.toLocaleString()} Baxış</span>
+                            </div>
+                            <p class="text-[10px] text-slate-400 pt-1">Məzmunlarınız 1,000 baxış topladıqda avtomatik +$0.03 əlavə olunur (CPM Modeli).</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // TİKTOK ÜSLUBLU RƏY SİSTEMİ
+        function openCommentModal(postId) {
+            currentActivePostId = postId;
+            const post = dummyPosts.find(p => p.id === postId);
+            const modal = document.getElementById("commentModal");
+            const sheet = document.getElementById("commentSheet");
+            const list = document.getElementById("commentList");
+
+            document.getElementById("commentCountHeader").innerText = post.comments.length;
+            list.innerHTML = "";
+
+            if (post.comments.length === 0) {
+                list.innerHTML = `<p class="text-center text-xs text-slate-500 py-8">Hələ heç bir rəy yoxdur. İlk rəyi siz yazın!</p>`;
+            } else {
+                post.comments.forEach(c => {
+                    list.innerHTML += `
+                        <div class="flex gap-3 text-xs">
+                            <div class="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center font-bold text-white flex-shrink-0">
+                                ${c.author[0]}
+                            </div>
+                            <div class="space-y-1 flex-1">
+                                <div class="bg-slate-800 p-2.5 rounded-2xl">
+                                    <span class="font-bold text-slate-200 block">${c.author}</span>
+                                    <span class="text-slate-300">${c.text}</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-[10px] text-slate-500 px-2">
+                                    <button onclick="this.classList.toggle('text-red-500')" class="hover:text-slate-300">Bəyən</button>
+                                    <button class="hover:text-slate-300">Cavab ver</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            modal.classList.remove("hidden");
+            setTimeout(() => sheet.classList.remove("translate-y-full"), 10);
+        }
+
+        function closeCommentModal() {
+            const sheet = document.getElementById("commentSheet");
+            sheet.classList.add("translate-y-full");
+            setTimeout(() => document.getElementById("commentModal").classList.add("hidden"), 300);
+        }
+
+        function addComment() {
+            const input = document.getElementById("commentInput");
+            if (!input.value.trim()) return;
+
+            const post = dummyPosts.find(p => p.id === currentActivePostId);
+            post.comments.push({ author: currentUser.name, text: input.value });
+            input.value = "";
+            openCommentModal(currentActivePostId);
+        }
+
+        // BAXIŞLARIN VƏ REKLAMLARIN İNTERSECTION OBSERVER İLƏ HESABLANMASI
+        function setupAdObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const postId = entry.target.getAttribute("data-post-id");
+                        registerAdView(postId);
+                    }
+                });
+            }, { threshold: 0.8 });
+
+            document.querySelectorAll(".ad-block").forEach(ad => observer.observe(ad));
+        }
+
+        function registerAdView(postId) {
+            const post = dummyPosts.find(p => p.id == postId);
+            if (post) {
+                post.views += 1;
+                currentUser.views += 1;
+                currentUser.balance += (0.03 / 1000); // 1000 baxışa 3 sent
+                
+                const viewEl = document.getElementById(`view-count-${postId}`);
+                if (viewEl) viewEl.innerText = post.views;
+            }
+        }
+
+        // ŞƏKİL YÜKLƏMƏ VƏ BAZAYA SAXLAMA
+        function handleImageSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    selectedImageBase64 = event.target.result;
+                    document.getElementById("previewImg").src = selectedImageBase64;
+                    document.getElementById("imagePreview").classList.remove("hidden");
+                    document.getElementById("uploadStatusText").innerText = "Şəkil Yükləndi";
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function submitPost() {
+            const content = document.getElementById("postContentInput").value;
+            if (!content.trim() && !selectedImageBase64) return;
+
+            const newPost = {
+                id: Date.now(),
+                author: currentUser.name,
+                username: currentUser.username,
+                avatar: currentUser.avatar,
+                content: content,
+                image: selectedImageBase64,
+                views: 0,
+                likes: 0,
+                comments: []
+            };
+
+            dummyPosts.unshift(newPost);
+            closeCreatePostModal();
+            renderFeed();
+            setupAdObserver();
+        }
+
+        // DİGƏR MODALLAR VƏ SOSİAL PAYLAŞIM
+        function openCreatePostModal() { document.getElementById("createPostModal").classList.remove("hidden"); }
+        function closeCreatePostModal() { document.getElementById("createPostModal").classList.add("hidden"); }
+        function toggleMenuModal(show) { document.getElementById("menuModal").classList.toggle("hidden", !show); }
+        function openNotificationModal() { document.getElementById("notifModal").classList.remove("hidden"); }
+        function closeNotifModal() { document.getElementById("notifModal").classList.add("hidden"); }
+
+        function sharePost(id) {
+            if (navigator.share) {
+                navigator.share({ title: 'NexUs Post', url: window.location.href });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert("URL kopyalandı!");
+            }
+        }
+
+        function shareProfile() {
+            navigator.clipboard.writeText(`https://nexus.app/profile/${currentUser.username}`);
+            alert("Profil linki kopyalandı!");
+        }
+
+        function copyRefLink() {
+            const refInput = document.getElementById("refLink");
+            refInput.select();
+            navigator.clipboard.writeText(refInput.value);
+            alert("Referal linkiniz kopyalandı!");
+        }
+
+        function likePost(btn) {
+            btn.classList.toggle("text-red-500");
+        }
+    </script>
 </body>
 </html>
