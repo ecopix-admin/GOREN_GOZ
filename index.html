@@ -1,108 +1,320 @@
 <!DOCTYPE html>
 <html lang="az">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpenAuto Search - Mərkəzsiz Avto Axtarış</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #0f172a; color: #f8fafc; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        
-        .header { margin-top: 30px; text-align: center; margin-bottom: 25px; }
-        .header h1 { font-size: 36px; color: #38bdf8; font-weight: bold; }
-        .header p { color: #94a3b8; font-size: 14px; margin-top: 5px; }
-        
-        .search-container { width: 100%; max-width: 650px; display: flex; gap: 10px; margin-bottom: 25px; }
-        .search-container input { flex: 1; padding: 14px 20px; font-size: 16px; border: 1px solid #334155; background: #1e293b; color: #fff; border-radius: 12px; outline: none; }
-        .search-container button { padding: 14px 24px; font-size: 16px; border: none; background: #0284c7; color: white; border-radius: 12px; cursor: pointer; font-weight: bold; }
-        .search-container button:hover { background: #0369a1; }
-
-        .results-container { width: 100%; max-width: 650px; }
-        
-        .result-card { background: #1e293b; padding: 18px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #334155; }
-        .result-title { font-size: 18px; color: #38bdf8; text-decoration: none; font-weight: bold; display: block; margin-bottom: 5px; }
-        .result-title:hover { text-decoration: underline; }
-        .result-url { font-size: 12px; color: #4ade80; margin-bottom: 8px; word-break: break-all; }
-        .result-snippet { font-size: 14px; color: #cbd5e1; line-height: 1.5; }
-        .tag { display: inline-block; background: #0369a1; color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 4px; margin-top: 10px; margin-right: 5px; }
-        
-        .no-results { text-align: center; color: #94a3b8; margin-top: 20px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sosial Bloq & Monetizasiya Platforması</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --bg: #f3f4f6;
+      --card-bg: #ffffff;
+      --text: #1f2937;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: var(--card-bg);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .container {
+      max-width: 700px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    /* Profil Bölməsi */
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .profile-avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #ccc;
+    }
+    .balance-badge {
+      background: #10b981;
+      color: white;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    /* Post Yaratmaq */
+    .create-post textarea, .create-post input {
+      width: 100%;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 0.8rem;
+      margin-bottom: 0.8rem;
+      box-sizing: border-box;
+    }
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button:hover { opacity: 0.9; }
+    /* Post Lenti */
+    .post-header {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 1rem;
+    }
+    .post-header img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+    .post-img {
+      width: 100%;
+      max-height: 450px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+    .post-stats {
+      display: flex;
+      justify-content: space-between;
+      color: #6b7280;
+      font-size: 0.85rem;
+      border-bottom: 1px solid #f3f4f6;
+      padding-bottom: 0.5rem;
+      margin-bottom: 0.8rem;
+    }
+    .post-actions {
+      display: flex;
+      gap: 1rem;
+    }
+    .post-actions button {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid #e5e7eb;
+    }
+    .comments-section {
+      margin-top: 1rem;
+      background: #f9fafb;
+      padding: 0.8rem;
+      border-radius: 8px;
+    }
+    .comment {
+      font-size: 0.9rem;
+      margin-bottom: 0.4rem;
+    }
+  </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>🚗 OpenAuto Search</h1>
-        <p>Mərkəzsiz Ehtiyat Hissəsi və Usta Axtarış Sistemi</p>
+  <header>
+    <h2>Sosial Bloq</h2>
+    <div id="user-info">Profil Yüklənir...</div>
+  </header>
+
+  <div class="container">
+    
+    <!-- Profil Paneli -->
+    <div class="card" id="profile-card">
+      <div class="profile-header">
+        <img src="https://via.placeholder.com/70" id="user-avatar" class="profile-avatar" alt="Avatar">
+        <div>
+          <h3 id="user-name" style="margin:0;">İstifadəçi Adı</h3>
+          <p id="user-status" style="margin: 0.2rem 0; color: #6b7280;">Status qeyd edilməyib</p>
+          <span class="balance-badge">Balans: <span id="user-balance">0.00</span> AZN</span>
+        </div>
+      </div>
+      <hr style="margin: 1rem 0; border: none; border-top: 1px solid #eee;">
+      <h4>Profili Redaktə Et</h4>
+      <input type="text" id="input-status" placeholder="Yeni status yazın..." style="width: 70%; padding: 0.4rem;">
+      <button onclick="updateStatus()">Yenilə</button>
     </div>
 
-    <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Ehtiyat hissəsi, zapçast və ya usta axtarın..." onkeyup="if(event.key==='Enter') searchAuto()">
-        <button onclick="searchAuto()">Axtar</button>
+    <!-- Post Paylaşma Formu -->
+    <div class="card create-post">
+      <h3>Yeni Məqalə / Hekayə Paylaş</h3>
+      <input type="text" id="post-image-url" placeholder="Şəkil URL-i daxil edin...">
+      <textarea id="post-text" rows="4" placeholder="Şəklin altına məqalənizi və ya hekayənizi yazın..."></textarea>
+      <button onclick="createPost()">Paylaş</button>
     </div>
 
-    <div class="results-container" id="resultsContainer"></div>
+    <!-- Məqalələr Lenti -->
+    <div id="posts-feed">
+      <!-- Postlar JavaScript ilə bura əlavə olunacaq -->
+    </div>
 
-    <script>
-        // Mərkəzsiz Avto Bazası (Bot tərəfindən toplanan və ya istifadəçilərin paylaşılan indeksi)
-        const autoDatabase = [
-            {
-                title: "BMW / Mercedes Mühərrik və Korobka Ustası - Əhməd Usta",
-                url: "https://example.com/ustalar/ahmed-bmw",
-                snippet: "Mühərriklərin sıfırdan yığılması, diaqnostika və yağ sızmalarının aradan qaldırılması. Ünvan: Babək prospekti.",
-                type: "Usta Xidməti",
-                keywords: ["bmw", "mercedes", "mühərrik", "motor", "korobka", "usta", "diaqnostika"]
-            },
-            {
-                title: "Toyota / Hyundai Orijinal Ehtiyat Hissələri (Zapçast)",
-                url: "https://example.com/zapcast/toyota-hyundai",
-                snippet: "Orijinal və firma nakladkaları, amartizatorlar, şamlar (sveça) və filtrlər. Çatdırılma var.",
-                type: "Ehtiyat Hissəsi",
-                keywords: ["toyota", "hyundai", "nakladka", "amartizator", "sveca", "filtr", "zapcast", "hissə"]
-            },
-            {
-                title: "Avto Elektrik və Kompüter Diaqnostikası",
-                url: "https://example.com/elektrit-yasamal",
-                snippet: "Akkumulyator problemləri, farsunka yuyulması, beyin yazılması və çeçidin söndürülməsi.",
-                type: "Elektrik",
-                keywords: ["elektrik", "akkumulyator", "farsunka", "beyin", "diaqnostika", "usta"]
-            }
-        ];
+  </div>
 
-        function searchAuto() {
-            const query = document.getElementById('searchInput').value.toLowerCase().trim();
-            const container = document.getElementById('resultsContainer');
-            container.innerHTML = '';
+  <script>
+    // CPM Hesablaması: 1000 baxış = 10 AZN Ümumi Reklam Qazancı
+    // Müəllifin Payı: %40 = 1000 baxışa 4.00 AZN (Hər 1 baxış = 0.004 AZN)
+    const EARNING_PER_VIEW = 0.004; 
 
-            if (query === '') {
-                container.innerHTML = '<p class="no-results">Zəhmət olmasa axtarış sözü daxil edin.</p>';
-                return;
-            }
+    // İstifadəçi Məlumatları (Simulyasiya)
+    let currentUser = {
+      name: "Əli Məmmədov",
+      status: "Yaradıcılıq tərəqqidir 🚀",
+      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100",
+      balance: 12.40
+    };
 
-            // Axtarış alqoritmi: Açar sözlərə və mətnə görə uyğunluğu tapır
-            const filtered = autoDatabase.filter(item => {
-                return item.keywords.some(kw => kw.includes(query)) ||
-                       item.title.toLowerCase().includes(query) ||
-                       item.snippet.toLowerCase().includes(query);
-            });
+    // Nümunə Postlar
+    let posts = [
+      {
+        id: 1,
+        author: "Əli Məmmədov",
+        avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100",
+        image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600",
+        text: "Texnologiya və gələcək: Sünil intellektin həyatımızdakı rolu hər keçən gün artır. Bu məqaləmdə AI-ın biznesə təsirlərini təhlil edirik...",
+        views: 1250,
+        likes: 42,
+        comments: ["Əla məqalədir!", "Çox faydalı məlumatlar."]
+      }
+    ];
 
-            if (filtered.length === 0) {
-                container.innerHTML = '<p class="no-results">Bu sorğu üzrə usta və ya ehtiyat hissəsi tapılmadı.</p>';
-                return;
-            }
+    function renderProfile() {
+      document.getElementById('user-name').innerText = currentUser.name;
+      document.getElementById('user-status').innerText = currentUser.status;
+      document.getElementById('user-avatar').src = currentUser.avatar;
+      document.getElementById('user-balance').innerText = currentUser.balance.toFixed(2);
+      document.getElementById('user-info').innerText = `@${currentUser.name.toLowerCase().replace(' ', '')}`;
+    }
 
-            filtered.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'result-card';
-                card.innerHTML = `
-                    <a href="${item.url}" target="_blank" class="result-title">${item.title}</a>
-                    <div class="result-url">${item.url}</div>
-                    <div class="result-snippet">${item.snippet}</div>
-                    <span class="tag">${item.type}</span>
-                `;
-                container.appendChild(card);
-            });
+    function updateStatus() {
+      const newStatus = document.getElementById('input-status').value;
+      if(newStatus) {
+        currentUser.status = newStatus;
+        renderProfile();
+        document.getElementById('input-status').value = '';
+      }
+    }
+
+    function renderPosts() {
+      const feed = document.getElementById('posts-feed');
+      feed.innerHTML = '';
+
+      posts.forEach((post, index) => {
+        // Post baxış sayını və qazancı simulyasiya edirik
+        const authorEarning = (post.views * EARNING_PER_VIEW).toFixed(2);
+
+        const postEl = document.createElement('div');
+        postEl.className = 'card';
+        postEl.innerHTML = `
+          <div class="post-header">
+            <img src="${post.avatar}" alt="Avatar">
+            <div>
+              <strong>${post.author}</strong>
+            </div>
+          </div>
+          <img src="${post.image}" class="post-img" alt="Post Şəkli">
+          <p>${post.text}</p>
+          
+          <div class="post-stats">
+            <span>👁️ ${post.views} Baxış (Qazanc: ${authorEarning} AZN)</span>
+            <span>❤️ ${post.likes} Bəyənmə</span>
+          </div>
+
+          <div class="post-actions">
+            <button onclick="likePost(${index})">❤️ Bəyən</button>
+            <button onclick="sharePost(${post.id})">🔗 Paylaş</button>
+          </div>
+
+          <div class="comments-section">
+            <h5>Rəylər (${post.comments.length})</h5>
+            <div id="comments-list-${index}">
+              ${post.comments.map(c => `<div class="comment">💬 ${c}</div>`).join('')}
+            </div>
+            <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem;">
+              <input type="text" id="comment-input-${index}" placeholder="Rəy yazın..." style="flex:1; padding:0.4rem; border-radius:4px; border:1px solid #ccc;">
+              <button onclick="addComment(${index})">Göndər</button>
+            </div>
+          </div>
+        `;
+        feed.appendChild(postEl);
+
+        // Hər dəfə post ekrana çıxanda baxış sayını 1 artırırıq (Baxış Monetizasiyası)
+        post.views += 1;
+        if(post.author === currentUser.name) {
+          currentUser.balance += EARNING_PER_VIEW;
         }
-    </script>
+      });
+      
+      // Balansı yenilə
+      document.getElementById('user-balance').innerText = currentUser.balance.toFixed(2);
+    }
+
+    function createPost() {
+      const imageUrl = document.getElementById('post-image-url').value;
+      const text = document.getElementById('post-text').value;
+
+      if(!imageUrl || !text) {
+        alert('Xahiş olunur şəkil URL-i və məqalə mətni daxil edin!');
+        return;
+      }
+
+      const newPost = {
+        id: posts.length + 1,
+        author: currentUser.name,
+        avatar: currentUser.avatar,
+        image: imageUrl,
+        text: text,
+        views: 0,
+        likes: 0,
+        comments: []
+      };
+
+      posts.unshift(newPost);
+      document.getElementById('post-image-url').value = '';
+      document.getElementById('post-text').value = '';
+      renderPosts();
+    }
+
+    function likePost(index) {
+      posts[index].likes += 1;
+      renderPosts();
+    }
+
+    function addComment(index) {
+      const input = document.getElementById(`comment-input-${index}`);
+      if(input.value) {
+        posts[index].comments.push(input.value);
+        renderPosts();
+      }
+    }
+
+    function sharePost(id) {
+      navigator.clipboard.writeText(window.location.href + `#post-${id}`);
+      alert('Postun linki kopyalandı!');
+    }
+
+    // İlk yüklənmə
+    renderProfile();
+    renderPosts();
+  </script>
 </body>
 </html>
