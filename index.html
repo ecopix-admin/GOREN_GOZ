@@ -1,747 +1,1196 @@
 <!DOCTYPE html>
-<html lang="az" class="dark">
+<html lang="az" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexUs Ultra - Dünya Səviyyəli Mərkəzsizləşdirilmiş Sosial Platforma</title>
-    <!-- Tailwind CSS Engine -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            500: '#0284c7',
-                            600: '#0369a1',
-                            700: '#075985',
-                            900: '#0c4a6e',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- FontAwesome Icon Suite -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProSocial Network & Monetization Platform</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-        
+        /* ==========================================================================
+           1. CORE CSS VARIABLES & THEME DEFINITIONS
+           ========================================================================== */
+        :root[data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-color: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-light: rgba(99, 102, 241, 0.15);
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --border-color: #334155;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+            --glass-bg: rgba(30, 41, 59, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.05);
+        }
+
+        :root[data-theme="light"] {
+            --bg-primary: #f1f5f9;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --accent-color: #4f46e5;
+            --accent-hover: #4338ca;
+            --accent-light: rgba(79, 70, 229, 0.1);
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --danger-color: #dc2626;
+            --border-color: #cbd5e1;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(0, 0, 0, 0.05);
+        }
+
         * {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
         }
 
         body {
-            background-color: #030712;
-            color: #f9fafb;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
             overflow-x: hidden;
         }
 
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        .glass-header {
-            background: rgba(3, 7, 18, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid rgba(31, 41, 55, 0.6);
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
         }
 
-        .glass-card {
-            background: rgba(17, 24, 39, 0.6);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(55, 65, 81, 0.4);
+        /* ==========================================================================
+           2. HEADER & NAVIGATION
+           ========================================================================== */
+        .app-header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
         }
 
-        .glass-nav {
-            background: rgba(3, 7, 18, 0.9);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(31, 41, 55, 0.8);
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
         }
 
-        .shimmer-bg {
-            background: linear-gradient(90deg, rgba(31, 41, 55, 0.2) 0%, rgba(55, 65, 81, 0.4) 50%, rgba(31, 41, 55, 0.2) 100%);
-            background-size: 200% 100%;
-            animation: shimmer 2s infinite;
+        .logo-brand {
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
         }
 
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
+        .search-wrapper {
+            position: relative;
+            width: 280px;
         }
 
-        .sheet-transition {
-            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+        .search-input {
+            width: 100%;
+            padding: 0.6rem 1rem 0.6rem 2.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            outline: none;
         }
 
-        .pulse-glow {
-            box-shadow: 0 0 20px rgba(2, 132, 199, 0.35);
+        .search-input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .icon-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        .icon-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .badge-count {
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            background: var(--danger-color);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+            border: 2px solid var(--bg-secondary);
+        }
+
+        .user-avatar-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent-color);
+            cursor: pointer;
+        }
+
+        /* ==========================================================================
+           3. MAIN LAYOUT ARCHITECTURE
+           ========================================================================== */
+        .layout-wrapper {
+            max-width: 1350px;
+            margin: 0 auto;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 280px 1fr 340px;
+            gap: 1.5rem;
+            padding: 1.5rem 1rem;
+            flex: 1;
+        }
+
+        /* ==========================================================================
+           4. SIDEBAR COMPONENTS (LEFT & RIGHT)
+           ========================================================================== */
+        .sidebar-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .profile-summary {
+            text-align: center;
+            position: relative;
+        }
+
+        .profile-banner {
+            height: 70px;
+            background: linear-gradient(135deg, var(--accent-color), #a855f7);
+            border-radius: 12px 12px 0 0;
+            margin: -1.25rem -1.25rem 2.5rem -1.25rem;
+        }
+
+        .profile-avatar-large {
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            border: 4px solid var(--bg-secondary);
+            position: absolute;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            object-fit: cover;
+        }
+
+        .user-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .user-handle {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+
+        .wallet-widget {
+            background: var(--accent-light);
+            border: 1px border var(--accent-color);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .wallet-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--accent-color);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .wallet-balance {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin: 0.3rem 0;
+        }
+
+        .monetization-info {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .nav-menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+
+        .nav-item a:hover, .nav-item.active a {
+            background: var(--accent-light);
+            color: var(--accent-color);
+        }
+
+        /* ==========================================================================
+           5. MAIN FEED & STORIES COMPONENTS
+           ========================================================================== */
+        .feed-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Stories Wrapper */
+        .stories-wrapper {
+            display: flex;
+            gap: 0.8rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+
+        .story-card {
+            min-width: 110px;
+            height: 160px;
+            border-radius: 14px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .story-card img.story-bg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .story-card:hover img.story-bg {
+            transform: scale(1.08);
+        }
+
+        .story-card .story-avatar {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-color);
+        }
+
+        .story-card .story-author {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .add-story {
+            background: var(--bg-secondary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            border: 2px dashed var(--border-color);
+        }
+
+        .add-story-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+
+        /* Post Publisher Box */
+        .create-post-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.25rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .create-post-header {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .post-input {
+            width: 100%;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            color: var(--text-primary);
+            resize: none;
+            height: 80px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .post-input:focus {
+            border-color: var(--accent-color);
+        }
+
+        .create-post-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid var(--border-color);
+            padding-top: 0.8rem;
+        }
+
+        .attach-options {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .attach-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 0.5rem 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .attach-btn:hover {
+            background: var(--bg-tertiary);
+            color: var(--accent-color);
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.4rem;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        /* Post Card Rendering */
+        .post-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.25rem;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .author-info {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .author-details .author-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .author-details .post-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Monetization & Analytics Bar on Post */
+        .monetization-bar {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px dashed var(--success-color);
+            border-radius: 10px;
+            padding: 0.6rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.82rem;
+        }
+
+        .monetization-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        .post-metrics-badges {
+            display: flex;
+            gap: 0.6rem;
+        }
+
+        .metric-badge {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .post-content {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: var(--text-primary);
+        }
+
+        .post-media {
+            border-radius: 12px;
+            overflow: hidden;
+            max-height: 420px;
+            width: 100%;
+        }
+
+        .post-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .post-actions-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.5rem 0;
+        }
+
+        .action-button {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .action-button:hover {
+            background: var(--bg-tertiary);
+            color: var(--accent-color);
+        }
+
+        .action-button.liked {
+            color: var(--danger-color);
+        }
+
+        /* Comments Engine */
+        .comments-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            padding-top: 0.5rem;
+        }
+
+        .comment-item {
+            display: flex;
+            gap: 0.8rem;
+            font-size: 0.85rem;
+        }
+
+        .comment-bubble {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.6rem 0.9rem;
+            flex: 1;
+        }
+
+        .comment-user {
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .comment-input-group {
+            display: flex;
+            gap: 0.6rem;
+            margin-top: 0.5rem;
+        }
+
+        .comment-input {
+            flex: 1;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            color: var(--text-primary);
+            outline: none;
+            font-size: 0.85rem;
+        }
+
+        /* ==========================================================================
+           6. RIGHT SIDEBAR - TRENDS & RECOMMENDATIONS
+           ========================================================================== */
+        .widget-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .widget-title {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .trend-item {
+            display: flex;
+            flex-direction: column;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .trend-item:last-child {
+            border-bottom: none;
+        }
+
+        .trend-category {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .trend-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin: 0.2rem 0;
+        }
+
+        .trend-payout {
+            font-size: 0.75rem;
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        .user-follow-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-outline:hover {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        /* ==========================================================================
+           7. RESPONSIVE DESIGN & MOBILE BAR
+           ========================================================================== */
+        .mobile-bottom-bar {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid var(--border-color);
+            z-index: 1000;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        @media (max-width: 1024px) {
+            .layout-wrapper {
+                grid-template-columns: 240px 1fr;
+            }
+            .right-sidebar {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .layout-wrapper {
+                grid-template-columns: 1fr;
+                padding-bottom: 70px;
+            }
+            .left-sidebar {
+                display: none;
+            }
+            .search-wrapper {
+                display: none;
+            }
+            .mobile-bottom-bar {
+                display: flex;
+            }
         }
     </style>
 </head>
-<body class="min-h-screen flex justify-center selection:bg-sky-500 selection:text-white antialiased">
+<body>
 
-    <!-- Əsas Mobil Və Veb Bütöv Konteyneri -->
-    <div class="w-full max-w-md bg-gray-950 min-h-screen flex flex-col justify-between relative shadow-2xl border-x border-gray-800/60">
-
-        <!-- YUXARI NƏFİS SABİT BAŞLIQ (TOP HEADER) -->
-        <header class="sticky top-0 z-40 glass-header px-4 py-3.5 flex items-center justify-between">
-            <div class="flex items-center gap-2.5 cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
-                    <i class="fa-solid fa-bolt text-white text-base"></i>
-                </div>
-                <div>
-                    <h1 class="font-black text-lg tracking-wider bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-400 bg-clip-text text-transparent leading-none">
-                        NexUs
-                    </h1>
-                    <span class="text-[9px] text-gray-400 font-semibold tracking-widest uppercase">Decentralized V2</span>
-                </div>
+    <!-- ==========================================================================
+       HEADER / NAVIGATION BAR
+       ========================================================================== -->
+    <header class="app-header">
+        <div class="header-left">
+            <div class="logo-brand" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                ProSocial
             </div>
-
-            <div class="flex items-center gap-3.5">
-                <button onclick="openSearchModal()" class="w-9 h-9 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-300 hover:text-white hover:border-gray-700 transition">
-                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
-                </button>
-                <button onclick="openNotifModal()" class="relative w-9 h-9 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-300 hover:text-white hover:border-gray-700 transition">
-                    <i class="fa-regular fa-bell text-sm"></i>
-                    <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-sky-500 rounded-full border-2 border-gray-950 animate-ping"></span>
-                    <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-sky-500 rounded-full border-2 border-gray-950"></span>
-                </button>
-                <button onclick="toggleSideMenu(true)" class="w-9 h-9 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-300 hover:text-white hover:border-gray-700 transition">
-                    <i class="fa-solid fa-bars-staggered text-xs"></i>
-                </button>
-            </div>
-        </header>
-
-        <!-- AXTARIŞ MODALI -->
-        <div id="searchModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden p-4 flex flex-col">
-            <div class="flex items-center gap-3 border-b border-gray-800 pb-3">
-                <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
-                <input type="text" id="searchInput" oninput="filterPosts(this.value)" placeholder="Məqalə, xəbər və ya profil axtarın..." class="flex-1 bg-transparent text-sm text-white focus:outline-none placeholder-gray-500">
-                <button onclick="closeSearchModal()" class="text-xs text-sky-400 font-bold uppercase tracking-wider">Bağla</button>
-            </div>
-            <div id="searchResults" class="flex-1 overflow-y-auto pt-4 space-y-3 no-scrollbar">
-                <p class="text-xs text-gray-500 text-center py-6">Axtarış üçün söz daxil edin...</p>
+            <div class="search-wrapper">
+                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" class="search-input" placeholder="Məqalə, həştəq və ya istifadəçi axtar...">
             </div>
         </div>
 
-        <!-- ƏSAS AKIŞ LENTASI (INFINITE FEED) -->
-        <main id="appFeed" class="flex-1 overflow-y-auto p-3.5 space-y-5 pb-28 no-scrollbar">
-            <!-- Məzmun dinamik JavaScript tərəfindən doldurulacaq -->
+        <div class="header-actions">
+            <button class="icon-btn" id="themeToggle" title="Temanı Dəyiş">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+            <button class="icon-btn" title="Bildirişlər">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                <span class="badge-count">3</span>
+            </button>
+            <button class="icon-btn" title="Mesajlar">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span class="badge-count">5</span>
+            </button>
+            <img src="https://picsum.photos/id/64/100/100" alt="Profil" class="user-avatar-small" id="userProfileBtn">
+        </div>
+    </header>
+
+    <!-- ==========================================================================
+       MAIN LAYOUT CONTAINER
+       ========================================================================== -->
+    <div class="layout-wrapper">
+
+        <!-- LEFT SIDEBAR -->
+        <aside class="left-sidebar">
+            <div class="sidebar-card profile-summary">
+                <div class="profile-banner"></div>
+                <img src="https://picsum.photos/id/64/100/100" alt="Avatar" class="profile-avatar-large">
+                <div class="user-name">Şamxal Qasımov</div>
+                <div class="user-handle">@samxal_dev</div>
+
+                <div class="wallet-widget">
+                    <div class="wallet-title">Məqalə Qazanc Balansı</div>
+                    <div class="wallet-balance" id="userBalance">$142.80</div>
+                    <div class="monetization-info">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                        1,000 baxışa 40% gəlir payı
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-card">
+                <ul class="nav-menu">
+                    <li class="nav-item active">
+                        <a href="#">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                            Əsas Akış (Feed)
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+                            Məqalələrim
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            Maliyyə & Çıxarış
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+                            Analitika
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                            Tənzimləmələr
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- MAIN FEED AREA -->
+        <main class="feed-container">
+
+            <!-- Stories Carousel -->
+            <div class="stories-wrapper">
+                <div class="story-card add-story" onclick="document.getElementById('storyFileInput').click()">
+                    <input type="file" id="storyFileInput" style="display:none;" accept="image/*">
+                    <div class="add-story-icon">+</div>
+                    <span style="font-size:0.75rem; font-weight:600;">Hekayə Əlavə Et</span>
+                </div>
+                <div class="story-card">
+                    <img src="https://picsum.photos/id/1015/200/300" class="story-bg" alt="Story">
+                    <img src="https://picsum.photos/id/1027/100/100" class="story-avatar" alt="Avatar">
+                    <span class="story-author">Aysel M.</span>
+                </div>
+                <div class="story-card">
+                    <img src="https://picsum.photos/id/1035/200/300" class="story-bg" alt="Story">
+                    <img src="https://picsum.photos/id/1005/100/100" class="story-avatar" alt="Avatar">
+                    <span class="story-author">Elvin K.</span>
+                </div>
+                <div class="story-card">
+                    <img src="https://picsum.photos/id/1050/200/300" class="story-bg" alt="Story">
+                    <img src="https://picsum.photos/id/1062/100/100" class="story-avatar" alt="Avatar">
+                    <span class="story-author">Leyla Ə.</span>
+                </div>
+                <div class="story-card">
+                    <img src="https://picsum.photos/id/1069/200/300" class="story-bg" alt="Story">
+                    <img src="https://picsum.photos/id/1074/100/100" class="story-avatar" alt="Avatar">
+                    <span class="story-author">Rəşad S.</span>
+                </div>
+            </div>
+
+            <!-- Create Post Card -->
+            <div class="create-post-card">
+                <div class="create-post-header">
+                    <img src="https://picsum.photos/id/64/100/100" alt="Avatar" class="user-avatar-small">
+                    <textarea class="post-input" id="newPostContent" placeholder="Yeni məqalə və ya fikirinizi bölüşün... (40% qazanc sistemi aktivdir)"></textarea>
+                </div>
+                <div class="create-post-actions">
+                    <div class="attach-options">
+                        <button class="attach-btn" onclick="document.getElementById('postImageInput').click()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            Şəkil
+                        </button>
+                        <input type="file" id="postImageInput" style="display:none;" accept="image/*">
+                        <button class="attach-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            Məqalə
+                        </button>
+                    </div>
+                    <button class="btn-primary" id="publishPostBtn">Paylaş</button>
+                </div>
+            </div>
+
+            <!-- Feed Dynamic Content Container -->
+            <div id="feedPostsContainer" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <!-- JavaScript ilə dinamik olaraq dolacaq -->
+            </div>
+
         </main>
 
-        <!-- AŞAĞI NAVİQASİYA PANOLU (BOTTOM TOOLBAR) -->
-        <nav class="fixed bottom-0 w-full max-w-md glass-nav px-5 py-2.5 flex justify-between items-center z-40">
-            <button onclick="switchTab('feed')" id="tabFeed" class="flex flex-col items-center gap-1 text-sky-400 transition">
-                <i class="fa-solid fa-square-rss text-lg"></i>
-                <span class="text-[10px] font-bold">Lenta</span>
-            </button>
-            <button onclick="switchTab('explore')" id="tabExplore" class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-200 transition">
-                <i class="fa-solid fa-compass text-lg"></i>
-                <span class="text-[10px] font-bold">Kəşf Et</span>
-            </button>
-            <button onclick="openCreateModal()" class="relative -top-3 w-13 h-13 rounded-2xl bg-gradient-to-tr from-sky-500 via-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-xl pulse-glow transform active:scale-90 transition">
-                <i class="fa-solid fa-plus text-xl"></i>
-            </button>
-            <button onclick="switchTab('referral')" id="tabRef" class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-200 transition">
-                <i class="fa-solid fa-users text-lg"></i>
-                <span class="text-[10px] font-bold">Referal</span>
-            </button>
-            <button onclick="switchTab('profile')" id="tabProfile" class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-200 transition">
-                <i class="fa-solid fa-circle-user text-lg"></i>
-                <span class="text-[10px] font-bold">Profil</span>
-            </button>
-        </nav>
-
-        <!-- TİKTOK ÜSLUBLU RƏYLƏR PANELİ (BOTTOM SHEET) -->
-        <div id="commentModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 hidden flex flex-col justify-end">
-            <div id="commentSheet" class="bg-gray-900 border-t border-gray-800 rounded-t-3xl h-[82vh] flex flex-col w-full max-w-md mx-auto sheet-transition translate-y-full">
-                
-                <!-- Sheet Header -->
-                <div class="p-4 border-b border-gray-800 flex items-center justify-between relative">
-                    <div class="w-10 h-1 bg-gray-700 rounded-full absolute left-1/2 -translate-x-1/2 top-2"></div>
-                    <div class="pt-2 flex items-center gap-2">
-                        <h3 class="font-bold text-sm text-gray-100"><span id="activeCommentCount">0</span> Rəy</h3>
-                        <span class="text-[10px] bg-gray-800 text-gray-400 px-2 py-0.5 rounded-full">Canlı Müzakirə</span>
-                    </div>
-                    <button onclick="closeCommentModal()" class="w-7 h-7 rounded-full bg-gray-800 text-gray-400 flex items-center justify-center hover:text-white">
-                        <i class="fa-solid fa-xmark text-xs"></i>
-                    </button>
+        <!-- RIGHT SIDEBAR -->
+        <aside class="right-sidebar">
+            <!-- Monetization Leaderboard Widget -->
+            <div class="sidebar-card">
+                <div class="widget-header">
+                    <div class="widget-title">🔥 Ən Çox Qazandıran Məqalələr</div>
                 </div>
-
-                <!-- Rəylər Siyahısı (Flow) -->
-                <div id="commentList" class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar">
-                    <!-- Dinamik rəylər -->
+                <div class="trend-item">
+                    <span class="trend-category">Proqramlaşdırma • 45.2k Baxış</span>
+                    <div class="trend-title">JavaScript ES2026-da Yeni İnkılabi Xüsusiyyətlər</div>
+                    <span class="trend-payout">Məqalə Qazancı: $180.80</span>
                 </div>
-
-                <!-- Rəy Göndərmə Paneli -->
-                <div class="p-3 bg-gray-950 border-t border-gray-800 flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-full bg-sky-600/30 border border-sky-500/40 flex items-center justify-center text-sky-400 font-bold text-xs">
-                        M
-                    </div>
-                    <input type="text" id="commentInput" placeholder="Cavabınızı yazın..." class="flex-1 bg-gray-900 text-xs text-white px-4 py-2.5 rounded-full border border-gray-800 focus:outline-none focus:border-sky-500">
-                    <button onclick="submitComment()" class="w-9 h-9 rounded-full bg-sky-500 text-white flex items-center justify-center hover:bg-sky-600 transition shadow-md shadow-sky-500/20">
-                        <i class="fa-solid fa-paper-plane text-xs"></i>
-                    </button>
+                <div class="trend-item">
+                    <span class="trend-category">Startap • 28.9k Baxış</span>
+                    <div class="trend-title">Süni İntellekt Dəstəkli Sosial Şəbəkə Monemizasiyası</div>
+                    <span class="trend-payout">Məqalə Qazancı: $115.60</span>
+                </div>
+                <div class="trend-item">
+                    <span class="trend-category">Dizayn • 12.1k Baxış</span>
+                    <div class="trend-title">UI/UX Dizaynda Neomorfizm vs Qlassmorfiya</div>
+                    <span class="trend-payout">Məqalə Qazancı: $48.40</span>
                 </div>
             </div>
-        </div>
 
-        <!-- MƏQALƏ YARATMA VƏ REDAKTƏ MODALI -->
-        <div id="createModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-            <div class="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-md p-5 space-y-4 shadow-2xl">
-                <div class="flex items-center justify-between border-b border-gray-800 pb-3">
-                    <h3 class="font-bold text-sm text-gray-100" id="createModalTitle">Yeni Məqalə Dərc Edin</h3>
-                    <button onclick="closeCreateModal()" class="text-gray-400 hover:text-white">
-                        <i class="fa-solid fa-xmark text-base"></i>
-                    </button>
+            <!-- Who to follow -->
+            <div class="sidebar-card">
+                <div class="widget-header">
+                    <div class="widget-title">Təklif Olunan Müəlliflər</div>
                 </div>
-
-                <textarea id="postContent" rows="5" placeholder="Düşüncələrinizi, xəbərinizi və ya məqalənizi bura qeyd edin..." class="w-full bg-gray-950 text-xs text-gray-200 p-3.5 rounded-xl border border-gray-800 focus:outline-none focus:border-sky-500 leading-relaxed"></textarea>
-
-                <div class="space-y-2">
-                    <label class="block text-[11px] font-semibold text-gray-400">Şəkil Əlavə Et (Qalereya)</label>
-                    <div class="flex items-center gap-3">
-                        <label class="flex-1 border border-dashed border-gray-700 bg-gray-950 hover:bg-gray-800/50 p-3 rounded-xl flex items-center justify-center gap-2 cursor-pointer transition">
-                            <i class="fa-solid fa-cloud-arrow-up text-sky-400 text-sm"></i>
-                            <span class="text-xs text-gray-300 font-medium" id="uploadLabel">Fayl Seçin</span>
-                            <input type="file" id="postImageFile" accept="image/*" class="hidden" onchange="previewSelectedImage(event)">
-                        </label>
-                    </div>
-                </div>
-
-                <div id="imagePreviewBox" class="hidden relative rounded-xl overflow-hidden border border-gray-800 max-h-48">
-                    <img id="imagePreview" src="" class="w-full object-cover">
-                    <button onclick="removeSelectedImage()" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/70 text-white flex items-center justify-center text-xs">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-
-                <button onclick="savePost()" class="w-full bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold text-xs py-3 rounded-xl hover:opacity-95 transition shadow-lg shadow-sky-500/20">
-                    Dərc Et Və Qazanmağa Başla
-                </button>
-            </div>
-        </div>
-
-        <!-- TƏNZİMLƏMƏLƏR VƏ 3 NÖQTƏ ƏSAS MENYU -->
-        <div id="sideMenu" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex justify-end">
-            <div class="bg-gray-900 w-4/5 max-w-xs h-full p-5 space-y-6 overflow-y-auto border-l border-gray-800">
-                <div class="flex items-center justify-between border-b border-gray-800 pb-3">
-                    <h3 class="font-bold text-sm text-gray-100">Naviqasiya Və Tənzimləmələr</h3>
-                    <button onclick="toggleSideMenu(false)" class="text-gray-400 hover:text-white">
-                        <i class="fa-solid fa-xmark text-lg"></i>
-                    </button>
-                </div>
-
-                <div class="space-y-4 text-xs text-gray-300">
-                    <div class="p-3.5 bg-gray-950/80 rounded-xl space-y-2 border border-gray-800">
-                        <div class="flex items-center gap-2 text-sky-400 font-bold">
-                            <i class="fa-solid fa-circle-info"></i>
-                            <span>Platforma Haqqında</span>
-                        </div>
-                        <p class="text-[11px] text-gray-400 leading-relaxed">
-                            NexUs - 0$ əməliyyat xərci ilə işləyən, istifadəçilərin kontent baxışına (CPM) görə real gəlir qazandığı növbəti nəsil sosial şəbəkədir.
-                        </p>
-                    </div>
-
-                    <a href="javascript:void(0)" onclick="alert('Məxfilik Qaydaları: Bütün məlumatlarınız mərkəzsizləşdirilmiş qaydada qorunur.')" class="flex items-center gap-3 p-2.5 hover:bg-gray-800 rounded-xl transition">
-                        <i class="fa-solid fa-user-shield text-sky-400"></i> Məxfilik Və Qaydalar
-                    </a>
-
-                    <a href="javascript:void(0)" onclick="alert('İstifadə Şərtləri: Bot və ya saxta baxış simulyasiyası hesabın dondurulması ilə nəticələnir.')" class="flex items-center gap-3 p-2.5 hover:bg-gray-800 rounded-xl transition">
-                        <i class="fa-solid fa-scale-balanced text-sky-400"></i> İstifadə Şərtləri
-                    </a>
-
-                    <a href="javascript:void(0)" onclick="openHistory()" class="flex items-center gap-3 p-2.5 hover:bg-gray-800 rounded-xl transition">
-                        <i class="fa-solid fa-clock-rotate-left text-sky-400"></i> Son Baxılanlar
-                    </a>
-
-                    <div class="pt-4 border-t border-gray-800 space-y-3">
-                        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Sistem Tənzimləmələri</span>
-                        <div class="flex items-center justify-between p-2 hover:bg-gray-800/50 rounded-xl">
-                            <span>Avto-Oynatma (Video)</span>
-                            <input type="checkbox" checked class="accent-sky-500">
-                        </div>
-                        <div class="flex items-center justify-between p-2 hover:bg-gray-800/50 rounded-xl">
-                            <span>Bildiriş Səsləri</span>
-                            <input type="checkbox" checked class="accent-sky-500">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- BİLDİRİŞLƏR PANELİ -->
-        <div id="notifModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-            <div class="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-md p-4 space-y-3">
-                <div class="flex items-center justify-between border-b border-gray-800 pb-2.5">
-                    <h3 class="font-bold text-xs text-gray-100">Canlı Bildirişlər</h3>
-                    <button onclick="closeNotifModal()" class="text-gray-400 hover:text-white">
-                        <i class="fa-solid fa-xmark text-sm"></i>
-                    </button>
-                </div>
-                <div class="space-y-2.5 text-xs">
-                    <div class="p-3 bg-gray-950 rounded-xl border border-gray-800/80 flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-                            <i class="fa-solid fa-coins"></i>
-                        </div>
+                <div class="user-follow-card">
+                    <div style="display: flex; align-items: center; gap: 0.6rem;">
+                        <img src="https://picsum.photos/id/1025/40/40" style="border-radius: 50%;" alt="User">
                         <div>
-                            <p class="font-bold text-gray-200">Baxış Gəliri Hesablandı</p>
-                            <p class="text-[10px] text-gray-400">Məqaləniz 1,000 baxış topladı və +$0.03 balansınıza əlavə edildi.</p>
+                            <div style="font-size: 0.85rem; font-weight: 700;">Kamran Əliyev</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">@kamran_tech</div>
                         </div>
                     </div>
-                    <div class="p-3 bg-gray-950 rounded-xl border border-gray-800/80 flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-sky-500/20 text-sky-400 flex items-center justify-center">
-                            <i class="fa-solid fa-user-plus"></i>
-                        </div>
+                    <button class="btn-outline">İzlə</button>
+                </div>
+                <div class="user-follow-card">
+                    <div style="display: flex; align-items: center; gap: 0.6rem;">
+                        <img src="https://picsum.photos/id/1012/40/40" style="border-radius: 50%;" alt="User">
                         <div>
-                            <p class="font-bold text-gray-200">Yeni Referal İştirakçısı</p>
-                            <p class="text-[10px] text-gray-400">Leyla X. sizin referal linkinizlə şəbəkəyə qoşuldu.</p>
+                            <div style="font-size: 0.85rem; font-weight: 700;">Nərgiz Məmmədova</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">@nergiz_m</div>
                         </div>
                     </div>
+                    <button class="btn-outline">İzlə</button>
                 </div>
             </div>
-        </div>
+        </aside>
 
     </div>
 
-    <!-- TƏTBİQİN BÜTÖV JAVASCRIPT LOGİKASI (Sistem Əməliyyatları) -->
+    <!-- MOBILE BOTTOM NAVIGATION -->
+    <nav class="mobile-bottom-bar">
+        <button class="icon-btn" style="border:none;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></button>
+        <button class="icon-btn" style="border:none;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+        <button class="icon-btn" style="border:none; background: var(--accent-color); color:white;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        <button class="icon-btn" style="border:none;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg></button>
+        <button class="icon-btn" style="border:none;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
+    </nav>
+
+    <!-- ==========================================================================
+       8. JAVASCRIPT ARCHITECTURE & LOGIC
+       ========================================================================== -->
     <script>
-        // İSTİFADƏÇİ ŞƏXSİ PROFiL MƏLUMATLARI (Məxfilik Qorunur)
-        let currentUser = {
-            id: "usr_az_88921",
-            name: "Şamxal R.",
-            username: "@samxal_official",
-            avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80",
-            balance: 18.930, // USD Balans
-            totalViews: 631000,
-            referralsCount: 32,
-            refEarnings: 5.670 // USD Referal qazancı (30%)
+        // State Management
+        const CPM_RATE = 10.00; // 1000 Total Ad Views = $10.00 Total Revenue
+        const AUTHOR_PERCENTAGE = 0.40; // 40% goes directly to the author
+
+        const state = {
+            currentUser: {
+                name: "Şamxal Qasımov",
+                handle: "@samxal_dev",
+                avatar: "https://picsum.photos/id/64/100/100",
+                balance: 142.80
+            },
+            posts: [
+                {
+                    id: 1,
+                    author: "Məmməd Əsgərov",
+                    handle: "@mammed_a",
+                    avatar: "https://picsum.photos/id/1005/100/100",
+                    time: "2 saat əvvəl",
+                    content: "Böyük məqalələrin monetizasiyası sistemini yenilədik! Artıq hər bir məqalə müəllifi 1000 baxışa görə hesablanan reklam gəlirlərinin dəqiq 40%-ni öz daxili balansına birbaşa çıxara bilər. Bu model müəllifləri daha keyfiyyətli kontent yazmağa həvəsləndirəcək.",
+                    image: "https://picsum.photos/id/180/800/400",
+                    views: 12400,
+                    followers: 3420,
+                    likes: 842,
+                    comments: [
+                        { user: "Tural R.", text: "Əla sistemdir! Müəlliflər üçün böyük dəstək olacaq." },
+                        { user: "Aynur V.", text: "1000 baxışa görə 40% pay tam ədalətlidir." }
+                    ],
+                    isLiked: false
+                },
+                {
+                    id: 2,
+                    author: "Günel Qasımova",
+                    handle: "@gunel_tech",
+                    avatar: "https://picsum.photos/id/1027/100/100",
+                    time: "5 saat əvvəl",
+                    content: "Yeni JS Framework-lərin performans müqayisəsi haqqında dərin analiz hazırladım. Şəkildən ətraflı baxa bilərsiniz.",
+                    image: "https://picsum.photos/id/20/800/400",
+                    views: 8500,
+                    followers: 1890,
+                    likes: 512,
+                    comments: [],
+                    isLiked: true
+                }
+            ]
         };
 
-        // DÜNYA MİQYASLI 100-LƏRLƏ GENİŞLƏNDİRİLMİŞ DUMMY POST BAZASI
-        let postsDatabase = [
-            {
-                id: 101,
-                author: "Rəşad Hüseynov",
-                username: "@reshad_tech",
-                avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
-                content: "Web3 Və Mərkəzsizləşdirilmiş Şəbəkələr: Gələcəkdə sosial mediyanı böyük korporasiyalar yox, istifadəçilərin özləri idarə edəcək. Kontent yaradıcıları baxış sayına görə şəffaf gəlir əldə edirlər.",
-                image: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=800&q=80",
-                views: 24500,
-                likes: 1820,
-                liked: false,
-                comments: [
-                    { id: 1, author: "Tural S.", text: "Çox vacib mövzudur, mərkəzsiz sistemlər mütləq qalib gələcək.", likes: 12 },
-                    { id: 2, author: "Aysel K.", text: "Baxışa görə ödəniş modeli kontent keyfiyyətini artıracaq.", likes: 8 }
-                ]
-            },
-            {
-                id: 102,
-                author: "Günel Məmmədova",
-                username: "@gunel_design",
-                avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80",
-                content: "UI/UX Dizaynında Tünd Rejim Psixologiyası: İstifadəçilərin gözünü yormayan, kontrast nisbəti mükəmməl olan interfeyslər tətbiqdə qalma müddətini 40% artırır.",
-                image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
-                views: 18900,
-                likes: 1240,
-                liked: false,
-                comments: [
-                    { id: 1, author: "Kamran Q.", text: "Minimalizm hər zaman üstünlükdür.", likes: 5 }
-                ]
-            },
-            {
-                id: 103,
-                author: "İqtisadiyyat & Biznes",
-                username: "@biznes_az",
-                avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80",
-                content: "Qlobal Reklam Bazarı Və CPM Modelləri: 2026-cı ildə rəqəmsal reklam xərcləri 700 milyard dolları keçdi. İstifadəçi baxışını düzgün qiymətləndirən platformalar sürətlə böyüyür.",
-                image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
-                views: 31200,
-                likes: 2410,
-                liked: false,
-                comments: []
-            }
-        ];
+        // Calculate Author Earning helper
+        function calculateEarning(views) {
+            return ((views / 1000) * CPM_RATE * AUTHOR_PERCENTAGE).toFixed(2);
+        }
 
-        let activePostForComment = null;
-        let base64ImageStore = null;
-        let editingPostId = null;
+        // Render Posts Engine
+        function renderPosts() {
+            const container = document.getElementById('feedPostsContainer');
+            container.innerHTML = '';
 
-        // TƏTBİQİN İŞƏ DÜŞMƏSİ
-        document.addEventListener("DOMContentLoaded", () => {
-            renderFeed();
-            initAdObserver();
-        });
+            state.posts.forEach(post => {
+                const authorEarning = calculateEarning(post.views);
 
-        // AKIŞIN (FEED) DOM-A YAZILMASI
-        function renderFeed(postsToRender = postsDatabase) {
-            const container = document.getElementById("appFeed");
-            container.innerHTML = "";
+                const postEl = document.createElement('article');
+                postEl.className = 'post-card';
+                postEl.setAttribute('data-id', post.id);
 
-            postsToRender.forEach((post) => {
-                const article = document.createElement("article");
-                article.className = "glass-card rounded-2xl p-4 space-y-3.5 shadow-xl relative overflow-hidden";
-                
-                article.innerHTML = `
-                    <!-- Müəllif Paneli -->
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <img src="${post.avatar}" class="w-9 h-9 rounded-full object-cover border border-sky-500/30">
-                            <div>
-                                <h4 class="font-bold text-xs text-gray-100">${post.author}</h4>
-                                <p class="text-[10px] text-gray-400">${post.username}</p>
+                postEl.innerHTML = `
+                    <div class="post-header">
+                        <div class="author-info">
+                            <img src="${post.avatar}" class="user-avatar-small" alt="${post.author}">
+                            <div class="author-details">
+                                <div class="author-name">${post.author}</div>
+                                <div class="post-time">${post.handle} • ${post.time}</div>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            ${post.username === currentUser.username ? `
-                                <button onclick="editPost(${post.id})" class="text-xs text-gray-400 hover:text-sky-400 p-1">
-                                    <i class="fa-solid fa-pen-to-square"></i>
-                                </button>
-                            ` : ''}
-                            <button onclick="shareContent(${post.id})" class="text-xs text-gray-400 hover:text-sky-400 p-1">
-                                <i class="fa-solid fa-share-nodes"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mətn Məzmunu -->
-                    <p class="text-xs text-gray-300 leading-relaxed font-normal">${post.content}</p>
-
-                    <!-- Şəkil Blok -->
-                    ${post.image ? `<div class="rounded-xl overflow-hidden border border-gray-800/80"><img src="${post.image}" class="w-full h-56 object-cover hover:scale-105 transition duration-500"></div>` : ''}
-
-                    <!-- Düymələr Və Statistika -->
-                    <div class="flex items-center justify-between pt-2 border-t border-gray-800/80 text-xs text-gray-400">
-                        <div class="flex items-center gap-4">
-                            <button onclick="toggleLike(this, ${post.id})" class="flex items-center gap-1.5 ${post.liked ? 'text-red-500' : 'hover:text-red-500'} transition">
-                                <i class="${post.liked ? 'fa-solid' : 'fa-regular'} fa-heart text-sm"></i>
-                                <span>${post.likes}</span>
-                            </button>
-                            <button onclick="openCommentModal(${post.id})" class="flex items-center gap-1.5 hover:text-sky-400 transition">
-                                <i class="fa-regular fa-comment text-sm"></i>
-                                <span>${post.comments.length}</span>
-                            </button>
-                        </div>
-                        <div class="flex items-center gap-1.5 text-gray-500 text-[11px]">
-                            <i class="fa-regular fa-eye"></i>
-                            <span id="view-count-${post.id}">${post.views.toLocaleString()}</span>
-                        </div>
-                    </div>
-
-                    <!-- REKLAM BLOKU (Baxışa Göre Pul Qazandıran Sabit Yer) -->
-                    <div class="ad-trigger-block mt-3 p-3 bg-gray-950 rounded-xl border border-dashed border-sky-500/30 text-center relative" data-post-id="${post.id}">
-                        <span class="absolute top-1 right-2 text-[8px] bg-sky-500/20 text-sky-400 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Sponsorlu Reklam</span>
-                        <div class="py-1">
-                            <p class="text-xs font-semibold text-sky-300">İnvestisiya Və Ticarət Platforması</p>
-                            <p class="text-[10px] text-gray-400 mt-0.5">Qlobal bazarlara çıxış əldə edin, 0% komissiya ilə qazanın.</p>
-                        </div>
-                        <button onclick="registerView(${post.id})" class="mt-1 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 text-[11px] font-semibold px-3 py-1 rounded-lg border border-sky-500/30 transition">
-                            Keçid Et
+                        <button class="icon-btn" style="border:none; background:transparent;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
                         </button>
                     </div>
-                `;
-                container.appendChild(article);
-            });
-        }
 
-        // TAB MƏZMUNUNU DƏYİŞMƏK
-        function switchTab(tab) {
-            const container = document.getElementById("appFeed");
-            
-            // Aktiv tab rənglərini yenilə
-            ['tabFeed', 'tabExplore', 'tabRef', 'tabProfile'].forEach(id => {
-                document.getElementById(id).className = "flex flex-col items-center gap-1 text-gray-400 hover:text-gray-200 transition";
-            });
-
-            if (tab === 'feed') {
-                document.getElementById('tabFeed').className = "flex flex-col items-center gap-1 text-sky-400 transition";
-                renderFeed();
-                initAdObserver();
-            } else if (tab === 'explore') {
-                document.getElementById('tabExplore').className = "flex flex-col items-center gap-1 text-sky-400 transition";
-                container.innerHTML = `
-                    <div class="space-y-4">
-                        <h2 class="font-bold text-sm text-gray-200">Gündəmdə Olan Mövzular</h2>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="p-4 bg-gray-900 border border-gray-800 rounded-xl">
-                                <p class="text-[10px] text-sky-400 font-bold uppercase">#Texnologiya</p>
-                                <p class="font-bold text-xs text-gray-200 mt-1">Süni İntellekt 2026</p>
-                                <p class="text-[10px] text-gray-500 mt-1">45.2K Baxış</p>
-                            </div>
-                            <div class="p-4 bg-gray-900 border border-gray-800 rounded-xl">
-                                <p class="text-[10px] text-emerald-400 font-bold uppercase">#Maliyyə</p>
-                                <p class="font-bold text-xs text-gray-200 mt-1">Mərkəzsiz Bankçılıq</p>
-                                <p class="text-[10px] text-gray-500 mt-1">89.1K Baxış</p>
-                            </div>
+                    <!-- Article Monetization & Metrics Info Box -->
+                    <div class="monetization-bar">
+                        <div class="monetization-stat">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            Məqalə Qazancı: $${authorEarning} USD (40%)
+                        </div>
+                        <div class="post-metrics-badges">
+                            <span class="metric-badge">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                ${post.views.toLocaleString()} Baxış
+                            </span>
+                            <span class="metric-badge">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                                ${post.followers.toLocaleString()} İzləyici
+                            </span>
                         </div>
                     </div>
-                `;
-            } else if (tab === 'referral') {
-                document.getElementById('tabRef').className = "flex flex-col items-center gap-1 text-sky-400 transition";
-                container.innerHTML = `
-                    <div class="space-y-4">
-                        <div class="p-5 bg-gradient-to-br from-sky-900/40 via-gray-900 to-gray-950 border border-sky-500/30 rounded-2xl text-center space-y-2.5">
-                            <i class="fa-solid fa-users-rays text-3xl text-sky-400"></i>
-                            <h2 class="font-extrabold text-base text-gray-100">Referal Şəbəkəsi Və 30% Gəlir</h2>
-                            <p class="text-xs text-gray-300 leading-relaxed">Sizin keçidinizlə qeydiyyatdan keçən hər istifadəçinin qazandığı məbləğin <span class="text-sky-400 font-bold">30%-i</span> sistemi tərəfindən sizə ödənilir.</p>
-                        </div>
 
-                        <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl space-y-3">
-                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Xüsusi Referal Linkiniz</label>
-                            <div class="flex items-center gap-2">
-                                <input type="text" id="refLinkInput" readonly value="https://nexus.app/join?ref=${currentUser.id}" class="w-full bg-gray-950 text-xs text-gray-300 p-3 rounded-xl border border-gray-800 focus:outline-none">
-                                <button onclick="copyReferralLink()" class="bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs px-4 py-3 rounded-xl transition">Kopyala</button>
-                            </div>
-                        </div>
+                    <div class="post-content">${post.content}</div>
 
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl text-center">
-                                <span class="text-[10px] text-gray-500 font-semibold uppercase">Aktiv Referallar</span>
-                                <p class="text-2xl font-black text-sky-400 mt-1">${currentUser.referralsCount}</p>
-                            </div>
-                            <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl text-center">
-                                <span class="text-[10px] text-gray-500 font-semibold uppercase">Referal Qazancı</span>
-                                <p class="text-2xl font-black text-emerald-400 mt-1">$${currentUser.refEarnings.toFixed(3)}</p>
-                            </div>
-                        </div>
+                    ${post.image ? `<div class="post-media"><img src="${post.image}" alt="Post Media"></div>` : ''}
+
+                    <div class="post-actions-bar">
+                        <button class="action-button ${post.isLiked ? 'liked' : ''}" onclick="toggleLike(${post.id})">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="${post.isLiked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                            <span>${post.likes} Bəyənmə</span>
+                        </button>
+                        <button class="action-button">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            <span>${post.comments.length} Şərh</span>
+                        </button>
+                        <button class="action-button">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                            <span>Paylaş</span>
+                        </button>
                     </div>
-                `;
-            } else if (tab === 'profile') {
-                document.getElementById('tabProfile').className = "flex flex-col items-center gap-1 text-sky-400 transition";
-                container.innerHTML = `
-                    <div class="space-y-4">
-                        <div class="bg-gray-900 border border-gray-800 p-5 rounded-2xl text-center space-y-3 relative">
-                            <img src="${currentUser.avatar}" class="w-20 h-20 rounded-full mx-auto object-cover border-2 border-sky-400 p-0.5">
-                            <div>
-                                <h2 class="font-bold text-base text-gray-100">${currentUser.name}</h2>
-                                <p class="text-xs text-gray-400">${currentUser.username}</p>
-                            </div>
-                            <button onclick="shareProfileLink()" class="bg-gray-800 hover:bg-gray-700 text-xs text-gray-200 px-4 py-1.5 rounded-full border border-gray-700 transition">
-                                <i class="fa-solid fa-share-nodes"></i> Profilimi Paylaş
-                            </button>
-                        </div>
 
-                        <!-- GİZLİ ŞƏXSİ BALANS PANELİ -->
-                        <div class="bg-gradient-to-r from-emerald-950/60 to-gray-900 border border-emerald-500/30 p-5 rounded-2xl space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Şəxsi Balansınız (Şifrəli)</span>
-                                <i class="fa-solid fa-shield-halved text-emerald-400 text-xs"></i>
-                            </div>
-                            <div class="flex items-baseline justify-between pt-1">
-                                <span class="text-3xl font-black text-gray-100">$${currentUser.balance.toFixed(3)}</span>
-                                <span class="text-xs text-gray-400">${currentUser.totalViews.toLocaleString()} Ümumi Baxış</span>
-                            </div>
-                            <p class="text-[10px] text-gray-400 pt-1 border-t border-gray-800/60 mt-2">
-                                1,000 baxış = $0.03 hesablanır. Qazanc avtomatik balansınıza əlavə olunur.
-                            </p>
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        // TİKTOK ÜSLUBLU RƏY MODALI LOGİKASI
-        function openCommentModal(postId) {
-            activePostForComment = postId;
-            const post = postsDatabase.find(p => p.id === postId);
-            const modal = document.getElementById("commentModal");
-            const sheet = document.getElementById("commentSheet");
-            const list = document.getElementById("commentList");
-
-            document.getElementById("activeCommentCount").innerText = post.comments.length;
-            list.innerHTML = "";
-
-            if (post.comments.length === 0) {
-                list.innerHTML = `<p class="text-center text-xs text-gray-500 py-10">İlk rəyi siz yazın!</p>`;
-            } else {
-                post.comments.forEach(c => {
-                    list.innerHTML += `
-                        <div class="flex gap-3 text-xs">
-                            <div class="w-7 h-7 rounded-full bg-sky-600 flex items-center justify-center font-bold text-white text-[10px] flex-shrink-0">
-                                ${c.author[0]}
-                            </div>
-                            <div class="space-y-1 flex-1">
-                                <div class="bg-gray-800/80 p-2.5 rounded-2xl border border-gray-800">
-                                    <span class="font-bold text-gray-200 block text-[11px]">${c.author}</span>
-                                    <span class="text-gray-300">${c.text}</span>
-                                </div>
-                                <div class="flex items-center gap-3 text-[10px] text-gray-500 px-2">
-                                    <button onclick="this.classList.toggle('text-red-500')" class="hover:text-gray-300">Bəyən (${c.likes || 0})</button>
-                                    <button onclick="replyComment('${c.author}')" class="hover:text-gray-300">Cavab Ver</button>
+                    <!-- Comments Engine Section -->
+                    <div class="comments-section">
+                        ${post.comments.map(c => `
+                            <div class="comment-item">
+                                <div class="comment-bubble">
+                                    <div class="comment-user">
+                                        <span>${c.user}</span>
+                                    </div>
+                                    <div>${c.text}</div>
                                 </div>
                             </div>
+                        `).join('')}
+
+                        <div class="comment-input-group">
+                            <input type="text" class="comment-input" placeholder="Şərh yazın..." onkeydown="handleCommentSubmit(event, ${post.id})">
                         </div>
-                    `;
-                });
-            }
+                    </div>
+                `;
 
-            modal.classList.remove("hidden");
-            setTimeout(() => sheet.classList.remove("translate-y-full"), 10);
-        }
-
-        function closeCommentModal() {
-            const sheet = document.getElementById("commentSheet");
-            sheet.classList.add("translate-y-full");
-            setTimeout(() => document.getElementById("commentModal").classList.add("hidden"), 300);
-        }
-
-        function submitComment() {
-            const input = document.getElementById("commentInput");
-            if (!input.value.trim()) return;
-
-            const post = postsDatabase.find(p => p.id === activePostForComment);
-            post.comments.push({
-                id: Date.now(),
-                author: currentUser.name,
-                text: input.value,
-                likes: 0
+                container.appendChild(postEl);
             });
-
-            input.value = "";
-            openCommentModal(activePostForComment);
         }
 
-        function replyComment(authorName) {
-            const input = document.getElementById("commentInput");
-            input.value = `@${authorName} `;
-            input.focus();
-        }
-
-        // BAXIŞ SAYI VƏ REKLAM HESABLANMASI OBSERVERİ
-        function initAdObserver() {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const postId = entry.target.getAttribute("data-post-id");
-                        registerView(postId);
-                    }
-                });
-            }, { threshold: 0.8 });
-
-            document.querySelectorAll(".ad-trigger-block").forEach(ad => observer.observe(ad));
-        }
-
-        function registerView(postId) {
-            const post = postsDatabase.find(p => p.id == postId);
-            if (post) {
-                post.views += 1;
-                currentUser.totalViews += 1;
-                currentUser.balance += (0.03 / 1000); // 1000 baxışa 3 sent
-                
-                const viewEl = document.getElementById(`view-count-${postId}`);
-                if (viewEl) viewEl.innerText = post.views.toLocaleString();
+        // Like Toggle Event
+        function toggleLike(postId) {
+            const post = state.posts.find(p => p.id === postId);
+            if(post) {
+                post.isLiked = !post.isLiked;
+                post.likes += post.isLiked ? 1 : -1;
+                renderPosts();
             }
         }
 
-        // ŞƏKİL YÜKLƏMƏ VƏ PREVIEW LOGİKASI
-        function previewSelectedImage(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    base64ImageStore = e.target.result;
-                    document.getElementById("imagePreview").src = base64ImageStore;
-                    document.getElementById("imagePreviewBox").classList.remove("hidden");
-                    document.getElementById("uploadLabel").innerText = "Şəkil Seçildi";
+        // New Comment Add Event
+        function handleCommentSubmit(event, postId) {
+            if (event.key === 'Enter' && event.target.value.trim() !== '') {
+                const post = state.posts.find(p => p.id === postId);
+                if(post) {
+                    post.comments.push({
+                        user: state.currentUser.name,
+                        text: event.target.value.trim()
+                    });
+                    event.target.value = '';
+                    renderPosts();
                 }
-                reader.readAsDataURL(file);
             }
         }
 
-        function removeSelectedImage() {
-            base64ImageStore = null;
-            document.getElementById("imagePreviewBox").classList.add("hidden");
-            document.getElementById("postImageFile").value = "";
-            document.getElementById("uploadLabel").innerText = "Fayl Seçin";
-        }
+        // Create New Post Event
+        document.getElementById('publishPostBtn').addEventListener('click', () => {
+            const input = document.getElementById('newPostContent');
+            const text = input.value.trim();
 
-        // POST YARATMA VƏ REDAKTƏ
-        function savePost() {
-            const content = document.getElementById("postContent").value;
-            if (!content.trim() && !base64ImageStore) return;
-
-            if (editingPostId) {
-                const post = postsDatabase.find(p => p.id === editingPostId);
-                post.content = content;
-                if (base64ImageStore) post.image = base64ImageStore;
-                editingPostId = null;
-            } else {
-                const newPost = {
-                    id: Date.now(),
-                    author: currentUser.name,
-                    username: currentUser.username,
-                    avatar: currentUser.avatar,
-                    content: content,
-                    image: base64ImageStore,
-                    views: 0,
-                    likes: 0,
-                    liked: false,
-                    comments: []
-                };
-                postsDatabase.unshift(newPost);
+            if (!text) {
+                alert("Xahiş olunur mətn daxil edin!");
+                return;
             }
 
-            closeCreateModal();
-            renderFeed();
-            initAdObserver();
-        }
+            const newPost = {
+                id: Date.now(),
+                author: state.currentUser.name,
+                handle: state.currentUser.handle,
+                avatar: state.currentUser.avatar,
+                time: "İndi",
+                content: text,
+                image: "https://picsum.photos/id/1060/800/400", // Simulyasiya üçün avto şəkil
+                views: 1, // İlkin baxış
+                followers: 520,
+                likes: 0,
+                comments: [],
+                isLiked: false
+            };
 
-        function editPost(postId) {
-            const post = postsDatabase.find(p => p.id === postId);
-            editingPostId = postId;
-            document.getElementById("postContent").value = post.content;
-            document.getElementById("createModalTitle").innerText = "Məqaləni Redaktə Edin";
-            openCreateModal();
-        }
+            state.posts.unshift(newPost);
+            input.value = '';
+            renderPosts();
+        });
 
-        function toggleLike(btn, postId) {
-            const post = postsDatabase.find(p => p.id === postId);
-            post.liked = !post.liked;
-            post.likes += post.liked ? 1 : -1;
-            renderFeed();
-        }
+        // Dark / Light Theme Toggle Engine
+        const themeBtn = document.getElementById('themeToggle');
+        themeBtn.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+        });
 
-        // DİGƏR YARDIMÇI MODAL NƏVİQASİYALARI
-        function openCreateModal() { document.getElementById("createModal").classList.remove("hidden"); }
-        function closeCreateModal() { 
-            document.getElementById("createModal").classList.add("hidden");
-            document.getElementById("postContent").value = "";
-            removeSelectedImage();
-            editingPostId = null;
-        }
+        // Simulated Realtime Views & Revenue Generator
+        setInterval(() => {
+            state.posts.forEach(post => {
+                const randomViewAdd = Math.floor(Math.random() * 5) + 1;
+                post.views += randomViewAdd;
+            });
+            renderPosts();
+        }, 8000);
 
-        function toggleSideMenu(show) { document.getElementById("sideMenu").classList.toggle("hidden", !show); }
-        function openNotifModal() { document.getElementById("notifModal").classList.remove("hidden"); }
-        function closeNotifModal() { document.getElementById("notifModal").classList.add("hidden"); }
-        function openSearchModal() { document.getElementById("searchModal").classList.remove("hidden"); }
-        function closeSearchModal() { document.getElementById("searchModal").classList.add("hidden"); }
-
-        function shareContent(postId) {
-            if (navigator.share) {
-                navigator.share({ title: 'NexUs Platforma', url: window.location.href });
-            } else {
-                navigator.clipboard.writeText(window.location.href);
-                alert("Məqalə URL kopyalandı!");
-            }
-        }
-
-        function shareProfileLink() {
-            navigator.clipboard.writeText(`https://nexus.app/${currentUser.username}`);
-            alert("Profil linki kopyalandı!");
-        }
-
-        function copyReferralLink() {
-            const input = document.getElementById("refLinkInput");
-            input.select();
-            navigator.clipboard.writeText(input.value);
-            alert("Referal linkiniz kopyalandı!");
-        }
+        // Initial Render Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            renderPosts();
+        });
     </script>
 </body>
 </html>
