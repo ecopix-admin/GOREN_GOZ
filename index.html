@@ -1,1196 +1,460 @@
 <!DOCTYPE html>
-<html lang="az" data-theme="dark">
+<html lang="az">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProSocial Network & Monetization Platform</title>
+    <title>Vibe ✦ Simple & Modern Social</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* ==========================================================================
-           1. CORE CSS VARIABLES & THEME DEFINITIONS
-           ========================================================================== */
-        :root[data-theme="dark"] {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-tertiary: #334155;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --accent-color: #6366f1;
-            --accent-hover: #4f46e5;
-            --accent-light: rgba(99, 102, 241, 0.15);
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --danger-color: #ef4444;
-            --border-color: #334155;
-            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-            --glass-bg: rgba(30, 41, 59, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.05);
-        }
-
-        :root[data-theme="light"] {
-            --bg-primary: #f1f5f9;
-            --bg-secondary: #ffffff;
-            --bg-tertiary: #e2e8f0;
-            --text-primary: #0f172a;
-            --text-secondary: #475569;
-            --text-muted: #94a3b8;
-            --accent-color: #4f46e5;
-            --accent-hover: #4338ca;
-            --accent-light: rgba(79, 70, 229, 0.1);
-            --success-color: #059669;
-            --warning-color: #d97706;
-            --danger-color: #dc2626;
-            --border-color: #cbd5e1;
-            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
-            --glass-bg: rgba(255, 255, 255, 0.85);
-            --glass-border: rgba(0, 0, 0, 0.05);
+        :root {
+            --bg-color: #000000;
+            --card-bg: #121212;
+            --border-color: #262626;
+            --text-main: #f5f5f5;
+            --text-muted: #a8a8a8;
+            --accent-color: #0095f6;
+            --like-color: #ff3040;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
             min-height: 100vh;
+        }
+
+        /* Layout Structure */
+        .app-container {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 245px;
+            padding: 24px 12px;
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow-x: hidden;
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--bg-primary);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--bg-tertiary);
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-muted);
-        }
-
-        /* ==========================================================================
-           2. HEADER & NAVIGATION
-           ========================================================================== */
-        .app-header {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border-color);
-            height: 65px;
-            display: flex;
-            align-items: center;
             justify-content: space-between;
-            padding: 0 1.5rem;
         }
 
-        .header-left {
+        .brand-logo {
+            font-size: 24px;
+            font-weight: 700;
+            padding: 0 12px 30px;
             display: flex;
             align-items: center;
-            gap: 1.5rem;
+            gap: 10px;
+            letter-spacing: -0.5px;
         }
 
-        .logo-brand {
-            font-size: 1.4rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #818cf8, #c084fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-        }
-
-        .search-wrapper {
-            position: relative;
-            width: 280px;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 0.6rem 1rem 0.6rem 2.5rem;
-            border-radius: 20px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            outline: none;
-        }
-
-        .search-input:focus {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px var(--accent-light);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 0.8rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            pointer-events: none;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .icon-btn {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            position: relative;
-            transition: transform 0.2s;
-        }
-
-        .icon-btn:hover {
-            transform: translateY(-2px);
-            border-color: var(--accent-color);
+        .brand-logo span {
             color: var(--accent-color);
         }
 
-        .badge-count {
-            position: absolute;
-            top: -3px;
-            right: -3px;
-            background: var(--danger-color);
-            color: white;
-            font-size: 0.7rem;
-            font-weight: bold;
-            padding: 2px 6px;
-            border-radius: 10px;
-            border: 2px solid var(--bg-secondary);
-        }
-
-        .user-avatar-small {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--accent-color);
-            cursor: pointer;
-        }
-
-        /* ==========================================================================
-           3. MAIN LAYOUT ARCHITECTURE
-           ========================================================================== */
-        .layout-wrapper {
-            max-width: 1350px;
-            margin: 0 auto;
-            width: 100%;
-            display: grid;
-            grid-template-columns: 280px 1fr 340px;
-            gap: 1.5rem;
-            padding: 1.5rem 1rem;
-            flex: 1;
-        }
-
-        /* ==========================================================================
-           4. SIDEBAR COMPONENTS (LEFT & RIGHT)
-           ========================================================================== */
-        .sidebar-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 1.25rem;
-            margin-bottom: 1.25rem;
-            box-shadow: var(--card-shadow);
-        }
-
-        .profile-summary {
-            text-align: center;
-            position: relative;
-        }
-
-        .profile-banner {
-            height: 70px;
-            background: linear-gradient(135deg, var(--accent-color), #a855f7);
-            border-radius: 12px 12px 0 0;
-            margin: -1.25rem -1.25rem 2.5rem -1.25rem;
-        }
-
-        .profile-avatar-large {
-            width: 75px;
-            height: 75px;
-            border-radius: 50%;
-            border: 4px solid var(--bg-secondary);
-            position: absolute;
-            top: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            object-fit: cover;
-        }
-
-        .user-name {
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-
-        .user-handle {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            margin-bottom: 1rem;
-        }
-
-        .wallet-widget {
-            background: var(--accent-light);
-            border: 1px border var(--accent-color);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-top: 1rem;
-        }
-
-        .wallet-title {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            color: var(--accent-color);
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-
-        .wallet-balance {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--text-primary);
-            margin: 0.3rem 0;
-        }
-
-        .monetization-info {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-
-        .nav-menu {
+        .nav-links {
             list-style: none;
             display: flex;
             flex-direction: column;
-            gap: 0.4rem;
+            gap: 8px;
         }
 
         .nav-item a {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            padding: 0.8rem 1rem;
-            color: var(--text-secondary);
+            gap: 16px;
+            padding: 12px;
+            color: var(--text-main);
             text-decoration: none;
-            font-weight: 600;
-            border-radius: 12px;
-            transition: all 0.2s;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: background 0.2s;
         }
 
-        .nav-item a:hover, .nav-item.active a {
-            background: var(--accent-light);
-            color: var(--accent-color);
+        .nav-item a:hover {
+            background-color: #1a1a1a;
         }
 
-        /* ==========================================================================
-           5. MAIN FEED & STORIES COMPONENTS
-           ========================================================================== */
-        .feed-container {
+        .nav-item i {
+            font-size: 20px;
+            width: 24px;
+        }
+
+        /* Main Content Feed */
+        .main-content {
+            margin-left: 245px;
+            width: 100%;
+            max-width: 630px;
+            padding: 20px;
+        }
+
+        /* Stories Bar */
+        .stories-container {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding: 16px 0;
+            margin-bottom: 24px;
+            scrollbar-width: none;
+        }
+
+        .stories-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .story-item {
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        /* Stories Wrapper */
-        .stories-wrapper {
-            display: flex;
-            gap: 0.8rem;
-            overflow-x: auto;
-            padding-bottom: 0.5rem;
-        }
-
-        .story-card {
-            min-width: 110px;
-            height: 160px;
-            border-radius: 14px;
-            position: relative;
-            overflow: hidden;
+            align-items: center;
+            gap: 6px;
             cursor: pointer;
-            border: 1px solid var(--border-color);
             flex-shrink: 0;
         }
 
-        .story-card img.story-bg {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s;
-        }
-
-        .story-card:hover img.story-bg {
-            transform: scale(1.08);
-        }
-
-        .story-card .story-avatar {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            width: 32px;
-            height: 32px;
+        .story-avatar-wrapper {
+            padding: 2px;
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
             border-radius: 50%;
-            border: 2px solid var(--accent-color);
         }
 
-        .story-card .story-author {
-            position: absolute;
-            bottom: 8px;
-            left: 8px;
-            right: 8px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: white;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-            white-space: nowrap;
+        .story-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: 2px solid var(--bg-color);
+            object-fit: cover;
+        }
+
+        .story-username {
+            font-size: 12px;
+            color: var(--text-muted);
+            max-width: 64px;
             overflow: hidden;
             text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
-        .add-story {
-            background: var(--bg-secondary);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            border: 2px dashed var(--border-color);
-        }
-
-        .add-story-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--accent-light);
-            color: var(--accent-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-        }
-
-        /* Post Publisher Box */
-        .create-post-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 1.25rem;
-            box-shadow: var(--card-shadow);
-        }
-
-        .create-post-header {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .post-input {
-            width: 100%;
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 0.8rem 1rem;
-            color: var(--text-primary);
-            resize: none;
-            height: 80px;
-            font-size: 0.95rem;
-            outline: none;
-        }
-
-        .post-input:focus {
-            border-color: var(--accent-color);
-        }
-
-        .create-post-actions {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-top: 1px solid var(--border-color);
-            padding-top: 0.8rem;
-        }
-
-        .attach-options {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .attach-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            padding: 0.5rem 0.8rem;
-            border-radius: 8px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .attach-btn:hover {
-            background: var(--bg-tertiary);
-            color: var(--accent-color);
-        }
-
-        .btn-primary {
-            background: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 0.6rem 1.4rem;
-            border-radius: 20px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-        }
-
-        .btn-primary:hover {
-            background: var(--accent-hover);
-        }
-
-        .btn-primary:active {
-            transform: scale(0.98);
-        }
-
-        /* Post Card Rendering */
+        /* Post Card */
         .post-card {
-            background: var(--bg-secondary);
+            background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 1.25rem;
-            box-shadow: var(--card-shadow);
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            overflow: hidden;
         }
 
         .post-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            padding: 12px 16px;
         }
 
-        .author-info {
+        .post-user-info {
             display: flex;
             align-items: center;
-            gap: 0.8rem;
+            gap: 10px;
         }
 
-        .author-details .author-name {
-            font-size: 0.95rem;
-            font-weight: 700;
-        }
-
-        .author-details .post-time {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        /* Monetization & Analytics Bar on Post */
-        .monetization-bar {
-            background: rgba(16, 185, 129, 0.08);
-            border: 1px dashed var(--success-color);
-            border-radius: 10px;
-            padding: 0.6rem 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 0.82rem;
-        }
-
-        .monetization-stat {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            color: var(--success-color);
-            font-weight: 600;
-        }
-
-        .post-metrics-badges {
-            display: flex;
-            gap: 0.6rem;
-        }
-
-        .metric-badge {
-            background: var(--bg-tertiary);
-            color: var(--text-secondary);
-            padding: 0.2rem 0.6rem;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-
-        .post-content {
-            font-size: 0.95rem;
-            line-height: 1.5;
-            color: var(--text-primary);
-        }
-
-        .post-media {
-            border-radius: 12px;
-            overflow: hidden;
-            max-height: 420px;
-            width: 100%;
-        }
-
-        .post-media img {
-            width: 100%;
-            height: 100%;
+        .post-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
             object-fit: cover;
         }
 
-        .post-actions-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-top: 1px solid var(--border-color);
-            border-bottom: 1px solid var(--border-color);
-            padding: 0.5rem 0;
-        }
-
-        .action-button {
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
+        .post-username {
+            font-size: 14px;
             font-weight: 600;
-            font-size: 0.85rem;
+        }
+
+        .post-image {
+            width: 100%;
+            max-height: 600px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .post-actions {
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 16px;
+        }
+
+        .action-btns i, .post-actions > i {
+            font-size: 22px;
             cursor: pointer;
-            flex: 1;
-            justify-content: center;
+            transition: transform 0.1s;
         }
 
-        .action-button:hover {
-            background: var(--bg-tertiary);
-            color: var(--accent-color);
+        .action-btns i:hover, .post-actions > i:hover {
+            opacity: 0.7;
         }
 
-        .action-button.liked {
-            color: var(--danger-color);
+        .fa-heart.active {
+            color: var(--like-color);
         }
 
-        /* Comments Engine */
+        .post-details {
+            padding: 0 16px 16px;
+        }
+
+        .likes-count {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .caption {
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .caption .username {
+            font-weight: 600;
+            margin-right: 6px;
+        }
+
         .comments-section {
             display: flex;
             flex-direction: column;
-            gap: 0.8rem;
-            padding-top: 0.5rem;
+            gap: 4px;
+            font-size: 13px;
         }
 
-        .comment-item {
-            display: flex;
-            gap: 0.8rem;
-            font-size: 0.85rem;
-        }
-
-        .comment-bubble {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 0.6rem 0.9rem;
-            flex: 1;
-        }
-
-        .comment-user {
-            font-weight: 700;
-            margin-bottom: 0.2rem;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .comment-input-group {
-            display: flex;
-            gap: 0.6rem;
-            margin-top: 0.5rem;
-        }
-
-        .comment-input {
-            flex: 1;
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 0.5rem 1rem;
-            color: var(--text-primary);
-            outline: none;
-            font-size: 0.85rem;
-        }
-
-        /* ==========================================================================
-           6. RIGHT SIDEBAR - TRENDS & RECOMMENDATIONS
-           ========================================================================== */
-        .widget-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-        }
-
-        .widget-title {
-            font-size: 1rem;
-            font-weight: 700;
-        }
-
-        .trend-item {
-            display: flex;
-            flex-direction: column;
-            padding: 0.6rem 0;
-            border-bottom: 1px solid var(--border-color);
-            cursor: pointer;
-        }
-
-        .trend-item:last-child {
-            border-bottom: none;
-        }
-
-        .trend-category {
-            font-size: 0.75rem;
+        .view-comments {
             color: var(--text-muted);
+            cursor: pointer;
+            margin-bottom: 4px;
         }
 
-        .trend-title {
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin: 0.2rem 0;
-        }
-
-        .trend-payout {
-            font-size: 0.75rem;
-            color: var(--success-color);
-            font-weight: 600;
-        }
-
-        .user-follow-card {
+        .add-comment-box {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 0.8rem;
+            border-top: 1px solid var(--border-color);
+            padding: 12px 16px;
+            gap: 10px;
         }
 
-        .btn-outline {
+        .add-comment-box input {
             background: transparent;
-            border: 1px solid var(--accent-color);
+            border: none;
+            outline: none;
+            color: var(--text-main);
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .add-comment-box button {
+            background: transparent;
+            border: none;
             color: var(--accent-color);
-            padding: 0.3rem 0.8rem;
-            border-radius: 15px;
-            font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
         }
 
-        .btn-outline:hover {
-            background: var(--accent-color);
-            color: white;
-        }
-
-        /* ==========================================================================
-           7. RESPONSIVE DESIGN & MOBILE BAR
-           ========================================================================== */
-        .mobile-bottom-bar {
-            display: none;
+        /* Right Sidebar / Suggestions */
+        .right-sidebar {
+            width: 320px;
+            padding: 20px;
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 60px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            border-top: 1px solid var(--border-color);
-            z-index: 1000;
-            justify-content: space-around;
-            align-items: center;
+            right: calc((100vw - 1200px) / 2);
+            display: none;
         }
 
-        @media (max-width: 1024px) {
-            .layout-wrapper {
-                grid-template-columns: 240px 1fr;
-            }
+        @media (min-width: 1000px) {
             .right-sidebar {
-                display: none;
+                display: block;
             }
         }
 
         @media (max-width: 768px) {
-            .layout-wrapper {
-                grid-template-columns: 1fr;
-                padding-bottom: 70px;
+            .sidebar {
+                width: 70px;
             }
-            .left-sidebar {
+            .sidebar .link-text, .brand-logo text {
                 display: none;
             }
-            .search-wrapper {
-                display: none;
-            }
-            .mobile-bottom-bar {
-                display: flex;
+            .main-content {
+                margin-left: 70px;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- ==========================================================================
-       HEADER / NAVIGATION BAR
-       ========================================================================== -->
-    <header class="app-header">
-        <div class="header-left">
-            <div class="logo-brand" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                ProSocial
-            </div>
-            <div class="search-wrapper">
-                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="text" class="search-input" placeholder="Məqalə, həştəq və ya istifadəçi axtar...">
-            </div>
-        </div>
-
-        <div class="header-actions">
-            <button class="icon-btn" id="themeToggle" title="Temanı Dəyiş">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-            </button>
-            <button class="icon-btn" title="Bildirişlər">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                <span class="badge-count">3</span>
-            </button>
-            <button class="icon-btn" title="Mesajlar">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                <span class="badge-count">5</span>
-            </button>
-            <img src="https://picsum.photos/id/64/100/100" alt="Profil" class="user-avatar-small" id="userProfileBtn">
-        </div>
-    </header>
-
-    <!-- ==========================================================================
-       MAIN LAYOUT CONTAINER
-       ========================================================================== -->
-    <div class="layout-wrapper">
-
-        <!-- LEFT SIDEBAR -->
-        <aside class="left-sidebar">
-            <div class="sidebar-card profile-summary">
-                <div class="profile-banner"></div>
-                <img src="https://picsum.photos/id/64/100/100" alt="Avatar" class="profile-avatar-large">
-                <div class="user-name">Şamxal Qasımov</div>
-                <div class="user-handle">@samxal_dev</div>
-
-                <div class="wallet-widget">
-                    <div class="wallet-title">Məqalə Qazanc Balansı</div>
-                    <div class="wallet-balance" id="userBalance">$142.80</div>
-                    <div class="monetization-info">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                        1,000 baxışa 40% gəlir payı
-                    </div>
+    <div class="app-container">
+        <!-- Sol Naviqasiya Paneli -->
+        <aside class="sidebar">
+            <div>
+                <div class="brand-logo">
+                    <span>✦</span> <div class="link-text">Vibe</div>
                 </div>
-            </div>
-
-            <div class="sidebar-card">
-                <ul class="nav-menu">
-                    <li class="nav-item active">
-                        <a href="#">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-                            Əsas Akış (Feed)
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-                            Məqalələrim
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                            Maliyyə & Çıxarış
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
-                            Analitika
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                            Tənzimləmələr
-                        </a>
-                    </li>
+                <ul class="nav-links">
+                    <li class="nav-item"><a href="#"><i class="fa-solid fa-house"></i><span class="link-text">Ana Səhifə</span></a></li>
+                    <li class="nav-item"><a href="#"><i class="fa-solid fa-magnifying-glass"></i><span class="link-text">Axtarış</span></a></li>
+                    <li class="nav-item"><a href="#"><i class="fa-regular fa-compass"></i><span class="link-text">Kəşf Et</span></a></li>
+                    <li class="nav-item"><a href="#"><i class="fa-regular fa-paper-plane"></i><span class="link-text">Mesajlar</span></a></li>
+                    <li class="nav-item"><a href="#"><i class="fa-regular fa-heart"></i><span class="link-text">Bildirişlər</span></a></li>
+                    <li class="nav-item"><a href="#"><i class="fa-regular fa-square-plus"></i><span class="link-text">Yarat</span></a></li>
                 </ul>
             </div>
         </aside>
 
-        <!-- MAIN FEED AREA -->
-        <main class="feed-container">
+        <!-- Əsas Lent (Feed) -->
+        <main class="main-content">
+            <!-- Story Bölməsi -->
+            <div class="stories-container" id="stories-wrapper"></div>
 
-            <!-- Stories Carousel -->
-            <div class="stories-wrapper">
-                <div class="story-card add-story" onclick="document.getElementById('storyFileInput').click()">
-                    <input type="file" id="storyFileInput" style="display:none;" accept="image/*">
-                    <div class="add-story-icon">+</div>
-                    <span style="font-size:0.75rem; font-weight:600;">Hekayə Əlavə Et</span>
-                </div>
-                <div class="story-card">
-                    <img src="https://picsum.photos/id/1015/200/300" class="story-bg" alt="Story">
-                    <img src="https://picsum.photos/id/1027/100/100" class="story-avatar" alt="Avatar">
-                    <span class="story-author">Aysel M.</span>
-                </div>
-                <div class="story-card">
-                    <img src="https://picsum.photos/id/1035/200/300" class="story-bg" alt="Story">
-                    <img src="https://picsum.photos/id/1005/100/100" class="story-avatar" alt="Avatar">
-                    <span class="story-author">Elvin K.</span>
-                </div>
-                <div class="story-card">
-                    <img src="https://picsum.photos/id/1050/200/300" class="story-bg" alt="Story">
-                    <img src="https://picsum.photos/id/1062/100/100" class="story-avatar" alt="Avatar">
-                    <span class="story-author">Leyla Ə.</span>
-                </div>
-                <div class="story-card">
-                    <img src="https://picsum.photos/id/1069/200/300" class="story-bg" alt="Story">
-                    <img src="https://picsum.photos/id/1074/100/100" class="story-avatar" alt="Avatar">
-                    <span class="story-author">Rəşad S.</span>
-                </div>
-            </div>
-
-            <!-- Create Post Card -->
-            <div class="create-post-card">
-                <div class="create-post-header">
-                    <img src="https://picsum.photos/id/64/100/100" alt="Avatar" class="user-avatar-small">
-                    <textarea class="post-input" id="newPostContent" placeholder="Yeni məqalə və ya fikirinizi bölüşün... (40% qazanc sistemi aktivdir)"></textarea>
-                </div>
-                <div class="create-post-actions">
-                    <div class="attach-options">
-                        <button class="attach-btn" onclick="document.getElementById('postImageInput').click()">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                            Şəkil
-                        </button>
-                        <input type="file" id="postImageInput" style="display:none;" accept="image/*">
-                        <button class="attach-btn">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                            Məqalə
-                        </button>
-                    </div>
-                    <button class="btn-primary" id="publishPostBtn">Paylaş</button>
-                </div>
-            </div>
-
-            <!-- Feed Dynamic Content Container -->
-            <div id="feedPostsContainer" style="display: flex; flex-direction: column; gap: 1.5rem;">
-                <!-- JavaScript ilə dinamik olaraq dolacaq -->
-            </div>
-
+            <!-- Postlar Siyahısı -->
+            <div id="feed-posts"></div>
         </main>
-
-        <!-- RIGHT SIDEBAR -->
-        <aside class="right-sidebar">
-            <!-- Monetization Leaderboard Widget -->
-            <div class="sidebar-card">
-                <div class="widget-header">
-                    <div class="widget-title">🔥 Ən Çox Qazandıran Məqalələr</div>
-                </div>
-                <div class="trend-item">
-                    <span class="trend-category">Proqramlaşdırma • 45.2k Baxış</span>
-                    <div class="trend-title">JavaScript ES2026-da Yeni İnkılabi Xüsusiyyətlər</div>
-                    <span class="trend-payout">Məqalə Qazancı: $180.80</span>
-                </div>
-                <div class="trend-item">
-                    <span class="trend-category">Startap • 28.9k Baxış</span>
-                    <div class="trend-title">Süni İntellekt Dəstəkli Sosial Şəbəkə Monemizasiyası</div>
-                    <span class="trend-payout">Məqalə Qazancı: $115.60</span>
-                </div>
-                <div class="trend-item">
-                    <span class="trend-category">Dizayn • 12.1k Baxış</span>
-                    <div class="trend-title">UI/UX Dizaynda Neomorfizm vs Qlassmorfiya</div>
-                    <span class="trend-payout">Məqalə Qazancı: $48.40</span>
-                </div>
-            </div>
-
-            <!-- Who to follow -->
-            <div class="sidebar-card">
-                <div class="widget-header">
-                    <div class="widget-title">Təklif Olunan Müəlliflər</div>
-                </div>
-                <div class="user-follow-card">
-                    <div style="display: flex; align-items: center; gap: 0.6rem;">
-                        <img src="https://picsum.photos/id/1025/40/40" style="border-radius: 50%;" alt="User">
-                        <div>
-                            <div style="font-size: 0.85rem; font-weight: 700;">Kamran Əliyev</div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted);">@kamran_tech</div>
-                        </div>
-                    </div>
-                    <button class="btn-outline">İzlə</button>
-                </div>
-                <div class="user-follow-card">
-                    <div style="display: flex; align-items: center; gap: 0.6rem;">
-                        <img src="https://picsum.photos/id/1012/40/40" style="border-radius: 50%;" alt="User">
-                        <div>
-                            <div style="font-size: 0.85rem; font-weight: 700;">Nərgiz Məmmədova</div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted);">@nergiz_m</div>
-                        </div>
-                    </div>
-                    <button class="btn-outline">İzlə</button>
-                </div>
-            </div>
-        </aside>
-
     </div>
 
-    <!-- MOBILE BOTTOM NAVIGATION -->
-    <nav class="mobile-bottom-bar">
-        <button class="icon-btn" style="border:none;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></button>
-        <button class="icon-btn" style="border:none;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
-        <button class="icon-btn" style="border:none; background: var(--accent-color); color:white;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
-        <button class="icon-btn" style="border:none;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg></button>
-        <button class="icon-btn" style="border:none;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
-    </nav>
-
-    <!-- ==========================================================================
-       8. JAVASCRIPT ARCHITECTURE & LOGIC
-       ========================================================================== -->
     <script>
-        // State Management
-        const CPM_RATE = 10.00; // 1000 Total Ad Views = $10.00 Total Revenue
-        const AUTHOR_PERCENTAGE = 0.40; // 40% goes directly to the author
+        // Saxta Profil Məlumatları Bazasının Avtomatik Generasiyası
+        const usernames = ["alex_vibe", "sarah.design", "tech_insider", "nature_lens", "creative_mind", "urban_explorer", "photo_master", "digital_art", "travel_bug", "coder_life"];
+        const captions = [
+            "İşıq və kölgənin mükəmməl ahəngi. ✨ #vibes #photography",
+            "Yeni layihə üzərində işlər yekunlaşmaq üzrədir! 🚀",
+            "Səhər qəhvəsi və sakitlik... ☕🌱",
+            "Şəhərin gecə ritmi 🏙️ #citylife",
+            "Təbiətin qoynunda keçən möhtəşəm gün! 🏔️"
+        ];
 
-        const state = {
-            currentUser: {
-                name: "Şamxal Qasımov",
-                handle: "@samxal_dev",
-                avatar: "https://picsum.photos/id/64/100/100",
-                balance: 142.80
-            },
-            posts: [
-                {
-                    id: 1,
-                    author: "Məmməd Əsgərov",
-                    handle: "@mammed_a",
-                    avatar: "https://picsum.photos/id/1005/100/100",
-                    time: "2 saat əvvəl",
-                    content: "Böyük məqalələrin monetizasiyası sistemini yenilədik! Artıq hər bir məqalə müəllifi 1000 baxışa görə hesablanan reklam gəlirlərinin dəqiq 40%-ni öz daxili balansına birbaşa çıxara bilər. Bu model müəllifləri daha keyfiyyətli kontent yazmağa həvəsləndirəcək.",
-                    image: "https://picsum.photos/id/180/800/400",
-                    views: 12400,
-                    followers: 3420,
-                    likes: 842,
-                    comments: [
-                        { user: "Tural R.", text: "Əla sistemdir! Müəlliflər üçün böyük dəstək olacaq." },
-                        { user: "Aynur V.", text: "1000 baxışa görə 40% pay tam ədalətlidir." }
-                    ],
-                    isLiked: false
-                },
-                {
-                    id: 2,
-                    author: "Günel Qasımova",
-                    handle: "@gunel_tech",
-                    avatar: "https://picsum.photos/id/1027/100/100",
-                    time: "5 saat əvvəl",
-                    content: "Yeni JS Framework-lərin performans müqayisəsi haqqında dərin analiz hazırladım. Şəkildən ətraflı baxa bilərsiniz.",
-                    image: "https://picsum.photos/id/20/800/400",
-                    views: 8500,
-                    followers: 1890,
-                    likes: 512,
-                    comments: [],
-                    isLiked: true
-                }
-            ]
-        };
-
-        // Calculate Author Earning helper
-        function calculateEarning(views) {
-            return ((views / 1000) * CPM_RATE * AUTHOR_PERCENTAGE).toFixed(2);
-        }
-
-        // Render Posts Engine
-        function renderPosts() {
-            const container = document.getElementById('feedPostsContainer');
-            container.innerHTML = '';
-
-            state.posts.forEach(post => {
-                const authorEarning = calculateEarning(post.views);
-
-                const postEl = document.createElement('article');
-                postEl.className = 'post-card';
-                postEl.setAttribute('data-id', post.id);
-
-                postEl.innerHTML = `
-                    <div class="post-header">
-                        <div class="author-info">
-                            <img src="${post.avatar}" class="user-avatar-small" alt="${post.author}">
-                            <div class="author-details">
-                                <div class="author-name">${post.author}</div>
-                                <div class="post-time">${post.handle} • ${post.time}</div>
-                            </div>
+        // Hekayələri (Stories) Generasiya Et
+        function generateStories() {
+            const wrapper = document.getElementById('stories-wrapper');
+            let storiesHTML = '';
+            
+            for(let i = 1; i <= 15; i++) {
+                const user = usernames[i % usernames.length] + i;
+                const avatarUrl = `https://picsum.photos/seed/user_${i}/150/150`;
+                
+                storiesHTML += `
+                    <div class="story-item">
+                        <div class="story-avatar-wrapper">
+                            <img src="${avatarUrl}" class="story-avatar" alt="${user}">
                         </div>
-                        <button class="icon-btn" style="border:none; background:transparent;">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-                        </button>
-                    </div>
-
-                    <!-- Article Monetization & Metrics Info Box -->
-                    <div class="monetization-bar">
-                        <div class="monetization-stat">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                            Məqalə Qazancı: $${authorEarning} USD (40%)
-                        </div>
-                        <div class="post-metrics-badges">
-                            <span class="metric-badge">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                                ${post.views.toLocaleString()} Baxış
-                            </span>
-                            <span class="metric-badge">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-                                ${post.followers.toLocaleString()} İzləyici
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="post-content">${post.content}</div>
-
-                    ${post.image ? `<div class="post-media"><img src="${post.image}" alt="Post Media"></div>` : ''}
-
-                    <div class="post-actions-bar">
-                        <button class="action-button ${post.isLiked ? 'liked' : ''}" onclick="toggleLike(${post.id})">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="${post.isLiked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                            <span>${post.likes} Bəyənmə</span>
-                        </button>
-                        <button class="action-button">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                            <span>${post.comments.length} Şərh</span>
-                        </button>
-                        <button class="action-button">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-                            <span>Paylaş</span>
-                        </button>
-                    </div>
-
-                    <!-- Comments Engine Section -->
-                    <div class="comments-section">
-                        ${post.comments.map(c => `
-                            <div class="comment-item">
-                                <div class="comment-bubble">
-                                    <div class="comment-user">
-                                        <span>${c.user}</span>
-                                    </div>
-                                    <div>${c.text}</div>
-                                </div>
-                            </div>
-                        `).join('')}
-
-                        <div class="comment-input-group">
-                            <input type="text" class="comment-input" placeholder="Şərh yazın..." onkeydown="handleCommentSubmit(event, ${post.id})">
-                        </div>
+                        <span class="story-username">${user}</span>
                     </div>
                 `;
-
-                container.appendChild(postEl);
-            });
+            }
+            wrapper.innerHTML = storiesHTML;
         }
 
-        // Like Toggle Event
-        function toggleLike(postId) {
-            const post = state.posts.find(p => p.id === postId);
-            if(post) {
-                post.isLiked = !post.isLiked;
-                post.likes += post.isLiked ? 1 : -1;
-                renderPosts();
+        // Postları Generasiya Et
+        function createPostElement(id) {
+            const username = usernames[Math.floor(Math.random() * usernames.length)] + "_" + (id % 50);
+            const userAvatar = `https://picsum.photos/seed/avatar_${id}/100/100`;
+            const postImg = `https://picsum.photos/seed/post_${id}/600/600`;
+            const likes = Math.floor(Math.random() * 800) + 12;
+            const caption = captions[Math.floor(Math.random() * captions.length)];
+
+            return `
+                <article class="post-card" id="post-${id}">
+                    <div class="post-header">
+                        <div class="post-user-info">
+                            <img src="${userAvatar}" class="post-avatar" alt="${username}">
+                            <span class="post-username">${username}</span>
+                        </div>
+                        <i class="fa-solid fa-ellipsis"></i>
+                    </div>
+                    <img src="${postImg}" class="post-image" alt="Post">
+                    <div class="post-actions">
+                        <div class="action-btns">
+                            <i class="fa-regular fa-heart" onclick="toggleLike(this, ${id})"></i>
+                            <i class="fa-regular fa-comment"></i>
+                            <i class="fa-regular fa-paper-plane"></i>
+                        </div>
+                        <i class="fa-regular fa-bookmark"></i>
+                    </div>
+                    <div class="post-details">
+                        <div class="likes-count" id="likes-${id}">${likes} bəyənmə</div>
+                        <div class="caption">
+                            <span class="username">${username}</span> ${caption}
+                        </div>
+                        <div class="comments-section" id="comments-${id}">
+                            <div class="view-comments">Bütün şərhləri göstər</div>
+                        </div>
+                    </div>
+                    <div class="add-comment-box">
+                        <input type="text" placeholder="Şərh əlavə et..." id="input-${id}">
+                        <button onclick="addComment(${id})">Paylaş</button>
+                    </div>
+                </article>
+            `;
+        }
+
+        // Bəyənmə Funksiyası
+        function toggleLike(element, postId) {
+            const likesElem = document.getElementById(`likes-${postId}`);
+            let currentLikes = parseInt(likesElem.innerText);
+
+            if(element.classList.contains('fa-regular')) {
+                element.classList.remove('fa-regular');
+                element.classList.add('fa-solid', 'active');
+                likesElem.innerText = `${currentLikes + 1} bəyənmə`;
+            } else {
+                element.classList.remove('fa-solid', 'active');
+                element.classList.add('fa-regular');
+                likesElem.innerText = `${currentLikes - 1} bəyənmə`;
             }
         }
 
-        // New Comment Add Event
-        function handleCommentSubmit(event, postId) {
-            if (event.key === 'Enter' && event.target.value.trim() !== '') {
-                const post = state.posts.find(p => p.id === postId);
-                if(post) {
-                    post.comments.push({
-                        user: state.currentUser.name,
-                        text: event.target.value.trim()
-                    });
-                    event.target.value = '';
-                    renderPosts();
-                }
+        // Şərh Əlavə Etmə Funksiyası
+        function addComment(postId) {
+            const input = document.getElementById(`input-${postId}`);
+            const commentsContainer = document.getElementById(`comments-${postId}`);
+            
+            if(input.value.trim() !== "") {
+                const commentDiv = document.createElement('div');
+                commentDiv.innerHTML = `<strong>siz:</strong> ${input.value}`;
+                commentsContainer.appendChild(commentDiv);
+                input.value = "";
             }
         }
 
-        // Create New Post Event
-        document.getElementById('publishPostBtn').addEventListener('click', () => {
-            const input = document.getElementById('newPostContent');
-            const text = input.value.trim();
-
-            if (!text) {
-                alert("Xahiş olunur mətn daxil edin!");
-                return;
+        // İlkin Postları Yüklə və Sonsuz Sürüşdürmə (Infinite Scroll) Təmin Et
+        let postCounter = 1;
+        function loadMorePosts(count = 5) {
+            const feed = document.getElementById('feed-posts');
+            for(let i = 0; i < count; i++) {
+                feed.innerHTML += createPostElement(postCounter);
+                postCounter++;
             }
+        }
 
-            const newPost = {
-                id: Date.now(),
-                author: state.currentUser.name,
-                handle: state.currentUser.handle,
-                avatar: state.currentUser.avatar,
-                time: "İndi",
-                content: text,
-                image: "https://picsum.photos/id/1060/800/400", // Simulyasiya üçün avto şəkil
-                views: 1, // İlkin baxış
-                followers: 520,
-                likes: 0,
-                comments: [],
-                isLiked: false
-            };
+        // Səhifə Yüklənərkən
+        window.onload = () => {
+            generateStories();
+            loadMorePosts(10);
+        };
 
-            state.posts.unshift(newPost);
-            input.value = '';
-            renderPosts();
-        });
-
-        // Dark / Light Theme Toggle Engine
-        const themeBtn = document.getElementById('themeToggle');
-        themeBtn.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-        });
-
-        // Simulated Realtime Views & Revenue Generator
-        setInterval(() => {
-            state.posts.forEach(post => {
-                const randomViewAdd = Math.floor(Math.random() * 5) + 1;
-                post.views += randomViewAdd;
-            });
-            renderPosts();
-        }, 8000);
-
-        // Initial Render Initialization
-        document.addEventListener('DOMContentLoaded', () => {
-            renderPosts();
-        });
+        // Scroll Hadisəsi (Sonsuz Yem)
+        window.onscroll = () => {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+                loadMorePosts(3);
+            }
+        };
     </script>
 </body>
 </html>
