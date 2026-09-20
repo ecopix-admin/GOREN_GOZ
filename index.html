@@ -3,388 +3,214 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sosial Bloq & Monetizasiya Platforması</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    :root {
-      --primary: #2563eb;
-      --bg: #f3f4f6;
-      --card-bg: #ffffff;
-      --text: #1f2937;
-    }
-    * { box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background: var(--card-bg);
-      padding: 1rem 1.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .container {
-      max-width: 680px;
-      margin: 1.5rem auto;
-      padding: 0 1rem;
-    }
-    .card {
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 1.2rem;
-      margin-bottom: 1.5rem;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-    input, textarea {
-      width: 100%;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      padding: 0.75rem;
-      margin-bottom: 0.8rem;
-      font-size: 0.95rem;
-    }
-    button {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 0.6rem 1.2rem;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-    button:hover { opacity: 0.9; }
-    .btn-secondary { background: #6b7280; }
-    .hidden { display: none !important; }
-    
-    /* Profil Kartı */
-    .profile-header {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    .profile-avatar {
-      width: 65px;
-      height: 65px;
-      border-radius: 50%;
-      object-fit: cover;
-      background: #e5e7eb;
-    }
-    .balance-badge {
-      background: #10b981;
-      color: white;
-      padding: 0.3rem 0.8rem;
-      border-radius: 20px;
-      font-weight: bold;
-      font-size: 0.85rem;
-      display: inline-block;
-      margin-top: 0.4rem;
-    }
+  <title>Pulsuz & Sürətli Sosial Bloq</title>
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-    /* Postlar */
-    .post-header {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      margin-bottom: 0.8rem;
-    }
-    .post-header img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-    .post-img {
-      width: 100%;
-      max-height: 450px;
-      object-fit: cover;
-      border-radius: 8px;
-      margin-bottom: 0.8rem;
-    }
-    .post-stats {
-      display: flex;
-      justify-content: space-between;
-      color: #6b7280;
-      font-size: 0.85rem;
-      border-bottom: 1px solid #f3f4f6;
-      padding-bottom: 0.5rem;
-      margin-bottom: 0.8rem;
-    }
-    .post-actions {
-      display: flex;
-      gap: 0.5rem;
-    }
-    .post-actions button {
-      background: #f3f4f6;
-      color: var(--text);
-      flex: 1;
-    }
-    .comments-box {
-      background: #f9fafb;
-      padding: 0.8rem;
-      border-radius: 8px;
-      margin-top: 0.8rem;
-    }
-    .comment-item {
-      font-size: 0.9rem;
-      margin-bottom: 0.4rem;
-      padding-bottom: 0.4rem;
-      border-bottom: 1px dashed #e5e7eb;
-    }
+  <style>
+    :root { --primary: #2563eb; --bg: #f3f4f6; --card: #ffffff; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 0; }
+    header { background: var(--card); padding: 1rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .container { max-width: 600px; margin: 1.5rem auto; padding: 0 1rem; }
+    .card { background: var(--card); border-radius: 12px; padding: 1.2rem; margin-bottom: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    input, textarea, button { width: 100%; padding: 0.75rem; margin-bottom: 0.8rem; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
+    button { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; }
+    button:hover { opacity: 0.9; }
+    .hidden { display: none !important; }
+    .post-img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; }
+    .badge { background: #10b981; color: white; padding: 0.3rem 0.6rem; border-radius: 12px; font-size: 0.85rem; }
   </style>
 </head>
 <body>
 
   <header>
-    <h2 style="margin:0; color: var(--primary);">SosialBloq</h2>
-    <div id="nav-auth">
-      <button onclick="showAuthModal()">Giriş / Qeydiyyat</button>
-    </div>
+    <h3 style="margin:0; color:var(--primary)">SosialBloq</h3>
+    <div id="user-nav">Giriş edilməyib</div>
   </header>
 
   <div class="container">
-
-    <!-- Auth Paneli (Giriş / Qeydiyyat) -->
-    <div class="card hidden" id="auth-card">
-      <h3 id="auth-title">Qeydiyyat</h3>
-      <input type="email" id="auth-email" placeholder="E-poçt ünvanınız">
-      <input type="password" id="auth-password" placeholder="Şifrə (min. 6 simvol)">
-      <input type="text" id="auth-username" placeholder="İstifadəçi adı (Profil üçün)">
-      <button onclick="handleAuth()" id="auth-btn">Daxil ol / Qeydiyyat</button>
-      <button class="btn-secondary" onclick="toggleAuthMode()">Keçid Et</button>
+    
+    <!-- QEYDİYYAT / GİRİŞ -->
+    <div class="card" id="auth-box">
+      <h3>Giriş və ya Qeydiyyat</h3>
+      <input type="email" id="email" placeholder="E-poçt">
+      <input type="password" id="password" placeholder="Şifrə">
+      <button onclick="handleAuth(true)">Qeydiyyatdan Keç</button>
+      <button onclick="handleAuth(false)" style="background:#6b7280">Daxil Ol</button>
     </div>
 
-    <!-- Profil Paneli -->
-    <div class="card hidden" id="profile-card">
-      <div class="profile-header">
-        <img id="user-avatar" class="profile-avatar" src="https://via.placeholder.com/65" alt="Avatar">
-        <div>
-          <h3 id="user-name" style="margin:0;">İstifadəçi</h3>
-          <p id="user-status" style="margin:0.2rem 0; color:#6b7280;">Status yoxdur</p>
-          <div class="balance-badge">Balans: <span id="user-balance">0.000</span> AZN</div>
-        </div>
-      </div>
-      <hr style="margin: 1rem 0; border:0; border-top: 1px solid #eee;">
-      <h4>Profili Yenilə</h4>
-      <input type="text" id="edit-avatar-url" placeholder="Profil şəklinin URL adresi">
-      <input type="text" id="edit-status" placeholder="Status yazın...">
-      <button onclick="updateProfile()">Yadda saxla</button>
-      <button class="btn-secondary" onclick="logout()">Çıxış et</button>
+    <!-- PROFİL VƏ BALANS -->
+    <div class="card hidden" id="profile-box">
+      <h3>Profilim</h3>
+      <p id="user-email"></p>
+      <div>Qazandığınız Balans: <span class="badge" id="user-balance">0.000 AZN</span></div>
+      <button onclick="logout()" style="margin-top:1rem; background:#ef4444">Çıxış Et</button>
     </div>
 
-    <!-- Post Yaratmaq Paneli -->
-    <div class="card hidden" id="create-post-card">
+    <!-- POST YARATMAQ (IMGBB YÜKLƏMƏSİ İLƏ) -->
+    <div class="card hidden" id="post-box">
       <h3>Yeni Məqalə Paylaş</h3>
-      <input type="text" id="post-title" placeholder="Məqalə Başlığı">
-      <input type="text" id="post-image-url" placeholder="Şəkil URL-i (Hər kəsin görə biləcəyi şəkil linki)">
-      <textarea id="post-content" rows="4" placeholder="Şəklin altına məqalənizi yazın..."></textarea>
-      <button onclick="createPost()">Paylaş Və Qazan</button>
+      <label>Şəkil Seçin (Limitsiz Pulsuz Hosting):</label>
+      <input type="file" id="image-file" accept="image/*">
+      <textarea id="post-text" rows="3" placeholder="Məqalənizi yazın..."></textarea>
+      <button onclick="uploadAndPost()" id="upload-btn">Paylaş Və Qazan</button>
     </div>
 
-    <!-- Məqalələr Lenti -->
-    <div id="posts-feed">
-      <p style="text-align: center; color: #6b7280;">Məqalələr yüklənir...</p>
-    </div>
+    <!-- POSTLAR LENTİ -->
+    <div id="posts-feed"></div>
 
   </div>
 
   <script>
-    // ⚠️ ÖZ SUPABASE MƏLUMATLARINIZLA ƏVƏZ EDİN ⚠️
-    const SUPABASE_URL = "https://YOUR_SUPABASE_URL.supabase.co";
-    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+    // 1. IMGBB API AÇARI (https://api.imgbb.com adresindən pulsuz alın)
+    const IMGBB_API_KEY = "YOUR_IMGBB_API_KEY";
 
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // 2. FIREBASE KONFİQURASİYASI (Firebase Console-dan kopyalayın)
+    const firebaseConfig = {
+      apiKey: "YOUR_FIREBASE_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "123456789",
+      appId: "YOUR_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
     let currentUser = null;
-    let isSignUp = true;
 
-    // Başlanğıc
-    async function init() {
-      const { data: { user } } = await supabase.auth.getUser();
+    // Authentifikasiya İzləyicisi
+    auth.onAuthStateChanged(async (user) => {
       currentUser = user;
-      
-      if(currentUser) {
-        document.getElementById('auth-card').classList.add('hidden');
-        document.getElementById('profile-card').classList.remove('hidden');
-        document.getElementById('create-post-card').classList.remove('hidden');
-        document.getElementById('nav-auth').innerHTML = `<button onclick="logout()">Çıxış</button>`;
-        await loadProfile();
+      if (user) {
+        document.getElementById('auth-box').classList.add('hidden');
+        document.getElementById('profile-box').classList.remove('hidden');
+        document.getElementById('post-box').classList.remove('hidden');
+        document.getElementById('user-email').innerText = user.email;
+        loadUserData(user.uid);
       } else {
-        document.getElementById('auth-card').classList.remove('hidden');
+        document.getElementById('auth-box').classList.remove('hidden');
+        document.getElementById('profile-box').classList.add('hidden');
+        document.getElementById('post-box').classList.add('hidden');
       }
+      loadPosts();
+    });
 
-      await loadPosts();
-    }
-
-    // Auth funksiyaları
-    function toggleAuthMode() {
-      isSignUp = !isSignUp;
-      document.getElementById('auth-title').innerText = isSignUp ? 'Qeydiyyat' : 'Giriş Et';
-      document.getElementById('auth-username').style.display = isSignUp ? 'block' : 'none';
-    }
-
-    async function handleAuth() {
-      const email = document.getElementById('auth-email').value;
-      const password = document.getElementById('auth-password').value;
-      const username = document.getElementById('auth-username').value;
-
-      if(!email || !password) return alert('Bütün xanaları doldurun');
-
-      if(isSignUp) {
-        const { data, error } = await supabase.auth.signUp({ email, password });
-        if(error) return alert(error.message);
-        
-        if(data.user) {
-          await supabase.from('profiles').insert([
-            { id: data.user.id, username: username || email.split('@')[0], avatar_url: 'https://via.placeholder.com/65' }
-          ]);
-          alert('Qeydiyyat tamamlandı!');
-          location.reload();
+    // Giriş / Qeydiyyat
+    async function handleAuth(isSignUp) {
+      const email = document.getElementById('email').value;
+      const pass = document.getElementById('password').value;
+      try {
+        if (isSignUp) {
+          const res = await auth.createUserWithEmailAndPassword(email, pass);
+          await db.collection('users').doc(res.user.uid).set({ email, balance: 0 });
+        } else {
+          await auth.signInWithEmailAndPassword(email, pass);
         }
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if(error) return alert(error.message);
-        location.reload();
+      } catch (err) { alert(err.message); }
+    }
+
+    function logout() { auth.signOut(); }
+
+    // İstifadəçi Balansını Yüklə
+    function loadUserData(uid) {
+      db.collection('users').doc(uid).onSnapshot(doc => {
+        if (doc.exists) {
+          document.getElementById('user-balance').innerText = (doc.data().balance || 0).toFixed(3) + " AZN";
+        }
+      });
+    }
+
+    // 3. ŞƏKİLİ IMGBB-YƏ YÜKLƏMƏK VƏ POST YARATMAQ
+    async function uploadAndPost() {
+      const fileInput = document.getElementById('image-file');
+      const text = document.getElementById('post-text').value;
+      const btn = document.getElementById('upload-btn');
+
+      if (!fileInput.files[0] || !text) return alert('Şəkil və mətn daxil edin');
+
+      btn.innerText = "Şəkil yüklənir...";
+      btn.disabled = true;
+
+      // ImgBB API ilə Şəkil Yükləmə (Limitsiz Və Pulsuz)
+      const formData = new FormData();
+      formData.append("image", fileInput.files[0]);
+
+      try {
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+          method: "POST",
+          body: formData
+        });
+        const data = await response.json();
+
+        if (data.success) {
+          const imageUrl = data.data.url; // ImgBB-dən gələn şəkil linki
+
+          // Postu Firestore-a yazırıq
+          await db.collection('posts').add({
+            userId: currentUser.uid,
+            userEmail: currentUser.email,
+            imageUrl: imageUrl,
+            text: text,
+            views: 0,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+          document.getElementById('post-text').value = '';
+          fileInput.value = '';
+          alert('Paylaşıldı!');
+        } else {
+          alert('Şəkil yüklənmədi!');
+        }
+      } catch (e) {
+        alert('Xəta baş verdi: ' + e.message);
+      } finally {
+        btn.innerText = "Paylaş Və Qazan";
+        btn.disabled = false;
       }
     }
 
-    async function logout() {
-      await supabase.auth.signOut();
-      location.reload();
-    }
+    // 4. POSTLARI VƏ 40% MONETİZASİYANI HESABLAMAQ
+    function loadPosts() {
+      db.collection('posts').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+        const feed = document.getElementById('posts-feed');
+        feed.innerHTML = '';
 
-    // Profil Yükləmə
-    async function loadProfile() {
-      const { data } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
-      if(data) {
-        document.getElementById('user-name').innerText = `@${data.username}`;
-        document.getElementById('user-status').innerText = data.status || '';
-        document.getElementById('user-avatar').src = data.avatar_url || 'https://via.placeholder.com/65';
-        document.getElementById('user-balance').innerText = parseFloat(data.balance || 0).toFixed(3);
-      }
-    }
+        snapshot.docs.forEach(doc => {
+          const post = doc.data();
+          const postId = doc.id;
 
-    async function updateProfile() {
-      const status = document.getElementById('edit-status').value;
-      const avatar_url = document.getElementById('edit-avatar-url').value;
+          // Hər dəfə post ekranda görünəndə Baxış sayını 1 artırırıq
+          db.collection('posts').doc(postId).update({
+            views: firebase.firestore.FieldValue.increment(1)
+          });
 
-      const updates = {};
-      if(status) updates.status = status;
-      if(avatar_url) updates.avatar_url = avatar_url;
+          // Müəllifin balansına 40% Pay (1000 baxış = 4 AZN, 1 baxış = 0.004 AZN)
+          db.collection('users').doc(post.userId).update({
+            balance: firebase.firestore.FieldValue.increment(0.004)
+          });
 
-      await supabase.from('profiles').update(updates).eq('id', currentUser.id);
-      alert('Profil yeniləndi!');
-      loadProfile();
-    }
+          const postEarning = ((post.views || 0) * 0.004).toFixed(3);
 
-    // Post Yaratmaq
-    async function createPost() {
-      const title = document.getElementById('post-title').value;
-      const image_url = document.getElementById('post-image-url').value;
-      const content = document.getElementById('post-content').value;
-
-      if(!image_url || !content) return alert('Şəkil URL-i və məzmun vacibdir!');
-
-      const { error } = await supabase.from('posts').insert([
-        { user_id: currentUser.id, title, image_url, content }
-      ]);
-
-      if(error) alert(error.message);
-      else {
-        document.getElementById('post-title').value = '';
-        document.getElementById('post-image-url').value = '';
-        document.getElementById('post-content').value = '';
-        loadPosts();
-      }
-    }
-
-    // Postları və Monetizasiyanı Yükləmək
-    async function loadPosts() {
-      const { data: posts, error } = await supabase
-        .from('posts')
-        .select(`
-          *,
-          profiles (username, avatar_url),
-          comments (id, comment_text, profiles(username))
-        `)
-        .order('created_at', { ascending: false });
-
-      if(error) return console.log(error);
-
-      const feed = document.getElementById('posts-feed');
-      feed.innerHTML = '';
-
-      for (let post of posts) {
-        // Hər baxışda avtomatik olaraq Postun baxışını +1 edirik və müəllifə 40% pay yazırıq
-        await supabase.rpc('increment_post_views', { post_id_param: post.id });
-
-        const authorEarning = (post.views * 0.004).toFixed(3);
-
-        const postCard = document.createElement('div');
-        postCard.className = 'card';
-        postCard.innerHTML = `
-          <div class="post-header">
-            <img src="${post.profiles?.avatar_url || 'https://via.placeholder.com/40'}">
-            <div>
-              <strong>@${post.profiles?.username || 'naməlum'}</strong>
+          const el = document.createElement('div');
+          el.className = 'card';
+          el.innerHTML = `
+            <div><b>@${post.userEmail.split('@')[0]}</b></div>
+            <img src="${post.imageUrl}" class="post-img" style="margin:0.5rem 0;">
+            <p>${post.text}</p>
+            <div style="font-size:0.85rem; color:#6b7280;">
+              👁️ ${post.views || 0} Baxış (Toplanan: ${postEarning} AZN)
             </div>
-          </div>
-          ${post.title ? `<h4>${post.title}</h4>` : ''}
-          <img src="${post.image_url}" class="post-img" onerror="this.src='https://via.placeholder.com/600x300'">
-          <p>${post.content}</p>
-          
-          <div class="post-stats">
-            <span>👁️ ${post.views + 1} Baxış (Toplanan: ${authorEarning} AZN)</span>
-            <span>❤️ ${post.likes_count || 0} Bəyənmə</span>
-          </div>
-
-          <div class="post-actions">
-            <button onclick="likePost(${post.id})">❤️ Bəyən</button>
-            <button onclick="sharePost(${post.id})">🔗 Paylaş</button>
-          </div>
-
-          <div class="comments-box">
-            <div id="comments-${post.id}">
-              ${post.comments.map(c => `<div class="comment-item"><b>@${c.profiles?.username}:</b> ${c.comment_text}</div>`).join('')}
-            </div>
-            ${currentUser ? `
-              <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
-                <input type="text" id="input-comment-${post.id}" placeholder="Rəy yaz..." style="margin:0;">
-                <button onclick="addComment(${post.id})">Göndər</button>
-              </div>
-            ` : ''}
-          </div>
-        `;
-        feed.appendChild(postCard);
-      }
+          `;
+          feed.appendChild(el);
+        });
+      });
     }
-
-    async function likePost(postId) {
-      if(!currentUser) return alert('Bəyənmək üçün daxil olun');
-      await supabase.from('likes').insert([{ post_id: postId, user_id: currentUser.id }]);
-      loadPosts();
-    }
-
-    async function addComment(postId) {
-      const text = document.getElementById(`input-comment-${postId}`).value;
-      if(!text) return;
-      await supabase.from('comments').insert([{ post_id: postId, user_id: currentUser.id, comment_text: text }]);
-      loadPosts();
-    }
-
-    function sharePost(id) {
-      navigator.clipboard.writeText(window.location.href);
-      alert('Postun linki kopyalandı! Dostlarınızı dəvət edə bilərsiniz.');
-    }
-
-    init();
   </script>
 </body>
 </html>
