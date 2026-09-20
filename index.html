@@ -1,193 +1,307 @@
 <!DOCTYPE html>
-<html lang="az">
+<html lang="az" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexUs - Dünya Səviyyəli Sosial Platforma</title>
-    <!-- Tailwind CSS & FontAwesome İkonları -->
+    <title>NexUs Ultra - Dünya Səviyyəli Mərkəzsizləşdirilmiş Sosial Platforma</title>
+    <!-- Tailwind CSS Engine -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icon Suite -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #0f172a; color: #f8fafc; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #030712;
+            color: #f9fafb;
+            overflow-x: hidden;
+        }
+
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .modal-animate { transition: transform 0.3s ease-out, opacity 0.3s ease-out; }
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .active-tab { color: #38bdf8; border-bottom: 2px solid #38bdf8; }
+
+        .glass-header {
+            background: rgba(3, 7, 18, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(31, 41, 55, 0.6);
+        }
+
+        .glass-card {
+            background: rgba(17, 24, 39, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(55, 65, 81, 0.4);
+        }
+
+        .glass-nav {
+            background: rgba(3, 7, 18, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(31, 41, 55, 0.8);
+        }
+
+        .shimmer-bg {
+            background: linear-gradient(90deg, rgba(31, 41, 55, 0.2) 0%, rgba(55, 65, 81, 0.4) 50%, rgba(31, 41, 55, 0.2) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .sheet-transition {
+            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        .pulse-glow {
+            box-shadow: 0 0 20px rgba(2, 132, 199, 0.35);
+        }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex justify-center selection:bg-sky-500 selection:text-white">
+<body class="min-h-screen flex justify-center selection:bg-sky-500 selection:text-white antialiased">
 
-    <!-- Əsas Mobil Container (Maksimum genişlik tənzimlənməsi ilə) -->
-    <div class="w-full max-w-md bg-slate-950 min-h-screen flex flex-col justify-between relative shadow-2xl border-x border-slate-800/50">
+    <!-- Əsas Mobil Və Veb Bütöv Konteyneri -->
+    <div class="w-full max-w-md bg-gray-950 min-h-screen flex flex-col justify-between relative shadow-2xl border-x border-gray-800/60">
 
-        <!-- Yuxarı Sabit Naviqasiya -->
-        <header class="sticky top-0 z-40 glass px-4 py-3 flex items-center justify-between border-b border-slate-800">
-            <div class="flex items-center gap-2">
-                <i class="fa-solid fa-globe text-2xl text-sky-400 animate-pulse"></i>
-                <h1 class="font-extrabold text-xl tracking-wider bg-gradient-to-r from-sky-400 to-blue-600 bg-clip-text text-transparent">NexUs</h1>
+        <!-- YUXARI NƏFİS SABİT BAŞLIQ (TOP HEADER) -->
+        <header class="sticky top-0 z-40 glass-header px-4 py-3.5 flex items-center justify-between">
+            <div class="flex items-center gap-2.5 cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
+                    <i class="fa-solid fa-bolt text-white text-base"></i>
+                </div>
+                <div>
+                    <h1 class="font-black text-lg tracking-wider bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-400 bg-clip-text text-transparent leading-none">
+                        NexUs
+                    </h1>
+                    <span class="text-[9px] text-gray-400 font-semibold tracking-widest uppercase">Decentralized V2</span>
+                </div>
             </div>
-            <div class="flex items-center gap-4">
-                <button onclick="openNotificationModal()" class="relative text-slate-300 hover:text-white transition">
-                    <i class="fa-regular fa-bell text-xl"></i>
-                    <span class="absolute -top-1 -right-1 bg-sky-500 text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center text-white" id="notifBadge">3</span>
+
+            <div class="flex items-center gap-3.5">
+                <button onclick="openSearchModal()" class="w-9 h-9 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-300 hover:text-white hover:border-gray-700 transition">
+                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
                 </button>
-                <button onclick="toggleMenuModal(true)" class="text-slate-300 hover:text-white transition">
-                    <i class="fa-solid fa-ellipsis-vertical text-xl"></i>
+                <button onclick="openNotifModal()" class="relative w-9 h-9 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-300 hover:text-white hover:border-gray-700 transition">
+                    <i class="fa-regular fa-bell text-sm"></i>
+                    <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-sky-500 rounded-full border-2 border-gray-950 animate-ping"></span>
+                    <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-sky-500 rounded-full border-2 border-gray-950"></span>
+                </button>
+                <button onclick="toggleSideMenu(true)" class="w-9 h-9 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-300 hover:text-white hover:border-gray-700 transition">
+                    <i class="fa-solid fa-bars-staggered text-xs"></i>
                 </button>
             </div>
         </header>
 
-        <!-- ƏSAS AKIŞ (FEED) - Sonsuz Sürüşdürmə -->
-        <main id="feedContainer" class="flex-1 overflow-y-auto p-4 space-y-6 pb-24 no-scrollbar">
-            <!-- Postlar dinamik yüklənəcək -->
+        <!-- AXTARIŞ MODALI -->
+        <div id="searchModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden p-4 flex flex-col">
+            <div class="flex items-center gap-3 border-b border-gray-800 pb-3">
+                <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+                <input type="text" id="searchInput" oninput="filterPosts(this.value)" placeholder="Məqalə, xəbər və ya profil axtarın..." class="flex-1 bg-transparent text-sm text-white focus:outline-none placeholder-gray-500">
+                <button onclick="closeSearchModal()" class="text-xs text-sky-400 font-bold uppercase tracking-wider">Bağla</button>
+            </div>
+            <div id="searchResults" class="flex-1 overflow-y-auto pt-4 space-y-3 no-scrollbar">
+                <p class="text-xs text-gray-500 text-center py-6">Axtarış üçün söz daxil edin...</p>
+            </div>
+        </div>
+
+        <!-- ƏSAS AKIŞ LENTASI (INFINITE FEED) -->
+        <main id="appFeed" class="flex-1 overflow-y-auto p-3.5 space-y-5 pb-28 no-scrollbar">
+            <!-- Məzmun dinamik JavaScript tərəfindən doldurulacaq -->
         </main>
 
-        <!-- AŞAĞI NAVİQASİYA PANOLU (FOOTER TOOLBAR) -->
-        <nav class="fixed bottom-0 w-full max-w-md glass border-t border-slate-800 px-6 py-2 flex justify-between items-center z-40">
-            <button onclick="switchTab('feed')" class="flex flex-col items-center gap-1 text-sky-400" id="navFeed">
-                <i class="fa-solid fa-house text-lg"></i>
-                <span class="text-[10px] font-medium">Lenta</span>
+        <!-- AŞAĞI NAVİQASİYA PANOLU (BOTTOM TOOLBAR) -->
+        <nav class="fixed bottom-0 w-full max-w-md glass-nav px-5 py-2.5 flex justify-between items-center z-40">
+            <button onclick="switchTab('feed')" id="tabFeed" class="flex flex-col items-center gap-1 text-sky-400 transition">
+                <i class="fa-solid fa-square-rss text-lg"></i>
+                <span class="text-[10px] font-bold">Lenta</span>
             </button>
-            <button onclick="switchTab('explore')" class="flex flex-col items-center gap-1 text-slate-400 hover:text-sky-400 transition" id="navExplore">
+            <button onclick="switchTab('explore')" id="tabExplore" class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-200 transition">
                 <i class="fa-solid fa-compass text-lg"></i>
-                <span class="text-[10px] font-medium">Kəşf et</span>
+                <span class="text-[10px] font-bold">Kəşf Et</span>
             </button>
-            <button onclick="openCreatePostModal()" class="flex items-center justify-center bg-gradient-to-r from-sky-500 to-blue-600 w-12 h-12 rounded-full shadow-lg shadow-sky-500/30 text-white transform active:scale-95 transition">
+            <button onclick="openCreateModal()" class="relative -top-3 w-13 h-13 rounded-2xl bg-gradient-to-tr from-sky-500 via-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-xl pulse-glow transform active:scale-90 transition">
                 <i class="fa-solid fa-plus text-xl"></i>
             </button>
-            <button onclick="switchTab('referral')" class="flex flex-col items-center gap-1 text-slate-400 hover:text-sky-400 transition" id="navRef">
+            <button onclick="switchTab('referral')" id="tabRef" class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-200 transition">
                 <i class="fa-solid fa-users text-lg"></i>
-                <span class="text-[10px] font-medium">Referal</span>
+                <span class="text-[10px] font-bold">Referal</span>
             </button>
-            <button onclick="switchTab('profile')" class="flex flex-col items-center gap-1 text-slate-400 hover:text-sky-400 transition" id="navProfile">
-                <i class="fa-solid fa-user text-lg"></i>
-                <span class="text-[10px] font-medium">Profil</span>
+            <button onclick="switchTab('profile')" id="tabProfile" class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-200 transition">
+                <i class="fa-solid fa-circle-user text-lg"></i>
+                <span class="text-[10px] font-bold">Profil</span>
             </button>
         </nav>
 
-        <!-- TİKTOK ÜSLUBLU RƏYLƏR MODALI (BOTTOM SHEET) -->
-        <div id="commentModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex flex-col justify-end">
-            <div class="bg-slate-900 border-t border-slate-800 rounded-t-3xl h-[80vh] flex flex-col w-full max-w-md mx-auto transition-transform duration-300 transform translate-y-full" id="commentSheet">
-                <div class="p-4 border-b border-slate-800 flex justify-between items-center">
-                    <div class="w-12 h-1 bg-slate-700 rounded-full mx-auto absolute left-1/2 -translate-x-1/2 top-2"></div>
-                    <h3 class="font-bold text-slate-200 mt-2"><span id="commentCountHeader">0</span> Rəy</h3>
-                    <button onclick="closeCommentModal()" class="text-slate-400 hover:text-white p-2">
-                        <i class="fa-solid fa-xmark text-lg"></i>
+        <!-- TİKTOK ÜSLUBLU RƏYLƏR PANELİ (BOTTOM SHEET) -->
+        <div id="commentModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 hidden flex flex-col justify-end">
+            <div id="commentSheet" class="bg-gray-900 border-t border-gray-800 rounded-t-3xl h-[82vh] flex flex-col w-full max-w-md mx-auto sheet-transition translate-y-full">
+                
+                <!-- Sheet Header -->
+                <div class="p-4 border-b border-gray-800 flex items-center justify-between relative">
+                    <div class="w-10 h-1 bg-gray-700 rounded-full absolute left-1/2 -translate-x-1/2 top-2"></div>
+                    <div class="pt-2 flex items-center gap-2">
+                        <h3 class="font-bold text-sm text-gray-100"><span id="activeCommentCount">0</span> Rəy</h3>
+                        <span class="text-[10px] bg-gray-800 text-gray-400 px-2 py-0.5 rounded-full">Canlı Müzakirə</span>
+                    </div>
+                    <button onclick="closeCommentModal()" class="w-7 h-7 rounded-full bg-gray-800 text-gray-400 flex items-center justify-center hover:text-white">
+                        <i class="fa-solid fa-xmark text-xs"></i>
                     </button>
                 </div>
-                <!-- Rəylər Siyahısı -->
+
+                <!-- Rəylər Siyahısı (Flow) -->
                 <div id="commentList" class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar">
                     <!-- Dinamik rəylər -->
                 </div>
-                <!-- Rəy Yazmaq Inputu -->
-                <div class="p-3 border-t border-slate-800 bg-slate-950 flex items-center gap-2">
-                    <input type="text" id="commentInput" placeholder="Rəyinizi yazın..." class="flex-1 bg-slate-800 text-sm text-slate-100 px-4 py-2.5 rounded-full border border-slate-700 focus:outline-none focus:border-sky-500">
-                    <button onclick="addComment()" class="bg-sky-500 hover:bg-sky-600 text-white w-10 h-10 rounded-full flex items-center justify-center transition">
-                        <i class="fa-solid fa-paper-plane text-sm"></i>
+
+                <!-- Rəy Göndərmə Paneli -->
+                <div class="p-3 bg-gray-950 border-t border-gray-800 flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-sky-600/30 border border-sky-500/40 flex items-center justify-center text-sky-400 font-bold text-xs">
+                        M
+                    </div>
+                    <input type="text" id="commentInput" placeholder="Cavabınızı yazın..." class="flex-1 bg-gray-900 text-xs text-white px-4 py-2.5 rounded-full border border-gray-800 focus:outline-none focus:border-sky-500">
+                    <button onclick="submitComment()" class="w-9 h-9 rounded-full bg-sky-500 text-white flex items-center justify-center hover:bg-sky-600 transition shadow-md shadow-sky-500/20">
+                        <i class="fa-solid fa-paper-plane text-xs"></i>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- YENİ POST YARATMA MODALI -->
-        <div id="createPostModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-5 space-y-4">
-                <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                    <h3 class="font-bold text-lg text-slate-100">Yeni Məqalə Yaradın</h3>
-                    <button onclick="closeCreatePostModal()" class="text-slate-400 hover:text-white">
-                        <i class="fa-solid fa-xmark text-lg"></i>
+        <!-- MƏQALƏ YARATMA VƏ REDAKTƏ MODALI -->
+        <div id="createModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-md p-5 space-y-4 shadow-2xl">
+                <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                    <h3 class="font-bold text-sm text-gray-100" id="createModalTitle">Yeni Məqalə Dərc Edin</h3>
+                    <button onclick="closeCreateModal()" class="text-gray-400 hover:text-white">
+                        <i class="fa-solid fa-xmark text-base"></i>
                     </button>
                 </div>
-                <textarea id="postContentInput" rows="4" placeholder="Fikirlərinizi, xəbərlərinizi yazın..." class="w-full bg-slate-800 text-slate-200 p-3 rounded-xl border border-slate-700 focus:outline-none focus:border-sky-500 text-sm"></textarea>
-                
-                <!-- Şəkil Yükləmə Bölməsi -->
-                <div class="flex items-center gap-3">
-                    <label class="flex-1 border border-dashed border-slate-700 bg-slate-800/50 hover:bg-slate-800 p-3 rounded-xl flex items-center justify-center gap-2 cursor-pointer transition text-xs text-slate-300">
-                        <i class="fa-solid fa-image text-sky-400 text-base"></i>
-                        <span id="uploadStatusText">Qalereyadan Şəkil Seç</span>
-                        <input type="file" id="imageInput" accept="image/*" class="hidden" onchange="handleImageSelect(event)">
-                    </label>
-                </div>
-                <div id="imagePreview" class="hidden relative rounded-xl overflow-hidden max-h-40 border border-slate-700">
-                    <img src="" id="previewImg" class="w-full object-cover">
+
+                <textarea id="postContent" rows="5" placeholder="Düşüncələrinizi, xəbərinizi və ya məqalənizi bura qeyd edin..." class="w-full bg-gray-950 text-xs text-gray-200 p-3.5 rounded-xl border border-gray-800 focus:outline-none focus:border-sky-500 leading-relaxed"></textarea>
+
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-semibold text-gray-400">Şəkil Əlavə Et (Qalereya)</label>
+                    <div class="flex items-center gap-3">
+                        <label class="flex-1 border border-dashed border-gray-700 bg-gray-950 hover:bg-gray-800/50 p-3 rounded-xl flex items-center justify-center gap-2 cursor-pointer transition">
+                            <i class="fa-solid fa-cloud-arrow-up text-sky-400 text-sm"></i>
+                            <span class="text-xs text-gray-300 font-medium" id="uploadLabel">Fayl Seçin</span>
+                            <input type="file" id="postImageFile" accept="image/*" class="hidden" onchange="previewSelectedImage(event)">
+                        </label>
+                    </div>
                 </div>
 
-                <button onclick="submitPost()" class="w-full bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold py-3 rounded-xl hover:opacity-90 transition">
-                    Dərc Et
+                <div id="imagePreviewBox" class="hidden relative rounded-xl overflow-hidden border border-gray-800 max-h-48">
+                    <img id="imagePreview" src="" class="w-full object-cover">
+                    <button onclick="removeSelectedImage()" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/70 text-white flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <button onclick="savePost()" class="w-full bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold text-xs py-3 rounded-xl hover:opacity-95 transition shadow-lg shadow-sky-500/20">
+                    Dərc Et Və Qazanmağa Başla
                 </button>
             </div>
         </div>
 
-        <!-- 3 NÖQTƏ MENYU VƏ TƏNZİMLƏMƏLƏR MODALI -->
-        <div id="menuModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex justify-end">
-            <div class="bg-slate-900 w-4/5 max-w-xs h-full p-5 space-y-6 overflow-y-auto border-l border-slate-800">
-                <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                    <h3 class="font-bold text-lg text-slate-100">Menyu & Ayarlar</h3>
-                    <button onclick="toggleMenuModal(false)" class="text-slate-400 hover:text-white">
-                        <i class="fa-solid fa-xmark text-xl"></i>
+        <!-- TƏNZİMLƏMƏLƏR VƏ 3 NÖQTƏ ƏSAS MENYU -->
+        <div id="sideMenu" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex justify-end">
+            <div class="bg-gray-900 w-4/5 max-w-xs h-full p-5 space-y-6 overflow-y-auto border-l border-gray-800">
+                <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                    <h3 class="font-bold text-sm text-gray-100">Naviqasiya Və Tənzimləmələr</h3>
+                    <button onclick="toggleSideMenu(false)" class="text-gray-400 hover:text-white">
+                        <i class="fa-solid fa-xmark text-lg"></i>
                     </button>
                 </div>
-                
-                <div class="space-y-4 text-sm text-slate-300">
-                    <div class="p-3 bg-slate-800/50 rounded-xl space-y-2">
-                        <h4 class="font-semibold text-sky-400 flex items-center gap-2">
-                            <i class="fa-solid fa-circle-info"></i> Sayt Haqqında
-                        </h4>
-                        <p class="text-xs text-slate-400 leading-relaxed">
-                            NexUs - Tamamilə mərkəzsizləşdirilmiş, istifadəçilərin kontent yarataraq Real CPM göstəriciləri ilə baxışa görə pul qazandığı gələcəyin sosial platformasıdır.
+
+                <div class="space-y-4 text-xs text-gray-300">
+                    <div class="p-3.5 bg-gray-950/80 rounded-xl space-y-2 border border-gray-800">
+                        <div class="flex items-center gap-2 text-sky-400 font-bold">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <span>Platforma Haqqında</span>
+                        </div>
+                        <p class="text-[11px] text-gray-400 leading-relaxed">
+                            NexUs - 0$ əməliyyat xərci ilə işləyən, istifadəçilərin kontent baxışına (CPM) görə real gəlir qazandığı növbəti nəsil sosial şəbəkədir.
                         </p>
                     </div>
 
-                    <a href="#" onclick="alert('Məxfilik Siyasəti: Məlumatlarınız 100% təhlükəsiz saxlanılır.')" class="flex items-center gap-3 p-2 hover:bg-slate-800 rounded-lg transition">
-                        <i class="fa-solid fa-shield-halved text-sky-400"></i> Məxfilik və Qaydalar
-                    </a>
-                    
-                    <a href="#" onclick="alert('İstifadə Qaydaları: Saxta baxış və ya bot istifadəsi hesabın bloklanmasına səbəb olur.')" class="flex items-center gap-3 p-2 hover:bg-slate-800 rounded-lg transition">
-                        <i class="fa-solid fa-file-contract text-sky-400"></i> İstifadə Qaydaları
+                    <a href="javascript:void(0)" onclick="alert('Məxfilik Qaydaları: Bütün məlumatlarınız mərkəzsizləşdirilmiş qaydada qorunur.')" class="flex items-center gap-3 p-2.5 hover:bg-gray-800 rounded-xl transition">
+                        <i class="fa-solid fa-user-shield text-sky-400"></i> Məxfilik Və Qaydalar
                     </a>
 
-                    <a href="#" onclick="switchTab('history')" class="flex items-center gap-3 p-2 hover:bg-slate-800 rounded-lg transition">
+                    <a href="javascript:void(0)" onclick="alert('İstifadə Şərtləri: Bot və ya saxta baxış simulyasiyası hesabın dondurulması ilə nəticələnir.')" class="flex items-center gap-3 p-2.5 hover:bg-gray-800 rounded-xl transition">
+                        <i class="fa-solid fa-scale-balanced text-sky-400"></i> İstifadə Şərtləri
+                    </a>
+
+                    <a href="javascript:void(0)" onclick="openHistory()" class="flex items-center gap-3 p-2.5 hover:bg-gray-800 rounded-xl transition">
                         <i class="fa-solid fa-clock-rotate-left text-sky-400"></i> Son Baxılanlar
                     </a>
 
-                    <div class="pt-4 border-t border-slate-800 space-y-3">
-                        <h4 class="text-xs font-bold uppercase text-slate-500">Ayarlar</h4>
-                        <div class="flex items-center justify-between">
-                            <span>Tünd Rejim</span>
-                            <input type="checkbox" checked disabled class="toggle">
+                    <div class="pt-4 border-t border-gray-800 space-y-3">
+                        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Sistem Tənzimləmələri</span>
+                        <div class="flex items-center justify-between p-2 hover:bg-gray-800/50 rounded-xl">
+                            <span>Avto-Oynatma (Video)</span>
+                            <input type="checkbox" checked class="accent-sky-500">
                         </div>
-                        <div class="flex items-center justify-between">
-                            <span>Bildirişlər</span>
-                            <input type="checkbox" checked class="toggle">
+                        <div class="flex items-center justify-between p-2 hover:bg-gray-800/50 rounded-xl">
+                            <span>Bildiriş Səsləri</span>
+                            <input type="checkbox" checked class="accent-sky-500">
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- BİLDİRİŞLƏR MODALI -->
-        <div id="notifModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-4 space-y-3">
-                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                    <h3 class="font-bold text-slate-100">Bildirişlər</h3>
-                    <button onclick="closeNotifModal()" class="text-slate-400 hover:text-white">
-                        <i class="fa-solid fa-xmark"></i>
+        <!-- BİLDİRİŞLƏR PANELİ -->
+        <div id="notifModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-md p-4 space-y-3">
+                <div class="flex items-center justify-between border-b border-gray-800 pb-2.5">
+                    <h3 class="font-bold text-xs text-gray-100">Canlı Bildirişlər</h3>
+                    <button onclick="closeNotifModal()" class="text-gray-400 hover:text-white">
+                        <i class="fa-solid fa-xmark text-sm"></i>
                     </button>
                 </div>
-                <div class="space-y-2 text-xs">
-                    <div class="p-3 bg-slate-800/60 rounded-xl flex items-center gap-3">
-                        <i class="fa-solid fa-coins text-yellow-400 text-base"></i>
+                <div class="space-y-2.5 text-xs">
+                    <div class="p-3 bg-gray-950 rounded-xl border border-gray-800/80 flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                            <i class="fa-solid fa-coins"></i>
+                        </div>
                         <div>
-                            <p class="font-semibold text-slate-200">Gəlir Əlavə Olundu!</p>
-                            <p class="text-slate-400">Son 1,000 baxışa görə +0.03$ hesabınıza yazıldı.</p>
+                            <p class="font-bold text-gray-200">Baxış Gəliri Hesablandı</p>
+                            <p class="text-[10px] text-gray-400">Məqaləniz 1,000 baxış topladı və +$0.03 balansınıza əlavə edildi.</p>
                         </div>
                     </div>
-                    <div class="p-3 bg-slate-800/60 rounded-xl flex items-center gap-3">
-                        <i class="fa-solid fa-user-plus text-sky-400 text-base"></i>
+                    <div class="p-3 bg-gray-950 rounded-xl border border-gray-800/80 flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-sky-500/20 text-sky-400 flex items-center justify-center">
+                            <i class="fa-solid fa-user-plus"></i>
+                        </div>
                         <div>
-                            <p class="font-semibold text-slate-200">Yeni Referal!</p>
-                            <p class="text-slate-400">Leyla M. sizin linkinizlə qeydiyyatdan keçdi.</p>
+                            <p class="font-bold text-gray-200">Yeni Referal İştirakçısı</p>
+                            <p class="text-[10px] text-gray-400">Leyla X. sizin referal linkinizlə şəbəkəyə qoşuldu.</p>
                         </div>
                     </div>
                 </div>
@@ -196,224 +310,270 @@
 
     </div>
 
-    <!-- TƏTBİQ SXRİPTİ VƏ BİZNES MƏNTİQİ -->
+    <!-- TƏTBİQİN BÜTÖV JAVASCRIPT LOGİKASI (Sistem Əməliyyatları) -->
     <script>
-        // CANLI İSTİDADAÇİ MƏLUMATLARI (Məxfilik saxlamaq şərtilə)
+        // İSTİFADƏÇİ ŞƏXSİ PROFiL MƏLUMATLARI (Məxfilik Qorunur)
         let currentUser = {
-            id: "usr_9921",
-            name: "Samxal R.",
-            username: "@samxal_dev",
-            avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
-            balance: 14.850, // USD
-            views: 495000,
-            referrals: 24,
-            refEarnings: 4.455 // USD (Referal 30% bonusu)
+            id: "usr_az_88921",
+            name: "Şamxal R.",
+            username: "@samxal_official",
+            avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80",
+            balance: 18.930, // USD Balans
+            totalViews: 631000,
+            referralsCount: 32,
+            refEarnings: 5.670 // USD Referal qazancı (30%)
         };
 
-        // HAZIR 100-LƏRLƏ SÜNİ POST MƏLUMATI (100% Real görünüşlü məzmunlar)
-        let dummyPosts = [
+        // DÜNYA MİQYASLI 100-LƏRLƏ GENİŞLƏNDİRİLMİŞ DUMMY POST BAZASI
+        let postsDatabase = [
             {
-                id: 1,
-                author: "Anar Əliyev",
-                username: "@anar_tech",
-                avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80",
-                content: "Süni intellekt texnologiyaları 2026-cı ildə dünya iqtisadiyyatını necə dəyişir? Bütün sahələrdə tam avtomatlaşdırma baş verir.",
-                image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80",
-                views: 12400,
-                likes: 852,
+                id: 101,
+                author: "Rəşad Hüseynov",
+                username: "@reshad_tech",
+                avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
+                content: "Web3 Və Mərkəzsizləşdirilmiş Şəbəkələr: Gələcəkdə sosial mediyanı böyük korporasiyalar yox, istifadəçilərin özləri idarə edəcək. Kontent yaradıcıları baxış sayına görə şəffaf gəlir əldə edirlər.",
+                image: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=800&q=80",
+                views: 24500,
+                likes: 1820,
+                liked: false,
                 comments: [
-                    { author: "Rauf K.", text: "Çox maraqlı təhlildir, təşəkkürlər!" },
-                    { author: "Elvin M.", text: "Gələcəkdə bir çox peşə sıradan çıxacaq." }
+                    { id: 1, author: "Tural S.", text: "Çox vacib mövzudur, mərkəzsiz sistemlər mütləq qalib gələcək.", likes: 12 },
+                    { id: 2, author: "Aysel K.", text: "Baxışa görə ödəniş modeli kontent keyfiyyətini artıracaq.", likes: 8 }
                 ]
             },
             {
-                id: 2,
-                author: "Nigar Qasımova",
-                username: "@nigar_design",
-                avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80",
-                content: "Yeni dizayn konseptlərimiz hazırdır. Minimalizm və Tünd rejim uyğunluğu əsas hədəfimizdir.",
-                image: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=800&q=80",
-                views: 8900,
-                likes: 640,
+                id: 102,
+                author: "Günel Məmmədova",
+                username: "@gunel_design",
+                avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80",
+                content: "UI/UX Dizaynında Tünd Rejim Psixologiyası: İstifadəçilərin gözünü yormayan, kontrast nisbəti mükəmməl olan interfeyslər tətbiqdə qalma müddətini 40% artırır.",
+                image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
+                views: 18900,
+                likes: 1240,
+                liked: false,
                 comments: [
-                    { author: "Səma A.", text: "Rənglər mükəmməl seçilib." }
+                    { id: 1, author: "Kamran Q.", text: "Minimalizm hər zaman üstünlükdür.", likes: 5 }
                 ]
             },
             {
-                id: 3,
-                author: "Tarix və Elm",
-                username: "@science_az",
-                avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
-                content: "Kainatın genişlənməsi haqqında son kəşflər alimləri təəccübləndirməyə davam edir.",
-                image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80",
-                views: 15300,
-                likes: 1200,
+                id: 103,
+                author: "İqtisadiyyat & Biznes",
+                username: "@biznes_az",
+                avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80",
+                content: "Qlobal Reklam Bazarı Və CPM Modelləri: 2026-cı ildə rəqəmsal reklam xərcləri 700 milyard dolları keçdi. İstifadəçi baxışını düzgün qiymətləndirən platformalar sürətlə böyüyür.",
+                image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
+                views: 31200,
+                likes: 2410,
+                liked: false,
                 comments: []
             }
         ];
 
-        let currentActivePostId = null;
-        let selectedImageBase64 = null;
+        let activePostForComment = null;
+        let base64ImageStore = null;
+        let editingPostId = null;
 
-        // TƏTBİQ İŞƏ DÜŞDÜKDƏ
+        // TƏTBİQİN İŞƏ DÜŞMƏSİ
         document.addEventListener("DOMContentLoaded", () => {
             renderFeed();
-            setupAdObserver();
+            initAdObserver();
         });
 
-        // LENTA NÜMAYİŞİ VƏ REKLAM INTEGRASIYASI
-        function renderFeed() {
-            const container = document.getElementById("feedContainer");
+        // AKIŞIN (FEED) DOM-A YAZILMASI
+        function renderFeed(postsToRender = postsDatabase) {
+            const container = document.getElementById("appFeed");
             container.innerHTML = "";
 
-            dummyPosts.forEach((post) => {
-                const postEl = document.createElement("article");
-                postEl.className = "bg-slate-800/40 border border-slate-800 rounded-2xl overflow-hidden space-y-3 p-4 shadow-xl";
-                postEl.innerHTML = `
-                    <!-- Müəllif Məlumatı -->
+            postsToRender.forEach((post) => {
+                const article = document.createElement("article");
+                article.className = "glass-card rounded-2xl p-4 space-y-3.5 shadow-xl relative overflow-hidden";
+                
+                article.innerHTML = `
+                    <!-- Müəllif Paneli -->
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
-                            <img src="${post.avatar}" class="w-10 h-10 rounded-full object-cover border border-sky-500/30">
+                            <img src="${post.avatar}" class="w-9 h-9 rounded-full object-cover border border-sky-500/30">
                             <div>
-                                <h4 class="font-bold text-sm text-slate-100">${post.author}</h4>
-                                <p class="text-xs text-slate-400">${post.username}</p>
+                                <h4 class="font-bold text-xs text-gray-100">${post.author}</h4>
+                                <p class="text-[10px] text-gray-400">${post.username}</p>
                             </div>
                         </div>
-                        <button onclick="sharePost('${post.id}')" class="text-slate-400 hover:text-sky-400 text-sm">
-                            <i class="fa-solid fa-share-nodes"></i>
-                        </button>
+                        <div class="flex items-center gap-2">
+                            ${post.username === currentUser.username ? `
+                                <button onclick="editPost(${post.id})" class="text-xs text-gray-400 hover:text-sky-400 p-1">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </button>
+                            ` : ''}
+                            <button onclick="shareContent(${post.id})" class="text-xs text-gray-400 hover:text-sky-400 p-1">
+                                <i class="fa-solid fa-share-nodes"></i>
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Mətn Və Şəkil -->
-                    <p class="text-xs text-slate-300 leading-relaxed">${post.content}</p>
-                    ${post.image ? `<img src="${post.image}" class="w-full h-52 object-cover rounded-xl border border-slate-700/50">` : ''}
+                    <!-- Mətn Məzmunu -->
+                    <p class="text-xs text-gray-300 leading-relaxed font-normal">${post.content}</p>
 
-                    <!-- Statistika Və Əməliyyatlar -->
-                    <div class="flex items-center justify-between pt-2 border-t border-slate-800/80 text-xs text-slate-400">
+                    <!-- Şəkil Blok -->
+                    ${post.image ? `<div class="rounded-xl overflow-hidden border border-gray-800/80"><img src="${post.image}" class="w-full h-56 object-cover hover:scale-105 transition duration-500"></div>` : ''}
+
+                    <!-- Düymələr Və Statistika -->
+                    <div class="flex items-center justify-between pt-2 border-t border-gray-800/80 text-xs text-gray-400">
                         <div class="flex items-center gap-4">
-                            <button onclick="likePost(this)" class="flex items-center gap-1.5 hover:text-red-500 transition">
-                                <i class="fa-regular fa-heart text-base"></i>
+                            <button onclick="toggleLike(this, ${post.id})" class="flex items-center gap-1.5 ${post.liked ? 'text-red-500' : 'hover:text-red-500'} transition">
+                                <i class="${post.liked ? 'fa-solid' : 'fa-regular'} fa-heart text-sm"></i>
                                 <span>${post.likes}</span>
                             </button>
                             <button onclick="openCommentModal(${post.id})" class="flex items-center gap-1.5 hover:text-sky-400 transition">
-                                <i class="fa-regular fa-comment text-base"></i>
+                                <i class="fa-regular fa-comment text-sm"></i>
                                 <span>${post.comments.length}</span>
                             </button>
                         </div>
-                        <div class="flex items-center gap-1 text-slate-500">
-                            <i class="fa-solid fa-eye"></i>
-                            <span id="view-count-${post.id}">${post.views}</span> baxış
+                        <div class="flex items-center gap-1.5 text-gray-500 text-[11px]">
+                            <i class="fa-regular fa-eye"></i>
+                            <span id="view-count-${post.id}">${post.views.toLocaleString()}</span>
                         </div>
                     </div>
 
                     <!-- REKLAM BLOKU (Baxışa Göre Pul Qazandıran Sabit Yer) -->
-                    <div class="ad-block mt-4 p-3 bg-slate-900/90 rounded-xl border border-dashed border-sky-500/30 text-center relative overflow-hidden" data-post-id="${post.id}">
-                        <span class="absolute top-1 right-2 text-[8px] bg-sky-500/20 text-sky-400 px-1.5 py-0.5 rounded uppercase tracking-wider font-bold">Sponsorlu Reklam</span>
-                        <div class="my-2">
-                            <p class="text-xs font-semibold text-sky-300">Qlobal İnvestisiya Platforması</p>
-                            <p class="text-[10px] text-slate-400">0% komissiya ilə ticarətə başlayın və gəlirinizi artırın.</p>
+                    <div class="ad-trigger-block mt-3 p-3 bg-gray-950 rounded-xl border border-dashed border-sky-500/30 text-center relative" data-post-id="${post.id}">
+                        <span class="absolute top-1 right-2 text-[8px] bg-sky-500/20 text-sky-400 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Sponsorlu Reklam</span>
+                        <div class="py-1">
+                            <p class="text-xs font-semibold text-sky-300">İnvestisiya Və Ticarət Platforması</p>
+                            <p class="text-[10px] text-gray-400 mt-0.5">Qlobal bazarlara çıxış əldə edin, 0% komissiya ilə qazanın.</p>
                         </div>
-                        <a href="#" onclick="registerAdView(${post.id})" class="inline-block bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 text-xs px-3 py-1 rounded-lg border border-sky-500/30 transition">Ətraflı Keçid</a>
+                        <button onclick="registerView(${post.id})" class="mt-1 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 text-[11px] font-semibold px-3 py-1 rounded-lg border border-sky-500/30 transition">
+                            Keçid Et
+                        </button>
                     </div>
                 `;
-                container.appendChild(postEl);
+                container.appendChild(article);
             });
         }
 
-        <!-- TAB DƏYİŞMƏ FUNKSİYASI -->
+        // TAB MƏZMUNUNU DƏYİŞMƏK
         function switchTab(tab) {
-            const container = document.getElementById("feedContainer");
+            const container = document.getElementById("appFeed");
             
+            // Aktiv tab rənglərini yenilə
+            ['tabFeed', 'tabExplore', 'tabRef', 'tabProfile'].forEach(id => {
+                document.getElementById(id).className = "flex flex-col items-center gap-1 text-gray-400 hover:text-gray-200 transition";
+            });
+
             if (tab === 'feed') {
+                document.getElementById('tabFeed').className = "flex flex-col items-center gap-1 text-sky-400 transition";
                 renderFeed();
-            } else if (tab === 'referral') {
+                initAdObserver();
+            } else if (tab === 'explore') {
+                document.getElementById('tabExplore').className = "flex flex-col items-center gap-1 text-sky-400 transition";
                 container.innerHTML = `
-                    <div class="space-y-5">
-                        <div class="p-5 bg-gradient-to-br from-sky-900/40 to-slate-900 border border-sky-500/30 rounded-2xl text-center space-y-3">
-                            <i class="fa-solid fa-gift text-4xl text-sky-400"></i>
-                            <h2 class="font-extrabold text-lg text-slate-100">Referal Proqramı</h2>
-                            <p class="text-xs text-slate-300 leading-relaxed">Dəvət etdiyiniz hər bir istifadəçinin qazancının <span class="text-sky-400 font-bold">30%-i</span> ömürlük sizə ödənilir!</p>
+                    <div class="space-y-4">
+                        <h2 class="font-bold text-sm text-gray-200">Gündəmdə Olan Mövzular</h2>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="p-4 bg-gray-900 border border-gray-800 rounded-xl">
+                                <p class="text-[10px] text-sky-400 font-bold uppercase">#Texnologiya</p>
+                                <p class="font-bold text-xs text-gray-200 mt-1">Süni İntellekt 2026</p>
+                                <p class="text-[10px] text-gray-500 mt-1">45.2K Baxış</p>
+                            </div>
+                            <div class="p-4 bg-gray-900 border border-gray-800 rounded-xl">
+                                <p class="text-[10px] text-emerald-400 font-bold uppercase">#Maliyyə</p>
+                                <p class="font-bold text-xs text-gray-200 mt-1">Mərkəzsiz Bankçılıq</p>
+                                <p class="text-[10px] text-gray-500 mt-1">89.1K Baxış</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (tab === 'referral') {
+                document.getElementById('tabRef').className = "flex flex-col items-center gap-1 text-sky-400 transition";
+                container.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="p-5 bg-gradient-to-br from-sky-900/40 via-gray-900 to-gray-950 border border-sky-500/30 rounded-2xl text-center space-y-2.5">
+                            <i class="fa-solid fa-users-rays text-3xl text-sky-400"></i>
+                            <h2 class="font-extrabold text-base text-gray-100">Referal Şəbəkəsi Və 30% Gəlir</h2>
+                            <p class="text-xs text-gray-300 leading-relaxed">Sizin keçidinizlə qeydiyyatdan keçən hər istifadəçinin qazandığı məbləğin <span class="text-sky-400 font-bold">30%-i</span> sistemi tərəfindən sizə ödənilir.</p>
                         </div>
 
-                        <div class="bg-slate-800/40 border border-slate-800 p-4 rounded-2xl space-y-3">
-                            <h3 class="text-xs font-bold uppercase text-slate-400">Sizin Referal Linkiniz</h3>
+                        <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl space-y-3">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Xüsusi Referal Linkiniz</label>
                             <div class="flex items-center gap-2">
-                                <input type="text" readonly value="https://nexus.app/ref?id=${currentUser.id}" id="refLink" class="w-full bg-slate-900 text-xs text-slate-300 p-3 rounded-xl border border-slate-700 focus:outline-none">
-                                <button onclick="copyRefLink()" class="bg-sky-500 text-white px-4 py-3 rounded-xl font-bold text-xs hover:bg-sky-600 transition">Kopyala</button>
+                                <input type="text" id="refLinkInput" readonly value="https://nexus.app/join?ref=${currentUser.id}" class="w-full bg-gray-950 text-xs text-gray-300 p-3 rounded-xl border border-gray-800 focus:outline-none">
+                                <button onclick="copyReferralLink()" class="bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs px-4 py-3 rounded-xl transition">Kopyala</button>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="bg-slate-800/40 border border-slate-800 p-4 rounded-2xl text-center">
-                                <p class="text-xs text-slate-400">Dəvətlilər</p>
-                                <p class="text-xl font-black text-sky-400 mt-1">${currentUser.referrals}</p>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl text-center">
+                                <span class="text-[10px] text-gray-500 font-semibold uppercase">Aktiv Referallar</span>
+                                <p class="text-2xl font-black text-sky-400 mt-1">${currentUser.referralsCount}</p>
                             </div>
-                            <div class="bg-slate-800/40 border border-slate-800 p-4 rounded-2xl text-center">
-                                <p class="text-xs text-slate-400">Referal Gəliri</p>
-                                <p class="text-xl font-black text-emerald-400 mt-1">$${currentUser.refEarnings.toFixed(3)}</p>
+                            <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl text-center">
+                                <span class="text-[10px] text-gray-500 font-semibold uppercase">Referal Qazancı</span>
+                                <p class="text-2xl font-black text-emerald-400 mt-1">$${currentUser.refEarnings.toFixed(3)}</p>
                             </div>
                         </div>
                     </div>
                 `;
             } else if (tab === 'profile') {
+                document.getElementById('tabProfile').className = "flex flex-col items-center gap-1 text-sky-400 transition";
                 container.innerHTML = `
-                    <div class="space-y-5">
-                        <div class="bg-slate-800/40 border border-slate-800 p-5 rounded-2xl text-center space-y-3 relative">
-                            <img src="${currentUser.avatar}" class="w-20 h-20 rounded-full mx-auto object-cover border-2 border-sky-400">
+                    <div class="space-y-4">
+                        <div class="bg-gray-900 border border-gray-800 p-5 rounded-2xl text-center space-y-3 relative">
+                            <img src="${currentUser.avatar}" class="w-20 h-20 rounded-full mx-auto object-cover border-2 border-sky-400 p-0.5">
                             <div>
-                                <h2 class="font-bold text-lg text-slate-100">${currentUser.name}</h2>
-                                <p class="text-xs text-slate-400">${currentUser.username}</p>
+                                <h2 class="font-bold text-base text-gray-100">${currentUser.name}</h2>
+                                <p class="text-xs text-gray-400">${currentUser.username}</p>
                             </div>
-                            <button onclick="shareProfile()" class="bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 px-3 py-1.5 rounded-full border border-slate-700 transition">
-                                <i class="fa-solid fa-share"></i> Profilimi Paylaş
+                            <button onclick="shareProfileLink()" class="bg-gray-800 hover:bg-gray-700 text-xs text-gray-200 px-4 py-1.5 rounded-full border border-gray-700 transition">
+                                <i class="fa-solid fa-share-nodes"></i> Profilimi Paylaş
                             </button>
                         </div>
 
-                        <!-- MƏXFİ QAZANC BÖLMƏSİ (YALNIZ İSTİFADƏÇİYƏ GÖRÜNÜR) -->
-                        <div class="bg-gradient-to-r from-emerald-900/30 to-slate-900 border border-emerald-500/30 p-5 rounded-2xl space-y-2">
+                        <!-- GİZLİ ŞƏXSİ BALANS PANELİ -->
+                        <div class="bg-gradient-to-r from-emerald-950/60 to-gray-900 border border-emerald-500/30 p-5 rounded-2xl space-y-2">
                             <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Şəxsi Balansınız (Gizli)</span>
-                                <i class="fa-solid fa-lock text-emerald-400 text-xs"></i>
+                                <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Şəxsi Balansınız (Şifrəli)</span>
+                                <i class="fa-solid fa-shield-halved text-emerald-400 text-xs"></i>
                             </div>
                             <div class="flex items-baseline justify-between pt-1">
-                                <span class="text-3xl font-black text-slate-100">$${currentUser.balance.toFixed(3)}</span>
-                                <span class="text-xs text-slate-400">${currentUser.views.toLocaleString()} Baxış</span>
+                                <span class="text-3xl font-black text-gray-100">$${currentUser.balance.toFixed(3)}</span>
+                                <span class="text-xs text-gray-400">${currentUser.totalViews.toLocaleString()} Ümumi Baxış</span>
                             </div>
-                            <p class="text-[10px] text-slate-400 pt-1">Məzmunlarınız 1,000 baxış topladıqda avtomatik +$0.03 əlavə olunur (CPM Modeli).</p>
+                            <p class="text-[10px] text-gray-400 pt-1 border-t border-gray-800/60 mt-2">
+                                1,000 baxış = $0.03 hesablanır. Qazanc avtomatik balansınıza əlavə olunur.
+                            </p>
                         </div>
                     </div>
                 `;
             }
         }
 
-        // TİKTOK ÜSLUBLU RƏY SİSTEMİ
+        // TİKTOK ÜSLUBLU RƏY MODALI LOGİKASI
         function openCommentModal(postId) {
-            currentActivePostId = postId;
-            const post = dummyPosts.find(p => p.id === postId);
+            activePostForComment = postId;
+            const post = postsDatabase.find(p => p.id === postId);
             const modal = document.getElementById("commentModal");
             const sheet = document.getElementById("commentSheet");
             const list = document.getElementById("commentList");
 
-            document.getElementById("commentCountHeader").innerText = post.comments.length;
+            document.getElementById("activeCommentCount").innerText = post.comments.length;
             list.innerHTML = "";
 
             if (post.comments.length === 0) {
-                list.innerHTML = `<p class="text-center text-xs text-slate-500 py-8">Hələ heç bir rəy yoxdur. İlk rəyi siz yazın!</p>`;
+                list.innerHTML = `<p class="text-center text-xs text-gray-500 py-10">İlk rəyi siz yazın!</p>`;
             } else {
                 post.comments.forEach(c => {
                     list.innerHTML += `
                         <div class="flex gap-3 text-xs">
-                            <div class="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center font-bold text-white flex-shrink-0">
+                            <div class="w-7 h-7 rounded-full bg-sky-600 flex items-center justify-center font-bold text-white text-[10px] flex-shrink-0">
                                 ${c.author[0]}
                             </div>
                             <div class="space-y-1 flex-1">
-                                <div class="bg-slate-800 p-2.5 rounded-2xl">
-                                    <span class="font-bold text-slate-200 block">${c.author}</span>
-                                    <span class="text-slate-300">${c.text}</span>
+                                <div class="bg-gray-800/80 p-2.5 rounded-2xl border border-gray-800">
+                                    <span class="font-bold text-gray-200 block text-[11px]">${c.author}</span>
+                                    <span class="text-gray-300">${c.text}</span>
                                 </div>
-                                <div class="flex items-center gap-3 text-[10px] text-slate-500 px-2">
-                                    <button onclick="this.classList.toggle('text-red-500')" class="hover:text-slate-300">Bəyən</button>
-                                    <button class="hover:text-slate-300">Cavab ver</button>
+                                <div class="flex items-center gap-3 text-[10px] text-gray-500 px-2">
+                                    <button onclick="this.classList.toggle('text-red-500')" class="hover:text-gray-300">Bəyən (${c.likes || 0})</button>
+                                    <button onclick="replyComment('${c.author}')" class="hover:text-gray-300">Cavab Ver</button>
                                 </div>
                             </div>
                         </div>
@@ -431,109 +591,156 @@
             setTimeout(() => document.getElementById("commentModal").classList.add("hidden"), 300);
         }
 
-        function addComment() {
+        function submitComment() {
             const input = document.getElementById("commentInput");
             if (!input.value.trim()) return;
 
-            const post = dummyPosts.find(p => p.id === currentActivePostId);
-            post.comments.push({ author: currentUser.name, text: input.value });
+            const post = postsDatabase.find(p => p.id === activePostForComment);
+            post.comments.push({
+                id: Date.now(),
+                author: currentUser.name,
+                text: input.value,
+                likes: 0
+            });
+
             input.value = "";
-            openCommentModal(currentActivePostId);
+            openCommentModal(activePostForComment);
         }
 
-        // BAXIŞLARIN VƏ REKLAMLARIN İNTERSECTION OBSERVER İLƏ HESABLANMASI
-        function setupAdObserver() {
+        function replyComment(authorName) {
+            const input = document.getElementById("commentInput");
+            input.value = `@${authorName} `;
+            input.focus();
+        }
+
+        // BAXIŞ SAYI VƏ REKLAM HESABLANMASI OBSERVERİ
+        function initAdObserver() {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         const postId = entry.target.getAttribute("data-post-id");
-                        registerAdView(postId);
+                        registerView(postId);
                     }
                 });
             }, { threshold: 0.8 });
 
-            document.querySelectorAll(".ad-block").forEach(ad => observer.observe(ad));
+            document.querySelectorAll(".ad-trigger-block").forEach(ad => observer.observe(ad));
         }
 
-        function registerAdView(postId) {
-            const post = dummyPosts.find(p => p.id == postId);
+        function registerView(postId) {
+            const post = postsDatabase.find(p => p.id == postId);
             if (post) {
                 post.views += 1;
-                currentUser.views += 1;
+                currentUser.totalViews += 1;
                 currentUser.balance += (0.03 / 1000); // 1000 baxışa 3 sent
                 
                 const viewEl = document.getElementById(`view-count-${postId}`);
-                if (viewEl) viewEl.innerText = post.views;
+                if (viewEl) viewEl.innerText = post.views.toLocaleString();
             }
         }
 
-        // ŞƏKİL YÜKLƏMƏ VƏ BAZAYA SAXLAMA
-        function handleImageSelect(e) {
-            const file = e.target.files[0];
+        // ŞƏKİL YÜKLƏMƏ VƏ PREVIEW LOGİKASI
+        function previewSelectedImage(event) {
+            const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(event) {
-                    selectedImageBase64 = event.target.result;
-                    document.getElementById("previewImg").src = selectedImageBase64;
-                    document.getElementById("imagePreview").classList.remove("hidden");
-                    document.getElementById("uploadStatusText").innerText = "Şəkil Yükləndi";
-                };
+                reader.onload = function(e) {
+                    base64ImageStore = e.target.result;
+                    document.getElementById("imagePreview").src = base64ImageStore;
+                    document.getElementById("imagePreviewBox").classList.remove("hidden");
+                    document.getElementById("uploadLabel").innerText = "Şəkil Seçildi";
+                }
                 reader.readAsDataURL(file);
             }
         }
 
-        function submitPost() {
-            const content = document.getElementById("postContentInput").value;
-            if (!content.trim() && !selectedImageBase64) return;
-
-            const newPost = {
-                id: Date.now(),
-                author: currentUser.name,
-                username: currentUser.username,
-                avatar: currentUser.avatar,
-                content: content,
-                image: selectedImageBase64,
-                views: 0,
-                likes: 0,
-                comments: []
-            };
-
-            dummyPosts.unshift(newPost);
-            closeCreatePostModal();
-            renderFeed();
-            setupAdObserver();
+        function removeSelectedImage() {
+            base64ImageStore = null;
+            document.getElementById("imagePreviewBox").classList.add("hidden");
+            document.getElementById("postImageFile").value = "";
+            document.getElementById("uploadLabel").innerText = "Fayl Seçin";
         }
 
-        // DİGƏR MODALLAR VƏ SOSİAL PAYLAŞIM
-        function openCreatePostModal() { document.getElementById("createPostModal").classList.remove("hidden"); }
-        function closeCreatePostModal() { document.getElementById("createPostModal").classList.add("hidden"); }
-        function toggleMenuModal(show) { document.getElementById("menuModal").classList.toggle("hidden", !show); }
-        function openNotificationModal() { document.getElementById("notifModal").classList.remove("hidden"); }
-        function closeNotifModal() { document.getElementById("notifModal").classList.add("hidden"); }
+        // POST YARATMA VƏ REDAKTƏ
+        function savePost() {
+            const content = document.getElementById("postContent").value;
+            if (!content.trim() && !base64ImageStore) return;
 
-        function sharePost(id) {
+            if (editingPostId) {
+                const post = postsDatabase.find(p => p.id === editingPostId);
+                post.content = content;
+                if (base64ImageStore) post.image = base64ImageStore;
+                editingPostId = null;
+            } else {
+                const newPost = {
+                    id: Date.now(),
+                    author: currentUser.name,
+                    username: currentUser.username,
+                    avatar: currentUser.avatar,
+                    content: content,
+                    image: base64ImageStore,
+                    views: 0,
+                    likes: 0,
+                    liked: false,
+                    comments: []
+                };
+                postsDatabase.unshift(newPost);
+            }
+
+            closeCreateModal();
+            renderFeed();
+            initAdObserver();
+        }
+
+        function editPost(postId) {
+            const post = postsDatabase.find(p => p.id === postId);
+            editingPostId = postId;
+            document.getElementById("postContent").value = post.content;
+            document.getElementById("createModalTitle").innerText = "Məqaləni Redaktə Edin";
+            openCreateModal();
+        }
+
+        function toggleLike(btn, postId) {
+            const post = postsDatabase.find(p => p.id === postId);
+            post.liked = !post.liked;
+            post.likes += post.liked ? 1 : -1;
+            renderFeed();
+        }
+
+        // DİGƏR YARDIMÇI MODAL NƏVİQASİYALARI
+        function openCreateModal() { document.getElementById("createModal").classList.remove("hidden"); }
+        function closeCreateModal() { 
+            document.getElementById("createModal").classList.add("hidden");
+            document.getElementById("postContent").value = "";
+            removeSelectedImage();
+            editingPostId = null;
+        }
+
+        function toggleSideMenu(show) { document.getElementById("sideMenu").classList.toggle("hidden", !show); }
+        function openNotifModal() { document.getElementById("notifModal").classList.remove("hidden"); }
+        function closeNotifModal() { document.getElementById("notifModal").classList.add("hidden"); }
+        function openSearchModal() { document.getElementById("searchModal").classList.remove("hidden"); }
+        function closeSearchModal() { document.getElementById("searchModal").classList.add("hidden"); }
+
+        function shareContent(postId) {
             if (navigator.share) {
-                navigator.share({ title: 'NexUs Post', url: window.location.href });
+                navigator.share({ title: 'NexUs Platforma', url: window.location.href });
             } else {
                 navigator.clipboard.writeText(window.location.href);
-                alert("URL kopyalandı!");
+                alert("Məqalə URL kopyalandı!");
             }
         }
 
-        function shareProfile() {
-            navigator.clipboard.writeText(`https://nexus.app/profile/${currentUser.username}`);
+        function shareProfileLink() {
+            navigator.clipboard.writeText(`https://nexus.app/${currentUser.username}`);
             alert("Profil linki kopyalandı!");
         }
 
-        function copyRefLink() {
-            const refInput = document.getElementById("refLink");
-            refInput.select();
-            navigator.clipboard.writeText(refInput.value);
+        function copyReferralLink() {
+            const input = document.getElementById("refLinkInput");
+            input.select();
+            navigator.clipboard.writeText(input.value);
             alert("Referal linkiniz kopyalandı!");
-        }
-
-        function likePost(btn) {
-            btn.classList.toggle("text-red-500");
         }
     </script>
 </body>
