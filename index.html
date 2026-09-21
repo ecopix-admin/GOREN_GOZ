@@ -2,306 +2,639 @@
 <html lang="az">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>UstaTAP - Təmir & Xidmət Platforması</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AzTube</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --accent-color: #38bdf8;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --btn-green: #22c55e;
-        }
-
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            box-sizing: border-box;
+            font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            padding-bottom: 70px;
+            background-color: #0f0f0f;
+            color: #fff;
+            overflow-x: hidden;
         }
 
-        .header {
-            background: #0284c7;
-            padding: 20px;
-            text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-
-        .container {
-            padding: 15px;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        /* Kateqoriya Düymələri */
-        .categories {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-
-        .cat-btn {
-            background: var(--card-bg);
-            border: 1px solid var(--accent-color);
-            color: var(--text-main);
-            padding: 8px 16px;
-            border-radius: 20px;
-            white-space: nowrap;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        /* Usta Kartı */
-        .master-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid #334155;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .master-header {
+        /* HEADER */
+        header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        .master-name {
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--accent-color);
-        }
-
-        .master-service {
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-
-        .price-tag {
-            background: #0369a1;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: bold;
-            width: fit-content;
-        }
-
-        .call-btn {
-            background: var(--btn-green);
-            color: white;
-            text-align: center;
-            padding: 10px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 5px;
-        }
-
-        /* Alt Naviqasiya Menyusu */
-        .bottom-nav {
+            padding: 0 16px;
+            height: 56px;
+            background-color: #0f0f0f;
             position: fixed;
-            bottom: 0; left: 0; right: 0;
-            background: #090d16;
-            display: flex;
-            justify-content: space-around;
-            padding: 12px 0;
-            border-top: 1px solid #334155;
-        }
-
-        .nav-item {
-            color: var(--text-muted);
-            text-align: center;
-            font-size: 12px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        .nav-item.active {
-            color: var(--accent-color);
-        }
-
-        .nav-item i {
-            font-size: 18px;
-            display: block;
-            margin-bottom: 3px;
-        }
-
-        /* Form Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
+            top: 0;
+            left: 0;
+            right: 0;
             z-index: 100;
-            justify-content: center;
-            align-items: center;
         }
 
-        .modal-content {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 400px;
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo-container i.fa-bars {
+            font-size: 18px;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: bold;
+            font-size: 20px;
+            letter-spacing: -1px;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .logo-icon {
+            background-color: #ff0000;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            width: 40%;
+            max-width: 600px;
+        }
+
+        .search-box {
+            display: flex;
+            width: 100%;
+            border: 1px solid #303030;
+            border-radius: 40px 0 0 40px;
+            background-color: #121212;
+            padding: 8px 16px;
+        }
+
+        .search-box input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .search-btn {
+            background-color: #222222;
+            border: 1px solid #303030;
+            border-left: none;
+            border-radius: 0 40px 40px 0;
+            padding: 8px 20px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .header-icons {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-profile {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            margin-top: 56px;
+        }
+
+        /* SIDEBAR */
+        aside {
+            width: 240px;
+            background-color: #0f0f0f;
+            height: calc(100vh - 56px);
+            position: fixed;
+            top: 56px;
+            left: 0;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            padding: 10px 12px;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: #272727;
+        }
+
+        .nav-link i {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: #272727;
+            margin: 12px 0;
+        }
+
+        /* CONTENT AREA */
+        main {
+            margin-left: 240px;
+            padding: 16px 24px;
+            width: calc(100% - 240px);
+        }
+
+        /* CATEGORIES */
+        .categories {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .category-btn {
+            background-color: #272727;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 14px;
+        }
+
+        .category-btn.active {
+            background-color: #fff;
+            color: #0f0f0f;
+        }
+
+        /* VIDEO GRID */
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+            row-gap: 32px;
+        }
+
+        .video-card {
+            cursor: pointer;
             display: flex;
             flex-direction: column;
             gap: 12px;
         }
 
-        .modal-content input, .modal-content select {
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #334155;
-            background: #0f172a;
-            color: white;
+        .thumbnail-container {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: #272727;
         }
 
-        .modal-content button {
-            padding: 10px;
-            background: var(--accent-color);
-            border: none;
-            color: #000;
-            font-weight: bold;
-            border-radius: 6px;
+        .thumbnail-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .duration {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(0,0,0,0.8);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .video-info {
+            display: flex;
+            gap: 12px;
+        }
+
+        .channel-img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .video-details {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .video-title {
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .channel-name, .video-stats {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        /* VIDEO PLAYER MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal-content {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: #0f0f0f;
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 28px;
             cursor: pointer;
+            color: #fff;
+        }
+
+        .video-player {
+            width: 100%;
+            height: 500px;
+            border-radius: 12px;
+            background: #000;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            margin: 16px 0 8px 0;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #272727;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+        }
+
+        .channel-block {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sub-btn {
+            background-color: #fff;
+            color: #0f0f0f;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .like-btn {
+            background: #272727;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* COMMENTS SECTION */
+        .comments-section {
+            margin-top: 20px;
+        }
+
+        .comment-input-box {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .comment-input-box input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #303030;
+            color: #fff;
+            outline: none;
+            padding: 4px 0;
+        }
+
+        .comment-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .comment-text {
+            font-size: 14px;
+        }
+
+        .comment-author {
+            font-weight: bold;
+            font-size: 13px;
+            margin-bottom: 4px;
         }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        🛠️ UstaTAP - Xidmət Portalı
+    <!-- HEADER -->
+    <header>
+        <div class="logo-container">
+            <i class="fa-solid fa-bars"></i>
+            <a href="#" class="logo">
+                <span class="logo-icon"><i class="fa-solid fa-play"></i></span> AzTube
+            </a>
+        </div>
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" placeholder="Axtarın...">
+            </div>
+            <button class="search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+        <div class="header-icons">
+            <i class="fa-solid fa-video" style="cursor: pointer;"></i>
+            <i class="fa-solid fa-bell" style="cursor: pointer;"></i>
+            <div class="user-profile">Ş</div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- SIDEBAR -->
+        <aside>
+            <a href="#" class="nav-link active"><i class="fa-solid fa-house"></i> Ana səhifə</a>
+            <a href="#" class="nav-link"><i class="fa-solid fa-bolt"></i> Shorts</a>
+            <a href="#" class="nav-link"><i class="fa-solid fa-folder-open"></i> Abunəliklər</a>
+            <hr>
+            <a href="#" class="nav-link"><i class="fa-solid fa-bookmark"></i> Kitabxana</a>
+            <a href="#" class="nav-link"><i class="fa-solid fa-clock-rotate-left"></i> Tarixçə</a>
+            <a href="#" class="nav-link"><i class="fa-solid fa-thumbs-up"></i> Bəyəndiklərim</a>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main>
+            <!-- CATEGORIES -->
+            <div class="categories">
+                <button class="category-btn active">Hamısı</button>
+                <button class="category-btn">Xəbərlər</button>
+                <button class="category-btn">Musiqi</button>
+                <button class="category-btn">Texnologiya</button>
+                <button class="category-btn">Oyunlar</button>
+                <button class="category-btn">Təmir vı Tikinti</button>
+                <button class="category-btn">Aşpazlıq</button>
+            </div>
+
+            <!-- VIDEO GRID -->
+            <div class="video-grid" id="videoGrid">
+                <!-- JavaScript ilə doldurulacaq -->
+            </div>
+        </main>
     </div>
 
-    <div class="container">
-        <!-- Kateqoriyalar -->
-        <div class="categories">
-            <button class="cat-btn" onclick="filterMaster('barchasi')">Bütün Xidmətlər</button>
-            <button class="cat-btn" onclick="filterMaster('şpatlyovka')">Şpatlyovka</button>
-            <button class="cat-btn" onclick="filterMaster('alçipan')">Alçipan</button>
-            <button class="cat-btn" onclick="filterMaster('təmir')">A-dan Z-yə Təmir</button>
-        </div>
-
-        <!-- Ustaların Siyahısı -->
-        <div id="masters-list"></div>
-    </div>
-
-    <!-- Alt Menyu -->
-    <div class="bottom-nav">
-        <div class="nav-item active" onclick="showSection('home')">
-            <i class="fa-solid fa-house"></i>
-            <span>Ana Səhifə</span>
-        </div>
-        <div class="nav-item" onclick="openModal()">
-            <i class="fa-solid fa-plus-circle"></i>
-            <span>Elan Əlavə Et</span>
-        </div>
-    </div>
-
-    <!-- Elan Əlavə Etmə Modalı -->
-    <div class="modal" id="addModal">
+    <!-- VIDEO MODAL -->
+    <div class="modal" id="videoModal">
         <div class="modal-content">
-            <h3 style="color: var(--accent-color);">Usta Profilinizi Yaratın</h3>
-            <input type="text" id="masterName" placeholder="Ad və Soyadınız">
-            <select id="masterCategory">
-                <option value="şpatlyovka">Şpatlyovka Ustası</option>
-                <option value="alçipan">Alçipan Ustası</option>
-                <option value="təmir">Tam Təmir Ustası</option>
-            </select>
-            <input type="text" id="masterPrice" placeholder="Qiymət (Məs: 3-5 AZN / kv.m)">
-            <input type="tel" id="masterPhone" placeholder="Telefon Nömrəniz (+994...)">
-            <button onclick="saveMaster()">Elanı Dərc Et (Ödənişsiz)</button>
-            <button style="background: #ef233c; color: white;" onclick="closeModal()">Ləğv Et</button>
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <iframe class="video-player" id="modalPlayer" src="" frameborder="0" allowfullscreen></iframe>
+            <h2 class="modal-title" id="modalTitle">Video Başlığı</h2>
+            <div class="modal-actions">
+                <div class="channel-block">
+                    <img src="" class="channel-img" id="modalChannelImg">
+                    <div>
+                        <div id="modalChannelName" style="font-weight: bold;">Kanal Adı</div>
+                        <div style="font-size: 12px; color: #aaa;">125K abunəçi</div>
+                    </div>
+                    <button class="sub-btn" style="margin-left: 12px;">Abunə ol</button>
+                </div>
+                <button class="like-btn"><i class="fa-regular fa-thumbs-up"></i> <span id="modalLikes">12K</span></button>
+            </div>
+            
+            <!-- COMMENTS SECTION -->
+            <div class="comments-section">
+                <h3>Şərhlər</h3>
+                <div class="comment-input-box" style="margin-top: 12px;">
+                    <div class="user-profile">Ş</div>
+                    <input type="text" placeholder="Şərh əlavə edin..." id="newCommentInput">
+                    <button class="category-btn" onclick="addComment()">Yaz</button>
+                </div>
+                <div id="commentsList">
+                    <!-- Saxta Şərhlər -->
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        const initialMasters = [
-            { id: 1, name: "Səmir Usta", cat: "şpatlyovka", price: "4 - 6 AZN / kv.m", phone: "+994501234567" },
-            { id: 2, name: "Rəşad Usta", cat: "alçipan", price: "5 - 8 AZN / kv.m", phone: "+994559876543" },
-            { id: 3, name: "Kamil Usta", cat: "təmir", price: "Razılaşma yolu ilə", phone: "+994705554433" }
+        // SAKTA VİDEOLAR VƏ PROFİLLƏR BAZASI
+        const mockVideos = [
+            {
+                id: 1,
+                title: "Bakıda Ev Təmiri Həlləri: Alçıpan və Şpatlyovka İşləri Düzgün Necə Edilir?",
+                channel: "Usta Tv Baku",
+                channelImg: "https://i.pravatar.cc/150?img=11",
+                views: "45K baxış",
+                time: "2 gün əvvəl",
+                duration: "14:20",
+                thumbnail: "https://picsum.photos/800/450?random=1",
+                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                likes: "3.2K"
+            },
+            {
+                id: 2,
+                title: "Milli Mətbəx: Həqiqi Şah Plovun Hazırlanma Sirləri",
+                channel: "Ləzzətli Reseptlər",
+                channelImg: "https://i.pravatar.cc/150?img=5",
+                views: "120K baxış",
+                time: "1 həftə əvvəl",
+                duration: "22:15",
+                thumbnail: "https://picsum.photos/800/450?random=2",
+                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                likes: "15K"
+            },
+            {
+                id: 3,
+                title: "JavaScript və HTML ilə Web Tətbiqlərin Yaradılması - Pulsuz Kurs",
+                channel: "Code Azerbaijan",
+                channelImg: "https://i.pravatar.cc/150?img=60",
+                views: "18K baxış",
+                time: "3 gün əvvəl",
+                duration: "45:00",
+                thumbnail: "https://picsum.photos/800/450?random=3",
+                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                likes: "2.1K"
+            },
+            {
+                id: 4,
+                title: "Xəzər Dənizi Sahilində Səyahət Vlogu | Abşeron Gəzintisi",
+                channel: "Aydın Səyyah",
+                channelImg: "https://i.pravatar.cc/150?img=33",
+                views: "8.9K baxış",
+                time: "5 saat əvvəl",
+                duration: "10:05",
+                thumbnail: "https://picsum.photos/800/450?random=4",
+                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                likes: "950"
+            },
+            {
+                id: 5,
+                title: "Son Texnologiya Xəbərləri: Yeni Smartfonlar İncelemesi",
+                channel: "TechAz",
+                channelImg: "https://i.pravatar.cc/150?img=68",
+                views: "92K baxış",
+                time: "2 həftə əvvəl",
+                duration: "18:40",
+                thumbnail: "https://picsum.photos/800/450?random=5",
+                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                likes: "8.4K"
+            },
+            {
+                id: 6,
+                title: "Beyin Dalğaları və Diqqət Artıran Relaks Musiqilər (528 Hz)",
+                channel: "Acoustic Mind",
+                channelImg: "https://i.pravatar.cc/150?img=12",
+                views: "310K baxış",
+                time: "1 ay əvvəl",
+                duration: "1:00:00",
+                thumbnail: "https://picsum.photos/800/450?random=6",
+                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                likes: "45K"
+            }
         ];
 
-        function renderMasters(list) {
-            const container = document.getElementById('masters-list');
-            container.innerHTML = '';
-            list.forEach(m => {
-                container.innerHTML += `
-                    <div class="master-card">
-                        <div class="master-header">
-                            <span class="master-name">${m.name}</span>
-                            <span class="price-tag">${m.price}</span>
-                        </div>
-                        <div class="master-service">Xidmət: ${m.cat.toUpperCase()}</div>
-                        <a href="tel:${m.phone}" class="call-btn">
-                            <i class="fa-solid fa-phone"></i> Zəng Et: ${m.phone}
-                        </a>
+        const mockComments = [
+            { author: "Eldar Məmmədov", text: "Çox faydalı məzmun olub, təşəkkürlər!", img: "https://i.pravatar.cc/150?img=1" },
+            { author: "Leyla Əliyeva", text: "Kanalınıza yeni abunə oldum, uğurlar!", img: "https://i.pravatar.cc/150?img=2" },
+            { author: "Rəşad Qasımov", text: "Davamı gəlsin zəhmət olmasa.", img: "https://i.pravatar.cc/150?img=3" }
+        ];
+
+        // VİDEO ŞƏBƏKƏSİNİ RENDER ETMƏK
+        function loadVideos() {
+            const grid = document.getElementById('videoGrid');
+            grid.innerHTML = mockVideos.map(video => `
+                <div class="video-card" onclick="openVideo(${video.id})">
+                    <div class="thumbnail-container">
+                        <img src="${video.thumbnail}" alt="${video.title}">
+                        <span class="duration">${video.duration}</span>
                     </div>
-                `;
-            });
+                    <div class="video-info">
+                        <img src="${video.channelImg}" class="channel-img">
+                        <div class="video-details">
+                            <div class="video-title">${video.title}</div>
+                            <div class="channel-name">${video.channel}</div>
+                            <div class="video-stats">${video.views} • ${video.time}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        function filterMaster(category) {
-            let masters = JSON.parse(localStorage.getItem('my_masters')) || initialMasters;
-            if (category === 'barchasi') {
-                renderMasters(masters);
-            } else {
-                const filtered = masters.filter(m => m.cat === category);
-                renderMasters(filtered);
-            }
-        }
+        // VİDEO MODALINI AÇMAQ
+        function openVideo(id) {
+            const video = mockVideos.find(v => v.id === id);
+            if (!video) return;
 
-        function openModal() {
-            document.getElementById('addModal').style.display = 'flex';
+            document.getElementById('modalPlayer').src = video.videoUrl;
+            document.getElementById('modalTitle').innerText = video.title;
+            document.getElementById('modalChannelName').innerText = video.channel;
+            document.getElementById('modalChannelImg').src = video.channelImg;
+            document.getElementById('modalLikes').innerText = video.likes;
+
+            loadComments();
+            document.getElementById('videoModal').style.display = 'block';
         }
 
         function closeModal() {
-            document.getElementById('addModal').style.display = 'none';
+            document.getElementById('videoModal').style.display = 'none';
+            document.getElementById('modalPlayer').src = '';
         }
 
-        function saveMaster() {
-            const name = document.getElementById('masterName').value;
-            const cat = document.getElementById('masterCategory').value;
-            const price = document.getElementById('masterPrice').value;
-            const phone = document.getElementById('masterPhone').value;
+        // ŞƏRHLƏRİ YÜKLƏMƏK VƏ ƏLAVƏ ETMƏK
+        function loadComments() {
+            const list = document.getElementById('commentsList');
+            list.innerHTML = mockComments.map(c => `
+                <div class="comment-item">
+                    <img src="${c.img}" class="channel-img">
+                    <div>
+                        <div class="comment-author">${c.author}</div>
+                        <div class="comment-text">${c.text}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-            if(!name || !price || !phone) {
-                alert("Zəhmət olmasa bütün xanaları doldurun!");
-                return;
+        function addComment() {
+            const input = document.getElementById('newCommentInput');
+            if (input.value.trim() !== '') {
+                mockComments.unshift({
+                    author: "Siz (İstifadəçi)",
+                    text: input.value,
+                    img: "https://i.pravatar.cc/150?img=15"
+                });
+                input.value = '';
+                loadComments();
             }
-
-            let masters = JSON.parse(localStorage.getItem('my_masters')) || initialMasters;
-            masters.unshift({ id: Date.now(), name, cat, price, phone });
-            localStorage.setItem('my_masters', JSON.stringify(masters));
-
-            renderMasters(masters);
-            closeModal();
-            alert("Elanınız uğurla yerləşdirildi!");
         }
 
-        window.onload = () => {
-            let masters = JSON.parse(localStorage.getItem('my_masters')) || initialMasters;
-            renderMasters(masters);
-        };
+        // Səhifə yüklənəndə işə sal
+        window.onload = loadVideos;
     </script>
 </body>
 </html>
