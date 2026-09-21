@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vibe ✦ Simple & Modern Social</title>
+    <title>SHAM & Social Platform</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -31,14 +31,13 @@
             min-height: 100vh;
         }
 
-        /* Layout Structure */
         .app-container {
             display: flex;
             width: 100%;
             max-width: 1200px;
         }
 
-        /* Sidebar Navigation */
+        /* Naviqasiya Paneli */
         .sidebar {
             width: 245px;
             padding: 24px 12px;
@@ -51,17 +50,19 @@
         }
 
         .brand-logo {
-            font-size: 24px;
-            font-weight: 700;
+            font-size: 26px;
+            font-weight: 800;
             padding: 0 12px 30px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            letter-spacing: -0.5px;
+            gap: 12px;
+            letter-spacing: 1px;
         }
 
         .brand-logo span {
             color: var(--accent-color);
+            font-size: 30px;
+            font-weight: 900;
         }
 
         .nav-links {
@@ -92,7 +93,7 @@
             width: 24px;
         }
 
-        /* Main Content Feed */
+        /* Əsas Lent (Feed) */
         .main-content {
             margin-left: 245px;
             width: 100%;
@@ -100,7 +101,7 @@
             padding: 20px;
         }
 
-        /* Stories Bar */
+        /* Hekayələr (Stories) */
         .stories-container {
             display: flex;
             gap: 16px;
@@ -146,7 +147,7 @@
             white-space: nowrap;
         }
 
-        /* Post Card */
+        /* Post Kartı */
         .post-card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -212,6 +213,10 @@
             color: var(--like-color);
         }
 
+        .fa-bookmark.active {
+            color: var(--text-main);
+        }
+
         .post-details {
             padding: 0 16px 16px;
         }
@@ -240,12 +245,6 @@
             font-size: 13px;
         }
 
-        .view-comments {
-            color: var(--text-muted);
-            cursor: pointer;
-            margin-bottom: 4px;
-        }
-
         .add-comment-box {
             display: flex;
             align-items: center;
@@ -271,21 +270,6 @@
             cursor: pointer;
         }
 
-        /* Right Sidebar / Suggestions */
-        .right-sidebar {
-            width: 320px;
-            padding: 20px;
-            position: fixed;
-            right: calc((100vw - 1200px) / 2);
-            display: none;
-        }
-
-        @media (min-width: 1000px) {
-            .right-sidebar {
-                display: block;
-            }
-        }
-
         @media (max-width: 768px) {
             .sidebar {
                 width: 70px;
@@ -306,7 +290,7 @@
         <aside class="sidebar">
             <div>
                 <div class="brand-logo">
-                    <span>✦</span> <div class="link-text">Vibe</div>
+                    <span>&</span> <div class="link-text">SHAM</div>
                 </div>
                 <ul class="nav-links">
                     <li class="nav-item"><a href="#"><i class="fa-solid fa-house"></i><span class="link-text">Ana Səhifə</span></a></li>
@@ -319,35 +303,34 @@
             </div>
         </aside>
 
-        <!-- Əsas Lent (Feed) -->
+        <!-- Əsas Məzmun Lenti -->
         <main class="main-content">
-            <!-- Story Bölməsi -->
+            <!-- Hekayələr -->
             <div class="stories-container" id="stories-wrapper"></div>
 
-            <!-- Postlar Siyahısı -->
+            <!-- Postlar -->
             <div id="feed-posts"></div>
         </main>
     </div>
 
     <script>
-        // Saxta Profil Məlumatları Bazasının Avtomatik Generasiyası
-        const usernames = ["alex_vibe", "sarah.design", "tech_insider", "nature_lens", "creative_mind", "urban_explorer", "photo_master", "digital_art", "travel_bug", "coder_life"];
+        const usernames = ["sham_user", "alex_dev", "creative_mind", "urban_lens", "tech_insider", "nature_art", "digital_flow", "photo_studio", "code_life", "vibe_master"];
         const captions = [
-            "İşıq və kölgənin mükəmməl ahəngi. ✨ #vibes #photography",
-            "Yeni layihə üzərində işlər yekunlaşmaq üzrədir! 🚀",
-            "Səhər qəhvəsi və sakitlik... ☕🌱",
-            "Şəhərin gecə ritmi 🏙️ #citylife",
-            "Təbiətin qoynunda keçən möhtəşəm gün! 🏔️"
+            "SHAM platformasında ilk paylaşım! 🔥 #sham #social",
+            "Sakitlik və ilham dolu bir gün ✨",
+            "Möhtəşəm mənzərə və yeni ideyalar 🚀",
+            "Dizayn və kodun mükəmməl uyğunluğu 💻",
+            "Təbiətin ritmini hiss et 🌱 #nature"
         ];
 
-        // Hekayələri (Stories) Generasiya Et
+        // Hekayələrin Yaradılması
         function generateStories() {
             const wrapper = document.getElementById('stories-wrapper');
             let storiesHTML = '';
             
-            for(let i = 1; i <= 15; i++) {
-                const user = usernames[i % usernames.length] + i;
-                const avatarUrl = `https://picsum.photos/seed/user_${i}/150/150`;
+            for(let i = 1; i <= 12; i++) {
+                const user = usernames[i % usernames.length] + "_" + i;
+                const avatarUrl = `https://picsum.photos/seed/sham_story_${i}/150/150`;
                 
                 storiesHTML += `
                     <div class="story-item">
@@ -361,12 +344,12 @@
             wrapper.innerHTML = storiesHTML;
         }
 
-        // Postları Generasiya Et
+        // Post Elementinin Hazırlanması
         function createPostElement(id) {
             const username = usernames[Math.floor(Math.random() * usernames.length)] + "_" + (id % 50);
-            const userAvatar = `https://picsum.photos/seed/avatar_${id}/100/100`;
-            const postImg = `https://picsum.photos/seed/post_${id}/600/600`;
-            const likes = Math.floor(Math.random() * 800) + 12;
+            const userAvatar = `https://picsum.photos/seed/sham_avatar_${id}/100/100`;
+            const postImg = `https://picsum.photos/seed/sham_post_${id}/600/600`;
+            const likes = Math.floor(Math.random() * 950) + 20;
             const caption = captions[Math.floor(Math.random() * captions.length)];
 
             return `
@@ -385,16 +368,14 @@
                             <i class="fa-regular fa-comment"></i>
                             <i class="fa-regular fa-paper-plane"></i>
                         </div>
-                        <i class="fa-regular fa-bookmark"></i>
+                        <i class="fa-regular fa-bookmark" onclick="toggleBookmark(this)"></i>
                     </div>
                     <div class="post-details">
                         <div class="likes-count" id="likes-${id}">${likes} bəyənmə</div>
                         <div class="caption">
                             <span class="username">${username}</span> ${caption}
                         </div>
-                        <div class="comments-section" id="comments-${id}">
-                            <div class="view-comments">Bütün şərhləri göstər</div>
-                        </div>
+                        <div class="comments-section" id="comments-${id}"></div>
                     </div>
                     <div class="add-comment-box">
                         <input type="text" placeholder="Şərh əlavə et..." id="input-${id}">
@@ -420,20 +401,32 @@
             }
         }
 
-        // Şərh Əlavə Etmə Funksiyası
+        // Saxlama (Bookmark) Funksiyası
+        function toggleBookmark(element) {
+            if(element.classList.contains('fa-regular')) {
+                element.classList.remove('fa-regular');
+                element.classList.add('fa-solid', 'active');
+            } else {
+                element.classList.remove('fa-solid', 'active');
+                element.classList.add('fa-regular');
+            }
+        }
+
+        // Şərh Əlavə Etmək
         function addComment(postId) {
             const input = document.getElementById(`input-${postId}`);
             const commentsContainer = document.getElementById(`comments-${postId}`);
             
             if(input.value.trim() !== "") {
                 const commentDiv = document.createElement('div');
+                commentDiv.style.marginTop = "4px";
                 commentDiv.innerHTML = `<strong>siz:</strong> ${input.value}`;
                 commentsContainer.appendChild(commentDiv);
                 input.value = "";
             }
         }
 
-        // İlkin Postları Yüklə və Sonsuz Sürüşdürmə (Infinite Scroll) Təmin Et
+        // Dinamik Post Yükləmə (Infinite Scroll)
         let postCounter = 1;
         function loadMorePosts(count = 5) {
             const feed = document.getElementById('feed-posts');
@@ -443,15 +436,13 @@
             }
         }
 
-        // Səhifə Yüklənərkən
         window.onload = () => {
             generateStories();
-            loadMorePosts(10);
+            loadMorePosts(8);
         };
 
-        // Scroll Hadisəsi (Sonsuz Yem)
         window.onscroll = () => {
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 400) {
                 loadMorePosts(3);
             }
         };
