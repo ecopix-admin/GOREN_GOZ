@@ -2,384 +2,328 @@
 <html lang="az">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Uşaq Macəra Dünyası</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUBG Style 3D Battle Royale</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 99%, #FECFEF 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-
-        #game-container {
-            width: 100%;
-            max-width: 480px;
-            height: 90vh;
-            background: #2b2d42;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        * { margin: 0; padding: 0; box-sizing: border-color; user-select: none; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: Arial, sans-serif; }
+        #canvas-container { width: 100%; height: 100%; display: block; }
+        
+        /* UI Overlay */
+        #hud {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
             display: flex;
             flex-direction: column;
-            position: relative;
-            overflow: hidden;
-            border: 4px solid #fff;
-        }
-
-        /* Başlıq Və Menyular */
-        .header {
-            background: #ffb703;
-            padding: 15px;
-            text-align: center;
-            color: #d90429;
-            font-size: 22px;
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            display: flex;
             justify-content: space-between;
-            align-items: center;
-        }
-
-        .home-btn {
-            background: #ef233c;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .screen {
-            flex: 1;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
             padding: 20px;
-            position: relative;
+            box-sizing: border-box;
+        }
+        
+        .crosshair {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 10px; height: 10px;
+            background: rgba(0, 255, 0, 0.8);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid #000;
         }
 
-        .screen.active {
+        .stats-panel {
             display: flex;
-        }
-
-        /* Ana Menyu */
-        .game-card {
-            width: 100%;
-            background: #8d99ae;
-            margin: 10px 0;
-            padding: 15px;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
-            border: 3px solid #edf2f4;
-        }
-
-        .game-card:hover {
-            transform: scale(1.03);
-            background: #ffb703;
-        }
-
-        .game-icon {
-            font-size: 40px;
-            background: white;
-            padding: 10px;
-            border-radius: 12px;
-        }
-
-        .game-info h3 {
+            gap: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px 25px;
+            border-radius: 10px;
             color: #fff;
             font-size: 18px;
-            margin-bottom: 5px;
+            font-weight: bold;
+            width: fit-content;
+            border: 1px solid #444;
         }
 
-        .game-info p {
-            color: #edf2f4;
-            font-size: 12px;
+        .hp-bar-container {
+            width: 200px; height: 20px;
+            background: #444;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid #fff;
         }
 
-        /* Oyun Kanvasları */
-        canvas {
-            background: #111;
-            border-radius: 10px;
-            width: 100%;
-            height: 100%;
-            max-height: 400px;
+        .hp-bar {
+            width: 100%; height: 100%;
+            background: #ff3333;
+            transition: width 0.2s;
         }
 
-        /* Yaddaş Oyunu Grid */
-        .memory-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            width: 100%;
-        }
-
-        .memory-card {
-            aspect-ratio: 1;
-            background: #ffb703;
-            border-radius: 10px;
+        #start-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-size: 32px;
-            cursor: pointer;
-            transition: transform 0.3s;
+            color: #fff;
+            z-index: 10;
         }
 
-        .memory-card.flipped {
-            background: #fff;
-            transform: rotateY(180deg);
-        }
-
-        /* Nəticə vərəqi */
-        .score-board {
-            color: white;
-            font-size: 18px;
-            margin-bottom: 10px;
+        #start-btn {
+            padding: 15px 40px;
+            font-size: 22px;
+            background: #ff9900;
+            border: none;
+            color: #000;
             font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: 0.2s;
         }
+
+        #start-btn:hover { background: #ffaa22; transform: scale(1.05); }
     </style>
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
-    <div id="game-container">
-        <div class="header">
-            <span id="header-title">🎮 Macəra Parkı</span>
-            <button class="home-btn" onclick="showScreen('menu-screen')">Menyu</button>
-        </div>
-
-        <!-- ANA MENYU -->
-        <div id="menu-screen" class="screen active">
-            <div class="game-card" onclick="startSpaceGame()">
-                <div class="game-icon">🚀</div>
-                <div class="game-info">
-                    <h3>Kosmik Kosmonavt</h3>
-                    <p>Meteoritlərdən qaç, ulduzları topla!</p>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="startMemoryGame()">
-                <div class="game-icon">🧩</div>
-                <div class="game-info">
-                    <h3>Sehrli Yaddaş</h3>
-                    <p>Gizli cütləri tap və qalib gəl!</p>
-                </div>
-            </div>
-
-            <div class="game-card" onclick="startCatchGame()">
-                <div class="game-icon">🍎</div>
-                <div class="game-info">
-                    <h3>Xəzinə Tutmaç</h3>
-                    <p>Meyvələri səbətə yığ, bombalardan qaç!</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- OYUN 1: KOSMİK KOSMONAVT -->
-        <div id="space-screen" class="screen">
-            <div class="score-board">Xal: <span id="space-score">0</span></div>
-            <canvas id="spaceCanvas"></canvas>
-            <p style="color: #aaa; font-size: 12px; margin-top: 10px;">İdarə: Ekrana vuraraq gəmini hərəkət etdirin</p>
-        </div>
-
-        <!-- OYUN 2: SEHRLİ YADDAŞ -->
-        <div id="memory-screen" class="screen">
-            <div class="score-board">Cütlər: <span id="memory-score">0</span>/6</div>
-            <div class="memory-grid" id="memoryGrid"></div>
-        </div>
-
-        <!-- OYUN 3: XƏZİNƏ TUTMAÇ -->
-        <div id="catch-screen" class="screen">
-            <div class="score-board">Xal: <span id="catch-score">0</span></div>
-            <canvas id="catchCanvas"></canvas>
-            <p style="color: #aaa; font-size: 12px; margin-top: 10px;">İdarə: Barmağınızla səbəti sürüşdürün</p>
-        </div>
+    <div id="start-screen">
+        <h1 style="font-size: 48px; color: #ff9900; margin-bottom: 10px;">BATTLE ROYALE 3D</h1>
+        <p style="font-size: 18px; color: #ccc;">WASD - Hərəkət | MOUSE - Baxış və Atəş (LMB)</p>
+        <button id="start-btn" onclick="startGame()">OYUNA BAŞLA</button>
     </div>
 
+    <div id="hud">
+        <div class="stats-panel">
+            <div>Düşmənlər: <span id="enemies-left" style="color: #ff3333;">5</span></div>
+            <div>Kills: <span id="kills" style="color: #00ff88;">0</span></div>
+            <div>
+                HP: 
+                <div class="hp-bar-container">
+                    <div id="hp-bar" class="hp-bar"></div>
+                </div>
+            </div>
+        </div>
+        <div class="crosshair"></div>
+    </div>
+
+    <div id="canvas-container"></div>
+
     <script>
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-            stopAllGames();
+        let scene, camera, renderer;
+        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+        let prevTime = performance.now();
+        const velocity = new THREE.Vector3();
+        const direction = new THREE.Vector3();
+        
+        let playerHp = 100;
+        let kills = 0;
+        let enemies = [];
+        let bullets = [];
+        let zoneMesh;
+        let zoneRadius = 150;
+
+        function initScene() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87ceeb);
+            scene.fog = new THREE.FogExp2(0x87ceeb, 0.005);
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.y = 2;
+
+            // İşıqlandırma
+            const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.8);
+            hemiLight.position.set(0, 200, 0);
+            scene.add(hemiLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(100, 100, 50);
+            scene.add(dirLight);
+
+            // Torpaq (Xəritə)
+            const floorGeo = new THREE.PlaneGeometry(400, 400);
+            const floorMat = new THREE.MeshLambertMaterial({ color: 0x557a2b });
+            const floor = new THREE.Mesh(floorGeo, floorMat);
+            floor.rotation.x = -Math.PI / 2;
+            scene.add(floor);
+
+            // Binalar / Sığınacaqlar
+            createMapObjects();
+
+            // Qırmızı Daralan Zona (PUBG Safe Zone)
+            const zoneGeo = new THREE.CylinderGeometry(zoneRadius, zoneRadius, 50, 32, 1, true);
+            const zoneMat = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true, side: THREE.DoubleSide });
+            zoneMesh = new THREE.Mesh(zoneGeo, zoneMat);
+            zoneMesh.position.y = 25;
+            scene.add(zoneMesh);
+
+            // Düşmən Botlar
+            spawnEnemies(5);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            window.addEventListener('resize', onWindowResize);
+            document.addEventListener('keydown', onKeyDown);
+            document.addEventListener('keyup', onKeyUp);
+            document.addEventListener('mousedown', shootBullet);
         }
 
-        function stopAllGames() {
-            clearInterval(spaceInterval);
-            clearInterval(catchInterval);
-        }
+        function createMapObjects() {
+            const boxGeo = new THREE.BoxGeometry(10, 15, 10);
+            const boxMat = new THREE.MeshLambertMaterial({ color: 0x777777 });
 
-        /* --- OYUN 1: KOSMİK KOSMONAVT --- */
-        let spaceCanvas = document.getElementById('spaceCanvas');
-        let spaceCtx = spaceCanvas.getContext('2d');
-        let spaceInterval, spaceScore = 0;
-        let shipX = 150;
-        let stars = [];
-
-        function startSpaceGame() {
-            showScreen('space-screen');
-            spaceCanvas.width = 320;
-            spaceCanvas.height = 350;
-            spaceScore = 0;
-            shipX = 140;
-            stars = [];
-            document.getElementById('space-score').innerText = spaceScore;
-
-            spaceCanvas.onclick = (e) => {
-                let rect = spaceCanvas.getBoundingClientRect();
-                let clickX = e.clientX - rect.left;
-                if (clickX < spaceCanvas.width / 2) shipX -= 30;
-                else shipX += 30;
-            };
-
-            spaceInterval = setInterval(updateSpaceGame, 50);
-        }
-
-        function updateSpaceGame() {
-            spaceCtx.clearRect(0, 0, spaceCanvas.width, spaceCanvas.height);
-            
-            // Kosmik Gəmi
-            spaceCtx.font = "30px Arial";
-            spaceCtx.fillText("🚀", shipX, 320);
-
-            // Ulduzlar generatoru
-            if(Math.random() < 0.1) {
-                stars.push({x: Math.random() * 280, y: 0});
-            }
-
-            for(let i = 0; i < stars.length; i++) {
-                stars[i].y += 5;
-                spaceCtx.fillText("⭐", stars[i].x, stars[i].y);
-
-                // Dəymə yoxlanışı
-                if(stars[i].y > 290 && Math.abs(stars[i].x - shipX) < 30) {
-                    spaceScore += 10;
-                    document.getElementById('space-score').innerText = spaceScore;
-                    stars.splice(i, 1);
-                }
-            }
-        }
-
-        /* --- OYUN 2: SEHRLİ YADDAŞ --- */
-        const icons = ['🐶', '🐱', '🦊', '🦁', '🐸', '🦄'];
-        let memoryCards = [];
-        let flippedCards = [];
-        let matchedPairs = 0;
-
-        function startMemoryGame() {
-            showScreen('memory-screen');
-            matchedPairs = 0;
-            document.getElementById('memory-score').innerText = matchedPairs;
-            const grid = document.getElementById('memoryGrid');
-            grid.innerHTML = '';
-            
-            memoryCards = [...icons, ...icons].sort(() => Math.random() - 0.5);
-            memoryCards.forEach((icon, index) => {
-                const card = document.createElement('div');
-                card.className = 'memory-card';
-                card.dataset.icon = icon;
-                card.dataset.index = index;
-                card.onclick = () => flipMemoryCard(card);
-                grid.appendChild(card);
-            });
-        }
-
-        function flipMemoryCard(card) {
-            if (flippedCards.length < 2 && !card.classList.contains('flipped')) {
-                card.classList.add('flipped');
-                card.innerText = card.dataset.icon;
-                flippedCards.push(card);
-
-                if (flippedCards.length === 2) {
-                    setTimeout(checkMemoryMatch, 800);
-                }
+            for (let i = 0; i < 25; i++) {
+                const building = new THREE.Mesh(boxGeo, boxMat);
+                building.position.x = (Math.random() - 0.5) * 250;
+                building.position.z = (Math.random() - 0.5) * 250;
+                building.position.y = 7.5;
+                scene.add(building);
             }
         }
 
-        function checkMemoryMatch() {
-            if (flippedCards[0].dataset.icon === flippedCards[1].dataset.icon) {
-                matchedPairs++;
-                document.getElementById('memory-score').innerText = matchedPairs;
-                if(matchedPairs === 6) alert('Təbrik edirik! Bütün cütləri tapdınız! 🎉');
-            } else {
-                flippedCards[0].classList.remove('flipped');
-                flippedCards[0].innerText = '';
-                flippedCards[1].classList.remove('flipped');
-                flippedCards[1].innerText = '';
+        function spawnEnemies(count) {
+            const enemyGeo = new THREE.BoxGeometry(1.5, 3, 1.5);
+            const enemyMat = new THREE.MeshLambertMaterial({ color: 0xff1111 });
+
+            for (let i = 0; i < count; i++) {
+                const enemy = new THREE.Mesh(enemyGeo, enemyMat);
+                enemy.position.x = (Math.random() - 0.5) * 200;
+                enemy.position.z = (Math.random() - 0.5) * 200;
+                enemy.position.y = 1.5;
+                enemy.hp = 50;
+                scene.add(enemy);
+                enemies.push(enemy);
             }
-            flippedCards = [];
         }
 
-        /* --- OYUN 3: XƏZİNƏ TUTMAÇ --- */
-        let catchCanvas = document.getElementById('catchCanvas');
-        let catchCtx = catchCanvas.getContext('2d');
-        let catchInterval, catchScore = 0;
-        let basketX = 130;
-        let fruits = [];
-
-        function startCatchGame() {
-            showScreen('catch-screen');
-            catchCanvas.width = 320;
-            catchCanvas.height = 350;
-            catchScore = 0;
-            fruits = [];
-            document.getElementById('catch-score').innerText = catchScore;
-
-            catchCanvas.onmousemove = (e) => {
-                let rect = catchCanvas.getBoundingClientRect();
-                basketX = e.clientX - rect.left - 20;
-            };
-
-            catchCanvas.ontouchmove = (e) => {
-                let rect = catchCanvas.getBoundingClientRect();
-                basketX = e.touches[0].clientX - rect.left - 20;
-            };
-
-            catchInterval = setInterval(updateCatchGame, 40);
+        function startGame() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.body.requestPointerLock();
+            initScene();
+            animate();
         }
 
-        function updateCatchGame() {
-            catchCtx.clearRect(0, 0, catchCanvas.width, catchCanvas.height);
-
-            // Səbət
-            catchCtx.font = "35px Arial";
-            catchCtx.fillText("🧺", basketX, 330);
-
-            // Meyvə düşməsi
-            if(Math.random() < 0.08) {
-                fruits.push({x: Math.random() * 280, y: 0, type: Math.random() > 0.2 ? "🍎" : "💣"});
+        // Siçan İdarəsi (Look Around)
+        document.addEventListener('mousemove', (e) => {
+            if (document.pointerLockElement === document.body) {
+                camera.rotation.y -= e.movementX * 0.002;
             }
+        });
 
-            for(let i = 0; i < fruits.length; i++) {
-                fruits[i].y += 4;
-                catchCtx.fillText(fruits[i].type, fruits[i].x, fruits[i].y);
+        function onKeyDown(e) {
+            switch (e.code) {
+                case 'KeyW': moveForward = true; break;
+                case 'KeyS': moveBackward = true; break;
+                case 'KeyA': moveLeft = true; break;
+                case 'KeyD': moveRight = true; break;
+            }
+        }
 
-                // Tutmağını yoxla
-                if(fruits[i].y > 300 && Math.abs(fruits[i].x - basketX) < 35) {
-                    if(fruits[i].type === "🍎") {
-                        catchScore += 5;
-                    } else {
-                        catchScore = Math.max(0, catchScore - 10);
+        function onKeyUp(e) {
+            switch (e.code) {
+                case 'KeyW': moveForward = false; break;
+                case 'KeyS': moveBackward = false; break;
+                case 'KeyA': moveLeft = false; break;
+                case 'KeyD': moveRight = false; break;
+            }
+        }
+
+        function shootBullet() {
+            if (document.pointerLockElement !== document.body) return;
+
+            const bulletGeo = new THREE.SphereGeometry(0.2, 8, 8);
+            const bulletMat = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+            const bullet = new THREE.Mesh(bulletGeo, bulletMat);
+
+            bullet.position.copy(camera.position);
+            bullet.ray = new THREE.Vector3();
+            camera.getWorldDirection(bullet.ray);
+
+            scene.add(bullet);
+            bullets.push(bullet);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const time = performance.now();
+            const delta = (time - prevTime) / 1000;
+
+            // Hərəkət Fizikası
+            velocity.x -= velocity.x * 10.0 * delta;
+            velocity.z -= velocity.z * 10.0 * delta;
+
+            direction.z = Number(moveForward) - Number(moveBackward);
+            direction.x = Number(moveRight) - Number(moveLeft);
+            direction.normalize();
+
+            if (moveForward || moveBackward) velocity.z -= direction.z * 100.0 * delta;
+            if (moveLeft || moveRight) velocity.x -= direction.x * 100.0 * delta;
+
+            camera.translateX(-velocity.x * delta);
+            camera.translateZ(velocity.z * delta);
+            camera.position.y = 2; // Yerdə saxlamaq
+
+            // Güllələrin hərəkəti
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                const b = bullets[i];
+                b.position.addScaledVector(b.ray, 3);
+
+                // Düşmənə dəymə yoxlanışı
+                for (let j = enemies.length - 1; j >= 0; j--) {
+                    const e = enemies[j];
+                    if (b.position.distanceTo(e.position) < 2) {
+                        e.hp -= 25;
+                        scene.remove(b);
+                        bullets.splice(i, 1);
+
+                        if (e.hp <= 0) {
+                            scene.remove(e);
+                            enemies.splice(j, 1);
+                            kills++;
+                            document.getElementById('kills').innerText = kills;
+                            document.getElementById('enemies-left').innerText = enemies.length;
+
+                            if (enemies.length === 0) {
+                                alert("VICTORY ROYALE! QALİB OLDUĞUNUZ!");
+                                location.reload();
+                            }
+                        }
+                        break;
                     }
-                    document.getElementById('catch-score').innerText = catchScore;
-                    fruits.splice(i, 1);
                 }
             }
+
+            // Qırmızı Zona Daralması
+            if (zoneRadius > 10) {
+                zoneRadius -= 0.03;
+                zoneMesh.scale.set(zoneRadius / 150, 1, zoneRadius / 150);
+            }
+
+            // Zonadan kənarda qalan oyunçunun canı getsin
+            const distFromCenter = Math.sqrt(camera.position.x ** 2 + camera.position.z ** 2);
+            if (distFromCenter > zoneRadius) {
+                playerHp -= 0.1;
+                document.getElementById('hp-bar').style.width = playerHp + '%';
+                if (playerHp <= 0) {
+                    alert("GAME OVER! Zona sizi məhv etdi.");
+                    location.reload();
+                }
+            }
+
+            prevTime = time;
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
         }
     </script>
 </body>
