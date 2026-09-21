@@ -3,638 +3,901 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AzTube</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>ArticleHub — Müasir Məqalə və Media Platforması</title>
+    <!-- FontAwesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --accent: #10b981;
+            --danger: #ef4444;
+        }
+
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
         body {
-            background-color: #0f0f0f;
-            color: #fff;
-            overflow-x: hidden;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
-        /* HEADER */
+        /* Header */
         header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 16px;
-            height: 56px;
-            background-color: #0f0f0f;
-            position: fixed;
+            position: sticky;
             top: 0;
-            left: 0;
-            right: 0;
             z-index: 100;
         }
 
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .logo-container i.fa-bars {
-            font-size: 18px;
-            cursor: pointer;
-            padding: 8px;
-        }
-
         .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 4px;
-            font-weight: bold;
-            font-size: 20px;
-            letter-spacing: -1px;
-            text-decoration: none;
-            color: #fff;
+            gap: 0.5rem;
         }
 
-        .logo-icon {
-            background-color: #ff0000;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-
-        .search-container {
+        .search-bar {
             display: flex;
             align-items: center;
-            width: 40%;
-            max-width: 600px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            width: 350px;
         }
 
-        .search-box {
-            display: flex;
-            width: 100%;
-            border: 1px solid #303030;
-            border-radius: 40px 0 0 40px;
-            background-color: #121212;
-            padding: 8px 16px;
-        }
-
-        .search-box input {
-            width: 100%;
+        .search-bar input {
             background: transparent;
             border: none;
+            color: var(--text);
+            width: 100%;
             outline: none;
-            color: #fff;
-            font-size: 16px;
         }
 
-        .search-btn {
-            background-color: #222222;
-            border: 1px solid #303030;
-            border-left: none;
-            border-radius: 0 40px 40px 0;
-            padding: 8px 20px;
-            color: #fff;
-            cursor: pointer;
-        }
-
-        .header-icons {
+        .nav-actions {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 1rem;
         }
 
-        .user-profile {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background-color: #555;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        /* MAIN LAYOUT */
-        .main-container {
-            display: flex;
-            margin-top: 56px;
-        }
-
-        /* SIDEBAR */
-        aside {
-            width: 240px;
-            background-color: #0f0f0f;
-            height: calc(100vh - 56px);
-            position: fixed;
-            top: 56px;
-            left: 0;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-            padding: 10px 12px;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 10px;
-            font-size: 14px;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            background-color: #272727;
-        }
-
-        .nav-link i {
-            font-size: 18px;
-            width: 24px;
-            text-align: center;
-        }
-
-        hr {
-            border: 0;
-            height: 1px;
-            background: #272727;
-            margin: 12px 0;
-        }
-
-        /* CONTENT AREA */
-        main {
-            margin-left: 240px;
-            padding: 16px 24px;
-            width: calc(100% - 240px);
-        }
-
-        /* CATEGORIES */
-        .categories {
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            padding-bottom: 12px;
-            margin-bottom: 16px;
-        }
-
-        .category-btn {
-            background-color: #272727;
-            color: #fff;
+        .btn {
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
             border: none;
-            padding: 6px 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+        .btn-outline:hover { background: var(--border); }
+
+        /* Container */
+        .container {
+            display: flex;
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Sidebar */
+        aside {
+            width: 260px;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem 1rem;
+            color: var(--text-muted);
             border-radius: 8px;
             cursor: pointer;
-            white-space: nowrap;
-            font-size: 14px;
+            transition: 0.2s;
+            text-decoration: none;
         }
 
-        .category-btn.active {
-            background-color: #fff;
-            color: #0f0f0f;
+        .menu-item:hover, .menu-item.active {
+            background: var(--primary);
+            color: white;
         }
 
-        /* VIDEO GRID */
-        .video-grid {
+        /* Main Content Area */
+        main {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        /* Articles Feed */
+        .feed-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 16px;
-            row-gap: 32px;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
         }
 
-        .video-card {
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .thumbnail-container {
-            position: relative;
-            width: 100%;
-            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+        .article-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
             border-radius: 12px;
             overflow: hidden;
-            background-color: #272727;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s;
         }
 
-        .thumbnail-container img {
-            position: absolute;
-            top: 0;
-            left: 0;
+        .article-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .card-img {
             width: 100%;
-            height: 100%;
+            height: 180px;
             object-fit: cover;
         }
 
-        .duration {
-            position: absolute;
-            bottom: 8px;
-            right: 8px;
-            background: rgba(0,0,0,0.8);
-            padding: 2px 4px;
-            border-radius: 4px;
-            font-size: 12px;
-        }
-
-        .video-info {
+        .card-body {
+            padding: 1.2rem;
             display: flex;
-            gap: 12px;
+            flex-direction: column;
+            gap: 0.8rem;
+            flex: 1;
         }
 
-        .channel-img {
-            width: 36px;
-            height: 36px;
+        .author-info {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            cursor: pointer;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             object-fit: cover;
         }
 
-        .video-details {
+        .author-details h4 { font-size: 0.95rem; }
+        .author-details p { font-size: 0.75rem; color: var(--text-muted); }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            line-height: 1.4;
+            cursor: pointer;
+        }
+
+        .card-stats {
             display: flex;
-            flex-direction: column;
-            gap: 4px;
+            justify-content: space-between;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+            padding-top: 0.8rem;
+            margin-top: auto;
         }
 
-        .video-title {
-            font-size: 16px;
-            font-weight: 500;
-            line-height: 1.3;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+        .stat-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
         }
 
-        .channel-name, .video-stats {
-            color: #aaa;
-            font-size: 14px;
+        .stat-btn:hover, .stat-btn.active { color: var(--primary); }
+
+        /* Banner Ads */
+        .ad-banner {
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: bold;
         }
 
-        /* VIDEO PLAYER MODAL */
-        .modal {
-            display: none;
+        /* Modal / Popups */
+        .modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.95);
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
             z-index: 1000;
-            overflow-y: auto;
-            padding: 20px;
         }
 
-        .modal-content {
-            max-width: 1000px;
-            margin: 40px auto;
-            background: #0f0f0f;
+        .modal {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 20px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
             position: relative;
         }
 
-        .close-btn {
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Video / Interstitial Ad Overlay */
+        .ad-overlay {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            background: #000;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .ad-timer {
             position: absolute;
             top: 10px;
-            right: 20px;
-            font-size: 28px;
-            cursor: pointer;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
             color: #fff;
         }
 
-        .video-player {
-            width: 100%;
-            height: 500px;
+        /* Profile & Settings Views */
+        .profile-header {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 2rem;
             border-radius: 12px;
-            background: #000;
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
         }
 
-        .modal-title {
-            font-size: 20px;
-            margin: 16px 0 8px 0;
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
         }
 
-        .modal-actions {
+        .monetization-box {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #272727;
-            padding-bottom: 16px;
-            margin-bottom: 16px;
         }
 
-        .channel-block {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .sub-btn {
-            background-color: #fff;
-            color: #0f0f0f;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .like-btn {
-            background: #272727;
-            color: #fff;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* COMMENTS SECTION */
-        .comments-section {
-            margin-top: 20px;
-        }
-
-        .comment-input-box {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .comment-input-box input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            border-bottom: 1px solid #303030;
-            color: #fff;
-            outline: none;
-            padding: 4px 0;
-        }
-
+        /* Comments Section */
         .comment-item {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
         }
 
-        .comment-text {
-            font-size: 14px;
+        .comment-reply {
+            margin-left: 2rem;
+            border-left: 2px solid var(--border);
+            padding-left: 1rem;
+            margin-top: 0.5rem;
         }
 
-        .comment-author {
-            font-weight: bold;
-            font-size: 13px;
-            margin-bottom: 4px;
+        /* Form Inputs */
+        .form-group {
+            margin-bottom: 1rem;
         }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            outline: none;
+        }
+
+        /* Utility */
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <!-- HEADER -->
+    <!-- Header -->
     <header>
-        <div class="logo-container">
-            <i class="fa-solid fa-bars"></i>
-            <a href="#" class="logo">
-                <span class="logo-icon"><i class="fa-solid fa-play"></i></span> AzTube
-            </a>
+        <div class="logo" onclick="showSection('feed')">
+            <i class="fa-solid fa-newspaper"></i> ArticleHub
         </div>
-        <div class="search-container">
-            <div class="search-box">
-                <input type="text" placeholder="Axtarın...">
-            </div>
-            <button class="search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+        <div class="search-bar">
+            <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted); margin-right: 0.5rem;"></i>
+            <input type="text" id="searchInput" placeholder="Məqalə, mövzu və ya müəllif axtarın..." onkeyup="searchArticles()">
         </div>
-        <div class="header-icons">
-            <i class="fa-solid fa-video" style="cursor: pointer;"></i>
-            <i class="fa-solid fa-bell" style="cursor: pointer;"></i>
-            <div class="user-profile">Ş</div>
+        <div class="nav-actions" id="navActions">
+            <!-- JavaScript tərəfindən idarə olunur -->
         </div>
     </header>
 
-    <!-- MAIN CONTAINER -->
-    <div class="main-container">
-        <!-- SIDEBAR -->
+    <div class="container">
+        <!-- Sidebar Navigation -->
         <aside>
-            <a href="#" class="nav-link active"><i class="fa-solid fa-house"></i> Ana səhifə</a>
-            <a href="#" class="nav-link"><i class="fa-solid fa-bolt"></i> Shorts</a>
-            <a href="#" class="nav-link"><i class="fa-solid fa-folder-open"></i> Abunəliklər</a>
-            <hr>
-            <a href="#" class="nav-link"><i class="fa-solid fa-bookmark"></i> Kitabxana</a>
-            <a href="#" class="nav-link"><i class="fa-solid fa-clock-rotate-left"></i> Tarixçə</a>
-            <a href="#" class="nav-link"><i class="fa-solid fa-thumbs-up"></i> Bəyəndiklərim</a>
+            <a class="menu-item active" onclick="showSection('feed')"><i class="fa-solid fa-house"></i> Ana Səhifə</a>
+            <a class="menu-item" onclick="showSection('popular')"><i class="fa-solid fa-fire"></i> Populyar</a>
+            <a class="menu-item" onclick="showSection('authors')"><i class="fa-solid fa-users"></i> Yazarlar (100+)</a>
+            <a class="menu-item" onclick="openCreateArticleModal()"><i class="fa-solid fa-pen-to-square"></i> Məqalə Yaz</a>
+            <a class="menu-item" onclick="showSection('messages')"><i class="fa-solid fa-envelope"></i> Mesajlar</a>
+            <a class="menu-item" onclick="showSection('profile')"><i class="fa-solid fa-user"></i> Profilim & Qazanc</a>
+            <a class="menu-item" onclick="showSection('settings')"><i class="fa-solid fa-gear"></i> Ayarlar & Məxfilik</a>
         </aside>
 
-        <!-- MAIN CONTENT -->
-        <main>
-            <!-- CATEGORIES -->
-            <div class="categories">
-                <button class="category-btn active">Hamısı</button>
-                <button class="category-btn">Xəbərlər</button>
-                <button class="category-btn">Musiqi</button>
-                <button class="category-btn">Texnologiya</button>
-                <button class="category-btn">Oyunlar</button>
-                <button class="category-btn">Təmir vı Tikinti</button>
-                <button class="category-btn">Aşpazlıq</button>
+        <!-- Main Content -->
+        <main id="mainContent">
+            <!-- Reklam Bannersi -->
+            <div class="ad-banner">
+                🚀 Sizin Reklamınız Burada Ola Bilər! — İndi Biznesinizi Inkişaf Etdirin!
             </div>
 
-            <!-- VIDEO GRID -->
-            <div class="video-grid" id="videoGrid">
-                <!-- JavaScript ilə doldurulacaq -->
+            <!-- Məqalələr Lenti -->
+            <div class="feed-grid" id="articlesGrid">
+                <!-- Dinamik məqalələr buraya yüklənəcək -->
             </div>
         </main>
     </div>
 
-    <!-- VIDEO MODAL -->
-    <div class="modal" id="videoModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
-            <iframe class="video-player" id="modalPlayer" src="" frameborder="0" allowfullscreen></iframe>
-            <h2 class="modal-title" id="modalTitle">Video Başlığı</h2>
-            <div class="modal-actions">
-                <div class="channel-block">
-                    <img src="" class="channel-img" id="modalChannelImg">
-                    <div>
-                        <div id="modalChannelName" style="font-weight: bold;">Kanal Adı</div>
-                        <div style="font-size: 12px; color: #aaa;">125K abunəçi</div>
-                    </div>
-                    <button class="sub-btn" style="margin-left: 12px;">Abunə ol</button>
-                </div>
-                <button class="like-btn"><i class="fa-regular fa-thumbs-up"></i> <span id="modalLikes">12K</span></button>
-            </div>
+    <!-- Modallar -->
+
+    <!-- Məqalə Oxuma və Video Reklam Modalı -->
+    <div class="modal-overlay" id="articleModal">
+        <div class="modal">
+            <button class="close-modal" onclick="closeModal('articleModal')">&times;</button>
             
-            <!-- COMMENTS SECTION -->
-            <div class="comments-section">
-                <h3>Şərhlər</h3>
-                <div class="comment-input-box" style="margin-top: 12px;">
-                    <div class="user-profile">Ş</div>
-                    <input type="text" placeholder="Şərh əlavə edin..." id="newCommentInput">
-                    <button class="category-btn" onclick="addComment()">Yaz</button>
+            <!-- YouTube Stilində Reklam Otağı -->
+            <div class="ad-overlay" id="videoAdContainer">
+                <div class="ad-timer" id="adTimer">Reklam: 4 san</div>
+                <div style="text-align: center; color: white;">
+                    <i class="fa-solid fa-rectangle-ad fa-3x" style="color: #f59e0b;"></i>
+                    <p style="margin-top: 10px;">Sponsorlu Reklam Göstərilir...</p>
                 </div>
-                <div id="commentsList">
-                    <!-- Saxta Şərhlər -->
+            </div>
+
+            <!-- Məqalə Məzmunu (Reklam bitdikdən sonra açılır) -->
+            <div id="articleContent" class="hidden">
+                <h2 id="modalTitle" style="margin-bottom: 1rem;"></h2>
+                <div class="author-info" style="margin-bottom: 1rem;">
+                    <img id="modalAuthorImg" src="" class="avatar">
+                    <div class="author-details">
+                        <h4 id="modalAuthorName"></h4>
+                        <p id="modalDate"></p>
+                    </div>
+                    <button class="btn btn-outline" id="modalFollowBtn" onclick="toggleFollow()"><i class="fa-solid fa-user-plus"></i> Takib Et</button>
                 </div>
+                <img id="modalImg" src="" style="width: 100%; max-height: 350px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">
+                <p id="modalBodyText" style="line-height: 1.6; color: #cbd5e1; margin-bottom: 1.5rem;"></p>
+                
+                <!-- Qarşılıqlı Əlaqə -->
+                <div style="display: flex; gap: 1rem; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 0.8rem 0; margin-bottom: 1.5rem;">
+                    <button class="btn btn-outline" onclick="likeCurrentArticle()"><i class="fa-solid fa-thumbs-up"></i> <span id="modalLikeCount">0</span> Bəyənmə</button>
+                    <button class="btn btn-outline" onclick="copyArticleLink()"><i class="fa-solid fa-copy"></i> Linki Kopyala</button>
+                    <button class="btn btn-outline" onclick="shareSocial()"><i class="fa-solid fa-share-nodes"></i> Paylaş</button>
+                </div>
+
+                <!-- Rəylər Bölməsi -->
+                <h3>Rəylər (<span id="modalCommentCount">0</span>)</h3>
+                <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                    <input type="text" id="newCommentInput" placeholder="Rəyinizi yazın..." style="flex:1; padding: 0.5rem; background: var(--bg); border: 1px solid var(--border); color: #fff; border-radius: 6px;">
+                    <button class="btn btn-primary" onclick="addComment()">Göndər</button>
+                </div>
+                <div id="commentsList" style="margin-top: 1.5rem;">
+                    <!-- Rəylər buraya yüklənəcək -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Qeydiyyat / Giriş Modalı -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal" style="max-width: 400px;">
+            <button class="close-modal" onclick="closeModal('authModal')">&times;</button>
+            <h2 style="margin-bottom: 1.5rem; text-align: center;">Platformaya Qoşulun</h2>
+            <div class="form-group">
+                <label>Ad və Soyad</label>
+                <input type="text" id="regName" placeholder="Məs: Əli Məmmədov">
+            </div>
+            <div class="form-group">
+                <label>E-poçt</label>
+                <input type="email" id="regEmail" placeholder="example@mail.com">
+            </div>
+            <div class="form-group">
+                <label>Hesab Növü</label>
+                <select id="regRole">
+                    <option value="reader">Sərbəst Oxucu</option>
+                    <option value="author">Məqalə Yazarı (Pul Qazan)</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="registerUser()">Qeydiyyatı Tamamla</button>
+        </div>
+    </div>
+
+    <!-- Məqalə Yaratma Modalı -->
+    <div class="modal-overlay" id="createModal">
+        <div class="modal">
+            <button class="close-modal" onclick="closeModal('createModal')">&times;</button>
+            <h2 style="margin-bottom: 1.5rem;">Yeni Məqalə Dərc Et</h2>
+            <div class="form-group">
+                <label>Başlıq</label>
+                <input type="text" id="createTitle" placeholder="Məqalə başlığını daxil edin...">
+            </div>
+            <div class="form-group">
+                <label>Şəkil URL</label>
+                <input type="text" id="createImg" placeholder="https://images.unsplash.com/...">
+            </div>
+            <div class="form-group">
+                <label>Məzmun</label>
+                <textarea id="createBody" rows="6" placeholder="Məqalənizi buraya yazın..."></textarea>
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="publishArticle()">Dərc Et</button>
+        </div>
+    </div>
+
+    <!-- Şəxsi Mesaj Modalı -->
+    <div class="modal-overlay" id="messageModal">
+        <div class="modal" style="max-width: 500px;">
+            <button class="close-modal" onclick="closeModal('messageModal')">&times;</button>
+            <h3 id="msgTargetName">Yazara Mesaj</h3>
+            <div id="msgHistory" style="height: 200px; border: 1px solid var(--border); background: var(--bg); border-radius: 8px; margin: 1rem 0; padding: 1rem; overflow-y: auto;">
+                <!-- Chat keçmişi -->
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                <input type="text" id="msgInput" placeholder="Mesajınızı yazın..." style="flex:1; padding: 0.5rem; background: var(--bg); border: 1px solid var(--border); color: #fff; border-radius: 6px;">
+                <button class="btn btn-primary" onclick="sendMessage()">Göndər</button>
             </div>
         </div>
     </div>
 
     <script>
-        // SAKTA VİDEOLAR VƏ PROFİLLƏR BAZASI
-        const mockVideos = [
-            {
-                id: 1,
-                title: "Bakıda Ev Təmiri Həlləri: Alçıpan və Şpatlyovka İşləri Düzgün Necə Edilir?",
-                channel: "Usta Tv Baku",
-                channelImg: "https://i.pravatar.cc/150?img=11",
-                views: "45K baxış",
-                time: "2 gün əvvəl",
-                duration: "14:20",
-                thumbnail: "https://picsum.photos/800/450?random=1",
-                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-                likes: "3.2K"
-            },
-            {
-                id: 2,
-                title: "Milli Mətbəx: Həqiqi Şah Plovun Hazırlanma Sirləri",
-                channel: "Ləzzətli Reseptlər",
-                channelImg: "https://i.pravatar.cc/150?img=5",
-                views: "120K baxış",
-                time: "1 həftə əvvəl",
-                duration: "22:15",
-                thumbnail: "https://picsum.photos/800/450?random=2",
-                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-                likes: "15K"
-            },
-            {
-                id: 3,
-                title: "JavaScript və HTML ilə Web Tətbiqlərin Yaradılması - Pulsuz Kurs",
-                channel: "Code Azerbaijan",
-                channelImg: "https://i.pravatar.cc/150?img=60",
-                views: "18K baxış",
-                time: "3 gün əvvəl",
-                duration: "45:00",
-                thumbnail: "https://picsum.photos/800/450?random=3",
-                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-                likes: "2.1K"
-            },
-            {
-                id: 4,
-                title: "Xəzər Dənizi Sahilində Səyahət Vlogu | Abşeron Gəzintisi",
-                channel: "Aydın Səyyah",
-                channelImg: "https://i.pravatar.cc/150?img=33",
-                views: "8.9K baxış",
-                time: "5 saat əvvəl",
-                duration: "10:05",
-                thumbnail: "https://picsum.photos/800/450?random=4",
-                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-                likes: "950"
-            },
-            {
-                id: 5,
-                title: "Son Texnologiya Xəbərləri: Yeni Smartfonlar İncelemesi",
-                channel: "TechAz",
-                channelImg: "https://i.pravatar.cc/150?img=68",
-                views: "92K baxış",
-                time: "2 həftə əvvəl",
-                duration: "18:40",
-                thumbnail: "https://picsum.photos/800/450?random=5",
-                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-                likes: "8.4K"
-            },
-            {
-                id: 6,
-                title: "Beyin Dalğaları və Diqqət Artıran Relaks Musiqilər (528 Hz)",
-                channel: "Acoustic Mind",
-                channelImg: "https://i.pravatar.cc/150?img=12",
-                views: "310K baxış",
-                time: "1 ay əvvəl",
-                duration: "1:00:00",
-                thumbnail: "https://picsum.photos/800/450?random=6",
-                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-                likes: "45K"
+        /* --- MƏLUMAT BAZASI VƏ SAXTA PROFİLLƏR (MOCK DATA) --- */
+        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+        let articles = JSON.parse(localStorage.getItem('articles')) || [];
+        let fakeUsers = [];
+
+        // 100-dən çox Saxta Profil Generatoru
+        const names = ["Aysel", "Rauf", "Elvin", "Leyla", "Murad", "Nigar", "Cavid", "Zəhra", "Orxan", "Günel", "Anar", "Fərid", "Turan", "Kənan", "Nərmin"];
+        const surnames = ["Məmmədov", "Əliyev", "Həsənov", "Hüseynov", "Quliyev", "İsmailov", "Rzayev", "Süleymanov", "Abbasov"];
+        const topics = ["Süni İntellektin Gələcəyi", "Azərbaycanda Texnologiya Trendləri", "Maliyyə Sərbəstliyinə Çatmaq", "Kiber Təhlükəsizlik Əsasları", "Kofe və Konsentrasiya", "Kosmosun Dərinlikləri", "Web3 və Blokçeyn"];
+
+        function initFakeData() {
+            if (articles.length === 0) {
+                for (let i = 1; i <= 105; i++) {
+                    const randomName = names[Math.floor(Math.random() * names.length)] + " " + surnames[Math.floor(Math.random() * surnames.length)];
+                    const fakeUser = {
+                        id: 'user_' + i,
+                        name: randomName,
+                        avatar: `https://i.pravatar.cc/150?img=${(i % 70) + 1}`,
+                        followers: Math.floor(Math.random() * 1500) + 50
+                    };
+                    fakeUsers.push(fakeUser);
+
+                    // Hər 2-ci profil üçün məqalə yarat
+                    if (i % 2 === 0) {
+                        articles.push({
+                            id: 'art_' + i,
+                            title: topics[i % topics.length] + " — " + i,
+                            body: "Bu məqalə peşəkar kontent olaraq platformaya daxil edilmişdir. Yazar burada öz fikirlərini və təcrübələrini paylaşır. Ətraflı öyrənmək üçün bəyənməyi və rəy yazmağı unutmayın!",
+                            image: `https://picsum.photos/seed/${i + 10}/600/400`,
+                            author: fakeUser,
+                            views: Math.floor(Math.random() * 12000) + 100,
+                            likes: Math.floor(Math.random() * 500) + 10,
+                            comments: [
+                                { author: "Tural K.", text: "Çox maraqlı məqalədir!", replies: [{author: fakeUser.name, text: "Təşəkkürlər!"}] }
+                            ],
+                            date: "21 Sentyabr 2026"
+                        });
+                    }
+                }
+                localStorage.setItem('articles', JSON.stringify(articles));
             }
-        ];
+        }
 
-        const mockComments = [
-            { author: "Eldar Məmmədov", text: "Çox faydalı məzmun olub, təşəkkürlər!", img: "https://i.pravatar.cc/150?img=1" },
-            { author: "Leyla Əliyeva", text: "Kanalınıza yeni abunə oldum, uğurlar!", img: "https://i.pravatar.cc/150?img=2" },
-            { author: "Rəşad Qasımov", text: "Davamı gəlsin zəhmət olmasa.", img: "https://i.pravatar.cc/150?img=3" }
-        ];
+        /* --- SƏHİFƏ YÜKLƏNMƏSİ VƏ NAVİQASİYA --- */
+        window.onload = function() {
+            initFakeData();
+            updateNav();
+            renderArticles(articles);
+        };
 
-        // VİDEO ŞƏBƏKƏSİNİ RENDER ETMƏK
-        function loadVideos() {
-            const grid = document.getElementById('videoGrid');
-            grid.innerHTML = mockVideos.map(video => `
-                <div class="video-card" onclick="openVideo(${video.id})">
-                    <div class="thumbnail-container">
-                        <img src="${video.thumbnail}" alt="${video.title}">
-                        <span class="duration">${video.duration}</span>
-                    </div>
-                    <div class="video-info">
-                        <img src="${video.channelImg}" class="channel-img">
-                        <div class="video-details">
-                            <div class="video-title">${video.title}</div>
-                            <div class="channel-name">${video.channel}</div>
-                            <div class="video-stats">${video.views} • ${video.time}</div>
+        function updateNav() {
+            const nav = document.getElementById('navActions');
+            if (currentUser) {
+                nav.innerHTML = `
+                    <span style="color: var(--accent);"><i class="fa-solid fa-wallet"></i> ₼${((currentUser.views || 0) / 1000 * 2).toFixed(2)}</span>
+                    <span style="font-weight: 600;">${currentUser.name} (${currentUser.role === 'author' ? 'Yazar' : 'Oxucu'})</span>
+                    <button class="btn btn-outline" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Çıxış</button>
+                `;
+            } else {
+                nav.innerHTML = `
+                    <button class="btn btn-outline" onclick="openModal('authModal')">Giriş / Qeydiyyat</button>
+                `;
+            }
+        }
+
+        function showSection(section) {
+            const main = document.getElementById('mainContent');
+            if (section === 'feed') {
+                main.innerHTML = `<div class="ad-banner">🚀 Sizin Reklamınız Burada Ola Bilər! — İndi Biznesinizi İnkişaf Etdirin!</div><div class="feed-grid" id="articlesGrid"></div>`;
+                renderArticles(articles);
+            } else if (section === 'popular') {
+                const sorted = [...articles].sort((a, b) => b.views - a.views);
+                main.innerHTML = `<h2>🔥 Ən Çox Oxunan Məqalələr</h2><br><div class="feed-grid" id="articlesGrid"></div>`;
+                renderArticles(sorted);
+            } else if (section === 'authors') {
+                let html = `<h2>👥 Aktiv Yazarlar və Profillər (${fakeUsers.length})</h2><br><div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;">`;
+                fakeUsers.slice(0, 40).forEach(u => {
+                    html += `
+                        <div style="background: var(--card-bg); border: 1px solid var(--border); padding: 1rem; border-radius: 8px; text-align: center;">
+                            <img src="${u.avatar}" class="avatar" style="width: 60px; height: 60px; margin-bottom: 0.5rem;">
+                            <h4>${u.name}</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted);">${u.followers} Takibçi</p>
+                            <button class="btn btn-outline" style="width:100%; margin-top: 0.5rem; justify-content:center;" onclick="openDirectMessage('${u.name}')">Mesaj Yaz</button>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+                main.innerHTML = html;
+            } else if (section === 'profile') {
+                if (!currentUser) return openModal('authModal');
+                const userArticles = articles.filter(a => a.author.name === currentUser.name);
+                const totalViews = userArticles.reduce((acc, curr) => acc + curr.views, 0);
+                const earnings = (totalViews / 1000 * 2).toFixed(2); // 1000 baxışa 2 AZN
+
+                main.innerHTML = `
+                    <div class="profile-header">
+                        <img src="${currentUser.avatar || 'https://i.pravatar.cc/150?img=12'}" class="profile-avatar">
+                        <div>
+                            <h2>${currentUser.name}</h2>
+                            <p style="color: var(--text-muted);">${currentUser.role === 'author' ? 'Rəsmi Yazar' : 'Sərbəst Oxucu'}</p>
+                            <br>
+                            <p>Dərc Olunan Məqalələr: <b>${userArticles.length}</b> | Ümumi Baxış: <b>${totalViews}</b></p>
                         </div>
                     </div>
-                </div>
-            `).join('');
-        }
-
-        // VİDEO MODALINI AÇMAQ
-        function openVideo(id) {
-            const video = mockVideos.find(v => v.id === id);
-            if (!video) return;
-
-            document.getElementById('modalPlayer').src = video.videoUrl;
-            document.getElementById('modalTitle').innerText = video.title;
-            document.getElementById('modalChannelName').innerText = video.channel;
-            document.getElementById('modalChannelImg').src = video.channelImg;
-            document.getElementById('modalLikes').innerText = video.likes;
-
-            loadComments();
-            document.getElementById('videoModal').style.display = 'block';
-        }
-
-        function closeModal() {
-            document.getElementById('videoModal').style.display = 'none';
-            document.getElementById('modalPlayer').src = '';
-        }
-
-        // ŞƏRHLƏRİ YÜKLƏMƏK VƏ ƏLAVƏ ETMƏK
-        function loadComments() {
-            const list = document.getElementById('commentsList');
-            list.innerHTML = mockComments.map(c => `
-                <div class="comment-item">
-                    <img src="${c.img}" class="channel-img">
-                    <div>
-                        <div class="comment-author">${c.author}</div>
-                        <div class="comment-text">${c.text}</div>
+                    <div class="monetization-box">
+                        <div>
+                            <h3><i class="fa-solid fa-money-bill-wave"></i> Qazanc Balansı (YouTube Monetizasiya Modeli)</h3>
+                            <p>Hər 1000 baxışa görə 2.00 AZN hesablanır.</p>
+                        </div>
+                        <h2 style="font-size: 2rem;">₼ ${earnings}</h2>
                     </div>
-                </div>
-            `).join('');
+                    <h3 style="margin: 2rem 0 1rem 0;">Mənim Məqalələrim</h3>
+                    <div class="feed-grid" id="articlesGrid"></div>
+                `;
+                renderArticles(userArticles);
+            } else if (section === 'settings') {
+                main.innerHTML = `
+                    <h2>⚙️ Ayarlar və Məxfilik Siyasəti</h2><br>
+                    <div style="background: var(--card-bg); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border); max-width: 600px;">
+                        <h3>Məxfilik və İstifadə Qaydaları</h3><br>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">
+                            1. Bu platformada dərc olunan bütün məqalələrin müəllif hüquqları yazarlara məxsusdur.<br>
+                            2. Qeyri-etik, təhqiramiz rəylər və müəllif hüquqlarını pozan materiallar dərhal silinir.<br>
+                            3. Monetizasiya yalnız unikal və real istifadəçi baxışları əsasında hesablanır.<br>
+                            4. Qeydiyyatsız istifadəçilər bütün kontenti sərbəst oxumaq hüququna malikdir.
+                        </p>
+                    </div>
+                `;
+            } else if (section === 'messages') {
+                main.innerHTML = `<h2>📩 Şəxsi Mesajlar</h2><br><p style="color: var(--text-muted);">Aktiv mesajınız yoxdur. Yazarlar bölməsindən hər hansı yazara şəxsi mesaj göndərə bilərsiniz.</p>`;
+            }
+        }
+
+        /* --- MƏQALƏLƏRİ RENDER ETMƏK --- */
+        function renderArticles(data) {
+            const grid = document.getElementById('articlesGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            data.forEach(art => {
+                const card = document.createElement('div');
+                card.className = 'article-card';
+                card.innerHTML = `
+                    <img src="${art.image}" class="card-img" onclick="openArticle('${art.id}')">
+                    <div class="card-body">
+                        <div class="author-info">
+                            <img src="${art.author.avatar}" class="avatar">
+                            <div class="author-details">
+                                <h4>${art.author.name}</h4>
+                                <p>${art.date}</p>
+                            </div>
+                        </div>
+                        <div class="card-title" onclick="openArticle('${art.id}')">${art.title}</div>
+                        <div class="card-stats">
+                            <span><i class="fa-solid fa-eye"></i> ${art.views} baxış</span>
+                            <button class="stat-btn" onclick="likeArticle('${art.id}', this)"><i class="fa-solid fa-thumbs-up"></i> <span>${art.likes}</span></button>
+                            <span><i class="fa-solid fa-comment"></i> ${art.comments.length}</span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        /* --- REKLAM VƏ MƏQALƏ OXUMA MODALI (YOUTUBE STİLİ REKLAM) --- */
+        let currentArticleId = null;
+
+        function openArticle(id) {
+            currentArticleId = id;
+            const art = articles.find(a => a.id === id);
+            if (!art) return;
+
+            // Baxış sayını artır
+            art.views++;
+            localStorage.setItem('articles', JSON.stringify(articles));
+
+            // Modalı sıfırla
+            document.getElementById('videoAdContainer').classList.remove('hidden');
+            document.getElementById('articleContent').classList.add('hidden');
+            openModal('articleModal');
+
+            // 3-4 Saniyəlik Reklam Taymeri
+            let timeLeft = 3;
+            const timerEl = document.getElementById('adTimer');
+            timerEl.innerText = `Reklam: ${timeLeft} san`;
+
+            const countdown = setInterval(() => {
+                timeLeft--;
+                if (timeLeft > 0) {
+                    timerEl.innerText = `Reklam: ${timeLeft} san`;
+                } else {
+                    clearInterval(countdown);
+                    // Reklamı gizlət, Məqaləni göstər
+                    document.getElementById('videoAdContainer').classList.add('hidden');
+                    document.getElementById('articleContent').classList.remove('hidden');
+                    loadArticleDetails(art);
+                }
+            }, 1000);
+        }
+
+        function loadArticleDetails(art) {
+            document.getElementById('modalTitle').innerText = art.title;
+            document.getElementById('modalAuthorImg').src = art.author.avatar;
+            document.getElementById('modalAuthorName').innerText = art.author.name;
+            document.getElementById('modalDate').innerText = art.date;
+            document.getElementById('modalImg').src = art.image;
+            document.getElementById('modalBodyText').innerText = art.body;
+            document.getElementById('modalLikeCount').innerText = art.likes;
+            document.getElementById('modalCommentCount').innerText = art.comments.length;
+
+            renderComments(art.comments);
+        }
+
+        /* --- RƏY SİSTEMİ VA CAVAB VERMƏK --- */
+        function renderComments(comments) {
+            const list = document.getElementById('commentsList');
+            list.innerHTML = '';
+            comments.forEach((c, index) => {
+                const item = document.createElement('div');
+                item.className = 'comment-item';
+                let repliesHtml = '';
+                if (c.replies) {
+                    c.replies.forEach(r => {
+                        repliesHtml += `<div class="comment-reply"><b>${r.author}:</b> ${r.text}</div>`;
+                    });
+                }
+                item.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <b>${c.author}</b>
+                        <button class="stat-btn" onclick="this.classList.toggle('active')"><i class="fa-solid fa-heart"></i></button>
+                    </div>
+                    <p style="margin-top:0.3rem; color:#cbd5e1;">${c.text}</p>
+                    <button class="stat-btn" style="font-size:0.75rem; margin-top:0.3rem;" onclick="replyComment(${index})">Cavab ver</button>
+                    ${repliesHtml}
+                `;
+                list.appendChild(item);
+            });
         }
 
         function addComment() {
             const input = document.getElementById('newCommentInput');
-            if (input.value.trim() !== '') {
-                mockComments.unshift({
-                    author: "Siz (İstifadəçi)",
-                    text: input.value,
-                    img: "https://i.pravatar.cc/150?img=15"
-                });
-                input.value = '';
-                loadComments();
+            if (!input.value.trim()) return;
+
+            const art = articles.find(a => a.id === currentArticleId);
+            const authorName = currentUser ? currentUser.name : "Sərbəst Oxucu";
+            
+            art.comments.push({
+                author: authorName,
+                text: input.value,
+                replies: []
+            });
+
+            localStorage.setItem('articles', JSON.stringify(articles));
+            input.value = '';
+            loadArticleDetails(art);
+        }
+
+        function replyComment(index) {
+            const text = prompt("Cavabınızı daxil edin:");
+            if (!text) return;
+            const art = articles.find(a => a.id === currentArticleId);
+            const authorName = currentUser ? currentUser.name : "Sərbəst Oxucu";
+            
+            if (!art.comments[index].replies) art.comments[index].replies = [];
+            art.comments[index].replies.push({ author: authorName, text: text });
+            
+            localStorage.setItem('articles', JSON.stringify(articles));
+            loadArticleDetails(art);
+        }
+
+        /* --- BƏYƏNMƏ VƏ PAYLAŞMA --- */
+        function likeArticle(id, btn) {
+            const art = articles.find(a => a.id === id);
+            art.likes++;
+            btn.querySelector('span').innerText = art.likes;
+            btn.style.color = 'var(--primary)';
+            localStorage.setItem('articles', JSON.stringify(articles));
+        }
+
+        function likeCurrentArticle() {
+            if (!currentArticleId) return;
+            const art = articles.find(a => a.id === currentArticleId);
+            art.likes++;
+            document.getElementById('modalLikeCount').innerText = art.likes;
+            localStorage.setItem('articles', JSON.stringify(articles));
+        }
+
+        function copyArticleLink() {
+            navigator.clipboard.writeText(window.location.href);
+            alert("Məqalə keçidi kopyalandı!");
+        }
+
+        function shareSocial() {
+            alert("Sosial şəbəkələrdə paylaşım pəncərəsi simulyasiya olundu!");
+        }
+
+        function toggleFollow() {
+            const btn = document.getElementById('modalFollowBtn');
+            if (btn.innerText.includes('Takib Et')) {
+                btn.innerHTML = `<i class="fa-solid fa-check"></i> Takib Olunur`;
+                btn.classList.replace('btn-outline', 'btn-primary');
+            } else {
+                btn.innerHTML = `<i class="fa-solid fa-user-plus"></i> Takib Et`;
+                btn.classList.replace('btn-primary', 'btn-outline');
             }
         }
 
-        // Səhifə yüklənəndə işə sal
-        window.onload = loadVideos;
+        /* --- MODAL İDARƏSİ VƏ QEYDİYYAT --- */
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        function registerUser() {
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const role = document.getElementById('regRole').value;
+
+            if (!name || !email) return alert("Xahiş olunur bütün xanaları doldurun!");
+
+            currentUser = { name, email, role, views: 0, avatar: 'https://i.pravatar.cc/150?img=33' };
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            updateNav();
+            closeModal('authModal');
+            alert("Qeydiyyat uğurla tamamlandı!");
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            currentUser = null;
+            updateNav();
+            showSection('feed');
+        }
+
+        function openCreateArticleModal() {
+            if (!currentUser) return openModal('authModal');
+            openModal('createModal');
+        }
+
+        function publishArticle() {
+            const title = document.getElementById('createTitle').value;
+            const img = document.getElementById('createImg').value || 'https://picsum.photos/600/400';
+            const body = document.getElementById('createBody').value;
+
+            if (!title || !body) return alert("Başlıq və məzmun tələb olunur!");
+
+            const newArt = {
+                id: 'art_' + Date.now(),
+                title: title,
+                body: body,
+                image: img,
+                author: { name: currentUser.name, avatar: currentUser.avatar },
+                views: 0,
+                likes: 0,
+                comments: [],
+                date: "İndi"
+            };
+
+            articles.unshift(newArt);
+            localStorage.setItem('articles', JSON.stringify(articles));
+            closeModal('createModal');
+            showSection('feed');
+        }
+
+        /* --- MESAJLAŞMA VƏ AXTAŞ SİSTEMİ --- */
+        function openDirectMessage(name) {
+            document.getElementById('msgTargetName').innerText = name + " ilə Mesajlaşma";
+            document.getElementById('msgHistory').innerHTML = `<div style="color:var(--text-muted); text-align:center;">Söhbətə başlayın...</div>`;
+            openModal('messageModal');
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('msgInput');
+            if (!input.value.trim()) return;
+            const history = document.getElementById('msgHistory');
+            history.innerHTML += `<div style="text-align:right; margin-bottom:0.5rem;"><span style="background:var(--primary); padding:0.4rem 0.8rem; border-radius:12px; display:inline-block;">${input.value}</span></div>`;
+            input.value = '';
+            history.scrollTop = history.scrollHeight;
+        }
+
+        function searchArticles() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = articles.filter(a => a.title.toLowerCase().includes(query) || a.author.name.toLowerCase().includes(query));
+            renderArticles(filtered);
+        }
     </script>
 </body>
 </html>
