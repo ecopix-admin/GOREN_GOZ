@@ -2,329 +2,306 @@
 <html lang="az">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PUBG Style 3D Battle Royale</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UstaTAP - Təmir & Xidmət Platforması</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-color; user-select: none; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: Arial, sans-serif; }
-        #canvas-container { width: 100%; height: 100%; display: block; }
-        
-        /* UI Overlay */
-        #hud {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        
-        .crosshair {
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 10px; height: 10px;
-            background: rgba(0, 255, 0, 0.8);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            border: 2px solid #000;
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-color: #38bdf8;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --btn-green: #22c55e;
         }
 
-        .stats-panel {
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-bottom: 70px;
+        }
+
+        .header {
+            background: #0284c7;
+            padding: 20px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .container {
+            padding: 15px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Kateqoriya Düymələri */
+        .categories {
             display: flex;
-            gap: 20px;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 15px 25px;
-            border-radius: 10px;
-            color: #fff;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .cat-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--accent-color);
+            color: var(--text-main);
+            padding: 8px 16px;
+            border-radius: 20px;
+            white-space: nowrap;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* Usta Kartı */
+        .master-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .master-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .master-name {
             font-size: 18px;
             font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .master-service {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .price-tag {
+            background: #0369a1;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: bold;
             width: fit-content;
-            border: 1px solid #444;
         }
 
-        .hp-bar-container {
-            width: 200px; height: 20px;
-            background: #444;
-            border-radius: 5px;
-            overflow: hidden;
-            border: 1px solid #fff;
-        }
-
-        .hp-bar {
-            width: 100%; height: 100%;
-            background: #ff3333;
-            transition: width 0.2s;
-        }
-
-        #start-screen {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
+        .call-btn {
+            background: var(--btn-green);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        /* Alt Naviqasiya Menyusu */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: #090d16;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            border-top: 1px solid #334155;
+        }
+
+        .nav-item {
+            color: var(--text-muted);
+            text-align: center;
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .nav-item.active {
+            color: var(--accent-color);
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        /* Form Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 100;
             justify-content: center;
             align-items: center;
-            color: #fff;
-            z-index: 10;
         }
 
-        #start-btn {
-            padding: 15px 40px;
-            font-size: 22px;
-            background: #ff9900;
+        .modal-content {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .modal-content input, .modal-content select {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: white;
+        }
+
+        .modal-content button {
+            padding: 10px;
+            background: var(--accent-color);
             border: none;
             color: #000;
             font-weight: bold;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
-            margin-top: 20px;
-            transition: 0.2s;
         }
-
-        #start-btn:hover { background: #ffaa22; transform: scale(1.05); }
     </style>
-    <!-- Three.js Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
-    <div id="start-screen">
-        <h1 style="font-size: 48px; color: #ff9900; margin-bottom: 10px;">BATTLE ROYALE 3D</h1>
-        <p style="font-size: 18px; color: #ccc;">WASD - Hərəkət | MOUSE - Baxış və Atəş (LMB)</p>
-        <button id="start-btn" onclick="startGame()">OYUNA BAŞLA</button>
+    <div class="header">
+        🛠️ UstaTAP - Xidmət Portalı
     </div>
 
-    <div id="hud">
-        <div class="stats-panel">
-            <div>Düşmənlər: <span id="enemies-left" style="color: #ff3333;">5</span></div>
-            <div>Kills: <span id="kills" style="color: #00ff88;">0</span></div>
-            <div>
-                HP: 
-                <div class="hp-bar-container">
-                    <div id="hp-bar" class="hp-bar"></div>
-                </div>
-            </div>
+    <div class="container">
+        <!-- Kateqoriyalar -->
+        <div class="categories">
+            <button class="cat-btn" onclick="filterMaster('barchasi')">Bütün Xidmətlər</button>
+            <button class="cat-btn" onclick="filterMaster('şpatlyovka')">Şpatlyovka</button>
+            <button class="cat-btn" onclick="filterMaster('alçipan')">Alçipan</button>
+            <button class="cat-btn" onclick="filterMaster('təmir')">A-dan Z-yə Təmir</button>
         </div>
-        <div class="crosshair"></div>
+
+        <!-- Ustaların Siyahısı -->
+        <div id="masters-list"></div>
     </div>
 
-    <div id="canvas-container"></div>
+    <!-- Alt Menyu -->
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="showSection('home')">
+            <i class="fa-solid fa-house"></i>
+            <span>Ana Səhifə</span>
+        </div>
+        <div class="nav-item" onclick="openModal()">
+            <i class="fa-solid fa-plus-circle"></i>
+            <span>Elan Əlavə Et</span>
+        </div>
+    </div>
+
+    <!-- Elan Əlavə Etmə Modalı -->
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <h3 style="color: var(--accent-color);">Usta Profilinizi Yaratın</h3>
+            <input type="text" id="masterName" placeholder="Ad və Soyadınız">
+            <select id="masterCategory">
+                <option value="şpatlyovka">Şpatlyovka Ustası</option>
+                <option value="alçipan">Alçipan Ustası</option>
+                <option value="təmir">Tam Təmir Ustası</option>
+            </select>
+            <input type="text" id="masterPrice" placeholder="Qiymət (Məs: 3-5 AZN / kv.m)">
+            <input type="tel" id="masterPhone" placeholder="Telefon Nömrəniz (+994...)">
+            <button onclick="saveMaster()">Elanı Dərc Et (Ödənişsiz)</button>
+            <button style="background: #ef233c; color: white;" onclick="closeModal()">Ləğv Et</button>
+        </div>
+    </div>
 
     <script>
-        let scene, camera, renderer;
-        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
-        let prevTime = performance.now();
-        const velocity = new THREE.Vector3();
-        const direction = new THREE.Vector3();
-        
-        let playerHp = 100;
-        let kills = 0;
-        let enemies = [];
-        let bullets = [];
-        let zoneMesh;
-        let zoneRadius = 150;
+        const initialMasters = [
+            { id: 1, name: "Səmir Usta", cat: "şpatlyovka", price: "4 - 6 AZN / kv.m", phone: "+994501234567" },
+            { id: 2, name: "Rəşad Usta", cat: "alçipan", price: "5 - 8 AZN / kv.m", phone: "+994559876543" },
+            { id: 3, name: "Kamil Usta", cat: "təmir", price: "Razılaşma yolu ilə", phone: "+994705554433" }
+        ];
 
-        function initScene() {
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x87ceeb);
-            scene.fog = new THREE.FogExp2(0x87ceeb, 0.005);
-
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.y = 2;
-
-            // İşıqlandırma
-            const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.8);
-            hemiLight.position.set(0, 200, 0);
-            scene.add(hemiLight);
-
-            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            dirLight.position.set(100, 100, 50);
-            scene.add(dirLight);
-
-            // Torpaq (Xəritə)
-            const floorGeo = new THREE.PlaneGeometry(400, 400);
-            const floorMat = new THREE.MeshLambertMaterial({ color: 0x557a2b });
-            const floor = new THREE.Mesh(floorGeo, floorMat);
-            floor.rotation.x = -Math.PI / 2;
-            scene.add(floor);
-
-            // Binalar / Sığınacaqlar
-            createMapObjects();
-
-            // Qırmızı Daralan Zona (PUBG Safe Zone)
-            const zoneGeo = new THREE.CylinderGeometry(zoneRadius, zoneRadius, 50, 32, 1, true);
-            const zoneMat = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true, side: THREE.DoubleSide });
-            zoneMesh = new THREE.Mesh(zoneGeo, zoneMat);
-            zoneMesh.position.y = 25;
-            scene.add(zoneMesh);
-
-            // Düşmən Botlar
-            spawnEnemies(5);
-
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.getElementById('canvas-container').appendChild(renderer.domElement);
-
-            window.addEventListener('resize', onWindowResize);
-            document.addEventListener('keydown', onKeyDown);
-            document.addEventListener('keyup', onKeyUp);
-            document.addEventListener('mousedown', shootBullet);
+        function renderMasters(list) {
+            const container = document.getElementById('masters-list');
+            container.innerHTML = '';
+            list.forEach(m => {
+                container.innerHTML += `
+                    <div class="master-card">
+                        <div class="master-header">
+                            <span class="master-name">${m.name}</span>
+                            <span class="price-tag">${m.price}</span>
+                        </div>
+                        <div class="master-service">Xidmət: ${m.cat.toUpperCase()}</div>
+                        <a href="tel:${m.phone}" class="call-btn">
+                            <i class="fa-solid fa-phone"></i> Zəng Et: ${m.phone}
+                        </a>
+                    </div>
+                `;
+            });
         }
 
-        function createMapObjects() {
-            const boxGeo = new THREE.BoxGeometry(10, 15, 10);
-            const boxMat = new THREE.MeshLambertMaterial({ color: 0x777777 });
-
-            for (let i = 0; i < 25; i++) {
-                const building = new THREE.Mesh(boxGeo, boxMat);
-                building.position.x = (Math.random() - 0.5) * 250;
-                building.position.z = (Math.random() - 0.5) * 250;
-                building.position.y = 7.5;
-                scene.add(building);
+        function filterMaster(category) {
+            let masters = JSON.parse(localStorage.getItem('my_masters')) || initialMasters;
+            if (category === 'barchasi') {
+                renderMasters(masters);
+            } else {
+                const filtered = masters.filter(m => m.cat === category);
+                renderMasters(filtered);
             }
         }
 
-        function spawnEnemies(count) {
-            const enemyGeo = new THREE.BoxGeometry(1.5, 3, 1.5);
-            const enemyMat = new THREE.MeshLambertMaterial({ color: 0xff1111 });
-
-            for (let i = 0; i < count; i++) {
-                const enemy = new THREE.Mesh(enemyGeo, enemyMat);
-                enemy.position.x = (Math.random() - 0.5) * 200;
-                enemy.position.z = (Math.random() - 0.5) * 200;
-                enemy.position.y = 1.5;
-                enemy.hp = 50;
-                scene.add(enemy);
-                enemies.push(enemy);
-            }
+        function openModal() {
+            document.getElementById('addModal').style.display = 'flex';
         }
 
-        function startGame() {
-            document.getElementById('start-screen').style.display = 'none';
-            document.body.requestPointerLock();
-            initScene();
-            animate();
+        function closeModal() {
+            document.getElementById('addModal').style.display = 'none';
         }
 
-        // Siçan İdarəsi (Look Around)
-        document.addEventListener('mousemove', (e) => {
-            if (document.pointerLockElement === document.body) {
-                camera.rotation.y -= e.movementX * 0.002;
-            }
-        });
+        function saveMaster() {
+            const name = document.getElementById('masterName').value;
+            const cat = document.getElementById('masterCategory').value;
+            const price = document.getElementById('masterPrice').value;
+            const phone = document.getElementById('masterPhone').value;
 
-        function onKeyDown(e) {
-            switch (e.code) {
-                case 'KeyW': moveForward = true; break;
-                case 'KeyS': moveBackward = true; break;
-                case 'KeyA': moveLeft = true; break;
-                case 'KeyD': moveRight = true; break;
+            if(!name || !price || !phone) {
+                alert("Zəhmət olmasa bütün xanaları doldurun!");
+                return;
             }
+
+            let masters = JSON.parse(localStorage.getItem('my_masters')) || initialMasters;
+            masters.unshift({ id: Date.now(), name, cat, price, phone });
+            localStorage.setItem('my_masters', JSON.stringify(masters));
+
+            renderMasters(masters);
+            closeModal();
+            alert("Elanınız uğurla yerləşdirildi!");
         }
 
-        function onKeyUp(e) {
-            switch (e.code) {
-                case 'KeyW': moveForward = false; break;
-                case 'KeyS': moveBackward = false; break;
-                case 'KeyA': moveLeft = false; break;
-                case 'KeyD': moveRight = false; break;
-            }
-        }
-
-        function shootBullet() {
-            if (document.pointerLockElement !== document.body) return;
-
-            const bulletGeo = new THREE.SphereGeometry(0.2, 8, 8);
-            const bulletMat = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-            const bullet = new THREE.Mesh(bulletGeo, bulletMat);
-
-            bullet.position.copy(camera.position);
-            bullet.ray = new THREE.Vector3();
-            camera.getWorldDirection(bullet.ray);
-
-            scene.add(bullet);
-            bullets.push(bullet);
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-
-            const time = performance.now();
-            const delta = (time - prevTime) / 1000;
-
-            // Hərəkət Fizikası
-            velocity.x -= velocity.x * 10.0 * delta;
-            velocity.z -= velocity.z * 10.0 * delta;
-
-            direction.z = Number(moveForward) - Number(moveBackward);
-            direction.x = Number(moveRight) - Number(moveLeft);
-            direction.normalize();
-
-            if (moveForward || moveBackward) velocity.z -= direction.z * 100.0 * delta;
-            if (moveLeft || moveRight) velocity.x -= direction.x * 100.0 * delta;
-
-            camera.translateX(-velocity.x * delta);
-            camera.translateZ(velocity.z * delta);
-            camera.position.y = 2; // Yerdə saxlamaq
-
-            // Güllələrin hərəkəti
-            for (let i = bullets.length - 1; i >= 0; i--) {
-                const b = bullets[i];
-                b.position.addScaledVector(b.ray, 3);
-
-                // Düşmənə dəymə yoxlanışı
-                for (let j = enemies.length - 1; j >= 0; j--) {
-                    const e = enemies[j];
-                    if (b.position.distanceTo(e.position) < 2) {
-                        e.hp -= 25;
-                        scene.remove(b);
-                        bullets.splice(i, 1);
-
-                        if (e.hp <= 0) {
-                            scene.remove(e);
-                            enemies.splice(j, 1);
-                            kills++;
-                            document.getElementById('kills').innerText = kills;
-                            document.getElementById('enemies-left').innerText = enemies.length;
-
-                            if (enemies.length === 0) {
-                                alert("VICTORY ROYALE! QALİB OLDUĞUNUZ!");
-                                location.reload();
-                            }
-                        }
-                        break;
-                    }
-                }
-            }
-
-            // Qırmızı Zona Daralması
-            if (zoneRadius > 10) {
-                zoneRadius -= 0.03;
-                zoneMesh.scale.set(zoneRadius / 150, 1, zoneRadius / 150);
-            }
-
-            // Zonadan kənarda qalan oyunçunun canı getsin
-            const distFromCenter = Math.sqrt(camera.position.x ** 2 + camera.position.z ** 2);
-            if (distFromCenter > zoneRadius) {
-                playerHp -= 0.1;
-                document.getElementById('hp-bar').style.width = playerHp + '%';
-                if (playerHp <= 0) {
-                    alert("GAME OVER! Zona sizi məhv etdi.");
-                    location.reload();
-                }
-            }
-
-            prevTime = time;
-            renderer.render(scene, camera);
-        }
-
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
+        window.onload = () => {
+            let masters = JSON.parse(localStorage.getItem('my_masters')) || initialMasters;
+            renderMasters(masters);
+        };
     </script>
 </body>
 </html>
