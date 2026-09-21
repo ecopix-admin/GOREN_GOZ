@@ -3,728 +3,384 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHAM & Social Platform</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
-    <!-- Optimized A-Frame and AR.js -->
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-
+    <title>Uşaq Macəra Dünyası</title>
     <style>
-        :root {
-            --bg-color: #000000;
-            --card-bg: #121212;
-            --border-color: #262626;
-            --text-main: #f5f5f5;
-            --text-muted: #a8a8a8;
-            --accent-color: #0095f6;
-            --like-color: #ff3040;
-        }
-
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            user-select: none;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
+            background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 99%, #FECFEF 100%);
             min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        .app-container {
             display: flex;
-            width: 100%;
-            max-width: 1200px;
-            position: relative;
-            z-index: 2;
-        }
-
-        /* Sidebar Navigation */
-        .sidebar {
-            width: 245px;
-            padding: 24px 12px;
-            border-right: 1px solid var(--border-color);
-            position: fixed;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            z-index: 10;
-            background: var(--bg-color);
-        }
-
-        .brand-logo {
-            font-size: 26px;
-            font-weight: 800;
-            padding: 0 12px 30px;
-            display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 12px;
-            cursor: pointer;
-        }
-
-        .brand-logo span { color: var(--accent-color); font-size: 30px; }
-
-        .nav-links {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .nav-item a {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 12px;
-            color: var(--text-main);
-            text-decoration: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .nav-item a:hover { background-color: #1a1a1a; }
-        .nav-item i { font-size: 20px; width: 24px; }
-
-        .nav-item.ar-btn a {
-            background: linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045);
-            font-weight: bold;
-        }
-
-        /* Main Content Feed */
-        .main-content {
-            margin-left: 245px;
-            width: 100%;
-            max-width: 630px;
-            padding: 20px;
-        }
-
-        .stories-container {
-            display: flex;
-            gap: 16px;
-            overflow-x: auto;
-            padding: 16px 0;
-            margin-bottom: 24px;
-            scrollbar-width: none;
-        }
-
-        .stories-container::-webkit-scrollbar { display: none; }
-
-        .story-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-
-        .story-avatar-wrapper {
-            padding: 2px;
-            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
-            border-radius: 50%;
-        }
-
-        .story-avatar {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            border: 2px solid var(--bg-color);
-            object-fit: cover;
-        }
-
-        .story-username {
-            font-size: 12px;
-            color: var(--text-muted);
-            max-width: 64px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        /* Post Card */
-        .post-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            margin-bottom: 24px;
             overflow: hidden;
         }
 
-        .post-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 16px;
-        }
-
-        .post-user-info { display: flex; align-items: center; gap: 10px; }
-        .post-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
-        .post-username { font-size: 14px; font-weight: 600; }
-        .post-image { width: 100%; max-height: 600px; object-fit: cover; display: block; }
-
-        .post-actions { padding: 12px 16px; display: flex; justify-content: space-between; }
-        .action-btns { display: flex; gap: 16px; }
-        .action-btns i, .post-actions > i { font-size: 22px; cursor: pointer; }
-
-        .fa-heart.active { color: var(--like-color); }
-        .fa-bookmark.active { color: var(--text-main); }
-
-        .post-details { padding: 0 16px 16px; }
-        .likes-count { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
-        .caption { font-size: 14px; line-height: 1.4; margin-bottom: 8px; }
-        .caption .username { font-weight: 600; margin-right: 6px; }
-
-        .add-comment-box {
-            display: flex;
-            align-items: center;
-            border-top: 1px solid var(--border-color);
-            padding: 12px 16px;
-            gap: 10px;
-        }
-
-        .add-comment-box input {
-            background: transparent;
-            border: none;
-            outline: none;
-            color: var(--text-main);
+        #game-container {
             width: 100%;
-            font-size: 14px;
-        }
-
-        .add-comment-box button {
-            background: transparent;
-            border: none;
-            color: var(--accent-color);
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        /* Modallar */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            width: 90%;
-            max-width: 500px;
-            padding: 20px;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 12px;
-            margin-bottom: 16px;
-        }
-
-        .close-btn { font-size: 20px; cursor: pointer; color: var(--text-muted); }
-
-        .modal-body { display: flex; flex-direction: column; gap: 12px; }
-
-        .modal-body input[type="text"], .modal-body textarea, .modal-body select {
-            width: 100%;
-            padding: 10px;
-            background: #000;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            color: #fff;
-        }
-
-        .modal-body button {
-            padding: 10px;
-            background: var(--accent-color);
-            border: none;
-            color: #fff;
-            font-weight: 600;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        /* AR Kamera Bölməsi - Tam İnteqrasiyalı */
-        #arWorldContainer {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            z-index: 99;
-            background: #000;
-        }
-
-        .ar-hud-controls {
-            position: absolute;
-            top: 20px; left: 50%;
-            transform: translateX(-50%);
-            z-index: 101;
-            display: flex;
-            gap: 10px;
-            width: 90%;
-            max-width: 500px;
-            justify-content: center;
-        }
-
-        .ar-hud-btn {
-            background: rgba(18, 18, 18, 0.9);
-            border: 1px solid var(--accent-color);
-            color: #fff;
-            padding: 10px 14px;
+            max-width: 480px;
+            height: 90vh;
+            background: #2b2d42;
             border-radius: 20px;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-            backdrop-filter: blur(5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            border: 4px solid #fff;
         }
 
-        @media (max-width: 768px) {
-            .sidebar { width: 70px; }
-            .sidebar .link-text, .brand-logo div { display: none; }
-            .main-content { margin-left: 70px; width: calc(100% - 70px); }
+        /* Başlıq Və Menyular */
+        .header {
+            background: #ffb703;
+            padding: 15px;
+            text-align: center;
+            color: #d90429;
+            font-size: 22px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .home-btn {
+            background: #ef233c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .screen {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Ana Menyu */
+        .game-card {
+            width: 100%;
+            background: #8d99ae;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            border: 3px solid #edf2f4;
+        }
+
+        .game-card:hover {
+            transform: scale(1.03);
+            background: #ffb703;
+        }
+
+        .game-icon {
+            font-size: 40px;
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+        }
+
+        .game-info h3 {
+            color: #fff;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .game-info p {
+            color: #edf2f4;
+            font-size: 12px;
+        }
+
+        /* Oyun Kanvasları */
+        canvas {
+            background: #111;
+            border-radius: 10px;
+            width: 100%;
+            height: 100%;
+            max-height: 400px;
+        }
+
+        /* Yaddaş Oyunu Grid */
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            width: 100%;
+        }
+
+        .memory-card {
+            aspect-ratio: 1;
+            background: #ffb703;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .memory-card.flipped {
+            background: #fff;
+            transform: rotateY(180deg);
+        }
+
+        /* Nəticə vərəqi */
+        .score-board {
+            color: white;
+            font-size: 18px;
+            margin-bottom: 10px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <div class="app-container" id="mainAppUi">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div>
-                <div class="brand-logo" onclick="window.scrollTo(0,0)">
-                    <span>&</span> <div class="link-text">SHAM</div>
+    <div id="game-container">
+        <div class="header">
+            <span id="header-title">🎮 Macəra Parkı</span>
+            <button class="home-btn" onclick="showScreen('menu-screen')">Menyu</button>
+        </div>
+
+        <!-- ANA MENYU -->
+        <div id="menu-screen" class="screen active">
+            <div class="game-card" onclick="startSpaceGame()">
+                <div class="game-icon">🚀</div>
+                <div class="game-info">
+                    <h3>Kosmik Kosmonavt</h3>
+                    <p>Meteoritlərdən qaç, ulduzları topla!</p>
                 </div>
-                <ul class="nav-links">
-                    <li class="nav-item"><a onclick="exitAR()"><i class="fa-solid fa-house"></i><span class="link-text">Ana Səhifə</span></a></li>
-                    <li class="nav-item ar-btn"><a onclick="enterAR()"><i class="fa-solid fa-vr-cardboard"></i><span class="link-text">AR Məkan</span></a></li>
-                    <li class="nav-item"><a onclick="toggleModal('searchModal')"><i class="fa-solid fa-magnifying-glass"></i><span class="link-text">Axtarış</span></a></li>
-                    <li class="nav-item"><a onclick="toggleModal('notifModal')"><i class="fa-regular fa-heart"></i><span class="link-text">Bildirişlər</span></a></li>
-                    <li class="nav-item"><a onclick="toggleModal('createModal')"><i class="fa-regular fa-square-plus"></i><span class="link-text">Yarat</span></a></li>
-                    <li class="nav-item"><a onclick="toggleModal('profileModal')"><i class="fa-regular fa-user"></i><span class="link-text">Profil</span></a></li>
-                </ul>
             </div>
-        </aside>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <div class="stories-container" id="stories-wrapper"></div>
-            <div id="feed-posts"></div>
-        </main>
-    </div>
-
-    <!-- AR Səhnəsi (Kamera və 3D Məkan) -->
-    <div id="arWorldContainer">
-        <div class="ar-hud-controls">
-            <button class="ar-hud-btn" onclick="toggleModal('addArObjectModal')"><i class="fa-solid fa-plus"></i> Əlavə Et</button>
-            <button class="ar-hud-btn" style="border-color: #00ff88;" onclick="scanNearbyArMarks()"><i class="fa-solid fa-radar"></i> Skan Et & İzi Tap</button>
-            <button class="ar-hud-btn" style="border-color: var(--like-color);" onclick="exitAR()"><i class="fa-solid fa-xmark"></i> Bağla</button>
-        </div>
-
-        <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false">
-            <a-entity id="arObjectContainer"></a-entity>
-            <a-entity camera></a-entity>
-        </a-scene>
-    </div>
-
-    <!-- MODALLAR -->
-    <!-- 1. Post Yarat -->
-    <div class="modal" id="createModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Yeni Paylaşım Yaradın</h3>
-                <i class="fa-solid fa-xmark close-btn" onclick="toggleModal('createModal')"></i>
+            <div class="game-card" onclick="startMemoryGame()">
+                <div class="game-icon">🧩</div>
+                <div class="game-info">
+                    <h3>Sehrli Yaddaş</h3>
+                    <p>Gizli cütləri tap və qalib gəl!</p>
+                </div>
             </div>
-            <div class="modal-body">
-                <input type="file" id="postImageInput" accept="image/*">
-                <textarea id="postCaptionInput" placeholder="Açıqlama yazın (Azərbaycan dili dəstəklənir)..." rows="3"></textarea>
-                <button onclick="publishUserPost()">Paylaş</button>
+
+            <div class="game-card" onclick="startCatchGame()">
+                <div class="game-icon">🍎</div>
+                <div class="game-info">
+                    <h3>Xəzinə Tutmaç</h3>
+                    <p>Meyvələri səbətə yığ, bombalardan qaç!</p>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- 2. AR-a Azərbaycan Mətni / Şəkil Qoymaq -->
-    <div class="modal" id="addArObjectModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Havaya/Məkana Əlavə Et</h3>
-                <i class="fa-solid fa-xmark close-btn" onclick="toggleModal('addArObjectModal')"></i>
-            </div>
-            <div class="modal-body">
-                <label>Məzmun Növü:</label>
-                <select id="arTypeSelect">
-                    <option value="az_text">3D Azərbaycan Mətni (ə, ş, ç, ğ, ı, ö, ü)</option>
-                    <option value="image">Məkan Şəkli / Profil</option>
-                </select>
-
-                <label>Yazı və ya Təsvir:</label>
-                <input type="text" id="arTextInput" placeholder="Məsələn: Bura bizim məkandır! 🇦🇿">
-
-                <label>Şəkil Seçin (Əgər Şəkil seçildisə):</label>
-                <input type="file" id="arFileInput" accept="image/*">
-
-                <button onclick="createAndAnchorArObject()">Konuma Zəncirlə & Bırax</button>
-            </div>
+        <!-- OYUN 1: KOSMİK KOSMONAVT -->
+        <div id="space-screen" class="screen">
+            <div class="score-board">Xal: <span id="space-score">0</span></div>
+            <canvas id="spaceCanvas"></canvas>
+            <p style="color: #aaa; font-size: 12px; margin-top: 10px;">İdarə: Ekrana vuraraq gəmini hərəkət etdirin</p>
         </div>
-    </div>
 
-    <!-- 3. Profil Tənzimləmələri -->
-    <div class="modal" id="profileModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Profil Tənzimləmələri</h3>
-                <i class="fa-solid fa-xmark close-btn" onclick="toggleModal('profileModal')"></i>
-            </div>
-            <div class="modal-body">
-                <label>İstifadəçi Adı:</label>
-                <input type="text" id="usernameInput" value="sham_user">
-                <label>Profil Şəkli:</label>
-                <input type="file" id="avatarFileInput" accept="image/*">
-                <button onclick="saveProfile()">Yadda Saxla</button>
-            </div>
+        <!-- OYUN 2: SEHRLİ YADDAŞ -->
+        <div id="memory-screen" class="screen">
+            <div class="score-board">Cütlər: <span id="memory-score">0</span>/6</div>
+            <div class="memory-grid" id="memoryGrid"></div>
         </div>
-    </div>
 
-    <!-- 4. Axtarış -->
-    <div class="modal" id="searchModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Axtarış</h3>
-                <i class="fa-solid fa-xmark close-btn" onclick="toggleModal('searchModal')"></i>
-            </div>
-            <div class="modal-body">
-                <input type="text" placeholder="İstifadəçi və ya haştaq axtarın...">
-            </div>
-        </div>
-    </div>
-
-    <!-- 5. Bildirişlər -->
-    <div class="modal" id="notifModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Bildirişlər</h3>
-                <i class="fa-solid fa-xmark close-btn" onclick="toggleModal('notifModal')"></i>
-            </div>
-            <div class="modal-body">
-                <p style="color: var(--text-muted);">Yeni bildirişiniz yoxdur.</p>
-            </div>
+        <!-- OYUN 3: XƏZİNƏ TUTMAÇ -->
+        <div id="catch-screen" class="screen">
+            <div class="score-board">Xal: <span id="catch-score">0</span></div>
+            <canvas id="catchCanvas"></canvas>
+            <p style="color: #aaa; font-size: 12px; margin-top: 10px;">İdarə: Barmağınızla səbəti sürüşdürün</p>
         </div>
     </div>
 
     <script>
-        let currentUser = JSON.parse(localStorage.getItem('sham_profile')) || {
-            username: "sham_master",
-            avatar: "https://picsum.photos/seed/sham_main/100/100"
-        };
-
-        const defaultUsers = ["alex_vibe", "creative_mind", "urban_lens", "tech_insider", "nature_art"];
-        const captions = ["Möhtəşəm gün! 🔥 #sham", "Yaradıcılıq heç vaxt bitmir ✨", "AZərbaycan dili dəstəyi ilə! 🇦🇿"];
-
-        function toggleModal(id) {
-            const modal = document.getElementById(id);
-            modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            stopAllGames();
         }
 
-        // --- AR MODU BÖLMƏSİ ---
-        function enterAR() {
-            document.getElementById('mainAppUi').style.display = 'none';
-            document.getElementById('arWorldContainer').style.display = 'block';
+        function stopAllGames() {
+            clearInterval(spaceInterval);
+            clearInterval(catchInterval);
         }
 
-        function exitAR() {
-            document.getElementById('arWorldContainer').style.display = 'none';
-            document.getElementById('mainAppUi').style.display = 'flex';
-        }
+        /* --- OYUN 1: KOSMİK KOSMONAVT --- */
+        let spaceCanvas = document.getElementById('spaceCanvas');
+        let spaceCtx = spaceCanvas.getContext('2d');
+        let spaceInterval, spaceScore = 0;
+        let shipX = 150;
+        let stars = [];
 
-        // Azərbaycan Əlifbasını Canvas vasitəsilə 3D Texture-ə çevirmək (Silinmə / Sual işarəsi problemini həll edir)
-        function createAzTextTexture(text) {
-            const canvas = document.createElement('canvas');
-            canvas.width = 512;
-            canvas.height = 256;
-            const ctx = canvas.getContext('2d');
-            
-            ctx.fillStyle = "rgba(18, 18, 18, 0.85)";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = "#0095f6";
-            ctx.lineWidth = 6;
-            ctx.strokeRect(0, 0, canvas.width, canvas.height);
+        function startSpaceGame() {
+            showScreen('space-screen');
+            spaceCanvas.width = 320;
+            spaceCanvas.height = 350;
+            spaceScore = 0;
+            shipX = 140;
+            stars = [];
+            document.getElementById('space-score').innerText = spaceScore;
 
-            ctx.fillStyle = "#ffffff";
-            ctx.font = "Bold 32px Arial";
-            ctx.textAlign = "center";
-            ctx.fillText(text, 256, 135);
-
-            return canvas.toDataURL();
-        }
-
-        // Məkana AR Məzmun Bıraxmaq & Geolocation Yaddaşı
-        function createAndAnchorArObject() {
-            const type = document.getElementById('arTypeSelect').value;
-            const text = document.getElementById('arTextInput').value || "SHAM Məkanı";
-            const fileInput = document.getElementById('arFileInput');
-            const container = document.getElementById('arObjectContainer');
-
-            // GPS Konumu almaq
-            navigator.geolocation.getCurrentPosition(pos => {
-                const lat = pos.coords.latitude;
-                const lng = pos.coords.longitude;
-
-                const posX = (Math.random() - 0.5) * 2;
-                const posY = (Math.random() * 1) + 0.5;
-                const posZ = - (Math.random() * 1.5 + 1);
-
-                if (type === 'az_text') {
-                    const textureData = createAzTextTexture(text);
-                    const plane = document.createElement('a-plane');
-                    plane.setAttribute('src', textureData);
-                    plane.setAttribute('position', `${posX} ${posY} ${posZ}`);
-                    plane.setAttribute('width', '2');
-                    plane.setAttribute('height', '1');
-                    container.appendChild(plane);
-                } else if (fileInput.files[0]) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const imgEntity = document.createElement('a-image');
-                        imgEntity.setAttribute('src', e.target.result);
-                        imgEntity.setAttribute('position', `${posX} ${posY} ${posZ}`);
-                        imgEntity.setAttribute('width', '1.5');
-                        imgEntity.setAttribute('height', '1.5');
-                        container.appendChild(imgEntity);
-                    };
-                    reader.readAsDataURL(fileInput.files[0]);
-                }
-
-                // Global Yaddaşa (Skan üçün) yazmaq
-                let arMarks = JSON.parse(localStorage.getItem('sham_ar_marks')) || [];
-                arMarks.push({ id: Date.now(), lat, lng, text, user: currentUser.username });
-                localStorage.setItem('sham_ar_marks', JSON.stringify(arMarks));
-
-                alert(`Məzmun məkana bıraxıldı! GPS: ${lat.toFixed(3)}, ${lng.toFixed(3)}`);
-                toggleModal('addArObjectModal');
-            }, err => {
-                alert("Geolokasiya icazəsi verilmədi, obyekt yerli məkana yerləşdirildi.");
-                toggleModal('addArObjectModal');
-            });
-        }
-
-        // Digər İstifadəçilərin Məkandakı İzini Skan Etmək
-        function scanNearbyArMarks() {
-            let arMarks = JSON.parse(localStorage.getItem('sham_ar_marks')) || [];
-            if (arMarks.length === 0) {
-                alert("Ərazidə başqa istifadəçi izi tapılmadı.");
-                return;
-            }
-
-            const container = document.getElementById('arObjectContainer');
-            arMarks.forEach((mark, index) => {
-                const textureData = createAzTextTexture(`[İz] ${mark.user}: ${mark.text}`);
-                const plane = document.createElement('a-plane');
-                plane.setAttribute('src', textureData);
-                plane.setAttribute('position', `${(index - 1) * 1.2} 1.2 -2`);
-                plane.setAttribute('width', '2');
-                plane.setAttribute('height', '1');
-                container.appendChild(plane);
-            });
-
-            alert(`${arMarks.length} ədəd istifadəçi izi skan olunub məkana yükləndi!`);
-        }
-
-        // --- STANDARD SOCIAL NETWORK FUNKSİYALARI ---
-        function saveProfile() {
-            const newName = document.getElementById('usernameInput').value;
-            const avatarFile = document.getElementById('avatarFileInput').files[0];
-
-            if(newName) currentUser.username = newName;
-
-            if(avatarFile) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    currentUser.avatar = e.target.result;
-                    localStorage.setItem('sham_profile', JSON.stringify(currentUser));
-                    alert("Profil yeniləndi!");
-                    toggleModal('profileModal');
-                };
-                reader.readAsDataURL(avatarFile);
-            } else {
-                localStorage.setItem('sham_profile', JSON.stringify(currentUser));
-                alert("Profil yeniləndi!");
-                toggleModal('profileModal');
-            }
-        }
-
-        function generateStories() {
-            const wrapper = document.getElementById('stories-wrapper');
-            let storiesHTML = `
-                <div class="story-item" onclick="toggleModal('profileModal')">
-                    <div class="story-avatar-wrapper" style="background: var(--border-color);">
-                        <img src="${currentUser.avatar}" class="story-avatar">
-                    </div>
-                    <span class="story-username">Siz</span>
-                </div>
-            `;
-            
-            for(let i = 1; i <= 10; i++) {
-                const user = defaultUsers[i % defaultUsers.length] + "_" + i;
-                const avatarUrl = `https://picsum.photos/seed/story_${i}/150/150`;
-                storiesHTML += `
-                    <div class="story-item">
-                        <div class="story-avatar-wrapper">
-                            <img src="${avatarUrl}" class="story-avatar">
-                        </div>
-                        <span class="story-username">${user}</span>
-                    </div>
-                `;
-            }
-            wrapper.innerHTML = storiesHTML;
-        }
-
-        function publishUserPost() {
-            const fileInput = document.getElementById('postImageInput');
-            const captionInput = document.getElementById('postCaptionInput');
-
-            if(!fileInput.files[0]) {
-                alert("Şəkil seçin!");
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const newPost = {
-                    id: Date.now(),
-                    username: currentUser.username,
-                    avatar: currentUser.avatar,
-                    image: e.target.result,
-                    caption: captionInput.value,
-                    likes: 1
-                };
-
-                let userPosts = JSON.parse(localStorage.getItem('sham_user_posts')) || [];
-                userPosts.unshift(newPost);
-                localStorage.setItem('sham_user_posts', JSON.stringify(userPosts));
-
-                renderPost(newPost, true);
-
-                fileInput.value = "";
-                captionInput.value = "";
-                toggleModal('createModal');
+            spaceCanvas.onclick = (e) => {
+                let rect = spaceCanvas.getBoundingClientRect();
+                let clickX = e.clientX - rect.left;
+                if (clickX < spaceCanvas.width / 2) shipX -= 30;
+                else shipX += 30;
             };
-            reader.readAsDataURL(fileInput.files[0]);
+
+            spaceInterval = setInterval(updateSpaceGame, 50);
         }
 
-        function createPostHTML(post) {
-            return `
-                <article class="post-card" id="post-${post.id}">
-                    <div class="post-header">
-                        <div class="post-user-info">
-                            <img src="${post.avatar}" class="post-avatar">
-                            <span class="post-username">${post.username}</span>
-                        </div>
-                        <i class="fa-solid fa-ellipsis"></i>
-                    </div>
-                    <img src="${post.image}" class="post-image">
-                    <div class="post-actions">
-                        <div class="action-btns">
-                            <i class="fa-regular fa-heart" onclick="toggleLike(this, ${post.id})"></i>
-                            <i class="fa-regular fa-comment"></i>
-                            <i class="fa-regular fa-paper-plane"></i>
-                        </div>
-                        <i class="fa-regular fa-bookmark" onclick="toggleBookmark(this)"></i>
-                    </div>
-                    <div class="post-details">
-                        <div class="likes-count" id="likes-${post.id}">${post.likes} bəyənmə</div>
-                        <div class="caption">
-                            <span class="username">${post.username}</span> ${post.caption}
-                        </div>
-                        <div class="comments-section" id="comments-${post.id}"></div>
-                    </div>
-                    <div class="add-comment-box">
-                        <input type="text" placeholder="Şərh əlavə et..." id="input-${post.id}">
-                        <button onclick="addComment(${post.id})">Paylaş</button>
-                    </div>
-                </article>
-            `;
-        }
-
-        function renderPost(post, prepend = false) {
-            const feed = document.getElementById('feed-posts');
-            if(prepend) {
-                feed.insertAdjacentHTML('afterbegin', createPostHTML(post));
-            } else {
-                feed.insertAdjacentHTML('beforeend', createPostHTML(post));
-            }
-        }
-
-        function toggleLike(element, postId) {
-            const likesElem = document.getElementById(`likes-${postId}`);
-            let currentLikes = parseInt(likesElem.innerText);
-
-            if(element.classList.contains('fa-regular')) {
-                element.classList.remove('fa-regular');
-                element.classList.add('fa-solid', 'active');
-                likesElem.innerText = `${currentLikes + 1} bəyənmə`;
-            } else {
-                element.classList.remove('fa-solid', 'active');
-                element.classList.add('fa-regular');
-                likesElem.innerText = `${currentLikes - 1} bəyənmə`;
-            }
-        }
-
-        function toggleBookmark(element) {
-            element.classList.toggle('fa-regular');
-            element.classList.toggle('fa-solid');
-            element.classList.toggle('active');
-        }
-
-        function addComment(postId) {
-            const input = document.getElementById(`input-${postId}`);
-            const commentsContainer = document.getElementById(`comments-${postId}`);
+        function updateSpaceGame() {
+            spaceCtx.clearRect(0, 0, spaceCanvas.width, spaceCanvas.height);
             
-            if(input.value.trim() !== "") {
-                const commentDiv = document.createElement('div');
-                commentDiv.style.marginTop = "4px";
-                commentDiv.innerHTML = `<strong>${currentUser.username}:</strong> ${input.value}`;
-                commentsContainer.appendChild(commentDiv);
-                input.value = "";
+            // Kosmik Gəmi
+            spaceCtx.font = "30px Arial";
+            spaceCtx.fillText("🚀", shipX, 320);
+
+            // Ulduzlar generatoru
+            if(Math.random() < 0.1) {
+                stars.push({x: Math.random() * 280, y: 0});
+            }
+
+            for(let i = 0; i < stars.length; i++) {
+                stars[i].y += 5;
+                spaceCtx.fillText("⭐", stars[i].x, stars[i].y);
+
+                // Dəymə yoxlanışı
+                if(stars[i].y > 290 && Math.abs(stars[i].x - shipX) < 30) {
+                    spaceScore += 10;
+                    document.getElementById('space-score').innerText = spaceScore;
+                    stars.splice(i, 1);
+                }
             }
         }
 
-        let postCounter = 1;
-        function initFeed() {
-            generateStories();
+        /* --- OYUN 2: SEHRLİ YADDAŞ --- */
+        const icons = ['🐶', '🐱', '🦊', '🦁', '🐸', '🦄'];
+        let memoryCards = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+
+        function startMemoryGame() {
+            showScreen('memory-screen');
+            matchedPairs = 0;
+            document.getElementById('memory-score').innerText = matchedPairs;
+            const grid = document.getElementById('memoryGrid');
+            grid.innerHTML = '';
             
-            let userPosts = JSON.parse(localStorage.getItem('sham_user_posts')) || [];
-            userPosts.forEach(post => renderPost(post));
+            memoryCards = [...icons, ...icons].sort(() => Math.random() - 0.5);
+            memoryCards.forEach((icon, index) => {
+                const card = document.createElement('div');
+                card.className = 'memory-card';
+                card.dataset.icon = icon;
+                card.dataset.index = index;
+                card.onclick = () => flipMemoryCard(card);
+                grid.appendChild(card);
+            });
+        }
 
-            for(let i = 0; i < 5; i++) {
-                const fakePost = {
-                    id: postCounter,
-                    username: defaultUsers[i % defaultUsers.length] + "_" + postCounter,
-                    avatar: `https://picsum.photos/seed/avatar_${postCounter}/100/100`,
-                    image: `https://picsum.photos/seed/post_${postCounter}/600/600`,
-                    caption: captions[i % captions.length],
-                    likes: Math.floor(Math.random() * 500) + 10
-                };
-                renderPost(fakePost);
-                postCounter++;
+        function flipMemoryCard(card) {
+            if (flippedCards.length < 2 && !card.classList.contains('flipped')) {
+                card.classList.add('flipped');
+                card.innerText = card.dataset.icon;
+                flippedCards.push(card);
+
+                if (flippedCards.length === 2) {
+                    setTimeout(checkMemoryMatch, 800);
+                }
             }
         }
 
-        window.onload = initFeed;
+        function checkMemoryMatch() {
+            if (flippedCards[0].dataset.icon === flippedCards[1].dataset.icon) {
+                matchedPairs++;
+                document.getElementById('memory-score').innerText = matchedPairs;
+                if(matchedPairs === 6) alert('Təbrik edirik! Bütün cütləri tapdınız! 🎉');
+            } else {
+                flippedCards[0].classList.remove('flipped');
+                flippedCards[0].innerText = '';
+                flippedCards[1].classList.remove('flipped');
+                flippedCards[1].innerText = '';
+            }
+            flippedCards = [];
+        }
+
+        /* --- OYUN 3: XƏZİNƏ TUTMAÇ --- */
+        let catchCanvas = document.getElementById('catchCanvas');
+        let catchCtx = catchCanvas.getContext('2d');
+        let catchInterval, catchScore = 0;
+        let basketX = 130;
+        let fruits = [];
+
+        function startCatchGame() {
+            showScreen('catch-screen');
+            catchCanvas.width = 320;
+            catchCanvas.height = 350;
+            catchScore = 0;
+            fruits = [];
+            document.getElementById('catch-score').innerText = catchScore;
+
+            catchCanvas.onmousemove = (e) => {
+                let rect = catchCanvas.getBoundingClientRect();
+                basketX = e.clientX - rect.left - 20;
+            };
+
+            catchCanvas.ontouchmove = (e) => {
+                let rect = catchCanvas.getBoundingClientRect();
+                basketX = e.touches[0].clientX - rect.left - 20;
+            };
+
+            catchInterval = setInterval(updateCatchGame, 40);
+        }
+
+        function updateCatchGame() {
+            catchCtx.clearRect(0, 0, catchCanvas.width, catchCanvas.height);
+
+            // Səbət
+            catchCtx.font = "35px Arial";
+            catchCtx.fillText("🧺", basketX, 330);
+
+            // Meyvə düşməsi
+            if(Math.random() < 0.08) {
+                fruits.push({x: Math.random() * 280, y: 0, type: Math.random() > 0.2 ? "🍎" : "💣"});
+            }
+
+            for(let i = 0; i < fruits.length; i++) {
+                fruits[i].y += 4;
+                catchCtx.fillText(fruits[i].type, fruits[i].x, fruits[i].y);
+
+                // Tutmağını yoxla
+                if(fruits[i].y > 300 && Math.abs(fruits[i].x - basketX) < 35) {
+                    if(fruits[i].type === "🍎") {
+                        catchScore += 5;
+                    } else {
+                        catchScore = Math.max(0, catchScore - 10);
+                    }
+                    document.getElementById('catch-score').innerText = catchScore;
+                    fruits.splice(i, 1);
+                }
+            }
+        }
     </script>
 </body>
 </html>
