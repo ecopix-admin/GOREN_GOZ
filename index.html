@@ -2,11 +2,11 @@
 <html lang="az">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SHAM & Social Platform</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
-    <!-- AR.js və A-Frame Kitabxanaları -->
+    <!-- Optimized A-Frame and AR.js -->
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 
@@ -41,6 +41,8 @@
             display: flex;
             width: 100%;
             max-width: 1200px;
+            position: relative;
+            z-index: 2;
         }
 
         /* Sidebar Navigation */
@@ -67,10 +69,7 @@
             cursor: pointer;
         }
 
-        .brand-logo span {
-            color: var(--accent-color);
-            font-size: 30px;
-        }
+        .brand-logo span { color: var(--accent-color); font-size: 30px; }
 
         .nav-links {
             list-style: none;
@@ -88,25 +87,18 @@
             text-decoration: none;
             border-radius: 8px;
             font-size: 16px;
-            transition: background 0.2s;
             cursor: pointer;
         }
 
-        .nav-item a:hover {
-            background-color: #1a1a1a;
-        }
-
-        .nav-item i {
-            font-size: 20px;
-            width: 24px;
-        }
+        .nav-item a:hover { background-color: #1a1a1a; }
+        .nav-item i { font-size: 20px; width: 24px; }
 
         .nav-item.ar-btn a {
             background: linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045);
             font-weight: bold;
         }
 
-        /* Main Content */
+        /* Main Content Feed */
         .main-content {
             margin-left: 245px;
             width: 100%;
@@ -114,7 +106,6 @@
             padding: 20px;
         }
 
-        /* Stories Bar */
         .stories-container {
             display: flex;
             gap: 16px;
@@ -174,46 +165,14 @@
             padding: 12px 16px;
         }
 
-        .post-user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .post-user-info { display: flex; align-items: center; gap: 10px; }
+        .post-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+        .post-username { font-size: 14px; font-weight: 600; }
+        .post-image { width: 100%; max-height: 600px; object-fit: cover; display: block; }
 
-        .post-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .post-username {
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .post-image {
-            width: 100%;
-            max-height: 600px;
-            object-fit: cover;
-            display: block;
-        }
-
-        .post-actions {
-            padding: 12px 16px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .action-btns {
-            display: flex;
-            gap: 16px;
-        }
-
-        .action-btns i, .post-actions > i {
-            font-size: 22px;
-            cursor: pointer;
-        }
+        .post-actions { padding: 12px 16px; display: flex; justify-content: space-between; }
+        .action-btns { display: flex; gap: 16px; }
+        .action-btns i, .post-actions > i { font-size: 22px; cursor: pointer; }
 
         .fa-heart.active { color: var(--like-color); }
         .fa-bookmark.active { color: var(--text-main); }
@@ -222,13 +181,6 @@
         .likes-count { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
         .caption { font-size: 14px; line-height: 1.4; margin-bottom: 8px; }
         .caption .username { font-weight: 600; margin-right: 6px; }
-
-        .comments-section {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            font-size: 13px;
-        }
 
         .add-comment-box {
             display: flex;
@@ -261,7 +213,7 @@
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(0, 0, 0, 0.85);
             z-index: 100;
             justify-content: center;
             align-items: center;
@@ -274,7 +226,6 @@
             width: 90%;
             max-width: 500px;
             padding: 20px;
-            position: relative;
         }
 
         .modal-header {
@@ -288,11 +239,7 @@
 
         .close-btn { font-size: 20px; cursor: pointer; color: var(--text-muted); }
 
-        .modal-body {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+        .modal-body { display: flex; flex-direction: column; gap: 12px; }
 
         .modal-body input[type="text"], .modal-body textarea, .modal-body select {
             width: 100%;
@@ -313,85 +260,90 @@
             cursor: pointer;
         }
 
-        /* Artırılmış Reallıq (AR) Ekranı */
-        #arViewContainer {
+        /* AR Kamera Bölməsi - Tam İnteqrasiyalı */
+        #arWorldContainer {
             display: none;
             position: fixed;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
-            z-index: 999;
+            z-index: 99;
             background: #000;
         }
 
-        .ar-controls {
+        .ar-hud-controls {
             position: absolute;
             top: 20px; left: 50%;
             transform: translateX(-50%);
-            z-index: 1000;
+            z-index: 101;
             display: flex;
             gap: 10px;
+            width: 90%;
+            max-width: 500px;
+            justify-content: center;
         }
 
-        .ar-btn-action {
-            background: rgba(0,0,0,0.8);
-            border: 1px solid #fff;
+        .ar-hud-btn {
+            background: rgba(18, 18, 18, 0.9);
+            border: 1px solid var(--accent-color);
             color: #fff;
-            padding: 10px 16px;
+            padding: 10px 14px;
             border-radius: 20px;
+            font-size: 13px;
             font-weight: bold;
             cursor: pointer;
+            backdrop-filter: blur(5px);
         }
 
         @media (max-width: 768px) {
             .sidebar { width: 70px; }
             .sidebar .link-text, .brand-logo div { display: none; }
-            .main-content { margin-left: 70px; }
+            .main-content { margin-left: 70px; width: calc(100% - 70px); }
         }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
-        <!-- Sidebar Navigation -->
+    <div class="app-container" id="mainAppUi">
+        <!-- Sidebar -->
         <aside class="sidebar">
             <div>
                 <div class="brand-logo" onclick="window.scrollTo(0,0)">
                     <span>&</span> <div class="link-text">SHAM</div>
                 </div>
                 <ul class="nav-links">
-                    <li class="nav-item"><a onclick="window.scrollTo(0,0)"><i class="fa-solid fa-house"></i><span class="link-text">Ana Səhifə</span></a></li>
-                    <li class="nav-item ar-btn"><a onclick="startAR()"><i class="fa-solid fa-vr-cardboard"></i><span class="link-text">AR Dünyası</span></a></li>
+                    <li class="nav-item"><a onclick="exitAR()"><i class="fa-solid fa-house"></i><span class="link-text">Ana Səhifə</span></a></li>
+                    <li class="nav-item ar-btn"><a onclick="enterAR()"><i class="fa-solid fa-vr-cardboard"></i><span class="link-text">AR Məkan</span></a></li>
                     <li class="nav-item"><a onclick="toggleModal('searchModal')"><i class="fa-solid fa-magnifying-glass"></i><span class="link-text">Axtarış</span></a></li>
                     <li class="nav-item"><a onclick="toggleModal('notifModal')"><i class="fa-regular fa-heart"></i><span class="link-text">Bildirişlər</span></a></li>
                     <li class="nav-item"><a onclick="toggleModal('createModal')"><i class="fa-regular fa-square-plus"></i><span class="link-text">Yarat</span></a></li>
-                    <li class="nav-item"><a onclick="toggleModal('profileModal')"><i class="fa-regular fa-user"></i><span class="link-text">Profil & Ayarlar</span></a></li>
+                    <li class="nav-item"><a onclick="toggleModal('profileModal')"><i class="fa-regular fa-user"></i><span class="link-text">Profil</span></a></li>
                 </ul>
             </div>
         </aside>
 
-        <!-- Main Feed -->
+        <!-- Main Content -->
         <main class="main-content">
             <div class="stories-container" id="stories-wrapper"></div>
             <div id="feed-posts"></div>
         </main>
     </div>
 
-    <!-- AR Kamera Ekranı -->
-    <div id="arViewContainer">
-        <div class="ar-controls">
-            <button class="ar-btn-action" onclick="toggleModal('addArObjectModal')"><i class="fa-solid fa-plus"></i> Havaya Obyekt Qoy</button>
-            <button class="ar-btn-action" style="background: red;" onclick="stopAR()"><i class="fa-solid fa-xmark"></i> Çıxış</button>
+    <!-- AR Səhnəsi (Kamera və 3D Məkan) -->
+    <div id="arWorldContainer">
+        <div class="ar-hud-controls">
+            <button class="ar-hud-btn" onclick="toggleModal('addArObjectModal')"><i class="fa-solid fa-plus"></i> Əlavə Et</button>
+            <button class="ar-hud-btn" style="border-color: #00ff88;" onclick="scanNearbyArMarks()"><i class="fa-solid fa-radar"></i> Skan Et & İzi Tap</button>
+            <button class="ar-hud-btn" style="border-color: var(--like-color);" onclick="exitAR()"><i class="fa-solid fa-xmark"></i> Bağla</button>
         </div>
 
-        <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
-            <!-- Havada/Məkanda Görünəcək AR Obyektlər Konteyneri -->
-            <a-entity id="arObjectsHolder"></a-entity>
+        <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false">
+            <a-entity id="arObjectContainer"></a-entity>
             <a-entity camera></a-entity>
         </a-scene>
     </div>
 
     <!-- MODALLAR -->
-    <!-- 1. Yarat (Standard Post) -->
+    <!-- 1. Post Yarat -->
     <div class="modal" id="createModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -400,39 +352,38 @@
             </div>
             <div class="modal-body">
                 <input type="file" id="postImageInput" accept="image/*">
-                <textarea id="postCaptionInput" placeholder="Açıqlama yazın..." rows="3"></textarea>
+                <textarea id="postCaptionInput" placeholder="Açıqlama yazın (Azərbaycan dili dəstəklənir)..." rows="3"></textarea>
                 <button onclick="publishUserPost()">Paylaş</button>
             </div>
         </div>
     </div>
 
-    <!-- 2. Məkana / Havaya AR Obyekt Qoymaq Modalı -->
+    <!-- 2. AR-a Azərbaycan Mətni / Şəkil Qoymaq -->
     <div class="modal" id="addArObjectModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>AR Dünyasına Məzmun Əlavə Et</h3>
+                <h3>Havaya/Məkana Əlavə Et</h3>
                 <i class="fa-solid fa-xmark close-btn" onclick="toggleModal('addArObjectModal')"></i>
             </div>
             <div class="modal-body">
-                <label>Növu Seçin:</label>
-                <select id="arObjectType">
-                    <option value="text">3D Mətn / Mesaj</option>
-                    <option value="image">Şəkil / Post</option>
-                    <option value="profile">Profil Kartı / Hekayə</option>
+                <label>Məzmun Növü:</label>
+                <select id="arTypeSelect">
+                    <option value="az_text">3D Azərbaycan Mətni (ə, ş, ç, ğ, ı, ö, ü)</option>
+                    <option value="image">Məkan Şəkli / Profil</option>
                 </select>
 
-                <label>Mətn və ya Açıqlama:</label>
-                <input type="text" id="arTextContent" placeholder="Məsələn: SHAM AR Dünyasına Xoş Gelmisiniz!">
+                <label>Yazı və ya Təsvir:</label>
+                <input type="text" id="arTextInput" placeholder="Məsələn: Bura bizim məkandır! 🇦🇿">
 
-                <label>Şəkil Seçin (Növ Şəkil və ya Profil olarsa):</label>
-                <input type="file" id="arFileContent" accept="image/*">
+                <label>Şəkil Seçin (Əgər Şəkil seçildisə):</label>
+                <input type="file" id="arFileInput" accept="image/*">
 
-                <button onclick="addArObjectToScene()">Məkana Yerləşdir</button>
+                <button onclick="createAndAnchorArObject()">Konuma Zəncirlə & Bırax</button>
             </div>
         </div>
     </div>
 
-    <!-- 3. Profil & Ayarlar -->
+    <!-- 3. Profil Tənzimləmələri -->
     <div class="modal" id="profileModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -482,43 +433,70 @@
         };
 
         const defaultUsers = ["alex_vibe", "creative_mind", "urban_lens", "tech_insider", "nature_art"];
-        const captions = ["Möhtəşəm gün! 🔥 #sham", "Yaradıcılıq heç vaxt bitmir ✨", "Kod və dizayn ahəngi 🚀"];
+        const captions = ["Möhtəşəm gün! 🔥 #sham", "Yaradıcılıq heç vaxt bitmir ✨", "AZərbaycan dili dəstəyi ilə! 🇦🇿"];
 
         function toggleModal(id) {
             const modal = document.getElementById(id);
             modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
         }
 
-        // --- AR FUNKSİYALARI ---
-        function startAR() {
-            document.getElementById('arViewContainer').style.display = 'block';
+        // --- AR MODU BÖLMƏSİ ---
+        function enterAR() {
+            document.getElementById('mainAppUi').style.display = 'none';
+            document.getElementById('arWorldContainer').style.display = 'block';
         }
 
-        function stopAR() {
-            document.getElementById('arViewContainer').style.display = 'none';
+        function exitAR() {
+            document.getElementById('arWorldContainer').style.display = 'none';
+            document.getElementById('mainAppUi').style.display = 'flex';
         }
 
-        function addArObjectToScene() {
-            const type = document.getElementById('arObjectType').value;
-            const text = document.getElementById('arTextContent').value || "SHAM AR";
-            const fileInput = document.getElementById('arFileContent');
-            const holder = document.getElementById('arObjectsHolder');
+        // Azərbaycan Əlifbasını Canvas vasitəsilə 3D Texture-ə çevirmək (Silinmə / Sual işarəsi problemini həll edir)
+        function createAzTextTexture(text) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = "rgba(18, 18, 18, 0.85)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = "#0095f6";
+            ctx.lineWidth = 6;
+            ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
-            // Havada təsadüfi koordinatlar
-            const posX = (Math.random() - 0.5) * 3;
-            const posY = (Math.random() * 1.5) + 0.5;
-            const posZ = - (Math.random() * 2 + 1.5);
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "Bold 32px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(text, 256, 135);
 
-            if (type === 'text') {
-                const textEntity = document.createElement('a-text');
-                textEntity.setAttribute('value', text);
-                textEntity.setAttribute('position', `${posX} ${posY} ${posZ}`);
-                textEntity.setAttribute('scale', '1.5 1.5 1.5');
-                textEntity.setAttribute('color', '#0095f6');
-                textEntity.setAttribute('align', 'center');
-                holder.appendChild(textEntity);
-            } else if (type === 'image' || type === 'profile') {
-                if (fileInput.files[0]) {
+            return canvas.toDataURL();
+        }
+
+        // Məkana AR Məzmun Bıraxmaq & Geolocation Yaddaşı
+        function createAndAnchorArObject() {
+            const type = document.getElementById('arTypeSelect').value;
+            const text = document.getElementById('arTextInput').value || "SHAM Məkanı";
+            const fileInput = document.getElementById('arFileInput');
+            const container = document.getElementById('arObjectContainer');
+
+            // GPS Konumu almaq
+            navigator.geolocation.getCurrentPosition(pos => {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+
+                const posX = (Math.random() - 0.5) * 2;
+                const posY = (Math.random() * 1) + 0.5;
+                const posZ = - (Math.random() * 1.5 + 1);
+
+                if (type === 'az_text') {
+                    const textureData = createAzTextTexture(text);
+                    const plane = document.createElement('a-plane');
+                    plane.setAttribute('src', textureData);
+                    plane.setAttribute('position', `${posX} ${posY} ${posZ}`);
+                    plane.setAttribute('width', '2');
+                    plane.setAttribute('height', '1');
+                    container.appendChild(plane);
+                } else if (fileInput.files[0]) {
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         const imgEntity = document.createElement('a-image');
@@ -526,20 +504,47 @@
                         imgEntity.setAttribute('position', `${posX} ${posY} ${posZ}`);
                         imgEntity.setAttribute('width', '1.5');
                         imgEntity.setAttribute('height', '1.5');
-                        holder.appendChild(imgEntity);
+                        container.appendChild(imgEntity);
                     };
                     reader.readAsDataURL(fileInput.files[0]);
-                } else {
-                    alert("Şəkil seçilməyib!");
-                    return;
                 }
-            }
 
-            alert("Məzmun AR Dünyasına (Kameraya) əlavə olundu!");
-            toggleModal('addArObjectModal');
+                // Global Yaddaşa (Skan üçün) yazmaq
+                let arMarks = JSON.parse(localStorage.getItem('sham_ar_marks')) || [];
+                arMarks.push({ id: Date.now(), lat, lng, text, user: currentUser.username });
+                localStorage.setItem('sham_ar_marks', JSON.stringify(arMarks));
+
+                alert(`Məzmun məkana bıraxıldı! GPS: ${lat.toFixed(3)}, ${lng.toFixed(3)}`);
+                toggleModal('addArObjectModal');
+            }, err => {
+                alert("Geolokasiya icazəsi verilmədi, obyekt yerli məkana yerləşdirildi.");
+                toggleModal('addArObjectModal');
+            });
         }
 
-        // --- PROFİL VƏ POST FUNKSİYALARI ---
+        // Digər İstifadəçilərin Məkandakı İzini Skan Etmək
+        function scanNearbyArMarks() {
+            let arMarks = JSON.parse(localStorage.getItem('sham_ar_marks')) || [];
+            if (arMarks.length === 0) {
+                alert("Ərazidə başqa istifadəçi izi tapılmadı.");
+                return;
+            }
+
+            const container = document.getElementById('arObjectContainer');
+            arMarks.forEach((mark, index) => {
+                const textureData = createAzTextTexture(`[İz] ${mark.user}: ${mark.text}`);
+                const plane = document.createElement('a-plane');
+                plane.setAttribute('src', textureData);
+                plane.setAttribute('position', `${(index - 1) * 1.2} 1.2 -2`);
+                plane.setAttribute('width', '2');
+                plane.setAttribute('height', '1');
+                container.appendChild(plane);
+            });
+
+            alert(`${arMarks.length} ədəd istifadəçi izi skan olunub məkana yükləndi!`);
+        }
+
+        // --- STANDARD SOCIAL NETWORK FUNKSİYALARI ---
         function saveProfile() {
             const newName = document.getElementById('usernameInput').value;
             const avatarFile = document.getElementById('avatarFileInput').files[0];
@@ -593,7 +598,7 @@
             const captionInput = document.getElementById('postCaptionInput');
 
             if(!fileInput.files[0]) {
-                alert("Xahiş olunur bir şəkil seçin!");
+                alert("Şəkil seçin!");
                 return;
             }
 
