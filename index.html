@@ -37,7 +37,7 @@
             max-width: 1200px;
         }
 
-        /* Naviqasiya Paneli */
+        /* Sidebar Navigation */
         .sidebar {
             width: 245px;
             padding: 24px 12px;
@@ -47,6 +47,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            z-index: 10;
         }
 
         .brand-logo {
@@ -56,13 +57,12 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            letter-spacing: 1px;
+            cursor: pointer;
         }
 
         .brand-logo span {
             color: var(--accent-color);
             font-size: 30px;
-            font-weight: 900;
         }
 
         .nav-links {
@@ -82,6 +82,7 @@
             border-radius: 8px;
             font-size: 16px;
             transition: background 0.2s;
+            cursor: pointer;
         }
 
         .nav-item a:hover {
@@ -93,7 +94,7 @@
             width: 24px;
         }
 
-        /* Əsas Lent (Feed) */
+        /* Main Content */
         .main-content {
             margin-left: 245px;
             width: 100%;
@@ -101,7 +102,7 @@
             padding: 20px;
         }
 
-        /* Hekayələr (Stories) */
+        /* Stories Bar */
         .stories-container {
             display: flex;
             gap: 16px;
@@ -111,9 +112,7 @@
             scrollbar-width: none;
         }
 
-        .stories-container::-webkit-scrollbar {
-            display: none;
-        }
+        .stories-container::-webkit-scrollbar { display: none; }
 
         .story-item {
             display: flex;
@@ -147,7 +146,7 @@
             white-space: nowrap;
         }
 
-        /* Post Kartı */
+        /* Post Card */
         .post-card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -202,20 +201,10 @@
         .action-btns i, .post-actions > i {
             font-size: 22px;
             cursor: pointer;
-            transition: transform 0.1s;
         }
 
-        .action-btns i:hover, .post-actions > i:hover {
-            opacity: 0.7;
-        }
-
-        .fa-heart.active {
-            color: var(--like-color);
-        }
-
-        .fa-bookmark.active {
-            color: var(--text-main);
-        }
+        .fa-heart.active { color: var(--like-color); }
+        .fa-bookmark.active { color: var(--text-main); }
 
         .post-details {
             padding: 0 16px 16px;
@@ -270,72 +259,216 @@
             cursor: pointer;
         }
 
+        /* Modal Overlays (Yarat, Profil & Ayarlar) */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .close-btn {
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .modal-body input[type="text"], .modal-body textarea {
+            width: 100%;
+            padding: 10px;
+            background: #000;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: #fff;
+        }
+
+        .modal-body button {
+            padding: 10px;
+            background: var(--accent-color);
+            border: none;
+            color: #fff;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
         @media (max-width: 768px) {
-            .sidebar {
-                width: 70px;
-            }
-            .sidebar .link-text, .brand-logo text {
-                display: none;
-            }
-            .main-content {
-                margin-left: 70px;
-            }
+            .sidebar { width: 70px; }
+            .sidebar .link-text, .brand-logo div { display: none; }
+            .main-content { margin-left: 70px; }
         }
     </style>
 </head>
 <body>
 
     <div class="app-container">
-        <!-- Sol Naviqasiya Paneli -->
+        <!-- Sidebar -->
         <aside class="sidebar">
             <div>
-                <div class="brand-logo">
+                <div class="brand-logo" onclick="window.scrollTo(0,0)">
                     <span>&</span> <div class="link-text">SHAM</div>
                 </div>
                 <ul class="nav-links">
-                    <li class="nav-item"><a href="#"><i class="fa-solid fa-house"></i><span class="link-text">Ana Səhifə</span></a></li>
-                    <li class="nav-item"><a href="#"><i class="fa-solid fa-magnifying-glass"></i><span class="link-text">Axtarış</span></a></li>
-                    <li class="nav-item"><a href="#"><i class="fa-regular fa-compass"></i><span class="link-text">Kəşf Et</span></a></li>
-                    <li class="nav-item"><a href="#"><i class="fa-regular fa-paper-plane"></i><span class="link-text">Mesajlar</span></a></li>
-                    <li class="nav-item"><a href="#"><i class="fa-regular fa-heart"></i><span class="link-text">Bildirişlər</span></a></li>
-                    <li class="nav-item"><a href="#"><i class="fa-regular fa-square-plus"></i><span class="link-text">Yarat</span></a></li>
+                    <li class="nav-item"><a onclick="window.scrollTo(0,0)"><i class="fa-solid fa-house"></i><span class="link-text">Ana Səhifə</span></a></li>
+                    <li class="nav-item"><a onclick="toggleModal('searchModal')"><i class="fa-solid fa-magnifying-glass"></i><span class="link-text">Axtarış</span></a></li>
+                    <li class="nav-item"><a onclick="toggleModal('notifModal')"><i class="fa-regular fa-heart"></i><span class="link-text">Bildirişlər</span></a></li>
+                    <li class="nav-item"><a onclick="toggleModal('createModal')"><i class="fa-regular fa-square-plus"></i><span class="link-text">Yarat</span></a></li>
+                    <li class="nav-item"><a onclick="toggleModal('profileModal')"><i class="fa-regular fa-user"></i><span class="link-text">Profil & Ayarlar</span></a></li>
                 </ul>
             </div>
         </aside>
 
-        <!-- Əsas Məzmun Lenti -->
+        <!-- Main Feed -->
         <main class="main-content">
-            <!-- Hekayələr -->
             <div class="stories-container" id="stories-wrapper"></div>
-
-            <!-- Postlar -->
             <div id="feed-posts"></div>
         </main>
     </div>
 
-    <script>
-        const usernames = ["sham_user", "alex_dev", "creative_mind", "urban_lens", "tech_insider", "nature_art", "digital_flow", "photo_studio", "code_life", "vibe_master"];
-        const captions = [
-            "SHAM platformasında ilk paylaşım! 🔥 #sham #social",
-            "Sakitlik və ilham dolu bir gün ✨",
-            "Möhtəşəm mənzərə və yeni ideyalar 🚀",
-            "Dizayn və kodun mükəmməl uyğunluğu 💻",
-            "Təbiətin ritmini hiss et 🌱 #nature"
-        ];
+    <!-- Modallar -->
+    <!-- 1. Yarat (Post Paylaş) -->
+    <div class="modal" id="createModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Yeni Paylaşım Yaradın</h3>
+                <i class="fa-solid fa-xmark close-btn" onclick="toggleModal('createModal')"></i>
+            </div>
+            <div class="modal-body">
+                <input type="file" id="postImageInput" accept="image/*">
+                <textarea id="postCaptionInput" placeholder="Açıqlama yazın..." rows="3"></textarea>
+                <button onclick="publishUserPost()">Paylaş</button>
+            </div>
+        </div>
+    </div>
 
-        // Hekayələrin Yaradılması
+    <!-- 2. Profil və Ayarlar -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Profil Tənzimləmələri</h3>
+                <i class="fa-solid fa-xmark close-btn" onclick="toggleModal('profileModal')"></i>
+            </div>
+            <div class="modal-body">
+                <label>İstifadəçi Adı:</label>
+                <input type="text" id="usernameInput" value="sham_user">
+                <label>Profil Şəkli (İstənilən Şəkil Seçin):</label>
+                <input type="file" id="avatarFileInput" accept="image/*">
+                <button onclick="saveProfile()">Yadda Saxla</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Axtarış Modal -->
+    <div class="modal" id="searchModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Axtarış</h3>
+                <i class="fa-solid fa-xmark close-btn" onclick="toggleModal('searchModal')"></i>
+            </div>
+            <div class="modal-body">
+                <input type="text" placeholder="İstifadəçi və ya haştaq axtarın...">
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Bildirişlər Modal -->
+    <div class="modal" id="notifModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Bildirişlər</h3>
+                <i class="fa-solid fa-xmark close-btn" onclick="toggleModal('notifModal')"></i>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--text-muted);">Yeni bildirişiniz yoxdur.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // İstifadəçi Profil Verilənləri (LocalStorage ilə)
+        let currentUser = JSON.parse(localStorage.getItem('sham_profile')) || {
+            username: "sham_master",
+            avatar: "https://picsum.photos/seed/sham_main/100/100"
+        };
+
+        const defaultUsers = ["alex_vibe", "creative_mind", "urban_lens", "tech_insider", "nature_art"];
+        const captions = ["Möhtəşəm gün! 🔥 #sham", "Yaradıcılıq heç vaxt bitmir ✨", "Kod və dizayn ahəngi 🚀"];
+
+        function toggleModal(id) {
+            const modal = document.getElementById(id);
+            modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+        function saveProfile() {
+            const newName = document.getElementById('usernameInput').value;
+            const avatarFile = document.getElementById('avatarFileInput').files[0];
+
+            if(newName) currentUser.username = newName;
+
+            if(avatarFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentUser.avatar = e.target.result;
+                    localStorage.setItem('sham_profile', JSON.stringify(currentUser));
+                    alert("Profil yeniləndi!");
+                    toggleModal('profileModal');
+                };
+                reader.readAsDataURL(avatarFile);
+            } else {
+                localStorage.setItem('sham_profile', JSON.stringify(currentUser));
+                alert("Profil yeniləndi!");
+                toggleModal('profileModal');
+            }
+        }
+
+        // Hekayələr
         function generateStories() {
             const wrapper = document.getElementById('stories-wrapper');
-            let storiesHTML = '';
+            let storiesHTML = `
+                <div class="story-item" onclick="toggleModal('profileModal')">
+                    <div class="story-avatar-wrapper" style="background: var(--border-color);">
+                        <img src="${currentUser.avatar}" class="story-avatar">
+                    </div>
+                    <span class="story-username">Siz</span>
+                </div>
+            `;
             
-            for(let i = 1; i <= 12; i++) {
-                const user = usernames[i % usernames.length] + "_" + i;
-                const avatarUrl = `https://picsum.photos/seed/sham_story_${i}/150/150`;
-                
+            for(let i = 1; i <= 10; i++) {
+                const user = defaultUsers[i % defaultUsers.length] + "_" + i;
+                const avatarUrl = `https://picsum.photos/seed/story_${i}/150/150`;
                 storiesHTML += `
                     <div class="story-item">
                         <div class="story-avatar-wrapper">
-                            <img src="${avatarUrl}" class="story-avatar" alt="${user}">
+                            <img src="${avatarUrl}" class="story-avatar">
                         </div>
                         <span class="story-username">${user}</span>
                     </div>
@@ -344,48 +477,86 @@
             wrapper.innerHTML = storiesHTML;
         }
 
-        // Post Elementinin Hazırlanması
-        function createPostElement(id) {
-            const username = usernames[Math.floor(Math.random() * usernames.length)] + "_" + (id % 50);
-            const userAvatar = `https://picsum.photos/seed/sham_avatar_${id}/100/100`;
-            const postImg = `https://picsum.photos/seed/sham_post_${id}/600/600`;
-            const likes = Math.floor(Math.random() * 950) + 20;
-            const caption = captions[Math.floor(Math.random() * captions.length)];
+        // Real Paylaşım Etmək
+        function publishUserPost() {
+            const fileInput = document.getElementById('postImageInput');
+            const captionInput = document.getElementById('postCaptionInput');
 
+            if(!fileInput.files[0]) {
+                alert("Xahiş olunur bir şəkil seçin!");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const newPost = {
+                    id: Date.now(),
+                    username: currentUser.username,
+                    avatar: currentUser.avatar,
+                    image: e.target.result,
+                    caption: captionInput.value,
+                    likes: 1
+                };
+
+                // Yaddaşa yaz
+                let userPosts = JSON.parse(localStorage.getItem('sham_user_posts')) || [];
+                userPosts.unshift(newPost);
+                localStorage.setItem('sham_user_posts', JSON.stringify(userPosts));
+
+                // Ekrana çıxart
+                renderPost(newPost, true);
+
+                // Temizle və bagla
+                fileInput.value = "";
+                captionInput.value = "";
+                toggleModal('createModal');
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        }
+
+        function createPostHTML(post) {
             return `
-                <article class="post-card" id="post-${id}">
+                <article class="post-card" id="post-${post.id}">
                     <div class="post-header">
                         <div class="post-user-info">
-                            <img src="${userAvatar}" class="post-avatar" alt="${username}">
-                            <span class="post-username">${username}</span>
+                            <img src="${post.avatar}" class="post-avatar">
+                            <span class="post-username">${post.username}</span>
                         </div>
                         <i class="fa-solid fa-ellipsis"></i>
                     </div>
-                    <img src="${postImg}" class="post-image" alt="Post">
+                    <img src="${post.image}" class="post-image">
                     <div class="post-actions">
                         <div class="action-btns">
-                            <i class="fa-regular fa-heart" onclick="toggleLike(this, ${id})"></i>
+                            <i class="fa-regular fa-heart" onclick="toggleLike(this, ${post.id})"></i>
                             <i class="fa-regular fa-comment"></i>
                             <i class="fa-regular fa-paper-plane"></i>
                         </div>
                         <i class="fa-regular fa-bookmark" onclick="toggleBookmark(this)"></i>
                     </div>
                     <div class="post-details">
-                        <div class="likes-count" id="likes-${id}">${likes} bəyənmə</div>
+                        <div class="likes-count" id="likes-${post.id}">${post.likes} bəyənmə</div>
                         <div class="caption">
-                            <span class="username">${username}</span> ${caption}
+                            <span class="username">${post.username}</span> ${post.caption}
                         </div>
-                        <div class="comments-section" id="comments-${id}"></div>
+                        <div class="comments-section" id="comments-${post.id}"></div>
                     </div>
                     <div class="add-comment-box">
-                        <input type="text" placeholder="Şərh əlavə et..." id="input-${id}">
-                        <button onclick="addComment(${id})">Paylaş</button>
+                        <input type="text" placeholder="Şərh əlavə et..." id="input-${post.id}">
+                        <button onclick="addComment(${post.id})">Paylaş</button>
                     </div>
                 </article>
             `;
         }
 
-        // Bəyənmə Funksiyası
+        function renderPost(post, prepend = false) {
+            const feed = document.getElementById('feed-posts');
+            if(prepend) {
+                feed.insertAdjacentHTML('afterbegin', createPostHTML(post));
+            } else {
+                feed.insertAdjacentHTML('beforeend', createPostHTML(post));
+            }
+        }
+
         function toggleLike(element, postId) {
             const likesElem = document.getElementById(`likes-${postId}`);
             let currentLikes = parseInt(likesElem.innerText);
@@ -401,18 +572,12 @@
             }
         }
 
-        // Saxlama (Bookmark) Funksiyası
         function toggleBookmark(element) {
-            if(element.classList.contains('fa-regular')) {
-                element.classList.remove('fa-regular');
-                element.classList.add('fa-solid', 'active');
-            } else {
-                element.classList.remove('fa-solid', 'active');
-                element.classList.add('fa-regular');
-            }
+            element.classList.toggle('fa-regular');
+            element.classList.toggle('fa-solid');
+            element.classList.toggle('active');
         }
 
-        // Şərh Əlavə Etmək
         function addComment(postId) {
             const input = document.getElementById(`input-${postId}`);
             const commentsContainer = document.getElementById(`comments-${postId}`);
@@ -420,32 +585,37 @@
             if(input.value.trim() !== "") {
                 const commentDiv = document.createElement('div');
                 commentDiv.style.marginTop = "4px";
-                commentDiv.innerHTML = `<strong>siz:</strong> ${input.value}`;
+                commentDiv.innerHTML = `<strong>${currentUser.username}:</strong> ${input.value}`;
                 commentsContainer.appendChild(commentDiv);
                 input.value = "";
             }
         }
 
-        // Dinamik Post Yükləmə (Infinite Scroll)
+        // İlk Yüklənmə
         let postCounter = 1;
-        function loadMorePosts(count = 5) {
-            const feed = document.getElementById('feed-posts');
-            for(let i = 0; i < count; i++) {
-                feed.innerHTML += createPostElement(postCounter);
+        function initFeed() {
+            generateStories();
+            
+            // İstifadəçinin öz yaddaşda olan postları
+            let userPosts = JSON.parse(localStorage.getItem('sham_user_posts')) || [];
+            userPosts.forEach(post => renderPost(post));
+
+            // Avto saxta postlar
+            for(let i = 0; i < 5; i++) {
+                const fakePost = {
+                    id: postCounter,
+                    username: defaultUsers[i % defaultUsers.length] + "_" + postCounter,
+                    avatar: `https://picsum.photos/seed/avatar_${postCounter}/100/100`,
+                    image: `https://picsum.photos/seed/post_${postCounter}/600/600`,
+                    caption: captions[i % captions.length],
+                    likes: Math.floor(Math.random() * 500) + 10
+                };
+                renderPost(fakePost);
                 postCounter++;
             }
         }
 
-        window.onload = () => {
-            generateStories();
-            loadMorePosts(8);
-        };
-
-        window.onscroll = () => {
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 400) {
-                loadMorePosts(3);
-            }
-        };
+        window.onload = initFeed;
     </script>
 </body>
 </html>
