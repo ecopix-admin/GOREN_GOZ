@@ -2,366 +2,234 @@
 <html lang="az">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AzSearch Engine</title>
-
-    <!-- PWA Konfiqurasiyası -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0d1117">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AzSearch - AI Axtarış Portalı</title>
     <style>
-        :root {
-            --bg-main: #0d1117;
-            --card-bg: #161b22;
-            --accent-blue: #2f81f7;
-            --border-color: #30363d;
-            --text-main: #f0f6fc;
-            --text-sub: #8b949e;
-        }
-
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            -webkit-tap-highlight-color: transparent;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: var(--bg-main);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            color: var(--text-main);
-        }
-
-        /* Əsas Konteyner */
-        .app-container {
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
             display: flex;
             flex-direction: column;
-            width: 100vw;
             height: 100vh;
-        }
-
-        /* 1. ÜST PANEL: Loqo və Axtarış Çubuğu */
-        .header-section {
-            background-color: var(--card-bg);
-            border-bottom: 1px solid var(--border-color);
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            z-index: 100;
-        }
-
-        .brand-logo {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: #ffffff;
-            letter-spacing: -0.5px;
-            cursor: pointer;
-            user-select: none;
-            white-space: nowrap;
-        }
-
-        .brand-logo span {
-            color: var(--accent-blue);
-        }
-
-        .search-container {
-            position: relative;
-            flex: 1;
-            max-width: 700px;
-        }
-
-        .search-bar {
-            display: flex;
-            align-items: center;
-            background-color: var(--bg-main);
-            border: 1px solid var(--border-color);
-            border-radius: 24px;
-            padding: 4px 6px 4px 16px;
-            transition: border-color 0.2s ease;
-        }
-
-        .search-bar:focus-within {
-            border-color: var(--accent-blue);
-        }
-
-        .search-bar input {
-            flex: 1;
-            background: none;
-            border: none;
-            outline: none;
-            color: var(--text-main);
-            font-size: 1rem;
-            height: 36px;
-        }
-
-        .search-bar button {
-            background-color: var(--accent-blue);
-            color: #ffffff;
-            border: none;
-            border-radius: 20px;
-            padding: 8px 18px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-
-        .search-bar button:active {
-            opacity: 0.8;
-        }
-
-        /* Auto-complete Təkliflər Siyahısı */
-        .suggestions-dropdown {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            margin-top: 6px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-            display: none;
-            z-index: 101;
             overflow: hidden;
         }
 
-        .suggestion-item {
-            padding: 12px 16px;
-            font-size: 0.95rem;
-            color: var(--text-main);
-            cursor: pointer;
-            border-bottom: 1px solid #21262d;
+        /* Yuxarı Axtarış Paneli */
+        header {
+            background-color: #1e293b;
+            padding: 15px 20px;
             display: flex;
             align-items: center;
-            gap: 10px;
-        }
-
-        .suggestion-item:last-child {
-            border-bottom: none;
-        }
-
-        .suggestion-item:hover, .suggestion-item:active {
-            background-color: #21262d;
-            color: var(--accent-blue);
-        }
-
-        /* 2. REKLAM BÖLMƏSİ (Tam Mərkəzləşdirilmiş) */
-        .ad-container {
-            background-color: #11161d;
-            border-bottom: 1px solid var(--border-color);
-            text-align: center;
-            padding: 6px 10px;
-            font-size: 0.75rem;
-            color: var(--text-sub);
-            min-height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* 3. NƏTİCƏLƏR BÖLMƏSİ (Çərçivəsiz İframe) */
-        .viewport-container {
-            flex: 1;
-            width: 100%;
-            height: 100%;
-            position: relative;
-            background-color: #ffffff;
-        }
-
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            outline: none;
-        }
-
-        /* Başlanğıc Ana Ekran Qrafikası */
-        .splash-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--bg-main);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            gap: 15px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
             z-index: 10;
         }
 
-        .splash-screen h1 {
-            font-size: 2.8rem;
-            font-weight: 800;
-            margin-bottom: 8px;
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #38bdf8;
+            text-decoration: none;
+            white-space: nowrap;
         }
 
-        .splash-screen p {
-            color: var(--text-sub);
+        .logo span {
+            color: #f43f5e;
+        }
+
+        .search-box {
+            display: flex;
+            flex: 1;
+            max-width: 700px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 25px;
+            border: 2px solid #334155;
+            background-color: #0f172a;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .search-box input:focus {
+            border-color: #38bdf8;
+        }
+
+        .search-box button {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            bottom: 5px;
+            padding: 0 20px;
+            border-radius: 20px;
+            border: none;
+            background-color: #38bdf8;
+            color: #0f172a;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .search-box button:hover {
+            background-color: #0284c7;
+            color: #fff;
+        }
+
+        /* Əsas Məzmun Sahəsi */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Giriş Ekranı */
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .welcome-screen h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #38bdf8;
+        }
+
+        .welcome-screen p {
+            color: #94a3b8;
+            max-width: 500px;
+        }
+
+        /* AI Xülasə Bloku */
+        #aiSummaryCard {
+            display: none;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 1px solid #38bdf8;
+            border-radius: 12px;
+            margin: 15px;
+            padding: 15px 20px;
+            box-shadow: 0 10px 15px -3px rgba(56, 189, 248, 0.1);
+        }
+
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #38bdf8;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .ai-content {
             font-size: 0.95rem;
+            line-height: 1.5;
+            color: #e2e8f0;
+        }
+
+        /* İframe Nəticələr */
+        iframe {
+            width: 100%;
+            flex: 1;
+            border: none;
+            background-color: #fff;
         }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
-        
-        <!-- Yuxarı Sabit Panel -->
-        <header class="header-section">
-            <div class="brand-logo" onclick="resetToHome()">Az<span>Search</span></div>
+    <header>
+        <a href="#" class="logo" onclick="resetPage()">Az<span>Search</span> AI</a>
+        <form class="search-box" onsubmit="executeSearch(event)">
+            <input type="text" id="searchInput" placeholder="Süni intellektlə axtarın..." required>
+            <button type="submit">Axtar</button>
+        </form>
+    </header>
 
-            <div class="search-container">
-                <form class="search-bar" id="searchForm" onsubmit="handleSearch(event)">
-                    <input type="text" id="searchInput" placeholder="Axtarış edin..." autocomplete="off" autofocus required>
-                    <button type="submit">Axtar</button>
-                </form>
-
-                <div class="suggestions-dropdown" id="suggestionsBox"></div>
-            </div>
-        </header>
-
-        <!-- Reklam Sahəsi -->
-        <div class="ad-container">
-            <span>📢 REKLAM BANNERİ (AdMob / Adsterra / Monetag Kodu)</span>
+    <main>
+        <!-- Qarşılama Ekranı -->
+        <div class="welcome-screen" id="welcomeScreen">
+            <h1>AzSearch AI-a Xoş Gəldiniz</h1>
+            <p>Süni intellekt dəstəkli milli axtarış sistemi. Axtardığınız mətni yazın və anında hazır cavab alın.</p>
         </div>
 
-        <!-- Əsas Məzmun Və Axtarış Nəticələri -->
-        <main class="viewport-container">
-            <div class="splash-screen" id="splashScreen">
-                <h1>Az<span>Search</span></h1>
-                <p>Millivə Təhlükəsiz Axtarış Platforması</p>
+        <!-- AI Ağıllı Cavab Kartı -->
+        <div id="aiSummaryCard">
+            <div class="ai-header">
+                🤖 AzSearch AI Cavabı & Xülasəsi
             </div>
+            <div class="ai-content" id="aiContent">
+                Məlumat hazırlanır...
+            </div>
+        </div>
 
-            <iframe id="contentFrame" src="about:blank"></iframe>
-        </main>
-
-    </div>
+        <!-- Veb Nəticələri Çərçivəsi -->
+        <iframe id="resultsFrame" style="display: none;"></iframe>
+    </main>
 
     <script>
-        // Service Worker Quraşdırılması
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(() => {});
-        }
-
-        const searchInput = document.getElementById('searchInput');
-        const suggestionsBox = document.getElementById('suggestionsBox');
-        const searchForm = document.getElementById('searchForm');
-        const splashScreen = document.getElementById('splashScreen');
-        const contentFrame = document.getElementById('contentFrame');
-
-        const STORAGE_KEY = 'azsearch_history';
-
-        window.onload = () => {
-            searchInput.focus();
-        };
-
-        function getHistory() {
-            return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-        }
-
-        function saveHistory(query) {
-            if (!query) return;
-            let history = getHistory().filter(item => item.toLowerCase() !== query.toLowerCase());
-            history.unshift(query);
-            if (history.length > 10) history.pop();
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-        }
-
-        function handleSearch(e) {
-            if (e) e.preventDefault();
-            const query = searchInput.value.trim();
+        function executeSearch(event) {
+            event.preventDefault();
+            const query = document.getElementById('searchInput').value.trim();
             if (!query) return;
 
-            saveHistory(query);
-            suggestionsBox.style.display = 'none';
-            splashScreen.style.display = 'none';
+            // Səhifə elementlərinə nəzarət
+            document.getElementById('welcomeScreen').style.display = 'none';
+            const aiCard = document.getElementById('aiSummaryCard');
+            const aiContent = document.getElementById('aiContent');
+            const resultsFrame = document.getElementById('resultsFrame');
 
-            // Nəticələr birbaşa çərçivəsiz yüklənir
-            const targetUrl = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
-            contentFrame.src = targetUrl;
-        }
+            aiCard.style.display = 'block';
+            aiContent.innerHTML = '<i>Süni intellekt cavabı analiz edir...</i>';
 
-        function resetToHome() {
-            splashScreen.style.display = 'flex';
-            contentFrame.src = 'about:blank';
-            searchInput.value = '';
-            searchInput.focus();
-        }
+            // DuckDuckGo Instant Answer API vasitəsilə AI Xülasə alırıq
+            const apiUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1`;
 
-        // Canlı Axtarış Təklifləri (Google API)
-        searchInput.addEventListener('input', function() {
-            const val = this.value.trim();
-            if (!val) {
-                renderHistory();
-                return;
-            }
-
-            const script = document.createElement('script');
-            script.src = `https://suggestqueries.google.com/complete/search?client=chrome&q=${encodeURIComponent(val)}&callback=onSuggestionsFetch`;
-            document.body.appendChild(script);
-            document.body.removeChild(script);
-        });
-
-        window.onSuggestionsFetch = function(data) {
-            const items = data[1];
-            suggestionsBox.innerHTML = '';
-
-            if (items && items.length > 0) {
-                items.slice(0, 6).forEach(text => {
-                    const div = document.createElement('div');
-                    div.className = 'suggestion-item';
-                    div.innerHTML = `🔍 <span>${text}</span>`;
-                    div.onclick = () => {
-                        searchInput.value = text;
-                        handleSearch();
-                    };
-                    suggestionsBox.appendChild(div);
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.AbstractText) {
+                        aiContent.innerHTML = `<strong>Xülasə:</strong> ${data.AbstractText} <br><br><small>Mənbə: ${data.AbstractSource || 'Açıq mənbələr'}</small>`;
+                    } else if (data.RelatedTopics && data.RelatedTopics.length > 0 && data.RelatedTopics[0].Text) {
+                        aiContent.innerHTML = `<strong>Ağıllı Cavab:</strong> ${data.RelatedTopics[0].Text}`;
+                    } else {
+                        aiContent.innerHTML = `<strong>Süni İntellekt Qeydi:</strong> "${query}" sorğusu üçün hazır xülasə tapılmadı. Aşağıdakı canlı axtarış nəticələrinə baxa bilərsiniz.`;
+                    }
+                })
+                .catch(() => {
+                    aiContent.innerHTML = `<strong>Süni İntellekt Qeydi:</strong> Sorğu üzrə xülasə yaradılarkən xəta baş verdi. Aşağıdan veb nəticələrinə baxa bilərsiniz.`;
                 });
-                suggestionsBox.style.display = 'block';
-            } else {
-                suggestionsBox.style.display = 'none';
-            }
-        };
 
-        function renderHistory() {
-            const history = getHistory();
-            suggestionsBox.innerHTML = '';
-
-            if (history.length > 0) {
-                history.forEach(text => {
-                    const div = document.createElement('div');
-                    div.className = 'suggestion-item';
-                    div.innerHTML = `🕒 <span>${text}</span>`;
-                    div.onclick = () => {
-                        searchInput.value = text;
-                        handleSearch();
-                    };
-                    suggestionsBox.appendChild(div);
-                });
-                suggestionsBox.style.display = 'block';
-            } else {
-                suggestionsBox.style.display = 'none';
-            }
+            // Axtarış nəticələrini İframe-ə yükləyirik
+            resultsFrame.style.display = 'block';
+            resultsFrame.src = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
         }
 
-        searchInput.addEventListener('focus', () => {
-            if (!searchInput.value.trim()) renderHistory();
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!searchForm.contains(e.target) && !suggestionsBox.contains(e.target)) {
-                suggestionsBox.style.display = 'none';
-            }
-        });
+        function resetPage() {
+            document.getElementById('welcomeScreen').style.display = 'flex';
+            document.getElementById('aiSummaryCard').style.display = 'none';
+            document.getElementById('resultsFrame').style.display = 'none';
+            document.getElementById('searchInput').value = '';
+        }
     </script>
 </body>
 </html>
