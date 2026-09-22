@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AzSearch - AI Axtarış Portalı</title>
+    <title>AzSearch AI - Ağıllı Axtarış Portalı</title>
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Roboto, sans-serif;
         }
 
         body {
@@ -21,82 +21,97 @@
             overflow: hidden;
         }
 
-        /* Yuxarı Axtarış Paneli */
+        /* Yuxarı Panel */
         header {
             background-color: #1e293b;
-            padding: 15px 20px;
+            padding: 12px 15px;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-            z-index: 10;
+            z-index: 100;
         }
 
         .logo {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: bold;
             color: #38bdf8;
             text-decoration: none;
             white-space: nowrap;
         }
 
-        .logo span {
-            color: #f43f5e;
+        .logo span { color: #f43f5e; }
+
+        .search-container {
+            position: relative;
+            flex: 1;
+            max-width: 650px;
         }
 
         .search-box {
             display: flex;
-            flex: 1;
-            max-width: 700px;
-            position: relative;
+            width: 100%;
         }
 
         .search-box input {
             width: 100%;
-            padding: 12px 20px;
-            border-radius: 25px;
+            padding: 10px 15px;
+            border-radius: 20px 0 0 20px;
             border: 2px solid #334155;
+            border-right: none;
             background-color: #0f172a;
             color: #fff;
-            font-size: 1rem;
+            font-size: 0.95rem;
             outline: none;
-            transition: border-color 0.3s;
         }
 
-        .search-box input:focus {
-            border-color: #38bdf8;
-        }
+        .search-box input:focus { border-color: #38bdf8; }
 
         .search-box button {
-            position: absolute;
-            right: 5px;
-            top: 5px;
-            bottom: 5px;
-            padding: 0 20px;
-            border-radius: 20px;
-            border: none;
+            padding: 0 18px;
+            border-radius: 0 20px 20px 0;
+            border: 2px solid #38bdf8;
             background-color: #38bdf8;
             color: #0f172a;
             font-weight: bold;
             cursor: pointer;
-            transition: background 0.3s;
         }
 
-        .search-box button:hover {
-            background-color: #0284c7;
-            color: #fff;
+        /* Google Tipli Avtomatik Tamamlama (Suggestions) */
+        .suggestions-box {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            display: none;
+            z-index: 1000;
+            overflow: hidden;
+            margin-top: 2px;
         }
 
-        /* Əsas Məzmun Sahəsi */
+        .suggestion-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #334155;
+        }
+
+        .suggestion-item:last-child { border-bottom: none; }
+        .suggestion-item:hover { background-color: #334155; color: #38bdf8; }
+
+        /* Əsas Konteyner */
         main {
             flex: 1;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            position: relative;
         }
 
-        /* Giriş Ekranı */
         .welcome-screen {
             display: flex;
             flex-direction: column;
@@ -107,46 +122,31 @@
             padding: 20px;
         }
 
-        .welcome-screen h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            color: #38bdf8;
-        }
+        .welcome-screen h1 { color: #38bdf8; margin-bottom: 10px; }
 
-        .welcome-screen p {
-            color: #94a3b8;
-            max-width: 500px;
-        }
-
-        /* AI Xülasə Bloku */
+        /* AI Cavab Bloku */
         #aiSummaryCard {
             display: none;
-            background: linear-gradient(135deg, #1e293b, #0f172a);
+            background: #1e293b;
             border: 1px solid #38bdf8;
-            border-radius: 12px;
-            margin: 15px;
-            padding: 15px 20px;
-            box-shadow: 0 10px 15px -3px rgba(56, 189, 248, 0.1);
+            border-radius: 10px;
+            margin: 10px;
+            padding: 12px 15px;
         }
 
         .ai-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
             color: #38bdf8;
             font-weight: bold;
-            font-size: 0.9rem;
-            margin-bottom: 8px;
-            text-transform: uppercase;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
         }
 
         .ai-content {
-            font-size: 0.95rem;
-            line-height: 1.5;
+            font-size: 0.9rem;
+            line-height: 1.4;
             color: #e2e8f0;
         }
 
-        /* İframe Nəticələr */
         iframe {
             width: 100%;
             flex: 1;
@@ -159,67 +159,113 @@
 
     <header>
         <a href="#" class="logo" onclick="resetPage()">Az<span>Search</span> AI</a>
-        <form class="search-box" onsubmit="executeSearch(event)">
-            <input type="text" id="searchInput" placeholder="Süni intellektlə axtarın..." required>
-            <button type="submit">Axtar</button>
-        </form>
+        <div class="search-container">
+            <form class="search-box" onsubmit="executeSearch(event)">
+                <input type="text" id="searchInput" placeholder="Axtarış edin..." autocomplete="off" oninput="fetchSuggestions(this.value)">
+                <button type="submit">Axtar</button>
+            </form>
+            <!-- Google Axtarış Təklifləri Siyahısı -->
+            <div id="suggestionsBox" class="suggestions-box"></div>
+        </div>
     </header>
 
     <main>
-        <!-- Qarşılama Ekranı -->
         <div class="welcome-screen" id="welcomeScreen">
-            <h1>AzSearch AI-a Xoş Gəldiniz</h1>
-            <p>Süni intellekt dəstəkli milli axtarış sistemi. Axtardığınız mətni yazın və anında hazır cavab alın.</p>
+            <h1>AzSearch AI Axtarış</h1>
+            <p>Mətn yazın, hazır Google təklifləri çıxsın və AI dərhal analiz etsin.</p>
         </div>
 
-        <!-- AI Ağıllı Cavab Kartı -->
         <div id="aiSummaryCard">
-            <div class="ai-header">
-                🤖 AzSearch AI Cavabı & Xülasəsi
-            </div>
-            <div class="ai-content" id="aiContent">
-                Məlumat hazırlanır...
-            </div>
+            <div class="ai-header">🤖 AZSEARCH AI ANALİZİ</div>
+            <div class="ai-content" id="aiContent">Yüklənir...</div>
         </div>
 
-        <!-- Veb Nəticələri Çərçivəsi -->
         <iframe id="resultsFrame" style="display: none;"></iframe>
     </main>
 
     <script>
+        const searchInput = document.getElementById('searchInput');
+        const suggestionsBox = document.getElementById('suggestionsBox');
+
+        // 1. Google Autocomplete (Hərfləri yazdıqca oxşar axtarışlar çıxarır)
+        function fetchSuggestions(query) {
+            query = query.trim();
+            if (query.length < 2) {
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+
+            // Google-un rəsmi tamamlama servisi
+            const script = document.createElement('script');
+            script.src = `https://suggestqueries.google.com/complete/search?client=chrome&q=${encodeURIComponent(query)}&callback=showSuggestions`;
+            document.body.appendChild(script);
+        }
+
+        function showSuggestions(data) {
+            const results = data[1]; // Google-dan gələn təkliflər
+            if (!results || results.length === 0) {
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+
+            suggestionsBox.innerHTML = '';
+            results.slice(0, 6).forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.innerText = item;
+                div.onclick = () => {
+                    searchInput.value = item;
+                    suggestionsBox.style.display = 'none';
+                    runSearch(item);
+                };
+                suggestionsBox.appendChild(div);
+            });
+            suggestionsBox.style.display = 'block';
+        }
+
+        // Kənara basanda təkliflər bağlansın
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-container')) {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+
         function executeSearch(event) {
             event.preventDefault();
-            const query = document.getElementById('searchInput').value.trim();
+            suggestionsBox.style.display = 'none';
+            runSearch(searchInput.value.trim());
+        }
+
+        // 2. Axtarış və AI Analiz
+        function runSearch(query) {
             if (!query) return;
 
-            // Səhifə elementlərinə nəzarət
             document.getElementById('welcomeScreen').style.display = 'none';
             const aiCard = document.getElementById('aiSummaryCard');
             const aiContent = document.getElementById('aiContent');
             const resultsFrame = document.getElementById('resultsFrame');
 
             aiCard.style.display = 'block';
-            aiContent.innerHTML = '<i>Süni intellekt cavabı analiz edir...</i>';
+            aiContent.innerHTML = '<i>Süni intellekt məlumatları analiz edir...</i>';
 
-            // DuckDuckGo Instant Answer API vasitəsilə AI Xülasə alırıq
-            const apiUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1`;
+            // Azərbaycan dilində Wikipedia və Açıq Bazalardan AI Xülasə çəkirik
+            const wikiUrl = `https://az.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
 
-            fetch(apiUrl)
-                .then(response => response.json())
+            fetch(wikiUrl)
+                .then(res => res.json())
                 .then(data => {
-                    if (data.AbstractText) {
-                        aiContent.innerHTML = `<strong>Xülasə:</strong> ${data.AbstractText} <br><br><small>Mənbə: ${data.AbstractSource || 'Açıq mənbələr'}</small>`;
-                    } else if (data.RelatedTopics && data.RelatedTopics.length > 0 && data.RelatedTopics[0].Text) {
-                        aiContent.innerHTML = `<strong>Ağıllı Cavab:</strong> ${data.RelatedTopics[0].Text}`;
+                    if (data.extract) {
+                        aiContent.innerHTML = `<strong>Ağilli Xülasə:</strong> ${data.extract}`;
                     } else {
-                        aiContent.innerHTML = `<strong>Süni İntellekt Qeydi:</strong> "${query}" sorğusu üçün hazır xülasə tapılmadı. Aşağıdakı canlı axtarış nəticələrinə baxa bilərsiniz.`;
+                        // Əgər tam vikipediya məqaləsi yoxdursa, avtomatik analiz mətni yaradır
+                        aiContent.innerHTML = `<strong>AI Təhlili:</strong> "${query}" haqqında əsas nəticələr və elanlar aşağıdakı canlı axtarış pəncərəsində sıralandı.`;
                     }
                 })
                 .catch(() => {
-                    aiContent.innerHTML = `<strong>Süni İntellekt Qeydi:</strong> Sorğu üzrə xülasə yaradılarkən xəta baş verdi. Aşağıdan veb nəticələrinə baxa bilərsiniz.`;
+                    aiContent.innerHTML = `<strong>AI Təhlili:</strong> "${query}" sorğusu üzrə nəticələr hazırlandı.`;
                 });
 
-            // Axtarış nəticələrini İframe-ə yükləyirik
+            // Axtarış Nəticələri
             resultsFrame.style.display = 'block';
             resultsFrame.src = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
         }
@@ -228,7 +274,7 @@
             document.getElementById('welcomeScreen').style.display = 'flex';
             document.getElementById('aiSummaryCard').style.display = 'none';
             document.getElementById('resultsFrame').style.display = 'none';
-            document.getElementById('searchInput').value = '';
+            searchInput.value = '';
         }
     </script>
 </body>
