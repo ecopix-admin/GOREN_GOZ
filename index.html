@@ -3,69 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AzSearch - Milli Axtarış Sistemi</title>
+    <title>AzSearch</title>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --accent-color: #38bdf8;
-            --text-color: #f8fafc;
-            --text-muted: #94a3b8;
+            --bg-color: #0b0f19;
+            --card-bg: #151d2a;
+            --border-color: #232d3f;
+            --accent-color: #3b82f6;
+            --text-color: #e2e8f0;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            margin: 0;
-            padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: space-between;
             min-height: 100vh;
+            padding: 15px;
         }
 
-        .container {
+        .ad-banner {
             width: 100%;
-            max-width: 650px;
-            padding: 20px;
-            box-sizing: border-box;
+            max-width: 728px;
+            background-color: var(--card-bg);
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 580px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: auto;
-            margin-bottom: auto;
+            position: relative;
         }
 
-        /* Logo */
         .logo {
-            font-size: 3rem;
-            font-weight: 800;
-            color: var(--accent-color);
-            margin-bottom: 20px;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 24px;
             letter-spacing: -1px;
-            text-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
         }
 
         .logo span {
-            color: #f43f5e;
+            color: var(--accent-color);
         }
 
-        /* Axtarış Formu */
+        /* Axtarış Qutusu və Təkliflər */
+        .search-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
         .search-box {
             width: 100%;
             display: flex;
             background-color: var(--card-bg);
-            border: 2px solid #334155;
-            border-radius: 30px;
-            padding: 6px 12px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 4px;
+            transition: 0.2s;
         }
 
         .search-box:focus-within {
             border-color: var(--accent-color);
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.25);
         }
 
         .search-box input {
@@ -74,109 +92,236 @@
             border: none;
             outline: none;
             color: var(--text-color);
-            font-size: 1.1rem;
-            padding: 10px 15px;
+            font-size: 1rem;
+            padding: 10px 18px;
         }
 
         .search-box button {
             background-color: var(--accent-color);
-            color: #0f172a;
+            color: #ffffff;
             border: none;
             border-radius: 20px;
-            padding: 10px 24px;
-            font-weight: bold;
-            font-size: 1rem;
+            padding: 8px 20px;
+            font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: 0.2s;
         }
 
         .search-box button:hover {
             opacity: 0.9;
         }
 
-        /* Reklam Zonaları (Sizin Qazanc Yeriniz) */
-        .ad-banner {
-            width: 100%;
-            max-width: 728px;
-            background-color: #1e293b;
-            border: 1px dashed var(--accent-color);
-            border-radius: 8px;
-            padding: 15px;
-            margin: 20px 0;
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            box-sizing: border-box;
+        /* Təkliflər Siyahısı (Suggestions Dropdown) */
+        .suggestions-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-top: 6px;
+            max-height: 250px;
+            overflow-y: auto;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
         }
 
-        /* Tez-tez İstifadə Olunan Linklər */
+        .suggestion-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            border-bottom: 1px solid #1e293b;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item:hover {
+            background-color: #1e293b;
+            color: var(--accent-color);
+        }
+
+        .history-tag {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            background: #0f172a;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* Sadə Düymələr */
         .quick-links {
             display: flex;
-            gap: 15px;
-            margin-top: 25px;
+            gap: 10px;
+            margin-top: 20px;
             flex-wrap: wrap;
             justify-content: center;
         }
 
         .link-card {
             background-color: var(--card-bg);
-            padding: 10px 18px;
-            border-radius: 12px;
+            padding: 8px 16px;
+            border-radius: 8px;
             text-decoration: none;
-            color: var(--text-color);
-            font-size: 0.9rem;
-            border: 1px solid #334155;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border: 1px solid var(--border-color);
             transition: 0.2s;
         }
 
         .link-card:hover {
             border-color: var(--accent-color);
-            color: var(--accent-color);
+            color: var(--text-color);
         }
 
         footer {
-            margin-top: auto;
-            padding: 20px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
             text-align: center;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
 
-    <!-- Yuxarı Reklam Sahəsi -->
-    <div class="ad-banner" style="margin-top: 10px;">
-        📢 REKLAM KODUNUZU BURA YERLƏŞDİRİN (Adsterra / Google AdSense)
+    <div class="ad-banner">
+        REKLAM SAHƏSİ 1
     </div>
 
-    <div class="container">
-        <!-- Şəxsi Logonuz -->
+    <div class="main-container">
         <div class="logo">Az<span>Search</span></div>
 
-        <!-- Axtarış Bölməsi -->
-        <form class="search-box" action="https://www.google.com/search" method="GET" target="_blank">
-            <input type="text" name="q" placeholder="İstədiyiniz hər şeyi axtarın..." required autocomplete="off">
-            <button type="submit">Axtar</button>
-        </form>
+        <div class="search-wrapper">
+            <form class="search-box" id="searchForm" action="https://www.google.com/search" method="GET" target="_blank">
+                <input type="text" id="searchInput" name="q" placeholder="Axtarın..." autocomplete="off" required>
+                <button type="submit">Axtar</button>
+            </form>
 
-        <!-- Sürətli Keçid Düymələri -->
+            <div class="suggestions-list" id="suggestions"></div>
+        </div>
+
         <div class="quick-links">
-            <a href="https://www.youtube.com" class="link-card" target="_blank">▶️ YouTube</a>
-            <a href="https://www.instagram.com" class="link-card" target="_blank">📸 Instagram</a>
-            <a href="https://www.wikipedia.org" class="link-card" target="_blank">📚 Wikipedia</a>
-            <a href="https://web.telegram.org" class="link-card" target="_blank">✈️ Telegram</a>
+            <a href="https://www.youtube.com" class="link-card" target="_blank">YouTube</a>
+            <a href="https://www.instagram.com" class="link-card" target="_blank">Instagram</a>
+            <a href="https://www.wikipedia.org" class="link-card" target="_blank">Wikipedia</a>
+            <a href="https://web.telegram.org" class="link-card" target="_blank">Telegram</a>
         </div>
     </div>
 
-    <!-- Alt Reklam Sahəsi -->
     <div class="ad-banner">
-        📢 İKİNCİ REKLAM KODUNUZU BURA YERLƏŞDİRİN
+        REKLAM SAHƏSİ 2
     </div>
 
     <footer>
-        &copy; 2026 AzSearch Engine. Bütün hüquqlar qorunur.
+        &copy; 2026 AzSearch Engine
     </footer>
 
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const suggestionsBox = document.getElementById('suggestions');
+        const searchForm = document.getElementById('searchForm');
+
+        // Yaddaşda Maksimum 15 Söz Saxlamaq
+        const MAX_HISTORY = 15;
+
+        function getHistory() {
+            return JSON.parse(localStorage.getItem('searchHistory') || '[]');
+        }
+
+        function saveToHistory(query) {
+            if (!query) return;
+            let history = getHistory();
+            history = history.filter(item => item.toLowerCase() !== query.toLowerCase());
+            history.unshift(query);
+            if (history.length > MAX_HISTORY) history.pop();
+            localStorage.setItem('searchHistory', JSON.stringify(history));
+        }
+
+        // Axtarış düyməsinə basıldıqda yaddaşa vurur
+        searchForm.addEventListener('submit', function() {
+            saveToHistory(searchInput.value.trim());
+        });
+
+        // İstifadəçi daxil edəndə Google Təkliflərini Canlı Çəkir
+        searchInput.addEventListener('input', function() {
+            const query = this.value.trim();
+
+            if (query.length === 0) {
+                showHistory();
+                return;
+            }
+
+            // Google Autocomplete API
+            const script = document.createElement('script');
+            script.src = `https://suggestqueries.google.com/complete/search?client=chrome&q=${encodeURIComponent(query)}&callback=handleSuggestions`;
+            document.body.appendChild(script);
+            document.body.removeChild(script);
+        });
+
+        // Təklifləri göstərən funksiya
+        window.handleSuggestions = function(data) {
+            const results = data[1];
+            suggestionsBox.innerHTML = '';
+
+            if (results.length > 0) {
+                results.slice(0, 7).forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'suggestion-item';
+                    div.innerHTML = `<span>${item}</span>`;
+                    div.onclick = function() {
+                        searchInput.value = item;
+                        saveToHistory(item);
+                        searchForm.submit();
+                    };
+                    suggestionsBox.appendChild(div);
+                });
+                suggestionsBox.style.display = 'block';
+            } else {
+                suggestionsBox.style.display = 'none';
+            }
+        };
+
+        // Yaddaşdakı son axtarışları göstərir
+        function showHistory() {
+            const history = getHistory();
+            suggestionsBox.innerHTML = '';
+
+            if (history.length > 0) {
+                history.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'suggestion-item';
+                    div.innerHTML = `<span>${item}</span> <span class="history-tag">Keçmiş</span>`;
+                    div.onclick = function() {
+                        searchInput.value = item;
+                        searchForm.submit();
+                    };
+                    suggestionsBox.appendChild(div);
+                });
+                suggestionsBox.style.display = 'block';
+            } else {
+                suggestionsBox.style.display = 'none';
+            }
+        }
+
+        searchInput.addEventListener('focus', function() {
+            if (this.value.trim().length === 0) {
+                showHistory();
+            }
+        });
+
+        // Kənara vuranda menyu bağlansın
+        document.addEventListener('click', function(e) {
+            if (!searchForm.contains(e.target) && !suggestionsBox.contains(e.target)) {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
