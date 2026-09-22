@@ -3,179 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KinoPortal - HD Filmlər</title>
+    <title>AzSearch - Milli Axtarış Sistemi</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
-        body { background-color: #0f172a; color: #f8fafc; padding-bottom: 50px; }
-        
-        header { background: #1e293b; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .logo { font-size: 22px; font-weight: bold; color: #38bdf8; text-decoration: none; }
-        
-        .search-box { display: flex; gap: 8px; }
-        .search-box input { padding: 8px 12px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white; outline: none; }
-        .search-box button { padding: 8px 15px; border-radius: 6px; border: none; background: #0284c7; color: white; cursor: pointer; font-weight: bold; }
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-color: #38bdf8;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+        }
 
-        .lang-select { padding: 8px; border-radius: 6px; background: #0f172a; color: white; border: 1px solid #334155; cursor: pointer; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
 
-        .container { max-width: 1200px; margin: 25px auto; padding: 0 15px; }
-        h2 { margin-bottom: 15px; border-left: 4px solid #0284c7; padding-left: 10px; font-size: 20px; }
+        .container {
+            width: 100%;
+            max-width: 650px;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: auto;
+            margin-bottom: auto;
+        }
 
-        .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-        .movie-card { background: #1e293b; border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.2s; }
-        .movie-card:hover { transform: scale(1.03); }
-        .movie-card img { width: 100%; height: 230px; object-fit: cover; background: #334155; }
-        .movie-info { padding: 10px; }
-        .movie-title { font-size: 13px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .movie-rating { font-size: 11px; color: #fbbf24; margin-top: 4px; }
+        /* Logo */
+        .logo {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+            text-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
+        }
 
-        /* Modal Player */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: #1e293b; width: 95%; max-width: 850px; border-radius: 8px; overflow: hidden; position: relative; }
-        .close-btn { position: absolute; top: 8px; right: 12px; color: white; font-size: 28px; cursor: pointer; z-index: 101; background: rgba(0,0,0,0.5); width: 35px; height: 35px; border-radius: 50%; text-align: center; line-height: 32px; }
-        
-        .player-container { position: relative; padding-bottom: 56.25%; height: 0; background: #000; }
-        .player-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-        
-        .ad-space { background: #f59e0b; color: #000; text-align: center; padding: 6px; font-weight: bold; font-size: 12px; }
-        .server-btns { display: flex; gap: 10px; padding: 10px; background: #0f172a; justify-content: center; }
-        .server-btn { background: #334155; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
-        .server-btn:hover { background: #0284c7; }
+        .logo span {
+            color: #f43f5e;
+        }
+
+        /* Axtarış Formu */
+        .search-box {
+            width: 100%;
+            display: flex;
+            background-color: var(--card-bg);
+            border: 2px solid #334155;
+            border-radius: 30px;
+            padding: 6px 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus-within {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+        }
+
+        .search-box input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-color);
+            font-size: 1.1rem;
+            padding: 10px 15px;
+        }
+
+        .search-box button {
+            background-color: var(--accent-color);
+            color: #0f172a;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 24px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .search-box button:hover {
+            opacity: 0.9;
+        }
+
+        /* Reklam Zonaları (Sizin Qazanc Yeriniz) */
+        .ad-banner {
+            width: 100%;
+            max-width: 728px;
+            background-color: #1e293b;
+            border: 1px dashed var(--accent-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            box-sizing: border-box;
+        }
+
+        /* Tez-tez İstifadə Olunan Linklər */
+        .quick-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .link-card {
+            background-color: var(--card-bg);
+            padding: 10px 18px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-color);
+            font-size: 0.9rem;
+            border: 1px solid #334155;
+            transition: 0.2s;
+        }
+
+        .link-card:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 20px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
-    <header>
-        <a href="#" class="logo" onclick="loadPopular()">🎬 KinoPortal</a>
-        
-        <div class="search-box">
-            <select id="langSelect" class="lang-select" onchange="loadPopular()">
-                <option value="tr-TR">🇹🇷 Türkçe</option>
-                <option value="ru-RU">🇷🇺 Русский</option>
-            </select>
-            <input type="text" id="searchInput" placeholder="Film adı yazın..." onkeypress="if(event.key === 'Enter') searchMovies()">
-            <button onclick="searchMovies()">Axtar</button>
-        </div>
-    </header>
+    <!-- Yuxarı Reklam Sahəsi -->
+    <div class="ad-banner" style="margin-top: 10px;">
+        📢 REKLAM KODUNUZU BURA YERLƏŞDİRİN (Adsterra / Google AdSense)
+    </div>
 
     <div class="container">
-        <h2 id="sectionTitle">Populyar Filmlər</h2>
-        <div class="movie-grid" id="movieGrid">Yüklənir...</div>
-    </div>
+        <!-- Şəxsi Logonuz -->
+        <div class="logo">Az<span>Search</span></div>
 
-    <!-- Modal Video Player -->
-    <div class="modal" id="playerModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closePlayer()">&times;</span>
-            <div class="ad-space">📢 REKLAM PANECİĞİ (4-5 Saniyəlik Reklam Kodunuz)</div>
-            
-            <div class="player-container">
-                <iframe id="videoIframe" src="" allowfullscreen></iframe>
-            </div>
+        <!-- Axtarış Bölməsi -->
+        <form class="search-box" action="https://www.google.com/search" method="GET" target="_blank">
+            <input type="text" name="q" placeholder="İstədiyiniz hər şeyi axtarın..." required autocomplete="off">
+            <button type="submit">Axtar</button>
+        </form>
 
-            <div class="server-btns">
-                <span style="font-size: 12px; align-self: center;">Serverlər:</span>
-                <button class="server-btn" onclick="switchServer(1)">Server 1</button>
-                <button class="server-btn" onclick="switchServer(2)">Server 2</button>
-            </div>
+        <!-- Sürətli Keçid Düymələri -->
+        <div class="quick-links">
+            <a href="https://www.youtube.com" class="link-card" target="_blank">▶️ YouTube</a>
+            <a href="https://www.instagram.com" class="link-card" target="_blank">📸 Instagram</a>
+            <a href="https://www.wikipedia.org" class="link-card" target="_blank">📚 Wikipedia</a>
+            <a href="https://web.telegram.org" class="link-card" target="_blank">✈️ Telegram</a>
         </div>
     </div>
 
-    <script>
-        const API_KEY = '3fd2be6f0c70a2a598f084dd2fb0648c';
-        let currentMovieId = null;
+    <!-- Alt Reklam Sahəsi -->
+    <div class="ad-banner">
+        📢 İKİNCİ REKLAM KODUNUZU BURA YERLƏŞDİRİN
+    </div>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            loadPopular();
-        });
+    <footer>
+        &copy; 2026 AzSearch Engine. Bütün hüquqlar qorunur.
+    </footer>
 
-        function getLang() {
-            return document.getElementById('langSelect').value;
-        }
-
-        async function loadPopular() {
-            document.getElementById('sectionTitle').innerText = "Populyar Filmlər";
-            const lang = getLang();
-            const url = `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=${lang}&page=1`;
-            fetchAndRender(url);
-        }
-
-        async function searchMovies() {
-            const query = document.getElementById('searchInput').value.trim();
-            if(!query) return;
-
-            document.getElementById('sectionTitle').innerText = `Axtarış: "${query}"`;
-            const lang = getLang();
-            const url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=${lang}&query=${encodeURIComponent(query)}`;
-            fetchAndRender(url);
-        }
-
-        async function fetchAndRender(url) {
-            const grid = document.getElementById('movieGrid');
-            grid.innerHTML = '<p style="grid-column: 1/-1;">Yüklənir, xahiş olunur gözləyin...</p>';
-            
-            try {
-                const res = await fetch(url);
-                const data = await res.json();
-                
-                if(!data.results || data.results.length === 0) {
-                    grid.innerHTML = '<p style="grid-column: 1/-1;">Heç bir film tapılmadı.</p>';
-                    return;
-                }
-                
-                renderGrid(data.results);
-            } catch (err) {
-                grid.innerHTML = '<p style="grid-column: 1/-1; color: #ef4444;">Məlumat çəkilərkən xəta baş verdi. İntrnet bağlantınızı yoxlayın.</p>';
-            }
-        }
-
-        function renderGrid(movies) {
-            const grid = document.getElementById('movieGrid');
-            grid.innerHTML = '';
-
-            movies.forEach(movie => {
-                const card = document.createElement('div');
-                card.className = 'movie-card';
-                card.onclick = () => openPlayer(movie.id);
-
-                const imgUrl = movie.poster_path 
-                    ? `https://image.tmdb.org/t/p/w300${movie.poster_path}` 
-                    : 'https://via.placeholder.com/300x450?text=Afişa+Yoxdur';
-
-                card.innerHTML = `
-                    <img src="${imgUrl}" alt="${movie.title}">
-                    <div class="movie-info">
-                        <div class="movie-title">${movie.title}</div>
-                        <div class="movie-rating">⭐ ${movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A'}</div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function openPlayer(movieId) {
-            currentMovieId = movieId;
-            const modal = document.getElementById('playerModal');
-            modal.style.display = 'flex';
-            switchServer(1); // Susmaya görə 1-ci serveri açır
-        }
-
-        function switchServer(serverNum) {
-            const iframe = document.getElementById('videoIframe');
-            const lang = getLang();
-            
-            if (serverNum === 1) {
-                iframe.src = `https://vidsrc.to/embed/movie/${currentMovieId}`;
-            } else if (serverNum === 2) {
-                iframe.src = `https://multiembed.mov/?video_id=${currentMovieId}&tmdb=1`;
-            }
-        }
-
-        function closePlayer() {
-            const modal = document.getElementById('playerModal');
-            const iframe = document.getElementById('videoIframe');
-            iframe.src = '';
-            modal.style.display = 'none';
-        }
-    </script>
 </body>
 </html>
