@@ -2,138 +2,174 @@
 <html lang="az">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AzSearch - Milli Axtarış Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AzSearch Engine</title>
+
+    <!-- PWA Konfiqurasiyası -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0d1117">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <style>
         :root {
-            --bg-color: #0b0f19;
-            --card-bg: #151d2a;
-            --border-color: #232d3f;
-            --accent-color: #3b82f6;
-            --text-color: #e2e8f0;
-            --text-muted: #64748b;
+            --bg-main: #0d1117;
+            --card-bg: #161b22;
+            --accent-blue: #2f81f7;
+            --border-color: #30363d;
+            --text-main: #f0f6fc;
+            --text-sub: #8b949e;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-main);
+        }
+
+        /* Əsas Konteyner */
+        .app-container {
             display: flex;
             flex-direction: column;
+            width: 100vw;
             height: 100vh;
-            overflow: hidden;
         }
 
-        /* Yuxarı Sabit Panel (Sizin Loqonuz və Axtarış) */
-        .top-bar {
+        /* 1. ÜST PANEL: Loqo və Axtarış Çubuğu */
+        .header-section {
             background-color: var(--card-bg);
             border-bottom: 1px solid var(--border-color);
-            padding: 10px 20px;
+            padding: 12px 16px;
             display: flex;
             align-items: center;
-            gap: 20px;
-            z-index: 1000;
+            gap: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 100;
         }
 
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 700;
+        .brand-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
             color: #ffffff;
-            letter-spacing: -1px;
-            white-space: nowrap;
+            letter-spacing: -0.5px;
             cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
         }
 
-        .logo span {
-            color: var(--accent-color);
+        .brand-logo span {
+            color: var(--accent-blue);
         }
 
-        .search-wrapper {
+        .search-container {
             position: relative;
             flex: 1;
-            max-width: 600px;
+            max-width: 700px;
         }
 
-        .search-box {
-            width: 100%;
+        .search-bar {
             display: flex;
-            background-color: var(--bg-color);
+            align-items: center;
+            background-color: var(--bg-main);
             border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 2px 4px;
+            border-radius: 24px;
+            padding: 4px 6px 4px 16px;
+            transition: border-color 0.2s ease;
         }
 
-        .search-box:focus-within {
-            border-color: var(--accent-color);
+        .search-bar:focus-within {
+            border-color: var(--accent-blue);
         }
 
-        .search-box input {
+        .search-bar input {
             flex: 1;
-            background: transparent;
+            background: none;
             border: none;
             outline: none;
-            color: var(--text-color);
-            font-size: 0.95rem;
-            padding: 8px 14px;
+            color: var(--text-main);
+            font-size: 1rem;
+            height: 36px;
         }
 
-        .search-box button {
-            background-color: var(--accent-color);
+        .search-bar button {
+            background-color: var(--accent-blue);
             color: #ffffff;
             border: none;
-            border-radius: 16px;
-            padding: 6px 16px;
+            border-radius: 20px;
+            padding: 8px 18px;
             font-weight: 600;
+            font-size: 0.9rem;
             cursor: pointer;
+            transition: opacity 0.2s;
         }
 
-        /* Təkliflər Siyahısı */
-        .suggestions-list {
+        .search-bar button:active {
+            opacity: 0.8;
+        }
+
+        /* Auto-complete Təkliflər Siyahısı */
+        .suggestions-dropdown {
             position: absolute;
             top: 100%;
             left: 0;
             right: 0;
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
-            margin-top: 4px;
-            max-height: 200px;
-            overflow-y: auto;
+            border-radius: 12px;
+            margin-top: 6px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
             display: none;
-            z-index: 1001;
+            z-index: 101;
+            overflow: hidden;
         }
 
         .suggestion-item {
-            padding: 8px 14px;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            color: var(--text-main);
             cursor: pointer;
-            font-size: 0.9rem;
-            color: #cbd5e1;
-            border-bottom: 1px solid #1e293b;
+            border-bottom: 1px solid #21262d;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .suggestion-item:hover {
-            background-color: #1e293b;
-            color: var(--accent-color);
+        .suggestion-item:last-child {
+            border-bottom: none;
         }
 
-        /* Reklam Sahəsi */
-        .ad-banner {
-            background-color: #0f172a;
+        .suggestion-item:hover, .suggestion-item:active {
+            background-color: #21262d;
+            color: var(--accent-blue);
+        }
+
+        /* 2. REKLAM BÖLMƏSİ (Tam Mərkəzləşdirilmiş) */
+        .ad-container {
+            background-color: #11161d;
             border-bottom: 1px solid var(--border-color);
             text-align: center;
-            padding: 6px;
-            color: var(--text-muted);
+            padding: 6px 10px;
             font-size: 0.75rem;
+            color: var(--text-sub);
+            min-height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* Axtarış Nəticələrinin Açıldığı Ərazi (Sizin Çərçivəniz) */
-        .results-container {
+        /* 3. NƏTİCƏLƏR BÖLMƏSİ (Çərçivəsiz İframe) */
+        .viewport-container {
             flex: 1;
             width: 100%;
             height: 100%;
@@ -145,16 +181,17 @@
             width: 100%;
             height: 100%;
             border: none;
+            outline: none;
         }
 
-        /* Başlanğıc Ekranı Maskası */
-        .welcome-screen {
+        /* Başlanğıc Ana Ekran Qrafikası */
+        .splash-screen {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: var(--bg-color);
+            background-color: var(--bg-main);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -162,115 +199,130 @@
             z-index: 10;
         }
 
-        .welcome-screen h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+        .splash-screen h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .splash-screen p {
+            color: var(--text-sub);
+            font-size: 0.95rem;
         }
     </style>
 </head>
 <body>
 
-    <!-- Yuxarı Sabit Panel (Sizin Brendiniz) -->
-    <div class="top-bar">
-        <div class="logo" onclick="resetSearch()">Az<span>Search</span></div>
+    <div class="app-container">
+        
+        <!-- Yuxarı Sabit Panel -->
+        <header class="header-section">
+            <div class="brand-logo" onclick="resetToHome()">Az<span>Search</span></div>
 
-        <div class="search-wrapper">
-            <form class="search-box" id="searchForm" onsubmit="executeSearch(event)">
-                <input type="text" id="searchInput" placeholder="İstədiyiniz hər şeyi axtarın..." autocomplete="off" required>
-                <button type="submit">Axtar</button>
-            </form>
+            <div class="search-container">
+                <form class="search-bar" id="searchForm" onsubmit="handleSearch(event)">
+                    <input type="text" id="searchInput" placeholder="Axtarış edin..." autocomplete="off" autofocus required>
+                    <button type="submit">Axtar</button>
+                </form>
 
-            <div class="suggestions-list" id="suggestions"></div>
-        </div>
-    </div>
+                <div class="suggestions-dropdown" id="suggestionsBox"></div>
+            </div>
+        </header>
 
-    <!-- Reklam Zonası -->
-    <div class="ad-banner">
-        📢 REKLAM SAHƏSİ (Adsterra / AdSense Kodunuz)
-    </div>
-
-    <!-- Axtarış Nəticələri Ekrani -->
-    <div class="results-container">
-        <!-- İlk girişdə görünən ekran -->
-        <div class="welcome-screen" id="welcomeScreen">
-            <h1>Az<span>Search</span> Engine</h1>
-            <p style="color: var(--text-muted);">Təhlükəsiz və Sürətli Axtarış Platforması</p>
+        <!-- Reklam Sahəsi -->
+        <div class="ad-container">
+            <span>📢 REKLAM BANNERİ (AdMob / Adsterra / Monetag Kodu)</span>
         </div>
 
-        <!-- Nəticələrin yükləndiyi pəncərə -->
-        <iframe id="resultsFrame" src="about:blank"></iframe>
+        <!-- Əsas Məzmun Və Axtarış Nəticələri -->
+        <main class="viewport-container">
+            <div class="splash-screen" id="splashScreen">
+                <h1>Az<span>Search</span></h1>
+                <p>Millivə Təhlükəsiz Axtarış Platforması</p>
+            </div>
+
+            <iframe id="contentFrame" src="about:blank"></iframe>
+        </main>
+
     </div>
 
     <script>
-        const searchInput = document.getElementById('searchInput');
-        const suggestionsBox = document.getElementById('suggestions');
-        const searchForm = document.getElementById('searchForm');
-        const welcomeScreen = document.getElementById('welcomeScreen');
-        const resultsFrame = document.getElementById('resultsFrame');
+        // Service Worker Quraşdırılması
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        }
 
-        const MAX_HISTORY = 15;
+        const searchInput = document.getElementById('searchInput');
+        const suggestionsBox = document.getElementById('suggestionsBox');
+        const searchForm = document.getElementById('searchForm');
+        const splashScreen = document.getElementById('splashScreen');
+        const contentFrame = document.getElementById('contentFrame');
+
+        const STORAGE_KEY = 'azsearch_history';
+
+        window.onload = () => {
+            searchInput.focus();
+        };
 
         function getHistory() {
-            return JSON.parse(localStorage.getItem('searchHistory') || '[]');
+            return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
         }
 
-        function saveToHistory(query) {
+        function saveHistory(query) {
             if (!query) return;
-            let history = getHistory();
-            history = history.filter(item => item.toLowerCase() !== query.toLowerCase());
+            let history = getHistory().filter(item => item.toLowerCase() !== query.toLowerCase());
             history.unshift(query);
-            if (history.length > MAX_HISTORY) history.pop();
-            localStorage.setItem('searchHistory', JSON.stringify(history));
+            if (history.length > 10) history.pop();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
         }
 
-        // Axtarış icra edildikdə nəticəni daxili pəncərədə açır
-        function executeSearch(e) {
+        function handleSearch(e) {
             if (e) e.preventDefault();
             const query = searchInput.value.trim();
             if (!query) return;
 
-            saveToHistory(query);
+            saveHistory(query);
             suggestionsBox.style.display = 'none';
-            welcomeScreen.style.display = 'none';
+            splashScreen.style.display = 'none';
 
-            // Google Axtarışı Sizin Çərçivədə (Məxfilik rejimində) Yükləyir
-            // Nəticələr birbaşa daxili pəncərədə görünür, üst panel sizin loqonuz olaraq qalır
-            const searchUrl = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
-            resultsFrame.src = searchUrl;
+            // Nəticələr birbaşa çərçivəsiz yüklənir
+            const targetUrl = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
+            contentFrame.src = targetUrl;
         }
 
-        function resetSearch() {
-            welcomeScreen.style.display = 'flex';
-            resultsFrame.src = 'about:blank';
+        function resetToHome() {
+            splashScreen.style.display = 'flex';
+            contentFrame.src = 'about:blank';
             searchInput.value = '';
+            searchInput.focus();
         }
 
-        // Canlı Təkliflər (Autocomplete)
+        // Canlı Axtarış Təklifləri (Google API)
         searchInput.addEventListener('input', function() {
-            const query = this.value.trim();
-            if (query.length === 0) {
-                showHistory();
+            const val = this.value.trim();
+            if (!val) {
+                renderHistory();
                 return;
             }
 
             const script = document.createElement('script');
-            script.src = `https://suggestqueries.google.com/complete/search?client=chrome&q=${encodeURIComponent(query)}&callback=handleSuggestions`;
+            script.src = `https://suggestqueries.google.com/complete/search?client=chrome&q=${encodeURIComponent(val)}&callback=onSuggestionsFetch`;
             document.body.appendChild(script);
             document.body.removeChild(script);
         });
 
-        window.handleSuggestions = function(data) {
-            const results = data[1];
+        window.onSuggestionsFetch = function(data) {
+            const items = data[1];
             suggestionsBox.innerHTML = '';
 
-            if (results.length > 0) {
-                results.slice(0, 7).forEach(item => {
+            if (items && items.length > 0) {
+                items.slice(0, 6).forEach(text => {
                     const div = document.createElement('div');
                     div.className = 'suggestion-item';
-                    div.innerText = item;
-                    div.onclick = function() {
-                        searchInput.value = item;
-                        executeSearch();
+                    div.innerHTML = `🔍 <span>${text}</span>`;
+                    div.onclick = () => {
+                        searchInput.value = text;
+                        handleSearch();
                     };
                     suggestionsBox.appendChild(div);
                 });
@@ -280,18 +332,18 @@
             }
         };
 
-        function showHistory() {
+        function renderHistory() {
             const history = getHistory();
             suggestionsBox.innerHTML = '';
 
             if (history.length > 0) {
-                history.forEach(item => {
+                history.forEach(text => {
                     const div = document.createElement('div');
                     div.className = 'suggestion-item';
-                    div.innerText = '🕒 ' + item;
-                    div.onclick = function() {
-                        searchInput.value = item;
-                        executeSearch();
+                    div.innerHTML = `🕒 <span>${text}</span>`;
+                    div.onclick = () => {
+                        searchInput.value = text;
+                        handleSearch();
                     };
                     suggestionsBox.appendChild(div);
                 });
@@ -301,11 +353,11 @@
             }
         }
 
-        searchInput.addEventListener('focus', function() {
-            if (this.value.trim().length === 0) showHistory();
+        searchInput.addEventListener('focus', () => {
+            if (!searchInput.value.trim()) renderHistory();
         });
 
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', (e) => {
             if (!searchForm.contains(e.target) && !suggestionsBox.contains(e.target)) {
                 suggestionsBox.style.display = 'none';
             }
