@@ -110,6 +110,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            background-color: #fff;
         }
 
         .welcome-screen {
@@ -120,6 +121,7 @@
             height: 100%;
             text-align: center;
             padding: 20px;
+            background-color: #0f172a;
         }
 
         .welcome-screen h1 { color: #38bdf8; margin-bottom: 10px; }
@@ -148,7 +150,7 @@
             color: #e2e8f0;
         }
 
-        /* İframe Maskalama (Kvadrat Logonu Gizlətmək Üçün) */
+        /* Təmizlənmiş İframe Maskası */
         .iframe-wrapper {
             display: none;
             flex: 1;
@@ -160,8 +162,8 @@
 
         iframe {
             width: 100%;
-            height: calc(100% + 120px);
-            margin-top: -120px; /* Yuxarıdakı Bing logosunu kəsib gizlədir */
+            height: calc(100% + 145px);
+            margin-top: -145px; /* Yuxarıdakı bütün lazımsız çərçivələri kəsib təmizləyir */
             border: none;
             background-color: #fff;
         }
