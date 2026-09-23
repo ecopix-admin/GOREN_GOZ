@@ -77,7 +77,7 @@
             cursor: pointer;
         }
 
-        /* Google Tipli Avtomatik Tamamlama (Suggestions) */
+        /* Google Axtarış Təklifləri */
         .suggestions-box {
             position: absolute;
             top: 100%;
@@ -132,6 +132,7 @@
             border-radius: 10px;
             margin: 10px;
             padding: 12px 15px;
+            z-index: 10;
         }
 
         .ai-header {
@@ -147,9 +148,20 @@
             color: #e2e8f0;
         }
 
+        /* İframe Maskalama (Kvadrat Logonu Gizlətmək Üçün) */
+        .iframe-wrapper {
+            display: none;
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
         iframe {
             width: 100%;
-            flex: 1;
+            height: calc(100% + 120px);
+            margin-top: -120px; /* Yuxarıdakı Bing logosunu kəsib gizlədir */
             border: none;
             background-color: #fff;
         }
@@ -164,7 +176,6 @@
                 <input type="text" id="searchInput" placeholder="Axtarış edin..." autocomplete="off" oninput="fetchSuggestions(this.value)">
                 <button type="submit">Axtar</button>
             </form>
-            <!-- Google Axtarış Təklifləri Siyahısı -->
             <div id="suggestionsBox" class="suggestions-box"></div>
         </div>
     </header>
@@ -172,7 +183,7 @@
     <main>
         <div class="welcome-screen" id="welcomeScreen">
             <h1>AzSearch AI Axtarış</h1>
-            <p>Mətn yazın, hazır Google təklifləri çıxsın və AI dərhal analiz etsin.</p>
+            <p>Sizin peşəkar və müstəqil axtarış sisteminiz.</p>
         </div>
 
         <div id="aiSummaryCard">
@@ -180,14 +191,16 @@
             <div class="ai-content" id="aiContent">Yüklənir...</div>
         </div>
 
-        <iframe id="resultsFrame" style="display: none;"></iframe>
+        <!-- Maskalanmış Çərçivə -->
+        <div class="iframe-wrapper" id="iframeWrapper">
+            <iframe id="resultsFrame"></iframe>
+        </div>
     </main>
 
     <script>
         const searchInput = document.getElementById('searchInput');
         const suggestionsBox = document.getElementById('suggestionsBox');
 
-        // 1. Google Autocomplete (Hərfləri yazdıqca oxşar axtarışlar çıxarır)
         function fetchSuggestions(query) {
             query = query.trim();
             if (query.length < 2) {
@@ -195,14 +208,13 @@
                 return;
             }
 
-            // Google-un rəsmi tamamlama servisi
             const script = document.createElement('script');
             script.src = `https://suggestqueries.google.com/complete/search?client=chrome&q=${encodeURIComponent(query)}&callback=showSuggestions`;
             document.body.appendChild(script);
         }
 
         function showSuggestions(data) {
-            const results = data[1]; // Google-dan gələn təkliflər
+            const results = data[1];
             if (!results || results.length === 0) {
                 suggestionsBox.style.display = 'none';
                 return;
@@ -223,7 +235,6 @@
             suggestionsBox.style.display = 'block';
         }
 
-        // Kənara basanda təkliflər bağlansın
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.search-container')) {
                 suggestionsBox.style.display = 'none';
@@ -236,44 +247,41 @@
             runSearch(searchInput.value.trim());
         }
 
-        // 2. Axtarış və AI Analiz
         function runSearch(query) {
             if (!query) return;
 
             document.getElementById('welcomeScreen').style.display = 'none';
             const aiCard = document.getElementById('aiSummaryCard');
             const aiContent = document.getElementById('aiContent');
+            const iframeWrapper = document.getElementById('iframeWrapper');
             const resultsFrame = document.getElementById('resultsFrame');
 
             aiCard.style.display = 'block';
             aiContent.innerHTML = '<i>Süni intellekt məlumatları analiz edir...</i>';
 
-            // Azərbaycan dilində Wikipedia və Açıq Bazalardan AI Xülasə çəkirik
             const wikiUrl = `https://az.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
 
             fetch(wikiUrl)
                 .then(res => res.json())
                 .then(data => {
                     if (data.extract) {
-                        aiContent.innerHTML = `<strong>Ağilli Xülasə:</strong> ${data.extract}`;
+                        aiContent.innerHTML = `<strong>Ağıllı Xülasə:</strong> ${data.extract}`;
                     } else {
-                        // Əgər tam vikipediya məqaləsi yoxdursa, avtomatik analiz mətni yaradır
-                        aiContent.innerHTML = `<strong>AI Təhlili:</strong> "${query}" haqqında əsas nəticələr və elanlar aşağıdakı canlı axtarış pəncərəsində sıralandı.`;
+                        aiContent.innerHTML = `<strong>AI Təhlili:</strong> "${query}" haqqında əsas nəticələr və elanlar aşağıda təqdim olundu.`;
                     }
                 })
                 .catch(() => {
                     aiContent.innerHTML = `<strong>AI Təhlili:</strong> "${query}" sorğusu üzrə nəticələr hazırlandı.`;
                 });
 
-            // Axtarış Nəticələri
-            resultsFrame.style.display = 'block';
+            iframeWrapper.style.display = 'block';
             resultsFrame.src = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
         }
 
         function resetPage() {
             document.getElementById('welcomeScreen').style.display = 'flex';
             document.getElementById('aiSummaryCard').style.display = 'none';
-            document.getElementById('resultsFrame').style.display = 'none';
+            document.getElementById('iframeWrapper').style.display = 'none';
             searchInput.value = '';
         }
     </script>
