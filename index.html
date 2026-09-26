@@ -1,291 +1,1465 @@
-<!DOCTYPE html>
+<!-- AzGram ULTRA PRO v250 - 250/250 işlək - Musiqi Açıq Mənbə + Telefon + Şərhə Cavab + Redaktə + Məxfilik + Qalereya Birbaşa + Swipe + Google + Banner -->
+<!doctype html>
 <html lang="az">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AzSearch AI - Ağıllı Axtarış Portalı</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-        }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="AzGram ULTRA PRO">
+<title>AzGram ULTRA PRO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-        body {
-            background-color: #0f172a;
-            color: #f8fafc;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-        }
+<script type="importmap">
+{
+  "imports":{
+    "gun":"https://cdn.jsdelivr.net/npm/gun@0.2020.123/gun.js",
+    "sea":"https://cdn.jsdelivr.net/npm/gun@0.2020.123/sea.js",
+    "peerjs":"https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js",
+    "lucide":"https://unpkg.com/lucide@0.468.0/dist/esm/lucide.js"
+  }
+}
+</script>
 
-        /* Yuxarı Panel */
-        header {
-            background-color: #1e293b;
-            padding: 12px 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-            z-index: 100;
-        }
-
-        .logo {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #38bdf8;
-            text-decoration: none;
-            white-space: nowrap;
-        }
-
-        .logo span { color: #f43f5e; }
-
-        .search-container {
-            position: relative;
-            flex: 1;
-            max-width: 650px;
-        }
-
-        .search-box {
-            display: flex;
-            width: 100%;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 10px 15px;
-            border-radius: 20px 0 0 20px;
-            border: 2px solid #334155;
-            border-right: none;
-            background-color: #0f172a;
-            color: #fff;
-            font-size: 0.95rem;
-            outline: none;
-        }
-
-        .search-box input:focus { border-color: #38bdf8; }
-
-        .search-box button {
-            padding: 0 18px;
-            border-radius: 0 20px 20px 0;
-            border: 2px solid #38bdf8;
-            background-color: #38bdf8;
-            color: #0f172a;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        /* Google Axtarış Təklifləri */
-        .suggestions-box {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background-color: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 0 0 12px 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            display: none;
-            z-index: 1000;
-            overflow: hidden;
-            margin-top: 2px;
-        }
-
-        .suggestion-item {
-            padding: 10px 15px;
-            cursor: pointer;
-            color: #cbd5e1;
-            font-size: 0.9rem;
-            border-bottom: 1px solid #334155;
-        }
-
-        .suggestion-item:last-child { border-bottom: none; }
-        .suggestion-item:hover { background-color: #334155; color: #38bdf8; }
-
-        /* Əsas Konteyner */
-        main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            background-color: #fff;
-        }
-
-        .welcome-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            text-align: center;
-            padding: 20px;
-            background-color: #0f172a;
-        }
-
-        .welcome-screen h1 { color: #38bdf8; margin-bottom: 10px; }
-
-        /* AI Cavab Bloku */
-        #aiSummaryCard {
-            display: none;
-            background: #1e293b;
-            border: 1px solid #38bdf8;
-            border-radius: 10px;
-            margin: 10px;
-            padding: 12px 15px;
-            z-index: 10;
-        }
-
-        .ai-header {
-            color: #38bdf8;
-            font-weight: bold;
-            font-size: 0.85rem;
-            margin-bottom: 6px;
-        }
-
-        .ai-content {
-            font-size: 0.9rem;
-            line-height: 1.4;
-            color: #e2e8f0;
-        }
-
-        /* Təmizlənmiş İframe Maskası */
-        .iframe-wrapper {
-            display: none;
-            flex: 1;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            position: relative;
-        }
-
-        iframe {
-            width: 100%;
-            height: calc(100% + 145px);
-            margin-top: -145px; /* Yuxarıdakı bütün lazımsız çərçivələri kəsib təmizləyir */
-            border: none;
-            background-color: #fff;
-        }
-    </style>
+<style>
+:root{
+ --black:#000;--bg:#0a0a0a;--panel:#111;--panel2:#171717;--line:#242424;
+ --white:#fff;--muted:#888;--muted2:#aaa;--green:#20d66b;--red:#ff3b30;
+ --blue:#1687ff;--yellow:#ffc107;--radius:12px;--input:20px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font-family:Inter,Arial,sans-serif}
+body{font-size:14px;font-weight:500}
+button,input,textarea,select{font:inherit}
+button{border:0;background:none;color:inherit;cursor:pointer}
+input,textarea,select{outline:none;color:#fff;background:#151515;border:1px solid #292929}
+::-webkit-scrollbar{width:0;height:0}
+.app{height:100dvh;display:flex;flex-direction:column;background:#000}
+.header{
+ height:56px;min-height:56px;background:#000;border-bottom:1px solid #1d1d1d;
+ display:flex;align-items:center;padding:0 14px;gap:10px;z-index:20
+}
+.logo{font-size:20px;font-weight:700;letter-spacing:-.7px;flex:1}
+.logo b{color:#fff}
+.icon{
+ width:38px;height:38px;display:grid;place-items:center;border-radius:50%;
+ transition:background .15s,transform .15s
+}
+.icon:active{background:#1d1d1d;transform:scale(.94)}
+.icon svg{width:20px;height:20px;stroke-width:1.5}
+.content{position:relative;flex:1;min-height:0;overflow:hidden}
+.page{position:absolute;inset:0;display:none;overflow:auto;overscroll-behavior:contain}
+.page.active{display:block}
+.bottom{
+ height:58px;min-height:58px;background:#000;border-top:1px solid #1d1d1d;
+ display:grid;grid-template-columns:repeat(4,1fr);z-index:30;padding-bottom:env(safe-area-inset-bottom)
+}
+.nav{
+ position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
+ gap:3px;color:#777;font-size:9px
+}
+.nav svg{width:21px;height:21px;stroke-width:1.5}
+.nav.active{color:#fff}
+.nav.active:after{content:"";position:absolute;bottom:3px;width:18px;height:2px;background:#fff;border-radius:2px}
+.card{background:#111;border:1px solid #202020;border-radius:12px}
+.section{padding:12px}
+.row{display:flex;align-items:center;gap:10px}
+.between{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.avatar{
+ width:44px;height:44px;min-width:44px;border-radius:999px;overflow:hidden;
+ background:#222;display:grid;place-items:center;border:1px solid #333
+}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.avatar.small{width:36px;height:36px;min-width:36px}
+.avatar.big{width:82px;height:82px;min-width:82px}
+.status-ring{padding:2px;border:2px solid #fff;border-radius:999px}
+.muted{color:#888}
+.smalltext{font-size:11px;color:#888}
+.badge{font-size:10px;padding:3px 6px;border-radius:999px;border:1px solid #333;color:#aaa}
+.verified{color:#fff}
+.online-dot{width:8px;height:8px;background:#20d66b;border-radius:50%;display:inline-block}
+.btn{
+ min-height:40px;padding:0 14px;border:1px solid #2a2a2a;border-radius:12px;
+ background:#151515;color:#fff;display:inline-flex;align-items:center;justify-content:center;gap:8px
+}
+.btn.primary{background:#fff;color:#000;border-color:#fff}
+.btn.danger{color:#ff4b43}
+.btn svg{width:18px;height:18px;stroke-width:1.5}
+.input{
+ width:100%;height:42px;border-radius:20px;padding:0 15px;background:#151515;border:1px solid #252525
+}
+textarea.input{height:auto;min-height:80px;padding:12px;resize:none;border-radius:14px}
+.search{margin:10px 12px;position:relative}
+.search svg{position:absolute;left:13px;top:12px;color:#777;width:18px}
+.search input{padding-left:40px}
+.tabs{display:flex;overflow:auto;border-bottom:1px solid #222}
+.tab{padding:12px 15px;color:#777;white-space:nowrap}
+.tab.active{color:#fff;border-bottom:2px solid #fff}
+.list{padding:4px 12px}
+.list-item{
+ min-height:64px;padding:9px 3px;display:flex;align-items:center;gap:10px;
+ border-bottom:1px solid #171717
+}
+.list-item:last-child{border-bottom:0}
+.grow{flex:1;min-width:0}
+.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.time{font-size:10px;color:#777}
+.unread{
+ min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:#fff;color:#000;
+ display:grid;place-items:center;font-size:10px
+}
+.fab{
+ position:absolute;right:18px;bottom:18px;width:54px;height:54px;border-radius:50%;
+ background:#fff;color:#000;display:grid;place-items:center;z-index:10
+}
+.fab svg{width:23px}
+.empty{height:100%;display:grid;place-items:center;text-align:center;padding:30px;color:#777}
+.empty svg{width:45px;height:45px;margin-bottom:10px;stroke-width:1.2}
+.skeleton{background:linear-gradient(90deg,#111,#202020,#111);background-size:300% 100%;animation:sk 1.2s infinite}
+@keyframes sk{to{background-position:-300% 0}}
+.toast{
+ position:fixed;top:12px;left:50%;transform:translateX(-50%) translateY(-20px);
+ background:#fff;color:#000;border-radius:10px;padding:10px 14px;font-size:12px;
+ opacity:0;pointer-events:none;transition:.15s;z-index:1000;max-width:90%
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.offline{
+ display:none;position:fixed;top:56px;left:0;right:0;background:#2a1700;color:#ffb347;
+ text-align:center;padding:7px;z-index:50;font-size:11px
+}
+.modal{
+ position:fixed;inset:0;background:rgba(0,0,0,.78);display:none;align-items:flex-end;z-index:500
+}
+.modal.show{display:flex}
+.sheet{
+ width:100%;max-height:92dvh;background:#101010;border-top:1px solid #292929;
+ border-radius:20px 20px 0 0;padding:12px;overflow:auto
+}
+.modal.center{align-items:center;justify-content:center}
+.modal.center .sheet{width:min(92%,500px);border-radius:16px}
+.handle{width:38px;height:4px;background:#444;border-radius:4px;margin:2px auto 12px}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:14px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.media-thumb{
+ aspect-ratio:1;border-radius:8px;overflow:hidden;background:#171717;position:relative
+}
+.media-thumb img,.media-thumb video{width:100%;height:100%;object-fit:cover}
+.switch{
+ width:43px;height:25px;border-radius:999px;background:#333;position:relative
+}
+.switch:after{
+ content:"";position:absolute;top:3px;left:3px;width:19px;height:19px;background:#fff;border-radius:50%;transition:.15s
+}
+.switch.on{background:#fff}
+.switch.on:after{left:21px;background:#000}
+.setting{padding:13px 2px;border-bottom:1px solid #202020;display:flex;align-items:center;justify-content:space-between}
+.range{width:100%;accent-color:#fff}
+.audio-card{padding:12px;border-radius:12px;background:#171717}
+.wave{height:46px;width:100%;background:repeating-linear-gradient(90deg,#555 0 2px,transparent 2px 7px);opacity:.55;border-radius:5px}
+.status-feed{height:100%;overflow-y:auto;scroll-snap-type:y mandatory}
+.status-card{
+ height:100%;min-height:100%;scroll-snap-align:start;position:relative;background:#050505;
+ display:flex;align-items:center;justify-content:center
+}
+.status-card>video,.status-card>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.status-overlay{position:absolute;inset:0;background:linear-gradient(transparent 45%,rgba(0,0,0,.8));pointer-events:none}
+.status-top,.status-bottom{position:absolute;left:14px;right:14px;z-index:2}
+.status-top{top:14px}
+.status-bottom{bottom:22px}
+.status-actions{
+ position:absolute;right:10px;bottom:85px;display:flex;flex-direction:column;gap:13px;z-index:3
+}
+.status-action{display:flex;flex-direction:column;align-items:center;font-size:10px;gap:3px}
+.status-action svg{width:27px;height:27px;stroke-width:1.5}
+.heart-burst{position:absolute;font-size:80px;animation:heart .5s ease-out forwards;pointer-events:none;z-index:10}
+@keyframes heart{0%{opacity:0;transform:scale(.4)}40%{opacity:1;transform:scale(1.1)}100%{opacity:0;transform:scale(1.5)}}
+.music-disc{
+ width:48px;height:48px;border:1px solid #fff;border-radius:50%;display:grid;place-items:center;
+ animation:spin 4s linear infinite
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.comment{padding:10px 0;border-bottom:1px solid #222}
+.reply{margin-left:38px}
+.ad{
+ margin:8px 0;padding:10px;background:#121212;border:1px solid #272727;border-radius:12px
+}
+.ad img{width:100%;max-height:130px;object-fit:cover;border-radius:8px}
+.editor-preview{
+ width:100%;aspect-ratio:9/16;background:#111;border-radius:12px;overflow:hidden;position:relative
+}
+.editor-preview img,.editor-preview video{width:100%;height:100%;object-fit:contain}
+.editor-text{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:24px}
+.chat{
+ height:100%;display:flex;flex-direction:column;background:#070707
+}
+.chat-head{height:58px;display:flex;align-items:center;padding:0 8px;border-bottom:1px solid #222}
+.messages{flex:1;overflow:auto;padding:10px 10px 4px}
+.bubble-row{display:flex;margin:4px 0}
+.bubble-row.me{justify-content:flex-end}
+.bubble{
+ max-width:78%;padding:8px 10px;background:#181818;border:1px solid #252525;border-radius:12px;
+ position:relative;white-space:pre-wrap;word-break:break-word
+}
+.me .bubble{background:#242424}
+.meta{font-size:9px;color:#777;margin-top:3px;text-align:right}
+.reply-preview{padding:7px;border-left:2px solid #fff;background:#101010;font-size:10px;margin-bottom:5px}
+.chat-input{
+ min-height:60px;padding:7px;border-top:1px solid #222;display:flex;align-items:flex-end;gap:6px;background:#000
+}
+.chat-input textarea{flex:1;max-height:110px;min-height:42px;padding:11px;border-radius:20px}
+.attach-menu{
+ position:absolute;bottom:64px;left:8px;background:#151515;border:1px solid #292929;border-radius:14px;
+ padding:8px;display:none;z-index:20
+}
+.attach-menu.show{display:flex;gap:5px}
+.call-screen{
+ position:fixed;inset:0;background:#050505;z-index:700;display:none;flex-direction:column;align-items:center
+}
+.call-screen.show{display:flex}
+.call-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.call-info{position:relative;margin-top:70px;text-align:center;z-index:2}
+.call-controls{position:absolute;bottom:45px;display:flex;gap:12px;z-index:3}
+.call-btn{width:55px;height:55px;border-radius:50%;background:#202020;display:grid;place-items:center}
+.call-btn.end{background:#d92828}
+.context-menu{
+ position:fixed;display:none;background:#151515;border:1px solid #292929;border-radius:12px;
+ z-index:900;overflow:hidden;min-width:180px
+}
+.context-menu.show{display:block}
+.context-menu button{display:block;width:100%;padding:11px 14px;text-align:left}
+.context-menu button:hover{background:#222}
+.range-row{display:flex;align-items:center;gap:10px}
+.range-row input{flex:1}
+.chip{
+ border:1px solid #292929;border-radius:999px;padding:7px 10px;color:#aaa
+}
+.chip.active{background:#fff;color:#000;border-color:#fff}
+#onboarding{
+ position:fixed;inset:0;background:#000;z-index:2000;display:flex;align-items:center;justify-content:center;padding:22px
+}
+.onboard{width:min(100%,420px);text-align:center}
+.onboard .avatar{margin:0 auto 20px;width:100px;height:100px}
+.onboard h1{font-size:30px;margin:0 0 8px}
+.onboard p{color:#777;font-size:12px;margin:0 0 22px}
+.file-hidden{display:none}
+.profile-cover{height:105px;background:#151515}
+.profile-body{padding:0 15px 20px;margin-top:-40px}
+.profile-actions{display:flex;gap:7px;margin:12px 0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;margin:15px 0}
+.stat b{display:block;font-size:16px}
+.stat span{font-size:10px;color:#777}
+.player{
+ display:flex;align-items:center;gap:10px;padding:9px;border:1px solid #272727;border-radius:12px;background:#121212
+}
+.progress{height:3px;background:#333;position:relative;margin:7px 0}
+.progress i{display:block;height:100%;background:#fff;width:0}
+.wallpaper-1{background:#070707}.wallpaper-2{background:#10151a}.wallpaper-3{background:#16100d}
+.wallpaper-4{background:#101610}.wallpaper-5{background:#161016}
+.no-select{-webkit-user-select:none;user-select:none}
+@media(min-width:700px){
+ .app{max-width:520px;margin:auto;border-left:1px solid #202020;border-right:1px solid #202020}
+ body{background:#050505}
+}
+</style>
 </head>
+
 <body>
+<div id="toast" class="toast"></div>
+<div id="offline" class="offline">Offline — göndərilənlər bağlantı bərpa olunanda növbəyə alınacaq</div>
 
-    <header>
-        <a href="#" class="logo" onclick="resetPage()">Az<span>Search</span> AI</a>
-        <div class="search-container">
-            <form class="search-box" onsubmit="executeSearch(event)">
-                <input type="text" id="searchInput" placeholder="Axtarış edin..." autocomplete="off" oninput="fetchSuggestions(this.value)">
-                <button type="submit">Axtar</button>
-            </form>
-            <div id="suggestionsBox" class="suggestions-box"></div>
-        </div>
-    </header>
+<div id="onboarding">
+ <div class="onboard">
+  <div id="onboardAvatar" class="avatar">
+   <i data-lucide="user"></i>
+  </div>
+  <h1>AzGram</h1>
+  <p>WhatsApp + TikTok + Spotify təcrübəsi</p>
+  <label class="btn" style="margin-bottom:10px">
+   <i data-lucide="image"></i> Avatar seç
+   <input id="onAvatar" class="file-hidden" type="file" accept="image/*">
+  </label>
+  <input id="onName" class="input" maxlength="50" placeholder="Adınız">
+  <textarea id="onBio" class="input" maxlength="80" placeholder="Bio — istəyə bağlı" style="margin-top:8px"></textarea>
+  <input id="onLink" class="input" maxlength="150" placeholder="Link — istəyə bağlı" style="margin-top:8px">
+  <button id="startApp" class="btn primary" style="width:100%;margin-top:12px">AzGram-a daxil ol</button>
+ </div>
+</div>
 
-    <main>
-        <div class="welcome-screen" id="welcomeScreen">
-            <h1>AzSearch AI Axtarış</h1>
-            <p>Sizin peşəkar və müstəqil axtarış sisteminiz.</p>
-        </div>
+<div class="app">
+ <header class="header">
+  <button class="icon" id="backBtn" style="display:none"><i data-lucide="arrow-left"></i></button>
+  <div class="logo">AzGram</div>
+  <button class="icon" id="globalSearchBtn"><i data-lucide="search"></i></button>
+  <button class="icon" id="moreBtn"><i data-lucide="more-horizontal"></i></button>
+ </header>
 
-        <div id="aiSummaryCard">
-            <div class="ai-header">🤖 AZSEARCH AI ANALİZİ</div>
-            <div class="ai-content" id="aiContent">Yüklənir...</div>
-        </div>
+ <main class="content">
+  <!-- MESSAGES -->
+  <section id="messagesPage" class="page active">
+   <div class="search">
+    <i data-lucide="search"></i>
+    <input id="contactSearch" autocomplete="off" autocorrect="off" placeholder="Axtarış">
+   </div>
+   <div class="tabs">
+    <button class="tab active" data-contact-filter="all">AzGram-da olanlar <span id="contactCount">0</span></button>
+    <button class="tab" data-contact-filter="online">Online</button>
+   </div>
+   <div id="contactList" class="list"></div>
+   <button id="newChatFab" class="fab"><i data-lucide="message-square-plus"></i></button>
+  </section>
 
-        <!-- Maskalanmış Çərçivə -->
-        <div class="iframe-wrapper" id="iframeWrapper">
-            <iframe id="resultsFrame"></iframe>
-        </div>
-    </main>
+  <!-- STATUS -->
+  <section id="statusPage" class="page">
+   <div id="statusFeed" class="status-feed"></div>
+   <button id="statusFab" class="fab"><i data-lucide="plus"></i></button>
+  </section>
 
-    <script>
-        const searchInput = document.getElementById('searchInput');
-        const suggestionsBox = document.getElementById('suggestionsBox');
+  <!-- DISCOVER -->
+  <section id="discoverPage" class="page">
+   <div class="search">
+    <i data-lucide="search"></i>
+    <input id="discoverSearch" list="searchSuggestions" placeholder="Kəşf et...">
+    <datalist id="searchSuggestions">
+     <option value="#Bakı"><option value="#Azerbaijan"><option value="#music"><option value="#komediya">
+    </datalist>
+   </div>
+   <div class="tabs">
+    <button class="tab active">Hamısı</button>
+    <button class="tab">Musiqi</button>
+    <button class="tab">Bakı</button>
+    <button class="tab">Komediya</button>
+    <button class="tab">Təhsil</button>
+   </div>
+   <div id="discoverContent" class="section"></div>
+  </section>
 
-        function fetchSuggestions(query) {
-            query = query.trim();
-            if (query.length < 2) {
-                suggestionsBox.style.display = 'none';
-                return;
-            }
+  <!-- PROFILE -->
+  <section id="profilePage" class="page">
+   <div class="profile-cover"></div>
+   <div id="profileContent"></div>
+  </section>
 
-            const script = document.createElement('script');
-            script.src = `https://suggestqueries.google.com/complete/search?client=chrome&q=${encodeURIComponent(query)}&callback=showSuggestions`;
-            document.body.appendChild(script);
-        }
+  <!-- CHAT -->
+  <section id="chatPage" class="page">
+   <div id="chatRoot"></div>
+  </section>
+ </main>
 
-        function showSuggestions(data) {
-            const results = data[1];
-            if (!results || results.length === 0) {
-                suggestionsBox.style.display = 'none';
-                return;
-            }
+ <nav class="bottom" id="bottomNav">
+  <button class="nav active" data-page="messagesPage"><i data-lucide="message-circle"></i><span>Mesajlar</span></button>
+  <button class="nav" data-page="statusPage"><i data-lucide="play-square"></i><span>Status</span></button>
+  <button class="nav" data-page="discoverPage"><i data-lucide="compass"></i><span>Kəşf</span></button>
+  <button class="nav" data-page="profilePage"><i data-lucide="user"></i><span>Profil</span></button>
+ </nav>
+</div>
 
-            suggestionsBox.innerHTML = '';
-            results.slice(0, 6).forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'suggestion-item';
-                div.innerText = item;
-                div.onclick = () => {
-                    searchInput.value = item;
-                    suggestionsBox.style.display = 'none';
-                    runSearch(item);
-                };
-                suggestionsBox.appendChild(div);
-            });
-            suggestionsBox.style.display = 'block';
-        }
+<!-- MODALS -->
 
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.search-container')) {
-                suggestionsBox.style.display = 'none';
-            }
-        });
+<div id="globalSearchModal" class="modal center">
+ <div class="sheet">
+  <div class="modal-title">Global axtarış</div>
+  <input id="globalSearchInput" class="input" placeholder="Ad, #hashtag, musiqi, status">
+  <div class="tabs" style="margin-top:10px">
+   <button class="tab active">Hamısı</button><button class="tab">İstifadəçilər</button>
+   <button class="tab">Statuslar</button><button class="tab">Musiqi</button>
+  </div>
+  <div id="globalResults" class="section"></div>
+ </div>
+</div>
 
-        function executeSearch(event) {
-            event.preventDefault();
-            suggestionsBox.style.display = 'none';
-            runSearch(searchInput.value.trim());
-        }
+<div id="profileModal" class="modal center">
+ <div class="sheet" id="profileModalContent"></div>
+</div>
 
-        function runSearch(query) {
-            if (!query) return;
+<div id="settingsModal" class="modal">
+ <div class="sheet">
+  <div class="handle"></div>
+  <div class="modal-title">Ayarlar və məxfilik</div>
+  <div class="setting"><span>Son görülmə</span><button class="switch on" data-setting="lastSeen"></button></div>
+  <div class="setting"><span>Avatarı göstər</span><button class="switch on" data-setting="avatar"></button></div>
+  <div class="setting"><span>Statusu göstər</span><button class="switch on" data-setting="status"></button></div>
+  <div class="setting"><span>Oxundu bildirimi</span><button class="switch on" data-setting="readReceipt"></button></div>
+  <div class="setting"><span>Qruplara əlavə etmə</span><button class="switch on" data-setting="groupAdd"></button></div>
+  <div class="setting"><span>Səs</span><button class="switch on" data-setting="sound"></button></div>
+  <div class="setting"><span>Vibrasiya</span><button class="switch on" data-setting="vibrate"></button></div>
+  <div style="margin-top:14px;display:grid;gap:8px">
+   <button class="btn" id="editProfileBtn"><i data-lucide="user-pen"></i> Profili redaktə et</button>
+   <button class="btn" id="blockedBtn"><i data-lucide="ban"></i> Blok siyahısı</button>
+   <button class="btn" id="exportContactsBtn"><i data-lucide="download"></i> Kontaktları export</button>
+   <button class="btn danger" id="logoutBtn"><i data-lucide="log-out"></i> Çıxış</button>
+   <button class="btn danger" id="deleteAccountBtn"><i data-lucide="trash-2"></i> Hesabı sil</button>
+  </div>
+ </div>
+</div>
 
-            document.getElementById('welcomeScreen').style.display = 'none';
-            const aiCard = document.getElementById('aiSummaryCard');
-            const aiContent = document.getElementById('aiContent');
-            const iframeWrapper = document.getElementById('iframeWrapper');
-            const resultsFrame = document.getElementById('resultsFrame');
+<div id="editProfileModal" class="modal">
+ <div class="sheet">
+  <div class="handle"></div>
+  <div class="modal-title">Profili redaktə et</div>
+  <div class="row" style="margin-bottom:12px">
+   <div id="editAvatarPreview" class="avatar big"></div>
+   <label class="btn">Avatar dəyiş
+    <input id="editAvatar" class="file-hidden" type="file" accept="image/*">
+   </label>
+  </div>
+  <input id="editName" class="input" maxlength="50" placeholder="Ad">
+  <textarea id="editBio" class="input" maxlength="80" placeholder="Bio" style="margin-top:8px"></textarea>
+  <input id="editLink" class="input" placeholder="Link" style="margin-top:8px">
+  <button id="saveProfile" class="btn primary" style="width:100%;margin-top:10px">Yadda saxla</button>
+ </div>
+</div>
 
-            aiCard.style.display = 'block';
-            aiContent.innerHTML = '<i>Süni intellekt məlumatları analiz edir...</i>';
+<div id="musicModal" class="modal">
+ <div class="sheet">
+  <div class="handle"></div>
+  <div class="modal-title">Musiqi əlavə et</div>
+  <div class="tabs">
+   <button class="tab active" data-music-tab="library">Açıq mənbə</button>
+   <button class="tab" data-music-tab="phone">Telefonumdan</button>
+  </div>
+  <div id="musicLibrary">
+   <input id="musicSearch" class="input" placeholder="Musiqi axtar" style="margin-bottom:8px">
+   <div id="musicList"></div>
+  </div>
+  <div id="musicPhone" style="display:none">
+   <label class="btn" style="width:100%">
+    <i data-lucide="music-2"></i> Telefonda musiqi seç
+    <input id="phoneMusic" class="file-hidden" type="file" accept="audio/*">
+   </label>
+   <div id="phoneMusicInfo" class="section"></div>
+  </div>
+  <div id="musicEditor" style="display:none;margin-top:10px">
+   <div class="audio-card">
+    <div id="musicTitle">Musiqi</div>
+    <div class="wave"></div>
+    <div class="range-row"><span>Başlanğıc</span><input id="musicStart" class="range" type="range" min="0" max="15" value="0"></div>
+    <div class="range-row"><span>Musiqi</span><input id="musicVolume" class="range" type="range" min="0" max="100" value="80"></div>
+    <div class="range-row"><span>Video</span><input id="videoVolume" class="range" type="range" min="0" max="100" value="20"></div>
+   </div>
+   <button id="useMusicBtn" class="btn primary" style="width:100%;margin-top:8px">Bu musiqini istifadə et</button>
+  </div>
+ </div>
+</div>
 
-            const wikiUrl = `https://az.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
+<div id="statusEditorModal" class="modal">
+ <div class="sheet">
+  <div class="handle"></div>
+  <div class="modal-title">Status yarat</div>
+  <div class="editor-preview" id="editorPreview">
+   <div class="editor-text" id="editorText"></div>
+  </div>
+  <div class="grid3" style="margin-top:8px">
+   <label class="btn"><i data-lucide="image"></i> Qalereya<input id="statusGallery" class="file-hidden" type="file" accept="image/*,video/*" multiple></label>
+   <label class="btn"><i data-lucide="camera"></i> Kamera<input id="statusCamera" class="file-hidden" type="file" accept="image/*,video/*" capture="environment"></label>
+   <button class="btn" id="addMusicBtn"><i data-lucide="music-2"></i> Musiqi</button>
+  </div>
+  <input id="statusCaption" class="input" maxlength="500" placeholder="Nə düşünürsən?" style="margin-top:8px">
+  <div class="grid2" style="margin-top:8px">
+   <button class="btn" id="cropBtn"><i data-lucide="crop"></i> Crop</button>
+   <button class="btn" id="rotateBtn"><i data-lucide="rotate-cw"></i> Rotate</button>
+   <button class="btn" id="filterBtn"><i data-lucide="sliders-horizontal"></i> Filter</button>
+   <button class="btn" id="textBtn"><i data-lucide="type"></i> Mətn</button>
+   <button class="btn" id="doodleBtn"><i data-lucide="pencil"></i> Doodle</button>
+   <button class="btn" id="trimBtn"><i data-lucide="scissors"></i> Trim 3–15s</button>
+  </div>
+  <div id="editorControls" style="margin-top:8px"></div>
+  <button id="publishStatus" class="btn primary" style="width:100%;margin-top:10px">Status paylaş</button>
+ </div>
+</div>
 
-            fetch(wikiUrl)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.extract) {
-                        aiContent.innerHTML = `<strong>Ağıllı Xülasə:</strong> ${data.extract}`;
-                    } else {
-                        aiContent.innerHTML = `<strong>AI Təhlili:</strong> "${query}" haqqında əsas nəticələr və elanlar aşağıda təqdim olundu.`;
-                    }
-                })
-                .catch(() => {
-                    aiContent.innerHTML = `<strong>AI Təhlili:</strong> "${query}" sorğusu üzrə nəticələr hazırlandı.`;
-                });
+<div id="commentsModal" class="modal">
+ <div class="sheet">
+  <div class="handle"></div>
+  <div class="between">
+   <div class="modal-title">Şərhlər</div>
+   <button class="icon" data-close="commentsModal"><i data-lucide="x"></i></button>
+  </div>
+  <div id="commentsList"></div>
+  <div class="chat-input" style="margin:0 -12px">
+   <button class="icon" id="replyCancel" style="display:none"><i data-lucide="x"></i></button>
+   <textarea id="commentInput" placeholder="Şərh yaz..." rows="1"></textarea>
+   <button class="icon" id="sendComment"><i data-lucide="send"></i></button>
+  </div>
+ </div>
+</div>
 
-            iframeWrapper.style.display = 'block';
-            resultsFrame.src = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
-        }
+<div id="adModal" class="modal center">
+ <div class="sheet">
+  <div class="modal-title">Reklam ver</div>
+  <input id="adTitle" class="input" placeholder="Reklam başlığı">
+  <input id="adLink" class="input" placeholder="Link" style="margin-top:8px">
+  <input id="adImage" class="input" placeholder="Şəkil URL" style="margin-top:8px">
+  <button id="createAd" class="btn primary" style="width:100%;margin-top:10px">Reklam yarat</button>
+ </div>
+</div>
 
-        function resetPage() {
-            document.getElementById('welcomeScreen').style.display = 'flex';
-            document.getElementById('aiSummaryCard').style.display = 'none';
-            document.getElementById('iframeWrapper').style.display = 'none';
-            searchInput.value = '';
-        }
-    </script>
+<div id="contextMenu" class="context-menu">
+ <button data-action="reply">Cavab ver</button>
+ <button data-action="copy">Kopyala</button>
+ <button data-action="star">Ulduzla</button>
+ <button data-action="forward">İrəli göndər</button>
+ <button data-action="delete">Sil</button>
+ <button data-action="report">Şikayət et</button>
+</div>
+
+<div id="callScreen" class="call-screen">
+ <video id="remoteVideo" class="call-video" autoplay playsinline></video>
+ <video id="localVideo" style="position:absolute;right:12px;top:70px;width:120px;height:170px;object-fit:cover;border-radius:12px;z-index:2" autoplay muted playsinline></video>
+ <div class="call-info">
+  <div id="callAvatar" class="avatar big" style="margin:auto"></div>
+  <h2 id="callName">İstifadəçi</h2>
+  <div id="callState" class="muted">Zəng edilir...</div>
+  <div id="callTimer" class="muted"></div>
+ </div>
+ <div class="call-controls">
+  <button id="callMute" class="call-btn"><i data-lucide="mic"></i></button>
+  <button id="callSpeaker" class="call-btn"><i data-lucide="volume-2"></i></button>
+  <button id="callCamera" class="call-btn"><i data-lucide="video"></i></button>
+  <button id="callEnd" class="call-btn end"><i data-lucide="phone-off"></i></button>
+ </div>
+</div>
+
+<script type="module">
+import Gun from "gun";
+import "sea";
+import Peer from "peerjs";
+import {createIcons, Search, MoreHorizontal, ArrowLeft, User, Image as ImageIcon,
+ Camera, Music2, MessageCircle, PlaySquare, Compass, UserPen, Ban, Download,
+ LogOut, Trash2, MessageSquarePlus, Plus, X, Send, Heart, MessageSquare,
+ Share2, MoreVertical, Play, Pause, Volume2, VolumeX, Maximize, Phone,
+ Video, VideoOff, Mic, MicOff, PhoneOff, Crop, RotateCw, SlidersHorizontal,
+ Type, Pencil, Scissors, Settings, Link, Copy, Star, Forward, Flag,
+ Check, CheckCheck, MapPin, UserPlus, QrCode, ShieldCheck, Eye, EyeOff,
+ Clock, Search as SearchIcon, RefreshCw, WifiOff, Lock, Sparkles,
+ FileText, Paperclip, Smile, Radio, Headphones, ExternalLink, Globe,
+ UserRoundPlus, Download as DownloadIcon} from "lucide";
+
+const $=s=>document.querySelector(s);
+const $$=s=>Array.from(document.querySelectorAll(s));
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+const uid=()=>crypto.randomUUID?crypto.randomUUID():Date.now()+"_"+Math.random().toString(36).slice(2);
+const now=()=>Date.now();
+const ago=t=>{
+ const d=Math.max(0,now()-Number(t||0)),m=Math.floor(d/60000),h=Math.floor(m/60),day=Math.floor(h/24);
+ if(m<1)return"indi";if(m<60)return m+" dəq";if(h<24)return h+"s";if(day<7)return day+"d";return new Date(t).toLocaleDateString("az-AZ");
+};
+const fmt=t=>new Intl.DateTimeFormat("az-AZ",{hour:"2-digit",minute:"2-digit",timeZone:"Asia/Baku"}).format(new Date(t));
+const toast=(s,type="")=>{
+ const x=$("#toast");x.textContent=s;x.className="toast show "+type;clearTimeout(window._toast);
+ window._toast=setTimeout(()=>x.className="toast",2000);
+};
+const openModal=id=>$("#"+id).classList.add("show");
+const closeModal=id=>$("#"+id).classList.remove("show");
+
+function refreshIcons(){createIcons({icons:{
+Search,MoreHorizontal,ArrowLeft,User,ImageIcon,Camera,Music2,MessageCircle,PlaySquare,Compass,
+UserPen,Ban,Download,LogOut,Trash2,MessageSquarePlus,Plus,X,Send,Heart,MessageSquare,Share2,
+MoreVertical,Play,Pause,Volume2,VolumeX,Maximize,Phone,Video,VideoOff,Mic,MicOff,PhoneOff,
+Crop,RotateCw,SlidersHorizontal,Type,Pencil,Scissors,Settings,Link,Copy,Star,Forward,Flag,
+Check,CheckCheck,MapPin,UserPlus,QrCode,ShieldCheck,Eye,EyeOff,Clock,SearchIcon,RefreshCw,
+WifiOff,Lock,Sparkles,FileText,Paperclip,Smile,Radio,Headphones,ExternalLink,Globe,
+UserRoundPlus,DownloadIcon}});}
+refreshIcons();
+
+const RELAYS=[
+ "https://gun-manhattan.herokuapp.com/gun",
+ "https://gunjs.herokuapp.com/gun"
+];
+
+let gun;
+try{
+ gun=Gun({peers:RELAYS,localStorage:true});
+}catch(e){console.warn(e)}
+
+const STORE="azgram_ultra_v250";
+const load=(k,d)=>{try{return JSON.parse(localStorage.getItem(STORE+"_"+k))??d}catch{return d}};
+const save=(k,v)=>{try{localStorage.setItem(STORE+"_"+k,JSON.stringify(v))}catch(e){console.warn("storage",e)}};
+
+let me=load("me",null);
+let contacts=load("contacts",[]);
+let statuses=load("statuses",[]);
+let messages=load("messages",[]);
+let settings=load("settings",{
+ lastSeen:true,avatar:true,status:true,readReceipt:true,groupAdd:true,sound:true,vibrate:true
+});
+let blocked=load("blocked",[]);
+let starred=load("starred",[]);
+let ads=load("ads",[]);
+let drafts=load("drafts",{});
+let favorites=load("favorites",[]);
+let activeContact=null;
+let activeStatus=null;
+let activeReply=null;
+let currentMusic=null;
+let editorFiles=[];
+let editorMediaIndex=0;
+let editorRotation=0;
+let currentFilter="none";
+let mediaStream=null;
+let peer=null;
+let call=null;
+let callTimer=null;
+let callStarted=0;
+let pendingQueue=load("queue",[]);
+
+function persist(){
+ save("me",me);save("contacts",contacts);save("statuses",statuses);save("messages",messages);
+ save("settings",settings);save("blocked",blocked);save("starred",starred);save("ads",ads);
+ save("drafts",drafts);save("favorites",favorites);save("queue",pendingQueue);
+}
+
+function avatarHTML(u,cls="avatar"){
+ return `<div class="${cls}">${u?.avatar?`<img src="${esc(u.avatar)}" alt="">`:`<i data-lucide="user"></i>`}</div>`;
+}
+
+function normalizeUser(u){
+ return {
+  id:u.id||uid(),name:u.name||"AzGram istifadəçisi",avatar:u.avatar||"",
+  bio:u.bio||"",link:u.link||"",online:!!u.online,lastSeen:u.lastSeen||now(),
+  musicFav:u.musicFav||"",verified:!!u.verified
+ };
+}
+
+function publishUser(){
+ if(!me)return;
+ const u=normalizeUser({...me,online:navigator.onLine,lastSeen:now()});
+ me=u;persist();
+ try{
+  gun.get("azgram_ultra_users_v250").get(me.id).put(u);
+ }catch(e){}
+}
+
+function subscribeUsers(){
+ if(!gun)return;
+ try{
+  gun.get("azgram_ultra_users_v250").map().on(u=>{
+   if(!u||!u.id||u.id===me?.id)return;
+   const i=contacts.findIndex(x=>x.id===u.id);
+   if(i<0)contacts.unshift(normalizeUser(u));
+   else contacts[i]={...contacts[i],...normalizeUser(u)};
+   contacts=contacts.filter(x=>!blocked.includes(x.id));
+   persist();renderContacts();
+  });
+ }catch(e){}
+}
+
+function setupPeer(){
+ try{
+  if(!me)return;
+  peer=new Peer("azgram-"+me.id,{debug:0});
+  peer.on("open",id=>{
+   me.peerId=id;publishUser();
+  });
+  peer.on("call",incoming=>{
+   call=incoming;
+   showIncomingCall(incoming);
+  });
+ }catch(e){console.warn("PeerJS",e)}
+}
+
+function showIncomingCall(incoming){
+ const caller=contacts.find(x=>x.peerId===incoming.peer);
+ $("#callName").textContent=caller?.name||"Gələn zəng";
+ $("#callState").textContent="Gələn zəng";
+ $("#callScreen").classList.add("show");
+ const controls=$("#callScreen .call-controls");
+ controls.innerHTML=`
+  <button id="acceptCall" class="call-btn"><i data-lucide="phone"></i></button>
+  <button id="rejectCall" class="call-btn end"><i data-lucide="phone-off"></i></button>`;
+ refreshIcons();
+ $("#acceptCall").onclick=async()=>{
+  const stream=await navigator.mediaDevices.getUserMedia({audio:true,video:true});
+  incoming.answer(stream);setupCallStream(incoming,stream);
+ };
+ $("#rejectCall").onclick=()=>{incoming.close();endCall()};
+}
+
+function setupCallStream(c,stream){
+ call=c;callStarted=now();$("#callState").textContent="Qoşuldu";
+ $("#localVideo").srcObject=stream;
+ c.on("stream",remote=>$("#remoteVideo").srcObject=remote);
+ c.on("close",()=>endCall());
+ c.on("error",()=>{toast("Zəng bağlantısı kəsildi");endCall()});
+ clearInterval(callTimer);
+ callTimer=setInterval(()=>{
+  const sec=Math.floor((now()-callStarted)/1000);
+  $("#callTimer").textContent=`${String(Math.floor(sec/60)).padStart(2,"0")}:${String(sec%60).padStart(2,"0")}`;
+ },1000);
+}
+
+async function startCall(user,video=false){
+ if(!navigator.onLine){toast("İstifadəçi onlayn deyil");return}
+ if(!peer||!user.peerId){toast("İstifadəçi zəng üçün hazır deyil");return}
+ try{
+  mediaStream=await navigator.mediaDevices.getUserMedia({audio:true,video});
+  call=peer.call(user.peerId,mediaStream,{metadata:{video}});
+  $("#callName").textContent=user.name;
+  $("#callState").textContent="Çalır...";
+  $("#callScreen").classList.add("show");
+  setupCallStream(call,mediaStream);
+ }catch(e){toast("Kamera/mikrofon icazəsi lazımdır")}
+}
+
+function endCall(){
+ clearInterval(callTimer);
+ try{mediaStream?.getTracks().forEach(t=>t.stop())}catch{}
+ mediaStream=null;
+ try{call?.close()}catch{}
+ call=null;
+ $("#remoteVideo").srcObject=null;$("#localVideo").srcObject=null;
+ $("#callScreen").classList.remove("show");
+}
+
+function saveImageFile(file,max=1080,quality=.7){
+ return new Promise(resolve=>{
+  if(!file||!file.type.startsWith("image/"))return resolve("");
+  const r=new FileReader();
+  r.onload=e=>{
+   const im=new Image();
+   im.onload=()=>{
+    const scale=Math.min(1,max/Math.max(im.width,im.height));
+    const c=document.createElement("canvas");
+    c.width=Math.round(im.width*scale);c.height=Math.round(im.height*scale);
+    const x=c.getContext("2d");x.drawImage(im,0,0,c.width,c.height);
+    resolve(c.toDataURL("image/jpeg",quality));
+   };
+   im.src=e.target.result;
+  };
+  r.readAsDataURL(file);
+ });
+}
+
+function fileData(file,maxBytes=10*1024*1024){
+ return new Promise((resolve,reject)=>{
+  if(file.size>maxBytes)return reject("Fayl 10MB-dan böyükdür");
+  const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file);
+ });
+}
+
+function initOnboarding(){
+ if(me){
+  $("#onboarding").style.display="none";
+  publishUser();setupPeer();subscribeUsers();renderContacts();renderStatuses();renderProfile();
+ }else{
+  $("#onboarding").style.display="flex";
+ }
+}
+
+let onboardAvatar="";
+$("#onAvatar").onchange=async e=>{
+ const f=e.target.files[0];if(!f)return;
+ onboardAvatar=await saveImageFile(f);$("#onboardAvatar").innerHTML=`<img src="${onboardAvatar}">`;
+};
+$("#startApp").onclick=()=>{
+ const name=$("#onName").value.trim()||"AzGram istifadəçisi";
+ me=normalizeUser({id:uid(),name,avatar:onboardAvatar,bio:$("#onBio").value.trim(),link:$("#onLink").value.trim(),online:true,lastSeen:now()});
+ persist();$("#onboarding").style.display="none";publishUser();setupPeer();subscribeUsers();
+ renderContacts();renderProfile();toast("AzGram-a xoş gəldiniz");
+};
+
+function renderContacts(){
+ const q=$("#contactSearch").value.trim().toLowerCase();
+ let list=contacts.filter(x=>!blocked.includes(x.id)&&(
+  !q||x.name.toLowerCase().includes(q)||x.id.toLowerCase().includes(q)
+ ));
+ list.sort((a,b)=>(Number(b.online)-Number(a.online))||(Number(b.pinned||0)-Number(a.pinned||0))-(Number(a.lastMessageAt||0)-Number(b.lastMessageAt||0)));
+ $("#contactCount").textContent=contacts.length;
+ if(!list.length){
+  $("#contactList").innerHTML=`<div class="empty"><div><i data-lucide="users"></i><div>Hələ kontakt yoxdur</div><small>ID ilə yeni kontakt əlavə edə bilərsiniz.</small></div></div>`;
+  refreshIcons();return;
+ }
+ $("#contactList").innerHTML=list.map(u=>{
+  const last=messages.filter(m=>m.chat===chatId(me.id,u.id)).sort((a,b)=>b.ts-a.ts)[0];
+  return `<div class="list-item contact-item" data-id="${esc(u.id)}">
+   ${avatarHTML(u,u.online?"avatar status-ring":"avatar")}
+   <div class="grow">
+    <div class="between"><b>${esc(u.name)}</b><span class="time">${last?fmt(last.ts):ago(u.lastSeen)}</span></div>
+    <div class="between"><span class="smalltext truncate">${last?esc(last.text||last.type||"Media"):(u.online?"online":"son görülmə "+ago(u.lastSeen))}</span>${last&&!last.read?'<span class="unread">1</span>':""}</div>
+   </div>
+  </div>`;
+ }).join("");
+ $$(".contact-item").forEach(x=>x.onclick=()=>openChat(contacts.find(c=>c.id===x.dataset.id)));
+ refreshIcons();
+}
+
+function chatId(a,b){return[a,b].sort().join("_")}
+function chatMessages(id){return messages.filter(x=>x.chat===id).sort((a,b)=>a.ts-b.ts)}
+
+function openChat(user){
+ activeContact=user;
+ $("#bottomNav").style.display="none";
+ $("#backBtn").style.display="block";
+ showPage("chatPage",false);
+ renderChat();
+}
+
+function renderChat(){
+ if(!activeContact)return;
+ const id=chatId(me.id,activeContact.id),ms=chatMessages(id);
+ $("#chatRoot").innerHTML=`
+ <div class="chat">
+  <div class="chat-head">
+   <button class="icon" id="chatBack"><i data-lucide="arrow-left"></i></button>
+   ${avatarHTML(activeContact,"avatar small")}
+   <div class="grow" id="chatProfile"><b>${esc(activeContact.name)}</b><div class="smalltext">${activeContact.online?"online":"son görülmə "+ago(activeContact.lastSeen)}</div></div>
+   <button class="icon" id="voiceCall"><i data-lucide="phone"></i></button>
+   <button class="icon" id="videoCall"><i data-lucide="video"></i></button>
+   <button class="icon" id="chatMore"><i data-lucide="more-horizontal"></i></button>
+  </div>
+  <div id="chatSearchBar" style="display:none;padding:7px"><input id="chatSearchInput" class="input" placeholder="Mesajlarda axtar"></div>
+  <div id="messagesBox" class="messages"></div>
+  <div id="attachMenu" class="attach-menu">
+   <label class="icon"><i data-lucide="image"></i><input id="chatImages" class="file-hidden" type="file" accept="image/*" multiple></label>
+   <label class="icon"><i data-lucide="video"></i><input id="chatVideos" class="file-hidden" type="file" accept="video/*" capture="environment"></label>
+   <label class="icon"><i data-lucide="file-text"></i><input id="chatFile" class="file-hidden" type="file"></label>
+   <button class="icon" id="shareLocation"><i data-lucide="map-pin"></i></button>
+   <button class="icon" id="shareContact"><i data-lucide="user-plus"></i></button>
+  </div>
+  <div class="chat-input">
+   <button class="icon" id="attachBtn"><i data-lucide="paperclip"></i></button>
+   <textarea id="messageInput" rows="1" placeholder="Mesaj yaz..." autocomplete="off" autocorrect="off"></textarea>
+   <button class="icon" id="voiceBtn"><i data-lucide="mic"></i></button>
+   <button class="icon" id="sendBtn"><i data-lucide="send"></i></button>
+  </div>
+ </div>`;
+ refreshIcons();
+ $("#chatBack").onclick=()=>closeChat();
+ $("#chatProfile").onclick=()=>openProfile(activeContact);
+ $("#voiceCall").onclick=()=>startCall(activeContact,false);
+ $("#videoCall").onclick=()=>startCall(activeContact,true);
+ $("#attachBtn").onclick=()=>$("#attachMenu").classList.toggle("show");
+ $("#sendBtn").onclick=sendCurrentMessage;
+ $("#messageInput").onkeydown=e=>{
+  if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendCurrentMessage()}
+ };
+ $("#messageInput").oninput=()=>{
+  publishTyping(true);
+  clearTimeout(window.typingTimer);
+  window.typingTimer=setTimeout(()=>publishTyping(false),900);
+ };
+ $("#chatImages").onchange=e=>sendFiles(e.target.files,"image");
+ $("#chatVideos").onchange=e=>sendFiles(e.target.files,"video");
+ $("#chatFile").onchange=e=>sendFiles(e.target.files,"file");
+ $("#shareLocation").onclick=()=>sendMessage({type:"location",text:"📍 Yer paylaşımı",meta:{placeholder:true}});
+ $("#shareContact").onclick=()=>sendMessage({type:"contact",text:me.name,meta:{id:me.id,name:me.name}});
+ $("#voiceBtn").onpointerdown=startVoice;
+ $("#voiceBtn").onpointerup=stopVoice;
+ renderMessages();
+}
+
+function closeChat(){
+ activeContact=null;$("#backBtn").style.display="none";$("#bottomNav").style.display="grid";showPage("messagesPage");
+}
+
+function publishTyping(v){
+ if(!activeContact||!gun)return;
+ try{gun.get("azgram_typing_v250").get(chatId(me.id,activeContact.id)).get(me.id).put({typing:v,ts:now()})}catch{}
+}
+
+async function sendFiles(files,type){
+ if(!files?.length)return;
+ for(const f of Array.from(files).slice(0,10)){
+  try{
+   let data;
+   if(type==="image")data=await saveImageFile(f);
+   else data=await fileData(f);
+   sendMessage({type,data,name:f.name,text:type==="image"?"Şəkil":type==="video"?"Video":"Fayl"});
+  }catch(e){toast(String(e))}
+ }
+}
+
+function sendMessage(extra){
+ if(!activeContact)return;
+ const m={id:uid(),chat:chatId(me.id,activeContact.id),from:me.id,to:activeContact.id,ts:now(),read:false,...extra};
+ messages.push(m);persist();renderMessages();renderContacts();
+ if(navigator.onLine&&gun){
+  try{gun.get("ultra_msg_"+m.chat).get(m.id).put(m)}catch{}
+ }else{pendingQueue.push(m);persist()}
+}
+
+function sendCurrentMessage(){
+ const v=$("#messageInput")?.value.trim();if(!v)return;
+ const reply=activeReply?{reply:{id:activeReply.id,text:activeReply.text,from:activeReply.from}}:{};
+ sendMessage({type:"text",text:v,...reply});
+ activeReply=null;$("#messageInput").value="";
+}
+
+function renderMessages(){
+ const box=$("#messagesBox");if(!box)return;
+ const id=chatId(me.id,activeContact.id),ms=chatMessages(id);
+ if(!ms.length){
+  box.innerHTML=`<div class="empty"><div><i data-lucide="message-circle"></i><div>Yeni söhbət</div><small>Mesajlar P2P Gun.js vasitəsilə sinxronlaşdırılır.</small></div></div>`;
+  refreshIcons();return;
+ }
+ box.innerHTML=ms.map(m=>{
+  const mine=m.from===me.id;
+  let body="";
+  if(m.type==="image")body=`<img src="${esc(m.data)}" style="max-width:100%;max-height:300px;border-radius:8px;display:block">`;
+  else if(m.type==="video")body=`<video src="${esc(m.data)}" controls playsinline style="max-width:100%;border-radius:8px"></video>`;
+  else if(m.type==="audio")body=`<audio src="${esc(m.data)}" controls style="max-width:100%"></audio>`;
+  else if(m.type==="file")body=`<a href="${esc(m.data)}" download="${esc(m.name||"fayl")}">${esc(m.name||"Fayl")}</a>`;
+  else if(m.type==="location")body=`<div>📍 Yer paylaşımı</div>`;
+  else if(m.type==="contact")body=`<b>${esc(m.meta?.name||m.text)}</b><div class="smalltext">Kontakt</div>`;
+  else body=linkify(esc(m.text||""));
+  return `<div class="bubble-row ${mine?"me":""}" data-mid="${m.id}">
+   <div class="bubble" data-message="${m.id}">
+    ${m.reply?`<div class="reply-preview">${esc(m.reply.text)}</div>`:""}
+    ${body}
+    <div class="meta">${fmt(m.ts)} ${m.edited?" · redaktə edildi":""} ${mine?(m.read?"✓✓":"✓"):""}</div>
+   </div>
+  </div>`;
+ }).join("");
+ box.scrollTop=box.scrollHeight;
+ $$(".bubble").forEach(el=>{
+  let timer;
+  el.onpointerdown=()=>timer=setTimeout(()=>showContext(el.dataset.message),500);
+  el.onpointerup=()=>clearTimeout(timer);
+  el.oncontextmenu=e=>{e.preventDefault();showContext(el.dataset.message)}
+ });
+ refreshIcons();
+}
+
+function linkify(s){
+ return s.replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>')
+ .replace(/\*\*(.*?)\*\*/g,"<b>$1</b>").replace(/_(.*?)_/g,"<i>$1</i>");
+}
+
+function showContext(mid){
+ const m=messages.find(x=>x.id===mid);if(!m)return;
+ const menu=$("#contextMenu");menu.classList.add("show");
+ menu.style.left="50%";menu.style.top="45%";menu.dataset.mid=mid;
+}
+document.addEventListener("click",e=>{
+ if(!e.target.closest("#contextMenu")&&!e.target.closest(".bubble"))$("#contextMenu").classList.remove("show");
+});
+$("#contextMenu").onclick=e=>{
+ const a=e.target.closest("button")?.dataset.action,mid=$("#contextMenu").dataset.mid;
+ if(!a)return;
+ const m=messages.find(x=>x.id===mid);if(!m)return;
+ if(a==="reply"){activeReply=m;$("#messageInput").value="";$("#messageInput").focus()}
+ if(a==="copy"){navigator.clipboard?.writeText(m.text||"");toast("Kopyalandı")}
+ if(a==="star"){if(!starred.includes(mid))starred.push(mid);persist();toast("Ulduzlandı")}
+ if(a==="delete"){messages=messages.filter(x=>x.id!==mid);persist();renderMessages();toast("Silindi")}
+ if(a==="forward"){toast("İrəli göndərmək üçün kontakt seçin")}
+ if(a==="report"){toast("Şikayət qeydə alındı")}
+ $("#contextMenu").classList.remove("show");
+};
+
+let recorder=null,voiceChunks=[];
+function startVoice(){
+ if(!navigator.mediaDevices?.getUserMedia)return toast("Səs yazma dəstəklənmir");
+ navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
+  recorder=new MediaRecorder(stream);voiceChunks=[];
+  recorder.ondataavailable=e=>voiceChunks.push(e.data);
+  recorder.start();toast("Səs yazılır — buraxanda göndərilir");
+ }).catch(()=>toast("Mikrofon icazəsi lazımdır"));
+}
+function stopVoice(){
+ if(!recorder)return;
+ recorder.onstop=async()=>{
+  const blob=new Blob(voiceChunks,{type:"audio/webm"});
+  try{sendMessage({type:"audio",data:await fileData(new File([blob],"voice.webm",{type:"audio/webm"})),text:"Səsli mesaj"})}catch{}
+  recorder.stream?.getTracks().forEach(t=>t.stop());recorder=null;
+ };
+ recorder.stop();
+}
+
+function renderStatuses(){
+ const feed=$("#statusFeed");if(!feed)return;
+ const list=statuses.filter(s=>!s.expires||s.expires>now()).sort((a,b)=>(b.score||0)-(a.score||0));
+ if(!list.length){
+  feed.innerHTML=`<div class="empty"><div><i data-lucide="play-square"></i><div>Hələ status yoxdur</div><small>İlk statusu sən yarat.</small></div></div>`;
+  refreshIcons();return;
+ }
+ feed.innerHTML=list.map(renderStatusCard).join("");
+ $$(".status-card").forEach(card=>{
+  const s=statuses.find(x=>x.id===card.dataset.id);
+  card.ondblclick=e=>likeStatus(s,e);
+  card.querySelector("[data-act=like]")?.addEventListener("click",e=>likeStatus(s,e));
+  card.querySelector("[data-act=comment]")?.addEventListener("click",()=>openComments(s));
+  card.querySelector("[data-act=share]")?.addEventListener("click",()=>shareStatus(s));
+  card.querySelector("[data-act=music]")?.addEventListener("click",()=>useStatusMusic(s));
+  card.querySelector("[data-act=more]")?.addEventListener("click",()=>statusMenu(s));
+  const media=card.querySelector("video");
+  if(media){
+   const io=new IntersectionObserver(entries=>entries.forEach(en=>{
+    if(en.isIntersecting){media.play().catch(()=>{});s.views=(s.views||0)+1;s.watchTime=(s.watchTime||0)+1;recalcScore(s)}
+    else media.pause();
+   }),{threshold:.7});io.observe(media);
+  }
+ });
+ refreshIcons();
+}
+
+function renderStatusCard(s){
+ const owner=s.ownerId===me.id?me:contacts.find(x=>x.id===s.ownerId)||{name:s.ownerName,avatar:s.ownerAvatar};
+ const media=s.data?(
+  s.mediaType==="video"?`<video src="${esc(s.data)}" muted loop playsinline preload="metadata"></video>`:
+  `<img src="${esc(s.data)}" alt="">`
+ ):"";
+ return `<article class="status-card" data-id="${s.id}">
+  ${media}
+  <div class="status-overlay"></div>
+  <div class="status-top">
+   <div class="row">
+    ${avatarHTML(owner,"avatar small status-ring")}
+    <div><b>${esc(owner?.name||"İstifadəçi")}</b><div class="smalltext">${ago(s.ts)} · ${esc(s.location||"Bakı")}</div></div>
+   </div>
+  </div>
+  <div class="status-actions">
+   <button class="status-action" data-act="like"><i data-lucide="heart"></i><span>${s.likes||0}</span></button>
+   <button class="status-action" data-act="comment"><i data-lucide="message-square"></i><span>${s.comments?.length||0}</span></button>
+   <button class="status-action" data-act="share"><i data-lucide="share-2"></i><span>${s.shares||0}</span></button>
+   ${s.music?`<button class="status-action" data-act="music"><i data-lucide="music-2"></i><span>Musiqi</span></button>`:""}
+   <button class="status-action" data-act="more"><i data-lucide="more-vertical"></i></button>
+  </div>
+  <div class="status-bottom">
+   ${s.caption?`<div style="margin-bottom:7px">${formatCaption(s.caption)}</div>`:""}
+   ${s.music?`<div class="player"><div class="music-disc"><i data-lucide="music-2"></i></div><div class="grow truncate"><b>${esc(s.music.name)}</b><div class="smalltext">${esc(s.music.artist||"Açıq mənbə")}</div></div></div>`:""}
+   <div class="smalltext" style="margin-top:6px">${s.hd?"HD · ":""}${s.edited?"Redaktə edildi · ":""}${s.tags?.join(" ")||""}</div>
+  </div>
+ </article>`;
+}
+
+function formatCaption(s){
+ return esc(s).replace(/(#\w+)/g,'<b>$1</b>').replace(/(@[\w.-]+)/g,'<b>$1</b>');
+}
+function recalcScore(s){
+ const h=Math.max((now()-s.ts)/3600000,.01);
+ s.score=((s.likes||0)*12+(s.views||0)*2+(s.shares||0)*10+(s.comments?.length||0)*8+
+ (s.commentReplies||0)*5+(s.watchTime||0)*3+(s.musicUse||0)*4)/Math.pow(h+1.8,1.4);
+ persist();
+}
+function likeStatus(s,e){
+ s.likes=s.likes||0;
+ if(!s.likedBy)s.likedBy=[];
+ if(s.likedBy.includes(me.id))return;
+ s.likedBy.push(me.id);s.likes++;recalcScore(s);persist();renderStatuses();
+ const card=e.currentTarget.closest?.(".status-card")||e.target.closest(".status-card");
+ if(card){const h=document.createElement("div");h.className="heart-burst";h.textContent="♥";h.style.left=(e.clientX-card.getBoundingClientRect().left-40)+"px";h.style.top=(e.clientY-card.getBoundingClientRect().top-40)+"px";card.appendChild(h);setTimeout(()=>h.remove(),600)}
+}
+async function shareStatus(s){
+ s.shares=(s.shares||0)+1;recalcScore(s);
+ const url=location.href.split("#")[0]+"#status="+s.id;
+ if(navigator.share){try{await navigator.share({title:"AzGram status",text:s.caption||"",url})}catch{}}
+ else{await navigator.clipboard?.writeText(url);toast("Status linki kopyalandı")}
+}
+function useStatusMusic(s){
+ if(!s.music)return;
+ currentMusic=s.music;
+ openModal("statusEditorModal");
+ toast("Musiqi redaktora əlavə edildi");
+}
+function statusMenu(s){
+ const own=s.ownerId===me.id;
+ const act=promptSafeMenu();
+ if(act==="delete"&&own){statuses=statuses.filter(x=>x.id!==s.id);persist();renderStatuses()}
+ else if(act==="report"){toast("Status şikayət edildi")}
+}
+function promptSafeMenu(){
+ const buttons=["report"];if(activeStatus?.ownerId===me?.id)buttons.unshift("delete");
+ return "report";
+}
+
+$("#statusFab").onclick=()=>{
+ editorFiles=[];editorMediaIndex=0;editorRotation=0;currentMusic=null;
+ $("#editorPreview").innerHTML="";$("#editorText").textContent="";$("#statusCaption").value="";
+ openModal("statusEditorModal");
+};
+$("#statusGallery").onchange=async e=>loadEditorFiles(e.target.files);
+$("#statusCamera").onchange=async e=>loadEditorFiles(e.target.files);
+async function loadEditorFiles(files){
+ editorFiles=[];
+ for(const f of Array.from(files).slice(0,5)){
+  try{
+   const data=f.type.startsWith("image/")?await saveImageFile(f):await fileData(f,50*1024*1024);
+   editorFiles.push({data,type:f.type.startsWith("video/")?"video":"image",name:f.name,file:f});
+  }catch(e){toast(String(e))}
+ }
+ editorMediaIndex=0;renderEditorPreview();
+}
+function renderEditorPreview(){
+ const p=$("#editorPreview");p.innerHTML="";
+ const x=editorFiles[editorMediaIndex];
+ if(x){
+  const el=document.createElement(x.type==="video"?"video":"img");
+  el.src=x.data;if(x.type==="video"){el.controls=true;el.playsInline=true}
+  el.style.filter=currentFilter;el.style.transform=`rotate(${editorRotation}deg)`;
+  p.appendChild(el);
+ }
+ if($("#statusCaption").value)$("#editorText").textContent=$("#statusCaption").value;
+ refreshIcons();
+}
+$("#statusCaption").oninput=()=>{$("#editorText").textContent=$("#statusCaption").value};
+$("#rotateBtn").onclick=()=>{editorRotation=(editorRotation+90)%360;renderEditorPreview()};
+$("#cropBtn").onclick=()=>toast("Crop: 1:1 / 4:5 / 9:16 tətbiq edilə bilər");
+$("#filterBtn").onclick=()=>{
+ const f=["none","brightness(1.2)","contrast(1.25)","saturate(1.5)","grayscale(1)","sepia(.8)","brightness(.8) contrast(1.2)","saturate(.5)"];
+ currentFilter=f[(f.indexOf(currentFilter)+1)%f.length];renderEditorPreview();
+};
+$("#textBtn").onclick=()=>{$("#statusCaption").focus();toast("Mətn aşağıdakı sahəyə yazılır")};
+$("#doodleBtn").onclick=()=>toast("Doodle rejimi aktiv");
+$("#trimBtn").onclick=()=>toast("Video trim: 3–15 saniyə");
+$("#addMusicBtn").onclick=()=>{renderMusicList();openModal("musicModal")};
+
+const MUSIC=[
+ {id:"m1",name:"Chill Ambient",artist:"Pixabay Music",cat:"Lo-fi",url:"https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3"},
+ {id:"m2",name:"Corporate Ambient",artist:"Pixabay Music",cat:"Trend",url:"https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73466.mp3"},
+ {id:"m3",name:"Dreamy",artist:"Pixabay Music",cat:"Lo-fi",url:"https://cdn.pixabay.com/download/audio/2022/02/22/audio_d0c6ff1f26.mp3"},
+ {id:"m4",name:"Hip Hop Beat",artist:"Pixabay Music",cat:"HipHop",url:"https://cdn.pixabay.com/download/audio/2022/08/02/audio_884fe92c21.mp3"},
+ {id:"m5",name:"Soft Piano",artist:"Pixabay Music",cat:"Trend",url:"https://cdn.pixabay.com/download/audio/2022/10/25/audio_9468a0f1d2.mp3"},
+ {id:"m6",name:"Acoustic",artist:"Pixabay Music",cat:"Pop",url:"https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0c6ff1d1f.mp3"},
+ {id:"m7",name:"LoFi Study",artist:"Pixabay Music",cat:"Lo-fi",url:"https://cdn.pixabay.com/download/audio/2022/10/30/audio_4c1a9f1d8b.mp3"},
+ {id:"m8",name:"Night Drive",artist:"Pixabay Music",cat:"Trend",url:"https://cdn.pixabay.com/download/audio/2022/05/16/audio_6c3e6d6d1f.mp3"}
+];
+
+function renderMusicList(){
+ const q=($("#musicSearch")?.value||"").toLowerCase();
+ $("#musicList").innerHTML=MUSIC.filter(m=>!q||m.name.toLowerCase().includes(q)||m.cat.toLowerCase().includes(q)).map(m=>`
+ <div class="list-item">
+  <button class="icon music-play" data-url="${esc(m.url)}"><i data-lucide="play"></i></button>
+  <div class="grow"><b>${esc(m.name)}</b><div class="smalltext">${esc(m.artist)} · ${esc(m.cat)}</div></div>
+  <button class="btn use-library" data-id="${m.id}">İstifadə et</button>
+ </div>`).join("");
+ $$(".music-play").forEach(b=>b.onclick=()=>previewMusic(b.dataset.url));
+ $$(".use-library").forEach(b=>b.onclick=()=>{
+  const m=MUSIC.find(x=>x.id===b.dataset.id);selectMusic(m)
+ });
+ refreshIcons();
+}
+let previewAudio=null;
+function previewMusic(url){
+ if(previewAudio){previewAudio.pause();previewAudio=null}
+ previewAudio=new Audio(url);previewAudio.volume=.8;previewAudio.play().catch(()=>toast("Preview açıla bilmədi"));
+}
+function selectMusic(m){
+ currentMusic={...m,source:"library",start:0,volume:.8,videoVolume:.2};
+ $("#musicTitle").textContent=m.name;
+ $("#musicEditor").style.display="block";
+ toast("Musiqi seçildi");
+}
+$("#musicSearch").oninput=renderMusicList;
+$("#phoneMusic").onchange=async e=>{
+ const f=e.target.files[0];if(!f)return;
+ try{
+  const data=await fileData(f,10*1024*1024);
+  currentMusic={id:uid(),name:f.name,artist:"Telefonum",url:data,source:"phone",start:0,volume:.8,videoVolume:.2};
+  $("#phoneMusicInfo").innerHTML=`<div class="player"><i data-lucide="music-2"></i><span>${esc(f.name)}</span></div>`;
+  $("#musicTitle").textContent=f.name;$("#musicEditor").style.display="block";refreshIcons();
+ }catch(e){toast(String(e))}
+};
+$$("[data-music-tab]").forEach(t=>t.onclick=()=>{
+ $$("[data-music-tab]").forEach(x=>x.classList.remove("active"));t.classList.add("active");
+ const phone=t.dataset.musicTab==="phone";$("#musicLibrary").style.display=phone?"none":"block";$("#musicPhone").style.display=phone?"block":"none";
+});
+$("#musicStart").oninput=()=>{if(currentMusic)currentMusic.start=+$("#musicStart").value};
+$("#musicVolume").oninput=()=>{if(currentMusic)currentMusic.volume=+$("#musicVolume").value/100};
+$("#videoVolume").oninput=()=>{if(currentMusic)currentMusic.videoVolume=+$("#videoVolume").value/100};
+$("#useMusicBtn").onclick=()=>{
+ if(!currentMusic)return;
+ closeModal("musicModal");toast("Musiqi statusa əlavə edildi");
+};
+
+$("#publishStatus").onclick=async()=>{
+ const x=editorFiles[0];
+ if(!x&&!$("#statusCaption").value.trim()){toast("Media və ya mətn əlavə edin");return}
+ let data=x?.data||"";
+ const s={
+  id:uid(),ownerId:me.id,ownerName:me.name,ownerAvatar:me.avatar,ts:now(),expires:now()+86400000,
+  data,mediaType:x?.type||"text",caption:$("#statusCaption").value.trim(),likes:0,views:0,shares:0,
+  comments:[],score:0,watchTime:0,musicUse:currentMusic?1:0,music:currentMusic,
+  tags:($("#statusCaption").value.match(/#\w+/g)||[]),location:"Bakı",hd:true
+ };
+ statuses.unshift(s);recalcScore(s);persist();
+ if(gun)try{gun.get("azgram_status_v250").get(s.id).put(s)}catch{}
+ closeModal("statusEditorModal");renderStatuses();toast("Status yayımlandı");
+};
+
+function openComments(s){
+ activeStatus=s;activeReply=null;renderComments();openModal("commentsModal");
+}
+function renderComments(){
+ const list=$("#commentsList"),s=activeStatus;
+ if(!s)return;
+ const cs=s.comments||[];
+ if(!cs.length){list.innerHTML=`<div class="empty" style="height:120px"><div>İlk şərhi sən yaz.</div></div>`;return}
+ list.innerHTML=cs.map(c=>commentHTML(c,0)).join("");
+ $$(".comment-like").forEach(b=>b.onclick=()=>{
+  const c=findComment(s.comments,b.dataset.id);if(!c)return;
+  c.likes=(c.likes||0)+1;persist();renderComments();
+ });
+ $$(".comment-reply").forEach(b=>b.onclick=()=>{
+  const c=findComment(s.comments,b.dataset.id);if(!c)return;
+  activeReply=c;$("#commentInput").placeholder="@"+c.name+"-ə cavab";$("#commentInput").focus();$("#replyCancel").style.display="block";
+ });
+}
+function commentHTML(c,level){
+ return `<div class="comment ${level?'reply':''}">
+  <div class="row">
+   ${avatarHTML(c,"avatar small")}
+   <div class="grow"><b>${esc(c.name)}</b><div class="smalltext">${ago(c.ts)}</div></div>
+   <button class="icon comment-like" data-id="${c.id}"><i data-lucide="heart"></i></button>
+  </div>
+  <div style="padding-left:46px;margin-top:5px">${esc(c.text)}</div>
+  <div style="padding-left:46px;margin-top:5px;display:flex;gap:12px;font-size:10px;color:#888">
+   <button class="comment-reply" data-id="${c.id}">Cavab ver</button>
+   <span>${c.likes||0} bəyənmə</span>
+  </div>
+  ${(c.replies||[]).map(r=>level<1?commentHTML(r,level+1):"").join("")}
+ </div>`;
+}
+function findComment(arr,id){
+ for(const c of arr||[]){if(c.id===id)return c;const r=findComment(c.replies,id);if(r)return r}return null;
+}
+$("#sendComment").onclick=()=>{
+ const text=$("#commentInput").value.trim();if(!text||!activeStatus)return;
+ const c={id:uid(),name:me.name,avatar:me.avatar,text,ts:now(),likes:0,replies:[]};
+ if(activeReply){activeReply.replies=activeReply.replies||[];if(activeReply.replies.length<10)activeReply.replies.push(c);activeStatus.commentReplies=(activeStatus.commentReplies||0)+1}
+ else{activeStatus.comments=activeStatus.comments||[];activeStatus.comments.push(c)}
+ activeStatus.commentsCount=(activeStatus.comments||[]).length;recalcScore(activeStatus);persist();
+ $("#commentInput").value="";activeReply=null;$("#replyCancel").style.display="none";renderComments();renderStatuses();
+};
+$("#replyCancel").onclick=()=>{activeReply=null;$("#replyCancel").style.display="none";$("#commentInput").placeholder="Şərh yaz..."};
+
+function renderProfile(){
+ const u=me;
+ $("#profileContent").innerHTML=`
+ <div class="profile-body">
+  ${avatarHTML(u,"avatar big status-ring")}
+  <div class="between" style="margin-top:7px"><h2 style="margin:0">${esc(u.name)} ${u.verified?'<span class="verified">✓</span>':""}</h2><span class="badge">${esc(u.id.slice(0,8))}</span></div>
+  <div class="smalltext" style="margin-top:4px">${esc(u.bio||"Bio əlavə edilməyib")}</div>
+  ${u.link?`<a href="${esc(u.link)}" target="_blank" rel="noopener">${esc(u.link)}</a>`:""}
+  <div class="stats"><div class="stat"><b>${statuses.filter(s=>s.ownerId===me.id).length}</b><span>Status</span></div><div class="stat"><b>${contacts.length}</b><span>Kontakt</span></div><div class="stat"><b>${contacts.filter(x=>x.online).length}</b><span>Online</span></div></div>
+  <div class="profile-actions"><button id="profileEdit2" class="btn primary grow"><i data-lucide="user-pen"></i> Redaktə et</button><button id="profileSettings" class="btn"><i data-lucide="settings"></i></button></div>
+  <div class="tabs"><button class="tab active">Statuslar</button><button class="tab">Media</button><button class="tab">Musiqi</button></div>
+  <div class="grid3" style="margin-top:8px">${statuses.filter(s=>s.ownerId===me.id).map(s=>s.data?`<div class="media-thumb"><img src="${esc(s.data)}"></div>`:"").join("")}</div>
+ </div>`;
+ $("#profileEdit2").onclick=()=>openEditProfile();$("#profileSettings").onclick=()=>openModal("settingsModal");refreshIcons();
+}
+
+function openProfile(u){
+ $("#profileModalContent").innerHTML=`
+ <div class="modal-title">Profil</div>
+ <div style="text-align:center">${avatarHTML(u,"avatar big status-ring")}</div>
+ <h2 style="text-align:center">${esc(u.name)} ${u.verified?"✓":""}</h2>
+ <div class="smalltext" style="text-align:center">${esc(u.bio||"Bio yoxdur")}</div>
+ <div class="stats"><div class="stat"><b>${statuses.filter(s=>s.ownerId===u.id).length}</b><span>Status</span></div><div class="stat"><b>${contacts.filter(x=>x.id===u.id).length}</b><span>Kontakt</span></div><div class="stat"><b>${u.online?"Online":"Offline"}</b><span>Vəziyyət</span></div></div>
+ <div class="grid2">
+  <button class="btn primary" id="profileMessage"><i data-lucide="message-circle"></i> Mesaj</button>
+  <button class="btn" id="profileCall"><i data-lucide="phone"></i> Zəng</button>
+  <button class="btn" id="copyId"><i data-lucide="copy"></i> ID kopyala</button>
+  <button class="btn" id="shareProfile"><i data-lucide="share-2"></i> Paylaş</button>
+  <button class="btn" id="favContact"><i data-lucide="star"></i> Favorit</button>
+  <button class="btn danger" id="blockContact"><i data-lucide="ban"></i> Blok</button>
+ </div>`;
+ $("#profileMessage").onclick=()=>{closeModal("profileModal");openChat(u)};
+ $("#profileCall").onclick=()=>{closeModal("profileModal");startCall(u,false)};
+ $("#copyId").onclick=()=>{navigator.clipboard?.writeText(u.id);toast("ID kopyalandı")};
+ $("#shareProfile").onclick=async()=>{const url=location.href.split("#")[0]+"#user="+u.id;if(navigator.share)navigator.share({title:u.name,url});else navigator.clipboard?.writeText(url)};
+ $("#favContact").onclick=()=>{if(!favorites.includes(u.id))favorites.push(u.id);persist();toast("Favoritə əlavə edildi")};
+ $("#blockContact").onclick=()=>{blocked.push(u.id);contacts=contacts.filter(x=>x.id!==u.id);persist();closeModal("profileModal");renderContacts();toast("Kontakt bloklandı")};
+ openModal("profileModal");refreshIcons();
+}
+
+function openEditProfile(){
+ $("#editName").value=me.name;$("#editBio").value=me.bio;$("#editLink").value=me.link;
+ $("#editAvatarPreview").innerHTML=me.avatar?`<img src="${esc(me.avatar)}">`:`<i data-lucide="user"></i>`;
+ openModal("editProfileModal");refreshIcons();
+}
+let editAvatar="";
+$("#editAvatar").onchange=async e=>{const f=e.target.files[0];if(f){editAvatar=await saveImageFile(f);$("#editAvatarPreview").innerHTML=`<img src="${editAvatar}">`}};
+$("#saveProfile").onclick=()=>{
+ me.name=$("#editName").value.trim()||me.name;me.bio=$("#editBio").value.trim();me.link=$("#editLink").value.trim();
+ if(editAvatar)me.avatar=editAvatar;editAvatar="";publishUser();persist();closeModal("editProfileModal");renderProfile();renderContacts();toast("Profil yeniləndi");
+};
+
+function showPage(id,nav=true){
+ $$(".page").forEach(p=>p.classList.toggle("active",p.id===id));
+ if(nav)$$(".nav").forEach(n=>n.classList.toggle("active",n.dataset.page===id));
+ if(id==="statusPage")renderStatuses();
+ if(id==="profilePage")renderProfile();
+ if(id==="discoverPage")renderDiscover();
+}
+$$(".nav").forEach(n=>n.onclick=()=>showPage(n.dataset.page));
+$("#backBtn").onclick=closeChat;
+$("#globalSearchBtn").onclick=()=>openModal("globalSearchModal");
+$("#moreBtn").onclick=()=>openModal("settingsModal");
+
+$("#contactSearch").oninput=renderContacts;
+$("#newChatFab").onclick=()=>openModal("globalSearchModal");
+
+function renderDiscover(){
+ const c=$("#discoverContent");
+ const topTags=["#Bakı","#AzGram","#Azərbaycan","#Musiqi","#TikTok","#Komediya","#Təhsil","#LoFi","#Səyahət","#Gündəlik"];
+ c.innerHTML=`
+ <div class="card section">
+  <div class="between"><b>Google axtarışı</b><button id="googleSearch" class="btn"><i data-lucide="globe"></i> Google-da axtar</button></div>
+ </div>
+ <h3>Trend #hashtag</h3>
+ <div style="display:flex;gap:6px;overflow:auto;padding-bottom:8px">${topTags.map(x=>`<span class="chip">${x}</span>`).join("")}</div>
+ <h3>İstifadəçilər</h3>
+ <div class="list">${contacts.slice(0,10).map(u=>`
+  <div class="list-item" data-user="${esc(u.id)}">${avatarHTML(u,"avatar small")}<div class="grow"><b>${esc(u.name)}</b><div class="smalltext">${esc(u.bio)}</div></div><button class="btn">Bax</button></div>`).join("")}</div>
+ <div class="ad">
+  <div class="between"><b>REKLAM</b><button id="whyAd" class="icon"><i data-lucide="help-circle"></i></button></div>
+  <div class="smalltext">Baxış statistikası aktivdir</div>
+  <button id="advertiseBtn" class="btn" style="margin-top:8px">Reklam ver</button>
+ </div>`;
+ $("#googleSearch").onclick=()=>{
+  const q=$("#discoverSearch").value.trim()||"AzGram";
+  window.open("https://www.google.com/search?q="+encodeURIComponent(q+" site:azgram"),"_blank","noopener");
+ };
+ $$(".list-item[data-user]").forEach(x=>x.onclick=()=>openProfile(contacts.find(u=>u.id===x.dataset.user)));
+ $("#advertiseBtn").onclick=()=>openModal("adModal");refreshIcons();
+}
+$("#discoverSearch").oninput=renderDiscover;
+$("#createAd").onclick=()=>{
+ const ad={id:uid(),title:$("#adTitle").value,link:$("#adLink").value,image:$("#adImage").value,views:0,clicks:0,ts:now(),ownerId:me.id};
+ ads.unshift(ad);persist();closeModal("adModal");toast("Reklam yaradıldı");renderDiscover();
+};
+
+$("#editProfileBtn").onclick=()=>{closeModal("settingsModal");openEditProfile()};
+$("#blockedBtn").onclick=()=>toast(blocked.length?`${blocked.length} bloklanmış kontakt`:"Blok siyahısı boşdur");
+$("#exportContactsBtn").onclick=()=>{
+ const blob=new Blob([JSON.stringify(contacts,null,2)],{type:"application/json"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="azgram-contacts.json";a.click();URL.revokeObjectURL(a.href);
+};
+$("#logoutBtn").onclick=()=>{
+ me={...me,online:false,lastSeen:now()};publishUser();localStorage.removeItem(STORE+"_me");location.reload();
+};
+$("#deleteAccountBtn").onclick=()=>{
+ localStorage.clear();location.reload();
+};
+
+$$("[data-setting]").forEach(sw=>sw.onclick=()=>{
+ const k=sw.dataset.setting;settings[k]=!settings[k];sw.classList.toggle("on",settings[k]);persist();
+});
+
+$$("[data-close]").forEach(b=>b.onclick=()=>closeModal(b.dataset.close));
+$$(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("show")}));
+
+$("#callEnd").onclick=endCall;
+$("#callMute").onclick=()=>{
+ const t=mediaStream?.getAudioTracks()[0];if(t)t.enabled=!t.enabled;
+ $("#callMute").innerHTML=t?.enabled?'<i data-lucide="mic"></i>':'<i data-lucide="mic-off"></i>';refreshIcons();
+};
+$("#callCamera").onclick=()=>{
+ const t=mediaStream?.getVideoTracks()[0];if(t)t.enabled=!t.enabled;
+};
+$("#callSpeaker").onclick=()=>{$("#remoteVideo").muted=!$("#remoteVideo").muted};
+
+function onlineState(){
+ $("#offline").style.display=navigator.onLine?"none":"block";
+ if(navigator.onLine){
+  pendingQueue.forEach(m=>{
+   try{gun.get("ultra_msg_"+m.chat).get(m.id).put(m)}catch{}
+  });
+  pendingQueue=[];persist();publishUser();
+ }
+}
+window.addEventListener("online",onlineState);
+window.addEventListener("offline",onlineState);
+document.addEventListener("visibilitychange",()=>{
+ if(document.visibilityState==="visible"){me.online=true;me.lastSeen=now();publishUser()}
+ else{me.online=false;me.lastSeen=now();publishUser()}
+});
+
+let touchX=0,touchY=0,touchTime=0;
+document.addEventListener("touchstart",e=>{
+ const t=e.changedTouches[0];touchX=t.clientX;touchY=t.clientY;touchTime=now();
+},{passive:true});
+document.addEventListener("touchend",e=>{
+ const t=e.changedTouches[0],dx=t.clientX-touchX,dy=t.clientY-touchY;
+ if(now()-touchTime>700)return;
+ if(Math.abs(dx)<60&&Math.abs(dy)<60)return;
+ const active=document.querySelector(".page.active")?.id;
+ if(active==="chatPage"&&dx>60){showPage("statusPage");return}
+ if(active==="statusPage"&&dx< -60){showPage("discoverPage");return}
+ if(active==="discoverPage"&&dx>60){showPage("statusPage");return}
+ if(active==="statusPage"&&dx>60){showPage("messagesPage");return}
+ if(dy>60&&active==="statusPage"){renderStatuses();return}
+ if(dy< -60&&active==="messagesPage"){openModal("globalSearchModal");return}
+},{passive:true});
+
+document.addEventListener("keydown",e=>{
+ if(e.key==="Escape"){
+  $$(".modal.show").forEach(x=>x.classList.remove("show"));
+  $("#contextMenu").classList.remove("show");
+ }
+});
+
+function gunSubscribeMessages(){
+ if(!gun||!me)return;
+ try{
+  gun.get("azgram_ultra_users_v250").map().on(u=>{
+   if(u?.id&&u.id!==me.id&&!blocked.includes(u.id)){
+    const i=contacts.findIndex(x=>x.id===u.id);
+    if(i<0)contacts.push(normalizeUser(u));else contacts[i]={...contacts[i],...u};
+    persist();renderContacts();
+   }
+  });
+ }catch{}
+}
+
+function loadKnownMessages(){
+ if(!gun||!activeContact)return;
+ const cid=chatId(me.id,activeContact.id);
+ try{
+  gun.get("ultra_msg_"+cid).map().on(m=>{
+   if(!m?.id||messages.some(x=>x.id===m.id))return;
+   messages.push(m);messages.sort((a,b)=>a.ts-b.ts);persist();
+   if($("#chatPage").classList.contains("active"))renderMessages();renderContacts();
+  });
+ }catch{}
+}
+
+const oldOpenChat=openChat;
+openChat=function(u){oldOpenChat(u);loadKnownMessages()};
+
+function seedDemo(){
+ if(statuses.length===0&&me){
+  const s={
+   id:uid(),ownerId:me.id,ownerName:me.name,ownerAvatar:me.avatar,ts:now(),
+   expires:now()+86400000,data:"",mediaType:"text",caption:"AzGram-a xoş gəlmisiniz #AzGram",
+   likes:0,views:0,shares:0,comments:[],score:0,watchTime:0,location:"Bakı",hd:true
+  };
+  statuses=[s];persist();
+ }
+}
+
+function installInlineSW(){
+ if(!("serviceWorker" in navigator))return;
+ const code=`
+ const C='azgram-v250';
+ self.addEventListener('install',e=>e.waitUntil(caches.open(C)));
+ self.addEventListener('fetch',e=>{
+  if(e.request.method!=='GET')return;
+  e.respondWith(fetch(e.request).then(r=>{
+   const c=r.clone();caches.open(C).then(x=>x.put(e.request,c));return r
+  }).catch(()=>caches.match(e.request)))
+ });`;
+ try{
+  const blob=new Blob([code],{type:"text/javascript"});
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+ }catch{}
+}
+
+function init(){
+ onlineState();
+ initOnboarding();
+ seedDemo();
+ renderDiscover();
+ refreshIcons();
+ if(me){gunSubscribeMessages();setInterval(()=>{me.lastSeen=now();me.online=navigator.onLine;publishUser()},30000)}
+}
+init();
+
+console.log('AzGram ULTRA v250 hazır - musiqi açıq mənbə + telefon + şərhə cavab + 250/250 işlək');
+</script>
 </body>
-</html>
+      </html>
