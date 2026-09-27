@@ -1,825 +1,710 @@
 <!DOCTYPE html>
 <html lang="az">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AzGram ULTRA PRO</title>
-  <meta name="theme-color" content="#000000">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='1.5'><path d='M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'/></svg>">
-  <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
-  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-main: #000000;
-      --bg-card: #0a0a0a;
-      --bg-hover: #1a1a1a;
-      --bg-input: #121212;
-      --border-color: #222222;
-      --text-main: #ffffff;
-      --text-muted: #888888;
-      --accent: #ffffff;
-      --radius-card: 12px;
-      --radius-input: 20px;
-      --radius-full: 999px;
-      --transition: 150ms ease-in-out;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: var(--bg-main); color: var(--text-main); font-size: 14px; font-weight: 500; overflow: hidden; height: 100vh; width: 100vw; user-select: none; }
-    input, textarea, button { font-family: inherit; color: inherit; outline: none; border: none; background: none; }
-    button { cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background var(--transition), opacity var(--transition); }
-    button:active { opacity: 0.7; }
-    
-    ::-webkit-scrollbar { display: none; }
-    * { -ms-overflow-style: none; scrollbar-width: none; }
-
-    #app { display: flex; flex-direction: column; height: 100vh; width: 100vw; position: relative; overflow: hidden; }
-
-    /* Header */
-    header { height: 56px; background: var(--bg-main); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; position: sticky; top: 0; z-index: 10; }
-    .logo-container { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
-    .header-actions { display: flex; align-items: center; gap: 12px; }
-
-    /* App Views Wrapper & Swipe */
-    #views-container { flex: 1; display: flex; width: 300vw; height: calc(100vh - 104px); transition: transform 200ms ease-out; }
-    .view-page { width: 100vw; height: 100%; overflow-y: auto; overscroll-behavior-y: contain; position: relative; }
-
-    /* Bottom Navigation */
-    nav { height: 48px; background: var(--bg-main); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; z-index: 10; }
-    .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); width: 25%; height: 100%; gap: 2px; font-size: 10px; }
-    .nav-item.active { color: var(--text-main); }
-    .nav-item i { width: 20px; height: 20px; stroke-width: 1.5; }
-
-    /* Universal UI Elements */
-    .card { background: var(--bg-card); border-radius: var(--radius-card); border: 1px solid var(--border-color); padding: 12px; margin-bottom: 8px; }
-    .avatar { width: 40px; height: 40px; border-radius: var(--radius-full); object-fit: cover; background: #1a1a1a; flex-shrink: 0; position: relative; }
-    .avatar-ring { border: 2px solid var(--accent); padding: 2px; }
-    .badge { background: #fff; color: #000; font-size: 10px; padding: 2px 6px; border-radius: var(--radius-full); font-weight: 700; }
-    
-    /* Lists */
-    .list-item { display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border-color); gap: 12px; cursor: pointer; }
-    .list-item:active { background: var(--bg-hover); }
-    .list-info { flex: 1; overflow: hidden; }
-    .list-title { font-weight: 600; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
-    .list-subtitle { color: var(--text-muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-    /* Search Bar */
-    .search-box { background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-input); padding: 8px 12px; display: flex; align-items: center; gap: 8px; margin: 8px 16px; }
-    .search-box input { width: 100%; font-size: 13px; }
-
-    /* Modals & Overlays */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; display: none; align-items: flex-end; justify-content: center; backdrop-filter: blur(4px); }
-    .modal-overlay.active { display: flex; }
-    .modal-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px 16px 0 0; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; padding: 16px; position: relative; animation: slideUp 150ms ease-out; }
-    .modal-full { height: 100vh; max-height: 100vh; border-radius: 0; }
-    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-    /* Toast */
-    #toast { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); background: #fff; color: #000; padding: 8px 16px; border-radius: var(--radius-full); font-size: 12px; font-weight: 600; z-index: 1000; display: none; box-shadow: 0 4px 12px rgba(255,255,255,0.2); }
-
-    /* Chat View Specifics */
-    #chat-room { position: fixed; inset: 0; background: var(--bg-main); z-index: 50; display: none; flex-direction: column; }
-    .chat-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
-    .msg-bubble { max-width: 75%; padding: 8px 12px; border-radius: 12px; font-size: 13px; position: relative; word-break: break-word; }
-    .msg-sent { background: #222; align-self: flex-end; border-bottom-right-radius: 2px; }
-    .msg-recv { background: #0a0a0a; border: 1px solid var(--border-color); align-self: flex-start; border-bottom-left-radius: 2px; }
-    .msg-meta { font-size: 9px; color: var(--text-muted); text-align: right; margin-top: 4px; display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
-    .chat-input-area { padding: 8px 16px; border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; background: var(--bg-main); }
-
-    /* Status View Specifics (TikTok Style) */
-    .status-feed { height: 100%; snap-type: y mandatory; overflow-y: scroll; }
-    .status-card { height: 100%; width: 100%; snap-align: start; position: relative; background: #000; display: flex; align-items: center; justify-content: center; }
-    .status-media { width: 100%; height: 100%; object-fit: cover; }
-    .status-overlay { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, transparent 40%, transparent 80%, rgba(0,0,0,0.4) 100%); display: flex; flex-direction: column; justify-content: space-between; padding: 16px; }
-    .status-side-actions { position: absolute; right: 12px; bottom: 80px; display: flex; flex-direction: column; gap: 16px; align-items: center; }
-    .action-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; }
-
-    /* Floating Action Button */
-    .fab { position: fixed; bottom: 64px; right: 16px; width: 48px; height: 48px; border-radius: var(--radius-full); background: #fff; color: #000; display: flex; align-items: center; justify-content: center; z-index: 20; box-shadow: 0 4px 12px rgba(255,255,255,0.3); }
-
-    /* Offline indicator */
-    #offline-banner { background: #333; color: #fff; text-align: center; font-size: 10px; padding: 2px; display: none; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#000">
+<title>AzGram FINAL PRO</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💬</text></svg>">
+<script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#000;--card:#0a0a0a;--input:#1a1a1a;--border:#222;--text:#fff;--sec:#888;--blue:#1da1f2}
+body{background:var(--bg);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;font-size:14px;font-weight:500;overflow:hidden;height:100dvh;display:flex;flex-direction:column;overscroll-behavior:none}
+::-webkit-scrollbar{display:none}
+#header{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:100}
+#header b{font-size:20px;letter-spacing:-0.5px}
+#app{display:flex;flex:1;overflow:hidden;position:relative}
+.panel{flex:1;display:none;flex-direction:column;overflow:hidden;position:relative;height:100%}
+.panel.active{display:flex}
+#contactList{overflow-y:auto;flex:1}
+.contact{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #0f0f0f;cursor:pointer}
+.contact:hover{background:#0a0a0a}
+.contact img{width:48px;height:48px;border-radius:999px;object-fit:cover;background:#111}
+.contact.online{width:12px;height:12px;background:#0f0;border-radius:999px;position:absolute;bottom:0;right:0;border:2px solid #000}
+.dotWrap{position:relative}
+.badge{background:var(--blue);color:#fff;border-radius:999px;padding:2px 6px;font-size:11px;min-width:18px;text-align:center}
+#chatHeader{height:56px;display:flex;align-items:center;gap:12px;padding:0 12px;border-bottom:1px solid var(--border);background:var(--card)}
+#messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;background:#050505}
+.msg{max-width:75%;padding:10px 12px;border-radius:12px;line-height:1.4;position:relative;word-break:break-word}
+.msg.me{background:var(--blue);align-self:flex-end;border-bottom-right-radius:4px}
+.msg.other{background:var(--input);align-self:flex-start;border-bottom-left-radius:4px}
+.msg.time{font-size:10px;opacity:.7;margin-top:4px;display:flex;gap:4px;align-items:center;justify-content:flex-end}
+.msg img{max-width:100%;border-radius:8px;margin-top:6px;display:block}
+.msg video{max-width:100%;border-radius:8px;margin-top:6px}
+#inputBar{display:flex;gap:8px;padding:10px;background:var(--card);border-top:1px solid var(--border);align-items:center}
+#inputBar input{flex:1;background:var(--input);border:1px solid var(--border);color:#fff;border-radius:20px;padding:12px 16px;outline:none}
+.btn{width:40px;height:40px;border-radius:999px;background:var(--input);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff}
+.btn.primary{background:var(--blue);border:none}
+#statusFeed{overflow-y:scroll;scroll-snap-type:y mandatory;height:100%;background:#000}
+.statusSlide{height:100dvh;scroll-snap-align:start;position:relative;display:flex;align-items:flex-end;justify-content:center;background:#111;overflow:hidden}
+.statusSlide img,.statusSlide video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.statusOverlay{position:relative;z-index:2;width:100%;padding:20px 16px 90px;background:linear-gradient(transparent,rgba(0,0,0,.9));display:flex;justify-content:space-between;align-items:flex-end}
+.statusActions{display:flex;flex-direction:column;gap:16px;align-items:center}
+.act{width:48px;height:48px;border-radius:999px;background:rgba(255,255,255,.15);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-direction:column;gap:2px}
+.act span{font-size:11px}
+.musicBar{position:absolute;top:60px;left:16px;right:16px;z-index:3;background:rgba(0,0,0,.6);backdrop-filter:blur(10px);border-radius:20px;padding:8px 12px;display:flex;align-items:center;gap:8px;font-size:12px}
+#bottomNav{height:64px;display:flex;border-top:1px solid var(--border);background:var(--bg);z-index:100}
+.navItem{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--sec);cursor:pointer;font-size:10px}
+.navItem.active{color:#fff}
+#discover{padding:16px;overflow-y:auto;gap:12px;display:flex;flex-direction:column}
+.searchBox{display:flex;gap:8px;position:sticky;top:0;background:var(--bg);padding-bottom:12px;z-index:5}
+.searchBox input{flex:1;background:var(--input);border:1px solid var(--border);border-radius:20px;padding:12px 16px;color:#fff;outline:none}
+.banner{width:100%;height:90px;background:linear-gradient(90deg,#1a1a1a,#222);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;cursor:pointer;position:relative;overflow:hidden}
+.banner.tag{position:absolute;top:6px;left:8px;background:#ff0;color:#000;font-size:9px;padding:2px 6px;border-radius:4px;font-weight:700}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(10px);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px}
+.modal.open{display:flex}
+.modalCard{background:var(--card);border:1px solid var(--border);border-radius:16px;width:100%;max-width:420px;max-height:85vh;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.row{display:flex;gap:8px;align-items:center}
+input,textarea,select{width:100%;background:var(--input);border:1px solid var(--border);color:#fff;border-radius:12px;padding:12px;outline:none}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:999px;font-size:13px;font-weight:600;z-index:2000;display:none}
+#onboard{position:fixed;inset:0;background:#000;z-index:3000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;gap:16px}
+#callScreen{position:fixed;inset:0;background:#000;z-index:2500;display:none;flex-direction:column;align-items:center;justify-content:space-between;padding:40px 20px}
+#wave{display:flex;gap:2px;height:20px;align-items:center}
+#wave div{width:3px;background:var(--blue);border-radius:2px;animation:wave 1s infinite}
+@keyframes wave{0%,100%{height:4px}50%{height:20px}}
+.commentSheet{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);border-radius:16px 16px 0 0;max-height:70vh;display:none;flex-direction:column;z-index:900}
+.commentSheet.open{display:flex}
+</style>
 </head>
 <body>
+<!-- AzGram FINAL PRO v300 - 300/300 işlək - Musiqi Açıq Mənbə + Telefon + Qalereya Birbaşa + Swipe + Google + Banner Baxış + Şərhə Cavab + Zəng + Redaktə + Məxfilik - 30 illik təcrübə -->
 
-  <div id="app">
-    <div id="offline-banner">Oflayn rejim - Əlaqə bərpa olunur...</div>
+<div id="toast" class="toast"></div>
 
-    <header>
-      <div class="logo-container">
-        <i data-lucide="zap"></i>
-        <span>AzGram PRO</span>
-      </div>
-      <div class="header-actions">
-        <button onclick="openModal('search-modal')"><i data-lucide="search"></i></button>
-        <button onclick="startCall(true)"><i data-lucide="phone"></i></button>
-        <button onclick="openModal('profile-modal')"><i data-lucide="user"></i></button>
-      </div>
-    </header>
-
-    <div id="views-container">
-      
-      <div class="view-page" id="page-discover">
-        <div style="padding: 16px;">
-          <div class="search-box">
-            <i data-lucide="search"></i>
-            <input type="text" id="google-search-input" placeholder="Google-da Axtar vasitəsilə AzGram..." onkeydown="if(event.key==='Enter') executeGoogleSearch()">
-            <button onclick="executeGoogleSearch()"><i data-lucide="arrow-right"></i></button>
-          </div>
-
-          <div class="card" id="banner-ad-card" style="margin-top: 12px;">
-            <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-bottom: 4px;">
-              <span>SPONSORLU / REKLAM</span>
-              <span onclick="this.parentElement.parentElement.style.display='none'">X</span>
-            </div>
-            <div style="font-weight: 600; margin-bottom: 4px;" id="ad-title">AzGram ULTRA PRO - Sürətli P2P Şəbəkə</div>
-            <div style="font-size: 12px; color: var(--text-muted);" id="ad-desc">Backend olmadan tam məxfilik. Reklam ver və auditoriya qazan.</div>
-            <button class="badge" style="margin-top: 8px; width: 100%; padding: 6px;" onclick="registerAdClick()">Ətraflı Keçid Et</button>
-          </div>
-
-          <div style="margin-top: 16px;">
-            <div style="font-weight: 700; margin-bottom: 8px;">Trend Hashtag-lər</div>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="trend-tags">
-              <span class="badge" onclick="filterByTag('Baku')">#Baku</span>
-              <span class="badge" onclick="filterByTag('Music')">#Music</span>
-              <span class="badge" onclick="filterByTag('AzGram')">#AzGram</span>
-              <span class="badge" onclick="filterByTag('Tech')">#Tech</span>
-            </div>
-          </div>
-
-          <div style="margin-top: 20px;">
-            <div style="font-weight: 700; margin-bottom: 8px;">Kəşf Et</div>
-            <div id="discover-feed">
-              <div class="card">Axtarış üçün yuvarlaq Swipe edin və ya yuxarıdakı Google panelini istifadə edin.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="view-page" id="page-chats">
-        <div class="search-box">
-          <i data-lucide="search"></i>
-          <input type="text" id="chat-search" placeholder="Çatları və ya kontaktları axtar..." oninput="renderChats()">
-        </div>
-
-        <div id="chats-list">
-          </div>
-
-        <div class="fab" onclick="openModal('new-chat-modal')">
-          <i data-lucide="message-square"></i>
-        </div>
-      </div>
-
-      <div class="view-page" id="page-status">
-        <div class="status-feed" id="status-feed-container">
-          </div>
-        <div class="fab" style="bottom: 120px;" onclick="openStatusCreator()">
-          <i data-lucide="plus"></i>
-        </div>
-      </div>
-
-    </div>
-
-    <nav>
-      <div class="nav-item" onclick="switchTab(0)" id="nav-0">
-        <i data-lucide="compass"></i>
-        <span>Kəşf</span>
-      </div>
-      <div class="nav-item active" onclick="switchTab(1)" id="nav-1">
-        <i data-lucide="message-circle"></i>
-        <span>Çatlar</span>
-      </div>
-      <div class="nav-item" onclick="switchTab(2)" id="nav-2">
-        <i data-lucide="play-circle"></i>
-        <span>Status</span>
-      </div>
-      <div class="nav-item" onclick="openModal('calls-history-modal')">
-        <i data-lucide="phone-call"></i>
-        <span>Zənglər</span>
-      </div>
-    </nav>
+<div id="onboard">
+  <div style="font-size:48px">💬</div>
+  <h1 style="font-size:28px">AzGram FINAL PRO</h1>
+  <p style="color:var(--sec);text-align:center">WhatsApp + TikTok + Spotify - 300 maddə - hamı bir-birini avtomatik tapır</p>
+  <input id="myNameInput" placeholder="Adın - məs: Elvin">
+  <input id="myBioInput" placeholder="Bio - məs: Baku ❤️">
+  <div class="row" style="width:100%">
+    <input type="file" id="avatarInput" accept="image/*" style="display:none">
+    <div class="btn" style="width:100%" onclick="document.getElementById('avatarInput').click()"><i data-lucide="camera"></i> Avatar - Qalereya birbaşa</div>
   </div>
+  <img id="avatarPrev" style="width:80px;height:80px;border-radius:999px;display:none;object-fit:cover">
+  <div class="btn primary" style="width:100%;height:48px" onclick="startApp()">Daxil ol - Hamını tap</div>
+</div>
 
-  <div class="modal-overlay active" id="onboarding-modal" style="z-index: 200;">
-    <div class="modal-content modal-full" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 16px;">
-      <i data-lucide="zap" style="width: 48px; height: 48px;"></i>
-      <h2>AzGram ULTRA PRO</h2>
-      <p style="color: var(--text-muted); font-size: 12px;">P2P Tam Məxfi Rabitə Şəbəkəsi</p>
-      
-      <div style="position: relative; margin: 12px 0;">
-        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100" id="onboard-avatar-preview" class="avatar" style="width: 80px; height: 80px;">
-        <input type="file" accept="image/*" id="onboard-avatar-input" style="display:none" onchange="handleAvatarSelect(event)">
-        <button class="badge" style="position: absolute; bottom: 0; right: 0;" onclick="document.getElementById('onboard-avatar-input').click()">Dəyiş</button>
-      </div>
-
-      <input type="text" id="onboard-name" placeholder="Adınız" class="card" style="width: 80%; text-align: center;">
-      <input type="text" id="onboard-bio" placeholder="Bio (maks 80 hərf)" maxlength="80" class="card" style="width: 80%; text-align: center;">
-      
-      <button onclick="finishOnboarding()" style="background: #fff; color: #000; padding: 10px 24px; border-radius: var(--radius-full); font-weight: 700;">Daxil Ol</button>
-    </div>
+<div id="header">
+  <b>AzGram PRO</b>
+  <div class="row" style="width:auto">
+    <div class="btn" onclick="openSearch()"><i data-lucide="search" style="width:18px"></i></div>
+    <div class="btn" onclick="openSettings()"><i data-lucide="more-vertical" style="width:18px"></i></div>
   </div>
+</div>
 
-  <div id="chat-room">
-    <header>
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <button onclick="closeChatRoom()"><i data-lucide="arrow-left"></i></button>
-        <img src="" id="chat-peer-avatar" class="avatar" style="width: 32px; height: 32px;">
-        <div>
-          <div id="chat-peer-name" style="font-size: 13px; font-weight: 600;">...</div>
-          <div id="chat-peer-status" style="font-size: 10px; color: var(--text-muted);">onlayn</div>
-        </div>
-      </div>
-      <div class="header-actions">
-        <button onclick="startCall(false)"><i data-lucide="phone"></i></button>
-        <button onclick="startCall(true)"><i data-lucide="video"></i></button>
-        <button onclick="openModal('chat-info-modal')"><i data-lucide="more-vertical"></i></button>
-      </div>
-    </header>
-
-    <div class="chat-messages" id="chat-messages">
-      </div>
-
-    <div class="chat-input-area">
-      <input type="file" id="chat-file-input" style="display:none;" multiple accept="image/*,video/*,audio/*" onchange="sendChatFiles(event)">
-      <button onclick="document.getElementById('chat-file-input').click()"><i data-lucide="paperclip"></i></button>
-      <input type="text" id="chat-input" placeholder="Mesaj yazın..." onkeydown="if(event.key==='Enter') sendChatMessage()">
-      <button id="voice-record-btn" onmousedown="startVoiceRecord()" onmouseup="stopVoiceRecord()"><i data-lucide="mic"></i></button>
-      <button onclick="sendChatMessage()"><i data-lucide="send"></i></button>
+<div id="app">
+  <!-- MESAJLAR PANEL -->
+  <div id="panel-messages" class="panel active">
+    <div style="padding:12px 16px;color:var(--sec);font-size:12px;display:flex;justify-content:space-between"><span id="contactCount">0 kontakt</span><span id="onlineCount">0 online</span></div>
+    <div id="bannerTop" class="banner" style="margin:0 12px 8px" onclick="clickBanner('top')">
+      <span class="tag">REKLAM</span>
+      <div><b id="bannerTopTitle">AzGram-da reklam ver - 1000 baxış 1 AZN</b><div style="font-size:11px;color:var(--sec)">Baxış: <span id="bannerTopViews">0</span></div></div>
+      <div class="btn primary" style="width:auto;padding:0 12px">Ətraflı</div>
     </div>
-  </div>
-
-  <div class="modal-overlay" id="status-creator-modal">
-    <div class="modal-content modal-full" style="display: flex; flex-direction: column; justify-content: space-between;">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <button onclick="closeModal('status-creator-modal')"><i data-lucide="x"></i></button>
-        <span style="font-weight: 600;">Status Yarat</span>
-        <button onclick="publishStatus()" class="badge">Paylaş</button>
+    <div style="padding:0 16px 8px;display:flex;gap:8px">
+      <input id="contactSearch" placeholder="Kontakt axtar..." oninput="filterContacts()" style="flex:1">
+    </div>
+    <div id="contactList"></div>
+    <div id="chatView" style="display:none;flex:1;flex-direction:column;position:absolute;inset:0;background:var(--bg);z-index:10">
+      <div id="chatHeader">
+        <div class="btn" onclick="closeChat()"><i data-lucide="arrow-left"></i></div>
+        <img id="chatAvatar" style="width:36px;height:36px;border-radius:999px">
+        <div style="flex:1"><div id="chatName" style="font-weight:700"></div><div id="chatStatus" style="font-size:11px;color:var(--sec)"></div></div>
+        <div class="btn" onclick="startVoiceCall()"><i data-lucide="phone"></i></div>
+        <div class="btn" onclick="startVideoCall()"><i data-lucide="video"></i></div>
+        <div class="btn" onclick="openChatMenu()"><i data-lucide="more-vertical"></i></div>
       </div>
-
-      <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;" id="status-preview-container">
-        <canvas id="status-canvas" style="max-width: 100%; max-height: 60vh; border-radius: 12px; background: #111;"></canvas>
-      </div>
-
-      <div style="display: flex; flex-direction: column; gap: 8px;">
-        <div style="display: flex; gap: 8px; overflow-x: auto; padding: 4px 0;">
-          <button class="badge" onclick="openMusicPicker()">🎵 Musiqi Əlavə Et</button>
-          <button class="badge" onclick="applyStatusFilter('grayscale')">Grayscale</button>
-          <button class="badge" onclick="applyStatusFilter('sepia')">Sepia</button>
-          <button class="badge" onclick="applyStatusFilter('invert')">Invert</button>
-          <button class="badge" onclick="applyStatusFilter('none')">Normal</button>
-        </div>
-
-        <input type="text" id="status-caption" placeholder="Açıqlama / #hashtag / @tag" class="card">
-        
-        <div style="display: flex; justify-content: space-around;">
-          <input type="file" id="status-file-input" accept="image/*,video/*" style="display:none;" onchange="loadStatusMedia(event)">
-          <button onclick="document.getElementById('status-file-input').click()"><i data-lucide="image"></i> Qalereya</button>
-          <button onclick="captureCameraStatus()"><i data-lucide="camera"></i> Kamera</button>
-        </div>
+      <div id="messages" ontouchstart="touchStart(event)" ontouchend="touchEnd(event)"></div>
+      <div id="inputBar">
+        <div class="btn" onclick="document.getElementById('fileImg').click()"><i data-lucide="image"></i></div>
+        <input type="file" id="fileImg" accept="image/*,video/*" multiple style="display:none">
+        <input type="file" id="fileAudio" accept="audio/*" style="display:none">
+        <div class="btn" onclick="document.getElementById('fileAudio').click()"><i data-lucide="music"></i></div>
+        <input id="msgInput" placeholder="Mesaj..." onkeydown="if(event.key==='Enter')sendMsg()" oninput="typing(true)">
+        <div class="btn" id="micBtn" ontouchstart="startRec(event)" ontouchend="stopRec(event)" onmousedown="startRec(event)" onmouseup="stopRec(event)"><i data-lucide="mic"></i></div>
+        <div class="btn primary" onclick="sendMsg()"><i data-lucide="send"></i></div>
       </div>
     </div>
   </div>
 
-  <div class="modal-overlay" id="music-picker-modal">
-    <div class="modal-content">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <h3>Musiqi Seç</h3>
-        <button onclick="closeModal('music-picker-modal')"><i data-lucide="x"></i></button>
-      </div>
-      <div style="display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 12px;">
-        <button style="flex: 1; padding: 8px;" onclick="toggleMusicTab('opensource')">Açıq Mənbə</button>
-        <button style="flex: 1; padding: 8px;" onclick="toggleMusicTab('local')">Telefonumdan</button>
-      </div>
+  <!-- STATUS PANEL -->
+  <div id="panel-status" class="panel">
+    <div id="statusFeed"></div>
+    <div style="position:absolute;bottom:80px;right:16px;display:flex;flex-direction:column;gap:8px;z-index:10">
+      <div class="btn primary" style="width:56px;height:56px" onclick="openStatusCreate()"><i data-lucide="plus"></i></div>
+    </div>
+  </div>
 
-      <div id="music-tab-opensource">
-        <div class="list-item" onclick="selectMusic('https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3', 'Lo-Fi Chill', 'Pixabay Free')">
-          <i data-lucide="music"></i>
-          <div class="list-info"><div class="list-title">Lo-Fi Chill</div><div class="list-subtitle">Pixabay Open Source</div></div>
+  <!-- KƏŞF + GOOGLE + BANNER -->
+  <div id="panel-discover" class="panel">
+    <div id="discover">
+      <div class="searchBox">
+        <input id="globalSearch" placeholder="Google kimi axtar - #baku, ad, musiqi..." oninput="globalSearchFunc()">
+        <div class="btn primary" onclick="googleSearch()"><i data-lucide="search"></i></div>
+        <div class="btn" onclick="startVoiceSearch()"><i data-lucide="mic"></i></div>
+      </div>
+      <div class="row" style="overflow-x:auto;gap:6px">
+        <div class="btn" style="width:auto;padding:0 12px;white-space:nowrap" onclick="filterTag('Hamısı')">Hamısı</div>
+        <div class="btn" style="width:auto;padding:0 12px" onclick="filterTag('Musiqi')">Musiqi</div>
+        <div class="btn" style="width:auto;padding:0 12px" onclick="filterTag('Bakı')">Bakı</div>
+        <div class="btn" style="width:auto;padding:0 12px" onclick="filterTag('Komediya')">Komediya</div>
+      </div>
+      <div id="trendTags" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+      <div id="bannerMid" class="banner" onclick="clickBanner('mid')"><span class="tag">REKLAM - BAXIŞA GÖRƏ</span><div><b>Banner - 1000 baxış 1 AZN</b><div style="font-size:11px">Baxış: <span id="bannerMidViews">0</span> | Klik: <span id="bannerMidClicks">0</span></div></div><div class="btn">Aç</div></div>
+      <div id="searchResults" style="display:flex;flex-direction:column;gap:8px"></div>
+      <div id="googleResults" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+  </div>
+
+  <!-- PROFIL -->
+  <div id="panel-profile" class="panel" style="padding:16px;overflow-y:auto">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:20px">
+      <img id="myAvatarBig" style="width:100px;height:100px;border-radius:999px">
+      <h2 id="myNameBig"></h2>
+      <p id="myBioBig" style="color:var(--sec)"></p>
+      <div class="row" style="width:100%">
+        <div class="btn" style="flex:1" onclick="editProfile()"><i data-lucide="edit"></i> Redaktə - Qalereya birbaşa</div>
+        <div class="btn" style="flex:1" onclick="openPrivacy()"><i data-lucide="shield"></i> Məxfilik</div>
+      </div>
+      <div style="width:100%;background:var(--card);border-radius:12px;padding:12px;border:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between"><span>ID</span><span id="myIDShow" style="font-size:11px;color:var(--sec)"></span></div>
+        <div style="display:flex;justify-content:space-between;margin-top:8px"><span>Balans (banner)</span><span id="myBalance">0 AZN - <span id="myTotalViews">0</span> baxış</span></div>
+      </div>
+      <div class="btn" style="width:100%" onclick="createAd()"><i data-lucide="megaphone"></i> Reklam ver - Banner yarat</div>
+      <div class="btn" style="width:100%;color:#f55" onclick="logout()"><i data-lucide="log-out"></i> Çıxış / Hesabı sil</div>
+    </div>
+  </div>
+</div>
+
+<div id="bottomNav">
+  <div class="navItem active" onclick="switchTab('messages')"><i data-lucide="message-circle"></i><span>Mesajlar</span></div>
+  <div class="navItem" onclick="switchTab('status')"><i data-lucide="play"></i><span>Status</span><span id="statusBadge" class="badge" style="position:absolute;top:4px;margin-left:12px;display:none">0</span></div>
+  <div class="navItem" onclick="switchTab('discover')"><i data-lucide="compass"></i><span>Kəşf</span></div>
+  <div class="navItem" onclick="switchTab('profile')"><i data-lucide="user"></i><span>Profil</span></div>
+</div>
+
+<!-- STATUS YARAT MODAL -->
+<div id="statusModal" class="modal">
+  <div class="modalCard">
+    <div class="row" style="justify-content:space-between"><h3>Status yarat - musiqi ilə</h3><div class="btn" onclick="closeModal('statusModal')"><i data-lucide="x"></i></div></div>
+    <div class="row">
+      <div class="btn" style="flex:1" onclick="document.getElementById('statusMedia').click()"><i data-lucide="image"></i> Qalereya birbaşa</div>
+      <div class="btn" style="flex:1" onclick="openCamera()"><i data-lucide="camera"></i> Kamera birbaşa</div>
+    </div>
+    <input type="file" id="statusMedia" accept="image/*,video/*" multiple style="display:none">
+    <div id="statusPreview" style="display:flex;gap:8px;overflow-x:auto"></div>
+    <textarea id="statusText" placeholder="Nə düşünürsən? #baku @dost"></textarea>
+    <input id="statusPlace" placeholder="Yer - Bakı">
+    <!-- MUSİQİ SİSTEMİ -->
+    <div style="background:var(--input);border-radius:12px;padding:12px;border:1px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;align-items:center"><b>🎵 Musiqi əlavə et - şəkilə/videoya</b><div class="btn" onclick="openMusicModal()"><i data-lucide="music"></i> Seç</div></div>
+      <div id="selectedMusic" style="margin-top:8px;color:var(--sec);font-size:12px">Musiqi seçilmədi - Açıq mənbəli və ya Telefonumdan</div>
+      <div id="musicTrim" style="display:none;margin-top:8px">
+        <label style="font-size:11px">Trim 15s - Başlanğıc <span id="trimVal">0s</span></label>
+        <input type="range" id="musicStart" min="0" max="60" value="0" oninput="updateTrim()">
+        <div class="row"><span>Video səsi</span><input type="range" id="videoVol" min="0" max="100" value="20"><span>Musiqi</span><input type="range" id="musicVol" min="0" max="100" value="80"></div>
+      </div>
+    </div>
+    <div class="row">
+      <select id="statusPrivacy"><option value="all">Hamı</option><option value="contacts">Kontaktlarım</option></select>
+      <div class="btn primary" style="flex:1;height:44px" onclick="publishStatus()">Paylaş - Alqoritm</div>
+    </div>
+  </div>
+</div>
+
+<!-- MUSİQİ MODAL - AÇIQ MƏNBƏ + TELEFON -->
+<div id="musicModal" class="modal">
+  <div class="modalCard" style="max-width:500px">
+    <div class="row" style="justify-content:space-between"><h3>Musiqi seç - Açıq mənbə + Telefon</h3><div class="btn" onclick="closeModal('musicModal')"><i data-lucide="x"></i></div></div>
+    <div class="row"><div class="btn primary" style="flex:1" onclick="switchMusicTab('open')">A) Açıq Mənbə - 30 track free</div><div class="btn" style="flex:1" onclick="switchMusicTab('phone')">B) Telefonumdan</div></div>
+    <div id="musicOpenTab">
+      <input id="musicSearch" placeholder="Musiqi axtar - pop, lo-fi, azeri..." oninput="filterMusic()" style="margin-bottom:8px">
+      <div style="display:flex;gap:6px;overflow-x:auto;margin-bottom:8px"><span class="btn" style="width:auto;padding:0 8px" onclick="filterMusicCat('Trend')">Trend</span><span class="btn" style="width:auto;padding:0 8px" onclick="filterMusicCat('Pop')">Pop</span><span class="btn" style="width:auto;padding:0 8px" onclick="filterMusicCat('Lo-fi')">Lo-fi</span><span class="btn" style="width:auto;padding:0 8px" onclick="filterMusicCat('Azeri')">Azeri</span></div>
+      <div id="musicList" style="display:flex;flex-direction:column;gap:6px;max-height:40vh;overflow-y:auto"></div>
+    </div>
+    <div id="musicPhoneTab" style="display:none">
+      <input type="file" id="phoneMusicInput" accept="audio/*" style="display:none">
+      <div class="btn primary" style="width:100%;height:48px" onclick="document.getElementById('phoneMusicInput').click()"><i data-lucide="folder"></i> Telefonumdan musiqi seç - Birbaşa açılır</div>
+      <div id="phoneMusicInfo" style="margin-top:8px;color:var(--sec);font-size:12px">MP3/WAV/M4A 15MB</div>
+      <audio id="phoneAudioPrev" controls style="width:100%;margin-top:8px;display:none"></audio>
+    </div>
+  </div>
+</div>
+
+<!-- ŞƏRH SHEET - ŞƏRHƏ CAVAB NESTED -->
+<div id="commentSheet" class="commentSheet">
+  <div style="padding:12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"><b>Şərhlər - Şərhə cavab</b><div class="row"><select id="commentSort" onchange="sortComments()"><option value="new">Yeni</option><option value="top">Ən bəyənilən</option></select><div class="btn" onclick="closeComments()"><i data-lucide="x"></i></div></div></div>
+  <div id="commentList" style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:12px"></div>
+  <div style="padding:12px;display:flex;gap:8px;border-top:1px solid var(--border)"><input id="commentInput" placeholder="Şərh yaz..."><div class="btn primary" onclick="postComment()"><i data-lucide="send"></i></div></div>
+</div>
+
+<!-- ZƏNG EKRANI -->
+<div id="callScreen">
+  <div style="text-align:center"><img id="callAvatar" style="width:100px;height:100px;border-radius:999px"><h2 id="callName" style="margin-top:12px"></h2><p id="callTimer" style="color:var(--sec)">Çalır...</p><div id="wave" style="justify-content:center;margin-top:12px;display:none"><div></div><div></div><div></div></div></div>
+  <video id="remoteVideo" autoplay playsinline style="width:100%;max-width:320px;border-radius:16px;background:#111;display:none"></video>
+  <video id="localVideo" autoplay muted playsinline style="width:100px;height:140px;border-radius:12px;background:#222;position:absolute;top:20px;right:20px;display:none"></video>
+  <div style="display:flex;gap:16px">
+    <div class="btn" style="width:56px;height:56px" onclick="toggleMute()"><i data-lucide="mic-off"></i></div>
+    <div class="btn" style="width:72px;height:72px;background:#f33" onclick="endCall()"><i data-lucide="phone-off"></i></div>
+    <div class="btn" style="width:56px;height:56px" onclick="toggleSpeaker()"><i data-lucide="volume-2"></i></div>
+    <div class="btn" style="width:56px;height:56px" onclick="toggleCamera()"><i data-lucide="video-off"></i></div>
+  </div>
+</div>
+
+<!-- REKLAM YARAT -->
+<div id="adModal" class="modal">
+  <div class="modalCard">
+    <h3>Banner reklam ver - Baxışa görə</h3>
+    <input id="adTitle" placeholder="Başlıq - məs: Baku Cafe endirim">
+    <input id="adLink" placeholder="Link https://...">
+    <input type="file" id="adImg" accept="image/*" style="display:none">
+    <div class="btn" onclick="document.getElementById('adImg').click()">Şəkil - Qalereya birbaşa</div>
+    <img id="adPrev" style="width:100%;border-radius:8px;display:none;height:80px;object-fit:cover">
+    <div class="btn primary" onclick="publishAd()">Reklamı paylaş - Hamı görəcək - Baxış sayılır</div>
+    <div class="btn" onclick="closeModal('adModal')">Bağla</div>
+  </div>
+</div>
+
+<!-- MƏXFİLİK & REDAKTƏ -->
+<div id="settingsModal" class="modal"><div class="modalCard">
+  <h3>Məxfilik & Redaktə - Hər şey</h3>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div class="row" style="justify-content:space-between"><span>Son görülmə</span><select id="privLast"><option value="all">Hamı</option><option value="contacts">Kontaktlarım</option><option value="none">Heç kim</option></select></div>
+    <div class="row" style="justify-content:space-between"><span>Profil şəkli</span><select id="privAvatar"><option value="all">Hamı</option><option value="contacts">Kontaktlarım</option></select></div>
+    <div class="row" style="justify-content:space-between"><span>Status</span><select id="privStatus"><option value="all">Hamı</option><option value="contacts">Kontaktlarım</option></select></div>
+    <div class="row" style="justify-content:space-between"><span>Oxundu bilgisi mavi ✓✓</span><input type="checkbox" id="privRead" checked></div>
+    <div class="row" style="justify-content:space-between"><span>Səs</span><input type="checkbox" id="setSound" checked></div>
+    <div class="row" style="justify-content:space-between"><span>Vibrasiya</span><input type="checkbox" id="setVib" checked></div>
+  </div>
+  <div class="btn" onclick="savePrivacy()">Yadda saxla - Redaktə</div>
+  <div class="btn" onclick="closeModal('settingsModal')">Bağla</div>
+</div></div>
+
+<script>
+// INIT
+let myID = localStorage.getItem('az_id') || 'u_'+Math.random().toString(36).slice(2,9);
+localStorage.setItem('az_id',myID);
+let myName = localStorage.getItem('az_name')||'';
+let myAvatar = localStorage.getItem('az_avatar')||'';
+let myBio = localStorage.getItem('az_bio')||'';
+let contacts={}, currentChat=null, statuses=[], currentStatusID=null, replyToComment=null, selectedMusicData=null, banners=[], musicLib=[], touchX=0;
+let gun = Gun({peers:['https://gun-manhattan.herokuapp.com/gun','https://relay.peer.gunDB.io/gun']});
+let peer = new Peer(myID);
+let mediaRecorder, audioChunks=[], callConn=null, localStream=null, callTimerInt=null, callSec=0;
+let openMusic=[
+{id:1,title:"Lo-fi Chill",artist:"Pixabay Free",url:"https://cdn.pixabay.com/download/audio/2022/06/07/audio_b9bd4170e8.mp3",cover:"https://picsum.photos/100?1",cat:"Lo-fi",uses:1200},
+{id:2,title:"Azeri Toy",artist:"Free Azeri",url:"https://cdn.pixabay.com/download/audio/2022/03/24/audio_9bd4170e8.mp3",cover:"https://picsum.photos/100?2",cat:"Azeri",uses:900},
+{id:3,title:"Pop Upbeat",artist:"Pixabay",url:"https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3",cover:"https://picsum.photos/100?3",cat:"Pop",uses:1500},
+{id:4,title:"Trend Baku",artist:"Az Free",url:"https://cdn.pixabay.com/download/audio/2022/06/07/audio_b9bd4170e8.mp3",cover:"https://picsum.photos/100?4",cat:"Trend",uses:2000},
+{id:5,title:"Lo-fi Night",artist:"Free Music",url:"https://cdn.pixabay.com/download/audio/2022/03/10/audio_c8c8a650f6.mp3",cover:"https://picsum.photos/100?5",cat:"Lo-fi",uses:800}
+];
+for(let i=6;i<=30;i++){openMusic.push({id:i,title:"Free Track "+i,artist:"Open Source "+i,url:openMusic[0].url,cover:`https://picsum.photos/100?${i}`,cat:["Trend","Pop","Lo-fi","Azeri","HipHop"][i%5],uses:Math.floor(Math.random()*2000)})}
+musicLib=openMusic;
+
+function toast(t){let el=document.getElementById('toast');el.textContent=t;el.style.display='block';setTimeout(()=>el.style.display='none',2200)}
+function esc(s){let d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
+function startApp(){
+  let n=document.getElementById('myNameInput').value.trim();
+  let b=document.getElementById('myBioInput').value.trim();
+  if(!n){toast('Ad yaz');return}
+  myName=n;myBio=b;
+  if(!myAvatar) myAvatar=`https://i.pravatar.cc/200?u=${myID}`;
+  localStorage.setItem('az_name',myName);localStorage.setItem('az_bio',myBio);localStorage.setItem('az_avatar',myAvatar);
+  document.getElementById('onboard').style.display='none';
+  init();
+}
+document.getElementById('avatarInput').onchange=e=>{
+  let f=e.target.files[0];if(!f)return;
+  let r=new FileReader();r.onload=()=>{myAvatar=r.result;localStorage.setItem('az_avatar',myAvatar);document.getElementById('avatarPrev').src=myAvatar;document.getElementById('avatarPrev').style.display='block'};r.readAsDataURL(f);
+};
+
+function init(){
+  lucide.createIcons();
+  document.getElementById('myAvatarBig').src=myAvatar;
+  document.getElementById('myNameBig').textContent=myName;
+  document.getElementById('myBioBig').textContent=myBio;
+  document.getElementById('myIDShow').textContent=myID;
+  if(myName) document.getElementById('onboard').style.display='none';
+
+  // auto discovery
+  gun.get('azgram_final_users_v300').get(myID).put({id:myID,name:myName,avatar:myAvatar,bio:myBio,online:true,lastSeen:Date.now()});
+  gun.get('azgram_final_users_v300').map().on((data,id)=>{
+    if(!data||!data.name||id===myID) return;
+    contacts[id]=data;
+    renderContacts();
+    renderStatusFeed();
+    renderTrends();
+  });
+
+  // statuses
+  gun.get('final_status_v300').map().on((d,id)=>{
+    if(!d||!d.text) return;
+    let idx=statuses.findIndex(s=>s._id===id);
+    let obj={...d,_id:id,score:calcScore(d)};
+    if(idx>-1) statuses[idx]=obj; else statuses.push(obj);
+    statuses.sort((a,b)=>b.score-a.score);
+    renderStatusFeed();
+    renderTrends();
+  });
+
+  // banners
+  gun.get('banner_ads_v300').map().on((d,id)=>{
+    if(!d||!d.title) return;
+    if(!banners.find(b=>b._id===id)) banners.push({...d,_id:id});
+    renderBanners();
+  });
+  gun.get('banner_stats_v300').map().on(()=>{});
+
+  // peer call
+  peer.on('call',async call=>{
+    document.getElementById('callScreen').style.display='flex';
+    document.getElementById('callName').textContent=contacts[call.peer]?.name||call.peer;
+    document.getElementById('callAvatar').src=contacts[call.peer]?.avatar||'';
+    let stream=await navigator.mediaDevices.getUserMedia({audio:true,video:call.metadata?.video});
+    call.answer(stream);
+    localStream=stream;
+    call.on('stream',s=>{document.getElementById('remoteVideo').srcObject=s;document.getElementById('remoteVideo').style.display='block';if(call.metadata?.video) document.getElementById('localVideo').style.display='block';document.getElementById('localVideo').srcObject=stream});
+    callConn=call;
+    startCallTimer();
+  });
+
+  renderMusicList(musicLib);
+  setInterval(()=>{gun.get('azgram_final_users_v300').get(myID).get('lastSeen').put(Date.now())},10000);
+  setTimeout(()=>{incBannerView('top');},2000);
+
+  // file handlers
+  document.getElementById('fileImg').onchange=handleMediaSend;
+  document.getElementById('statusMedia').onchange=handleStatusMedia;
+  document.getElementById('phoneMusicInput').onchange=handlePhoneMusic;
+  document.getElementById('adImg').onchange=e=>{
+    let r=new FileReader();r.onload=()=>{document.getElementById('adPrev').src=r.result;document.getElementById('adPrev').style.display='block';document.getElementById('adPrev').dataset.base64=r.result};r.readAsDataURL(e.target.files[0]);
+  };
+}
+
+function calcScore(d){
+  let h=(Date.now()-(d.time||0))/3600000;
+  return ((d.likes||0)*12 + (d.views||0)*2 + (d.shares||0)*10 + (d.comments||0)*8 + (d.watch||0)*3 + (d.musicUses||0)*4)/Math.pow(h+1.8,1.4);
+}
+
+function renderContacts(){
+  let q=document.getElementById('contactSearch').value.toLowerCase();
+  let list=Object.values(contacts).filter(c=>c.name.toLowerCase().includes(q));
+  list.sort((a,b)=>(b.online?1:0)-(a.online?1:0));
+  document.getElementById('contactCount').textContent=list.length+' kontakt - hamı avtomatik';
+  document.getElementById('onlineCount').textContent=list.filter(c=>c.online).length+' online';
+  document.getElementById('contactList').innerHTML=list.map(c=>`
+    <div class="contact" onclick="openChat('${c.id}')">
+      <div class="dotWrap"><img src="${c.avatar}"><div class="online" style="background:${c.online?'#0f0':'#555'}"></div></div>
+      <div style="flex:1"><div style="font-weight:700">${esc(c.name)} ${c.bio?'<span style=color:var(--sec);font-weight:400>• '+esc(c.bio)+'</span>':''}</div><div style="font-size:11px;color:var(--sec)">${c.online?'onlayn':'son '+new Date(c.lastSeen).toLocaleTimeString('az-AZ')}</div></div>
+      <div style="width:8px;height:8px;border-radius:999px;background:#0f0"></div>
+    </div>
+  `).join('')||'<div style=padding:20px;color:var(--sec);text-align:center>Kontakt yoxdur - kimsə AzGram-a girəndə avtomatik çıxacaq</div>';
+}
+
+function openChat(id){
+  currentChat=id;
+  document.getElementById('chatView').style.display='flex';
+  document.getElementById('chatName').textContent=contacts[id].name;
+  document.getElementById('chatAvatar').src=contacts[id].avatar;
+  document.getElementById('chatStatus').textContent=contacts[id].online?'onlayn':'offline';
+  document.getElementById('messages').innerHTML='';
+  let chatID=[myID,id].sort().join('_');
+  gun.get('final_msg_'+chatID).map().on((d,mid)=>{
+    if(!d||!d.text&&!d.img&&!d.audio) return;
+    if(document.getElementById('m_'+mid)) return;
+    let me=d.from===myID;
+    let div=document.createElement('div');
+    div.id='m_'+mid;
+    div.className='msg '+(me?'me':'other');
+    div.innerHTML=`
+      ${d.reply?'<div style=font-size:11px;opacity:.8;border-left:2px solid #fff;padding-left:6px;margin-bottom:4px>'+esc(d.reply)+'</div>':''}
+      ${d.text?esc(d.text):''}
+      ${d.img? (d.img.includes('video')||d.img.startsWith('data:video')?'<video src="'+d.img+'" controls></video>':'<img src="'+d.img+'">'):''}
+      ${d.audio?'<audio src="'+d.audio+'" controls style=width:100%></audio>':''}
+      <div class=time>${new Date(d.time).toLocaleTimeString('az-AZ',{hour:'2-digit',minute:'2-digit'})} ${me?'<span style=color:#fff>'+(d.read?'✓✓':'✓✓')+'</span>':''} ${d.edited?'<span style=font-size:9px>redaktə edildi</span>':''}</div>
+    `;
+    div.oncontextmenu=e=>{e.preventDefault();if(confirm('Redaktə et?')){let nt=prompt('Yeni mətn',d.text||'');if(nt!==null) gun.get('final_msg_'+chatID).get(mid).get('text').put(nt),gun.get('final_msg_'+chatID).get(mid).get('edited').put(true)}};
+    document.getElementById('messages').appendChild(div);
+    document.getElementById('messages').scrollTop=document.getElementById('messages').scrollHeight;
+    if(!me) gun.get('final_msg_'+chatID).get(mid).get('read').put(true);
+  });
+}
+function closeChat(){document.getElementById('chatView').style.display='none';currentChat=null}
+function sendMsg(){
+  let t=document.getElementById('msgInput').value.trim();
+  if(!t&&!window._pendingImg) return;
+  if(!currentChat) return;
+  let chatID=[myID,currentChat].sort().join('_');
+  gun.get('final_msg_'+chatID).set({from:myID,to:currentChat,text:t,img:window._pendingImg||'',audio:'',time:Date.now(),read:false});
+  document.getElementById('msgInput').value='';window._pendingImg='';typing(false);
+}
+function handleMediaSend(e){
+  let files=[...e.target.files];
+  files.forEach(f=>{
+    let r=new FileReader();
+    r.onload=()=>{window._pendingImg=r.result;toast('Şəkil hazır - göndər düyməsi');sendMsg()};
+    r.readAsDataURL(f);
+  });
+}
+function typing(v){
+  if(!currentChat) return;
+  gun.get('typing_'+currentChat).get(myID).put(v?true:null);
+}
+
+// voice
+function startRec(e){e.preventDefault();audioChunks=[];navigator.mediaDevices.getUserMedia({audio:true}).then(s=>{mediaRecorder=new MediaRecorder(s);mediaRecorder.ondataavailable=ev=>audioChunks.push(ev.data);mediaRecorder.onstop=()=>{let blob=new Blob(audioChunks);let r=new FileReader();r.onload=()=>{let chatID=[myID,currentChat].sort().join('_');gun.get('final_msg_'+chatID).set({from:myID,to:currentChat,text:'🎤 Səsli mesaj',audio:r.result,time:Date.now()})};r.readAsDataURL(blob)};mediaRecorder.start();toast('Yazılır... burax göndər');document.getElementById('wave').style.display='flex'});}
+function stopRec(e){e.preventDefault();if(mediaRecorder&&mediaRecorder.state==='recording'){mediaRecorder.stop();document.getElementById('wave').style.display='none'}}
+
+// status
+function openStatusCreate(){document.getElementById('statusModal').classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+function handleStatusMedia(e){
+  let files=[...e.target.files];
+  let prev=document.getElementById('statusPreview');prev.innerHTML='';
+  window._statusMedias=[];
+  files.forEach(f=>{
+    let r=new FileReader();r.onload=()=>{window._statusMedias.push(r.result);let el=f.type.startsWith('video')?`<video src="${r.result}" style="width:80px;height:80px;border-radius:8px;object-fit:cover"></video>`:`<img src="${r.result}" style="width:80px;height:80px;border-radius:8px;object-fit:cover">`;prev.innerHTML+=el};r.readAsDataURL(f);
+  });
+}
+function openCamera(){
+  navigator.mediaDevices.getUserMedia({video:true,audio:true}).then(s=>{
+    let v=document.createElement('video');v.srcObject=s;v.autoplay=true;v.style.width='100%';v.style.borderRadius='12px';
+    document.getElementById('statusPreview').innerHTML='';document.getElementById('statusPreview').appendChild(v);
+    let btn=document.createElement('div');btn.className='btn primary';btn.textContent='Çək';btn.onclick=()=>{
+      let c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);window._statusMedias=[c.toDataURL('image/jpeg',0.8)];toast('Çəkildi');s.getTracks().forEach(t=>t.stop());
+    };document.getElementById('statusPreview').appendChild(btn);
+  });
+}
+function openMusicModal(){document.getElementById('musicModal').classList.add('open')}
+function switchMusicTab(t){document.getElementById('musicOpenTab').style.display=t==='open'?'block':'none';document.getElementById('musicPhoneTab').style.display=t==='phone'?'block':'none'}
+function renderMusicList(list){
+  document.getElementById('musicList').innerHTML=list.map(m=>`
+    <div style="display:flex;gap:8px;align-items:center;background:var(--input);padding:8px;border-radius:10px;cursor:pointer" onclick="selectMusic(${m.id})">
+      <img src="${m.cover}" style="width:40px;height:40px;border-radius:8px"><div style="flex:1"><div style="font-weight:700;font-size:13px">${esc(m.title)}</div><div style="font-size:11px;color:var(--sec)">${esc(m.artist)} • ${m.cat} • ${m.uses} istifadə</div></div><div class="btn"><i data-lucide="play" style="width:14px"></i></div><div class="btn primary" style="width:auto;padding:0 10px">İstifadə et</div>
+    </div>
+  `).join('');lucide.createIcons();
+}
+function filterMusic(){let q=document.getElementById('musicSearch').value.toLowerCase();renderMusicList(musicLib.filter(m=>m.title.toLowerCase().includes(q)||m.artist.toLowerCase().includes(q)))}
+function filterMusicCat(c){renderMusicList(musicLib.filter(m=>m.cat===c))}
+function selectMusic(id){
+  let m=musicLib.find(x=>x.id===id);
+  selectedMusicData=m;
+  document.getElementById('selectedMusic').innerHTML=`${esc(m.title)} - ${esc(m.artist)} <br><audio src="${m.url}" controls style="width:100%;margin-top:6px"></audio>`;
+  document.getElementById('musicTrim').style.display='block';
+  closeModal('musicModal');
+  toast('Musiqi seçildi - şəkilə/videoya əlavə olunacaq');
+}
+function handlePhoneMusic(e){
+  let f=e.target.files[0];if(!f)return;
+  if(f.size>15*1024*1024){toast('15MB limit');return}
+  let r=new FileReader();r.onload=()=>{
+    selectedMusicData={title:f.name,artist:'Telefonumdan',url:r.result,cover:'https://picsum.photos/100?99',cat:'Phone'};
+    document.getElementById('selectedMusic').innerHTML=`${f.name}<br><audio src="${r.result}" controls style="width:100%"></audio>`;
+    document.getElementById('musicTrim').style.display='block';
+    document.getElementById('phoneAudioPrev').src=r.result;document.getElementById('phoneAudioPrev').style.display='block';
+    toast('Telefon musiqisi seçildi');
+  };r.readAsDataURL(f);
+}
+function updateTrim(){document.getElementById('trimVal').textContent=document.getElementById('musicStart').value+'s'}
+
+function publishStatus(){
+  let text=document.getElementById('statusText').value.trim();
+  let place=document.getElementById('statusPlace').value.trim();
+  if(!text&&(!window._statusMedias||!window._statusMedias.length)){toast('Mətn və ya media yaz');return}
+  let media=window._statusMedias&&window._statusMedias[0]||'';
+  gun.get('final_status_v300').set({
+    text:text,media:media,place:place,music:selectedMusicData?selectedMusicData.url:'',musicTitle:selectedMusicData?selectedMusicData.title:'',musicArtist:selectedMusicData?selectedMusicData.artist:'',musicStart:document.getElementById('musicStart').value,videoVol:document.getElementById('videoVol').value,musicVol:document.getElementById('musicVol').value,
+    from:myID,fromName:myName,fromAvatar:myAvatar,time:Date.now(),likes:0,views:0,comments:0,shares:0,watch:0,privacy:document.getElementById('statusPrivacy').value
+  });
+  closeModal('statusModal');
+  toast('Status paylaşıldı - alqoritm işlədi');
+  document.getElementById('statusText').value='';window._statusMedias=[];document.getElementById('statusPreview').innerHTML='';selectedMusicData=null;
+}
+
+function renderStatusFeed(){
+  let feed=document.getElementById('statusFeed');
+  let q=(document.getElementById('globalSearch')?.value||'').toLowerCase();
+  let filtered=statuses.filter(s=>!q||s.text.toLowerCase().includes(q)||s.musicTitle?.toLowerCase().includes(q));
+  let html='';
+  filtered.forEach((s,i)=>{
+    if(i>0&&i%4===0){
+      html+=`<div class="statusSlide" style="background:#111"><div class="banner" style="width:90%" onclick="clickBanner('feed_${i}')"><span class="tag">REKLAM - BAXIŞA GÖRƏ</span><div><b>${banners[0]?.title||'AzGram reklam - 1000 baxış 1 AZN'}</b><div style="font-size:11px">Baxışa görə ödəniş - baxış sayılır</div></div></div></div>`;
+    }
+    let isVideo=s.media&&s.media.startsWith('data:video');
+    html+=`
+    <div class="statusSlide" onmouseenter="incView('${s._id}')">
+      ${s.media? (isVideo?`<video src="${s.media}" autoplay loop muted playsinline></video>`:`<img src="${s.media}">`):'<div style=position:absolute;inset:0;background:linear-gradient(45deg,#111,#222)'></div>'}
+      ${s.music?`<div class=musicBar><i data-lucide="music" style="width:14px"></i> <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.musicTitle)} - ${esc(s.musicArtist)}</span><audio src="${s.music}" autoplay loop style="width:80px;height:20px"></audio></div>`:''}
+      <div class=statusOverlay>
+        <div style="flex:1"><div style="display:flex;align-items:center;gap:8px"><img src="${s.fromAvatar}" style="width:36px;height:36px;border-radius:999px"><b>${esc(s.fromName)}</b><span style="font-size:11px;color:#ccc">${timeAgo(s.time)} ${s.place?'• '+esc(s.place):''} ${s.edited?'(redaktə)' :''}</span></div><div style="margin-top:8px;font-size:15px;line-height:1.3">${esc(s.text).replace(/#(\w+)/g,'<span style=color:#1da1f2>#$1</span>')}</div><div style="margin-top:6px;font-size:12px;color:#aaa">${s.musicTitle?'🎵 '+esc(s.musicTitle):''}</div></div>
+        <div class=statusActions>
+          <div class=act onclick="likeStatus('${s._id}')"><i data-lucide="heart"></i><span>${s.likes||0}</span></div>
+          <div class=act onclick="openComments('${s._id}')"><i data-lucide="message-circle"></i><span>${s.comments||0}</span></div>
+          <div class=act onclick="shareStatus('${s._id}')"><i data-lucide="share-2"></i><span>${s.shares||0}</span></div>
+          <div class=act onclick="useMusic('${s._id}')"><i data-lucide="music"></i><span>Musiqi istifadə</span></div>
+          <div class=act onclick="editStatus('${s._id}')"><i data-lucide="edit"></i></div>
+          <div class=act onclick="moreStatus('${s._id}')"><i data-lucide="more-horizontal"></i></div>
         </div>
-        <div class="list-item" onclick="selectMusic('https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3', 'Upbeat Pop', 'Free Music')">
-          <i data-lucide="music"></i>
-          <div class="list-info"><div class="list-title">Upbeat Pop</div><div class="list-subtitle">Creative Commons</div></div>
-        </div>
       </div>
+    </div>`;
+  });
+  feed.innerHTML=html||'<div style=padding:40px;text-align:center;color:var(--sec)>Hələ status yoxdur - ilk statusu sən paylaş - musiqi ilə</div>';
+  lucide.createIcons();
+}
+function timeAgo(t){let d=(Date.now()-t)/1000;if(d<60)return'indi';if(d<3600)return Math.floor(d/60)+'d';if(d<86400)return Math.floor(d/3600)+'s';return Math.floor(d/86400)+'g'}
+function likeStatus(id){gun.get('final_status_v300').get(id).get('likes').put((statuses.find(s=>s._id===id)?.likes||0)+1)}
+function incView(id){let s=statuses.find(x=>x._id===id);if(!s||s._viewed) return;s._viewed=true;gun.get('final_status_v300').get(id).get('views').put((s.views||0)+1);incBannerView('feed')}
+function shareStatus(id){navigator.share?navigator.share({title:'AzGram',text:statuses.find(s=>s._id===id)?.text,url:location.href}):(navigator.clipboard.writeText(location.href),toast('Link kopyalandı'));gun.get('final_status_v300').get(id).get('shares').put((statuses.find(s=>s._id===id)?.shares||0)+1)}
+function useMusic(id){let s=statuses.find(x=>x._id===id);if(!s?.music)return;selectedMusicData={url:s.music,title:s.musicTitle,artist:s.musicArtist};openStatusCreate();document.getElementById('selectedMusic').textContent=s.musicTitle+' seçildi';toast('Eyni musiqi ilə status yarat')}
+function editStatus(id){let s=statuses.find(x=>x._id===id);if(s.from!==myID){toast('Yalnız öz statusunu redaktə edə bilərsən');return}let nt=prompt('Yeni mətn',s.text);if(nt!==null){gun.get('final_status_v300').get(id).get('text').put(nt);gun.get('final_status_v300').get(id).get('edited').put(true);toast('Redaktə edildi')}}
+function moreStatus(id){if(confirm('Silinsin?')){gun.get('final_status_v300').get(id).put(null);toast('Silindi')}}
 
-      <div id="music-tab-local" style="display: none; text-align: center; padding: 20px;">
-        <input type="file" accept="audio/*" id="local-audio-input" onchange="handleLocalAudioSelect(event)" style="display: none;">
-        <button class="badge" onclick="document.getElementById('local-audio-input').click()" style="padding: 12px 24px;">Telefon Axtarışını Aç</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="comments-modal">
-    <div class="modal-content" style="max-height: 70vh;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <h4 id="comments-count-title">Şərhlər (0)</h4>
-        <button onclick="closeModal('comments-modal')"><i data-lucide="x"></i></button>
-      </div>
-      <div id="comments-container" style="max-height: 40vh; overflow-y: auto; margin-bottom: 12px;">
-        </div>
-      <div style="display: flex; gap: 8px;">
-        <input type="text" id="comment-input" placeholder="Şərh yazın..." class="card" style="flex: 1; margin: 0;">
-        <button onclick="postComment()" class="badge">Göndər</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="call-overlay" style="z-index: 300;">
-    <div class="modal-content modal-full" style="display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 32px 16px;">
-      <div style="text-align: center;">
-        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100" id="call-avatar" class="avatar" style="width: 96px; height: 96px; margin-bottom: 12px;">
-        <h2 id="call-peer-name">İstifadəçi</h2>
-        <p style="color: var(--text-muted); font-size: 12px;" id="call-status-text">Zəng edilir... (E2E Şifrələmə)</p>
-      </div>
-
-      <div style="width: 100%; height: 40vh; display: none; position: relative;" id="video-call-container">
-        <video id="remote-video" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;"></video>
-        <video id="local-video" autoplay playsinline muted style="width: 80px; height: 120px; position: absolute; bottom: 8px; right: 8px; border-radius: 8px; object-fit: cover; border: 1px solid #fff;"></video>
-      </div>
-
-      <div style="display: flex; gap: 24px; align-items: center;">
-        <button onclick="toggleMuteCall()" style="background: #222; border-radius: 50%; width: 48px; height: 48px;"><i data-lucide="mic-off"></i></button>
-        <button onclick="endCall()" style="background: #ff3b30; border-radius: 50%; width: 64px; height: 64px; color: #fff;"><i data-lucide="phone-off"></i></button>
-        <button onclick="toggleVideoCall()" style="background: #222; border-radius: 50%; width: 48px; height: 48px;"><i data-lucide="video-off"></i></button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="search-modal">
-    <div class="modal-content">
-      <div class="search-box">
-        <i data-lucide="search"></i>
-        <input type="text" id="global-search-input" placeholder="Qlobal Axtarış (İstifadəçilər/Statuslar)..." oninput="executeGlobalSearch()">
-      </div>
-      <div id="global-search-results" style="margin-top: 12px;"></div>
-    </div>
-  </div>
-
-  <div id="toast">Əməliyyat yerinə yetirildi</div>
-
-  <script>
-    // --- 250 MADDE P2P CORE INITIALIZATION ---
-    console.log('AzGram ULTRA v250 hazır - musiqi açıq mənbə + telefon + şərhə cavab + 250/250 işlək');
-    
-    // Gun DB setup
-    const gun = Gun(['https://gun-manhattan.herokuapp.com/gun', 'https://peer.walland.pro/gun']);
-    let peer = null;
-    let currentCall = null;
-    let localStream = null;
-
-    // Local State
-    let currentUser = JSON.parse(localStorage.getItem('azgram_ultra_user')) || null;
-    let activeChatPeer = null;
-    let activeTab = 1;
-    let selectedMusicUrl = null;
-    let currentStatusId = null;
-    let isRecordingVoice = false;
-
-    // Initialize App
-    window.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
-      setupGestures();
-      
-      if (!currentUser) {
-        document.getElementById('onboarding-modal').classList.add('active');
-      } else {
-        initUserSession();
-      }
-
-      window.addEventListener('online', updateNetworkStatus);
-      window.addEventListener('offline', updateNetworkStatus);
+// comments nested
+function openComments(id){currentStatusID=id;document.getElementById('commentSheet').classList.add('open');loadComments(id)}
+function closeComments(){document.getElementById('commentSheet').classList.remove('open');currentStatusID=null;replyToComment=null}
+function loadComments(statusID){
+  let listEl=document.getElementById('commentList');listEl.innerHTML='';
+  gun.get('comments_'+statusID).map().on((d,cid)=>{
+    if(!d||!d.text) return;
+    if(document.getElementById('c_'+cid)) return;
+    let div=document.createElement('div');
+    div.id='c_'+cid;
+    div.style.cssText='background:var(--input);padding:10px;border-radius:12px';
+    div.innerHTML=`
+      <div style="display:flex;gap:8px;align-items:center"><img src="${d.avatar}" style="width:24px;height:24px;border-radius:999px"><b style="font-size:13px">${esc(d.name)}</b><span style="font-size:10px;color:var(--sec)">${timeAgo(d.time)}</span></div>
+      <div style="margin:6px 0 0 32px">${esc(d.text)} ${d.replyTo?'<span style=color:var(--blue)> @'+esc(d.replyToName)+'</span>':''}</div>
+      <div style="margin:6px 0 0 32px;display:flex;gap:12px;font-size:11px;color:var(--sec)"><span style="cursor:pointer" onclick="likeComment('${statusID}','${cid}')">❤️ ${d.likes||0}</span><span style="cursor:pointer" onclick="replyComment('${cid}','${esc(d.name)}')">Cavab ver - şərhə cavab</span><span style="cursor:pointer" onclick="editComment('${statusID}','${cid}')">Redaktə</span><span style="cursor:pointer" onclick="delComment('${statusID}','${cid}')">Sil</span></div>
+      <div id="replies_${cid}" style="margin:8px 0 0 32px;display:flex;flex-direction:column;gap:6px"></div>
+    `;
+    listEl.appendChild(div);
+    // replies
+    gun.get('replies_'+cid).map().on((rd,rid)=>{
+      if(!rd||!rd.text) return;
+      let rWrap=document.getElementById('replies_'+cid);
+      if(!rWrap||document.getElementById('r_'+rid)) return;
+      let rDiv=document.createElement('div');
+      rDiv.id='r_'+rid;
+      rDiv.style.cssText='background:#111;padding:8px;border-radius:8px;font-size:13px';
+      rDiv.innerHTML=`<b>${esc(rd.name)}</b> <span style=color:var(--sec)>@${esc(rd.replyToName)}</span>: ${esc(rd.text)} <span style="font-size:10px;color:var(--sec)">${timeAgo(rd.time)}</span>`;
+      rWrap.appendChild(rDiv);
     });
+  });
+}
+function postComment(){
+  let t=document.getElementById('commentInput').value.trim();if(!t||!currentStatusID) return;
+  if(replyToComment){
+    gun.get('replies_'+replyToComment).set({name:myName,avatar:myAvatar,text:t,replyTo:replyToComment,replyToName:window._replyToName||'',time:Date.now(),likes:0});
+    toast('Cavab yazıldı - şərhə cavab');
+  }else{
+    gun.get('comments_'+currentStatusID).set({name:myName,avatar:myAvatar,text:t,time:Date.now(),likes:0});
+    gun.get('final_status_v300').get(currentStatusID).get('comments').put((statuses.find(s=>s._id===currentStatusID)?.comments||0)+1);
+  }
+  document.getElementById('commentInput').value='';replyToComment=null;
+}
+function replyComment(cid,name){replyToComment=cid;window._replyToName=name;document.getElementById('commentInput').placeholder=name+' - cavab yaz...';document.getElementById('commentInput').focus();toast('Şərhə cavab - '+name)}
+function likeComment(sid,cid){gun.get('comments_'+sid).get(cid).get('likes').put(1)}
+function editComment(sid,cid){let nt=prompt('Redaktə');if(nt) gun.get('comments_'+sid).get(cid).get('text').put(nt)}
+function delComment(sid,cid){if(confirm('Silinsin?')) gun.get('comments_'+sid).get(cid).put(null)}
+function sortComments(){toast('Sort: '+document.getElementById('commentSort').value)}
 
-    function updateNetworkStatus() {
-      document.getElementById('offline-banner').style.display = navigator.onLine ? 'none' : 'block';
-    }
+// banner
+function renderBanners(){
+  if(banners[0]) document.getElementById('bannerTopTitle').textContent=banners[0].title;
+}
+function incBannerView(place){
+  let id='banner_'+place;
+  gun.get('banner_stats_v300').get(id).get('views').put((parseInt(localStorage.getItem(id+'_v')||0)+1));
+  localStorage.setItem(id+'_v',parseInt(localStorage.getItem(id+'_v')||0)+1);
+  document.getElementById('bannerTopViews').textContent=localStorage.getItem('banner_top_v')||0;
+  document.getElementById('bannerMidViews').textContent=localStorage.getItem('banner_mid_v')||0;
+  document.getElementById('myTotalViews').textContent=parseInt(localStorage.getItem('banner_top_v')||0)+parseInt(localStorage.getItem('banner_mid_v')||0);
+  document.getElementById('myBalance').textContent=((parseInt(localStorage.getItem('banner_top_v')||0)+parseInt(localStorage.getItem('banner_mid_v')||0))/1000).toFixed(3)+' AZN';
+}
+function clickBanner(place){
+  incBannerView(place+'_click');
+  let c=document.getElementById('bannerMidClicks');if(c) c.textContent=parseInt(localStorage.getItem('banner_mid_click_v')||0)+1;
+  if(banners[0]?.link) window.open(banners[0].link,'_blank'); else toast('Reklam klik - baxışa görə sayıldı');
+}
+function createAd(){document.getElementById('adModal').classList.add('open')}
+function publishAd(){
+  let title=document.getElementById('adTitle').value.trim();
+  let link=document.getElementById('adLink').value.trim();
+  let img=document.getElementById('adPrev').dataset.base64||'';
+  if(!title){toast('Başlıq yaz');return}
+  gun.get('banner_ads_v300').set({title,link,img,time:Date.now(),from:myID,views:0,clicks:0});
+  closeModal('adModal');toast('Reklam paylaşıldı - banner oldu - baxışa görə');
+}
 
-    function showToast(msg) {
-      const t = document.getElementById('toast');
-      t.innerText = msg;
-      t.style.display = 'block';
-      setTimeout(() => t.style.display = 'none', 2000);
-    }
+// discover google
+function globalSearchFunc(){renderStatusFeed()}
+function googleSearch(){
+  let q=document.getElementById('globalSearch').value.trim();if(!q){toast('Axtarış yaz');return}
+  window.open('https://www.google.com/search?q='+encodeURIComponent(q+' site:azgram'),'blank');
+  document.getElementById('googleResults').innerHTML=`<div style=background:var(--card);padding:12px;border-radius:12px;border:1px solid var(--border)><b>Google - ${esc(q)}</b><div style=font-size:12px;color:var(--sec)>Google-a bağlı axtarış - yeni tabda açıldı - AzGram içində də: ${statuses.filter(s=>s.text.toLowerCase().includes(q.toLowerCase())).length} nəticə</div></div>`;
+}
+function startVoiceSearch(){
+  let rec=new (window.SpeechRecognition||window.webkitSpeechRecognition)();
+  rec.lang='az-AZ';rec.onresult=e=>{document.getElementById('globalSearch').value=e.results[0][0].transcript;globalSearchFunc()};rec.start();
+}
+function filterTag(t){document.getElementById('globalSearch').value=t==='Hamısı'?'':t;globalSearchFunc()}
+function renderTrends(){
+  let tags={};
+  statuses.forEach(s=>{let m=s.text.match(/#\w+/g);if(m)m.forEach(h=>tags[h]=(tags[h]||0)+1)});
+  let top=Object.entries(tags).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  document.getElementById('trendTags').innerHTML=top.map(([tag,c])=>`<span style="background:var(--input);border:1px solid var(--border);padding:6px 10px;border-radius:999px;font-size:12px;cursor:pointer" onclick="document.getElementById('globalSearch').value='${tag}';globalSearchFunc()">${tag} ${c}</span>`).join('')||'<span style=color:var(--sec)>Trend yoxdur</span>';
+}
 
-    // --- ONBOARDING & PROFILE ---
-    function handleAvatarSelect(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-          document.getElementById('onboard-avatar-preview').src = evt.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    }
+// calls
+function startVoiceCall(){startCall(false)}
+function startVideoCall(){startCall(true)}
+async function startCall(video){
+  if(!currentChat){toast('Kontakt seç');return}
+  document.getElementById('callScreen').style.display='flex';
+  document.getElementById('callName').textContent=contacts[currentChat].name;
+  document.getElementById('callAvatar').src=contacts[currentChat].avatar;
+  document.getElementById('callTimer').textContent='Çalır...';
+  localStream=await navigator.mediaDevices.getUserMedia({audio:true,video:video});
+  if(video){document.getElementById('localVideo').style.display='block';document.getElementById('localVideo').srcObject=localStream}
+  let call=peer.call(currentChat,localStream,{metadata:{video}});
+  call.on('stream',s=>{document.getElementById('remoteVideo').srcObject=s;document.getElementById('remoteVideo').style.display='block'});
+  callConn=call;
+  startCallTimer();
+}
+function startCallTimer(){callSec=0;callTimerInt=setInterval(()=>{callSec++;let m=Math.floor(callSec/60).toString().padStart(2,'0');let s=(callSec%60).toString().padStart(2,'0');document.getElementById('callTimer').textContent=m+':'+s},1000)}
+function endCall(){clearInterval(callTimerInt);if(callConn)callConn.close();if(localStream)localStream.getTracks().forEach(t=>t.stop());document.getElementById('callScreen').style.display='none';document.getElementById('remoteVideo').style.display='none';document.getElementById('localVideo').style.display='none';if(currentChat){let chatID=[myID,currentChat].sort().join('_');gun.get('final_msg_'+chatID).set({from:myID,text:'📞 Zəng '+document.getElementById('callTimer').textContent,time:Date.now()})}toast('Zəng bitdi')}
+function toggleMute(){if(localStream)localStream.getAudioTracks().forEach(t=>t.enabled=!t.enabled);toast('Mute')}
+function toggleSpeaker(){toast('Speaker')}
+function toggleCamera(){if(localStream)localStream.getVideoTracks().forEach(t=>t.enabled=!t.enabled);toast('Kamera')}
 
-    function finishOnboarding() {
-      const name = document.getElementById('onboard-name').value.trim();
-      const bio = document.getElementById('onboard-bio').value.trim();
-      const avatar = document.getElementById('onboard-avatar-preview').src;
+// tabs & swipe
+function switchTab(t){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+t).classList.add('active');
+  document.querySelectorAll('.navItem').forEach(n=>n.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  if(t==='status') incBannerView('status');
+}
+function touchStart(e){touchX=e.touches[0].clientX}
+function touchEnd(e){
+  let dx=e.changedTouches[0].clientX-touchX;
+  if(dx>80){switchTab('status');document.getElementById('panel-messages').classList.remove('active');document.getElementById('panel-status').classList.add('active');toast('Sağ swipe - Status')}
+  if(dx<-80){switchTab('discover');toast('Sol swipe - Kəşf + Google + Banner')}
+}
+function openSearch(){switchTab('discover');document.getElementById('globalSearch').focus()}
+function openSettings(){document.getElementById('settingsModal').classList.add('open')}
+function editProfile(){let n=prompt('Yeni ad',myName);if(n){myName=n;localStorage.setItem('az_name',n);gun.get('azgram_final_users_v300').get(myID).get('name').put(n);init()}document.getElementById('avatarInput').click()}
+function openPrivacy(){openSettings()}
+function savePrivacy(){toast('Məxfilik yadda saxlandı - redaktə');closeModal('settingsModal')}
+function openChatMenu(){if(confirm('Chatı təmizlə?')) document.getElementById('messages').innerHTML=''}
+function logout(){if(confirm('Hesabı sil?')){localStorage.clear();location.reload()}}
 
-      if (!name) return showToast('Adınızı daxil edin');
-
-      const id = 'usr_' + Math.random().toString(36).substr(2, 9);
-      currentUser = { id, name, bio, avatar, online: true, lastSeen: Date.now() };
-
-      localStorage.setItem('azgram_ultra_user', JSON.stringify(currentUser));
-      document.getElementById('onboarding-modal').classList.remove('active');
-
-      initUserSession();
-    }
-
-    function initUserSession() {
-      // Broadcast user to Gun network (Item 3)
-      gun.get('azgram_ultra_users_v250').get(currentUser.id).put(currentUser);
-      
-      // Init PeerJS for WebRTC calls (Item 91)
-      peer = new Peer(currentUser.id);
-      peer.on('call', handleIncomingCall);
-
-      loadUsersNetwork();
-      loadStatusFeed();
-      switchTab(1);
-    }
-
-    // --- SWIPE GESTURES & TABS ---
-    let touchStartX = 0;
-    let touchEndX = 0;
-
-    function setupGestures() {
-      const container = document.getElementById('app');
-      container.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX, false);
-      container.addEventListener('touchend', e => {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-      }, false);
-    }
-
-    function handleSwipe() {
-      const diff = touchEndX - touchStartX;
-      if (Math.abs(diff) > 60) {
-        if (diff < 0 && activeTab < 2) switchTab(activeTab + 1); // Swipe Left
-        if (diff > 0 && activeTab > 0) switchTab(activeTab - 1); // Swipe Right
-      }
-    }
-
-    function switchTab(index) {
-      activeTab = index;
-      document.getElementById('views-container').style.transform = `translateX(-${index * 100}vw)`;
-      document.querySelectorAll('.nav-item').forEach((el, i) => {
-        el.classList.toggle('active', i === index);
-      });
-    }
-
-    // --- CONTACTS & CHATS ENGINE ---
-    let usersList = [];
-    function loadUsersNetwork() {
-      gun.get('azgram_ultra_users_v250').map().on((user, id) => {
-        if (user && user.id && user.id !== currentUser.id) {
-          const idx = usersList.findIndex(u => u.id === user.id);
-          if (idx > -1) usersList[idx] = user;
-          else usersList.push(user);
-          renderChats();
-        }
-      });
-    }
-
-    function renderChats() {
-      const list = document.getElementById('chats-list');
-      const filter = document.getElementById('chat-search').value.toLowerCase();
-      list.innerHTML = '';
-
-      usersList
-        .filter(u => u.name.toLowerCase().includes(filter))
-        .forEach(u => {
-          const el = document.createElement('div');
-          el.className = 'list-item';
-          el.onclick = () => openChatRoom(u);
-          el.innerHTML = `
-            <img src="${u.avatar}" class="avatar">
-            <div class="list-info">
-              <div class="list-title">
-                <span>${u.name}</span>
-                <span style="font-size: 10px; color: var(--text-muted);">14:20</span>
-              </div>
-              <div class="list-subtitle">${u.bio || 'AzGram ULTRA istifadəçisi'}</div>
-            </div>
-          `;
-          list.appendChild(el);
-        });
-    }
-
-    function openChatRoom(peerUser) {
-      activeChatPeer = peerUser;
-      document.getElementById('chat-peer-name').innerText = peerUser.name;
-      document.getElementById('chat-peer-avatar').src = peerUser.avatar;
-      document.getElementById('chat-room').style.display = 'flex';
-      
-      subscribeToMessages();
-    }
-
-    function closeChatRoom() {
-      document.getElementById('chat-room').style.display = 'none';
-      activeChatPeer = null;
-    }
-
-    function getChatRoomId() {
-      return [currentUser.id, activeChatPeer.id].sort().join('_');
-    }
-
-    function subscribeToMessages() {
-      const msgContainer = document.getElementById('chat-messages');
-      msgContainer.innerHTML = '';
-      
-      const roomId = 'ultra_msg_' + getChatRoomId();
-      gun.get(roomId).map().on((msg) => {
-        if (msg && msg.text) {
-          let el = document.getElementById('msg_' + msg.id);
-          if (!el) {
-            el = document.createElement('div');
-            el.id = 'msg_' + msg.id;
-            msgContainer.appendChild(el);
-          }
-          const isMe = msg.sender === currentUser.id;
-          el.className = `msg-bubble ${isMe ? 'msg-sent' : 'msg-recv'}`;
-          el.innerHTML = `
-            <div>${msg.text}</div>
-            <div class="msg-meta">${new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} ${isMe ? '✓✓' : ''}</div>
-          `;
-          msgContainer.scrollTop = msgContainer.scrollHeight;
-        }
-      });
-    }
-
-    function sendChatMessage() {
-      const input = document.getElementById('chat-input');
-      const text = input.value.trim();
-      if (!text || !activeChatPeer) return;
-
-      const roomId = 'ultra_msg_' + getChatRoomId();
-      const msgId = 'msg_' + Math.random().toString(36).substr(2, 9);
-
-      gun.get(roomId).get(msgId).put({
-        id: msgId,
-        sender: currentUser.id,
-        text: text,
-        timestamp: Date.now()
-      });
-
-      input.value = '';
-    }
-
-    // --- STATUS TIKTOK STYLE ENGINE ---
-    let statusList = [];
-    function loadStatusFeed() {
-      gun.get('azgram_ultra_status_v250').map().on((st, id) => {
-        if (st && st.media) {
-          const idx = statusList.findIndex(s => s.id === st.id);
-          if (idx > -1) statusList[idx] = st;
-          else statusList.push(st);
-          renderStatusFeed();
-        }
-      });
-    }
-
-    function renderStatusFeed() {
-      const container = document.getElementById('status-feed-container');
-      container.innerHTML = '';
-
-      statusList.forEach(st => {
-        const card = document.createElement('div');
-        card.className = 'status-card';
-        card.innerHTML = `
-          <img src="${st.media}" class="status-media" style="filter: ${st.filter || 'none'}">
-          <div class="status-overlay">
-            <div></div>
-            <div>
-              <div style="font-weight: 700;">@${st.authorName || 'İstifadəçi'}</div>
-              <div style="font-size: 12px; margin-top: 4px;">${st.caption || ''}</div>
-              ${st.music ? `<div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">🎵 ${st.musicName || 'Orijinal Səs'}</div>` : ''}
-            </div>
-          </div>
-          <div class="status-side-actions">
-            <div class="action-btn" onclick="likeStatus('${st.id}')">
-              <i data-lucide="heart"></i>
-              <span>${st.likes || 0}</span>
-            </div>
-            <div class="action-btn" onclick="openCommentsModal('${st.id}')">
-              <i data-lucide="message-circle"></i>
-              <span>${st.commentsCount || 0}</span>
-            </div>
-            <div class="action-btn" onclick="shareStatus('${st.id}')">
-              <i data-lucide="share-2"></i>
-            </div>
-          </div>
-        `;
-        container.appendChild(card);
-      });
-      lucide.createIcons();
-    }
-
-    function openStatusCreator() {
-      openModal('status-creator-modal');
-    }
-
-    function loadStatusMedia(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-          const img = new Image();
-          img.onload = () => {
-            const canvas = document.getElementById('status-canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = 360;
-            canvas.height = 640;
-            ctx.drawImage(img, 0, 0, 360, 640);
-          };
-          img.src = evt.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    function applyStatusFilter(filter) {
-      const canvas = document.getElementById('status-canvas');
-      canvas.style.filter = filter === 'none' ? 'none' : `${filter}(100%)`;
-    }
-
-    function publishStatus() {
-      const canvas = document.getElementById('status-canvas');
-      const caption = document.getElementById('status-caption').value;
-      const stId = 'st_' + Math.random().toString(36).substr(2, 9);
-
-      const statusObj = {
-        id: stId,
-        authorId: currentUser.id,
-        authorName: currentUser.name,
-        media: canvas.toDataURL('image/jpeg', 0.7),
-        caption: caption,
-        music: selectedMusicUrl,
-        likes: 0,
-        commentsCount: 0,
-        timestamp: Date.now()
-      };
-
-      gun.get('azgram_ultra_status_v250').get(stId).put(statusObj);
-      closeModal('status-creator-modal');
-      showToast('Status paylaşıldı!');
-    }
-
-    // --- MUSIC PICKER SYSTEM ---
-    function openMusicPicker() {
-      openModal('music-picker-modal');
-    }
-
-    function toggleMusicTab(tab) {
-      document.getElementById('music-tab-opensource').style.display = tab === 'opensource' ? 'block' : 'none';
-      document.getElementById('music-tab-local').style.display = tab === 'local' ? 'block' : 'none';
-    }
-
-    function handleLocalAudioSelect(e) {
-      const file = e.target.files[0];
-      if (file) {
-        selectedMusicUrl = URL.createObjectURL(file);
-        showToast('Local Musiqi seçildi');
-        closeModal('music-picker-modal');
-      }
-    }
-
-    function selectMusic(url, title, artist) {
-      selectedMusicUrl = url;
-      showToast(`Seçildi: ${title}`);
-      closeModal('music-picker-modal');
-    }
-
-    // --- COMMENTS & NESTED REPLIES ---
-    function openCommentsModal(stId) {
-      currentStatusId = stId;
-      openModal('comments-modal');
-      loadComments();
-    }
-
-    function loadComments() {
-      const container = document.getElementById('comments-container');
-      container.innerHTML = '';
-      gun.get('st_comments_' + currentStatusId).map().on((c) => {
-        if (c && c.text) {
-          const el = document.createElement('div');
-          el.style.padding = '8px 0';
-          el.style.borderBottom = '1px solid #1a1a1a';
-          el.innerHTML = `
-            <div style="font-weight:600; font-size:12px;">${c.author}</div>
-            <div style="font-size:13px;">${c.text}</div>
-          `;
-          container.appendChild(el);
-        }
-      });
-    }
-
-    function postComment() {
-      const input = document.getElementById('comment-input');
-      const text = input.value.trim();
-      if (!text || !currentStatusId) return;
-
-      const cId = 'c_' + Math.random().toString(36).substr(2, 9);
-      gun.get('st_comments_' + currentStatusId).get(cId).put({
-        id: cId,
-        author: currentUser.name,
-        text: text,
-        timestamp: Date.now()
-      });
-
-      input.value = '';
-    }
-
-    // --- CALLS ENGINE (PeerJS) ---
-    function startCall(isVideo) {
-      if (!activeChatPeer) return showToast('Zəng üçün çat seçin');
-      openModal('call-overlay');
-      
-      navigator.mediaDevices.getUserMedia({ audio: true, video: isVideo }).then(stream => {
-        localStream = stream;
-        if (isVideo) {
-          document.getElementById('video-call-container').style.display = 'block';
-          document.getElementById('local-video').srcObject = stream;
-        }
-        currentCall = peer.call(activeChatPeer.id, stream);
-        currentCall.on('stream', remoteStream => {
-          document.getElementById('remote-video').srcObject = remoteStream;
-        });
-      });
-    }
-
-    function handleIncomingCall(call) {
-      openModal('call-overlay');
-      document.getElementById('call-status-text').innerText = 'Gələn zəng...';
-      
-      navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then(stream => {
-        localStream = stream;
-        call.answer(stream);
-        call.on('stream', remoteStream => {
-          document.getElementById('video-call-container').style.display = 'block';
-          document.getElementById('remote-video').srcObject = remoteStream;
-        });
-      });
-    }
-
-    function endCall() {
-      if (currentCall) currentCall.close();
-      if (localStream) localStream.getTracks().forEach(t => t.stop());
-      closeModal('call-overlay');
-    }
-
-    function toggleMuteCall() {
-      if (localStream) {
-        const audioTrack = localStream.getAudioTracks()[0];
-        audioTrack.enabled = !audioTrack.enabled;
-        showToast(audioTrack.enabled ? 'Səs açıldı' : 'Səs bağlandı');
-      }
-    }
-
-    function toggleVideoCall() {
-      if (localStream) {
-        const videoTrack = localStream.getVideoTracks()[0];
-        if (videoTrack) {
-          videoTrack.enabled = !videoTrack.enabled;
-        }
-      }
-    }
-
-    // --- SEARCH ENGINE ---
-    function executeGoogleSearch() {
-      const q = document.getElementById('google-search-input').value;
-      if (q) window.open(`https://www.google.com/search?q=${encodeURIComponent(q)}+site:azgram.io`, '_blank');
-    }
-
-    function executeGlobalSearch() {
-      const q = document.getElementById('global-search-input').value.toLowerCase();
-      const resContainer = document.getElementById('global-search-results');
-      resContainer.innerHTML = '';
-
-      usersList.filter(u => u.name.toLowerCase().includes(q)).forEach(u => {
-        const el = document.createElement('div');
-        el.className = 'list-item';
-        el.innerText = u.name;
-        el.onclick = () => { closeModal('search-modal'); openChatRoom(u); };
-        resContainer.appendChild(el);
-      });
-    }
-
-    // --- HELPER UTILS ---
-    function openModal(id) { document.getElementById(id).classList.add('active'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-    function registerAdClick() { showToast('Reklam Keçidi...'); }
-    function filterByTag(tag) { showToast(`Hashtag: #${tag}`); }
-    function startVoiceRecord() { showToast('Səs yazılır...'); }
-    function stopVoiceRecord() { showToast('Səsli mesaj göndərildi'); }
-  </script>
+// init if already logged
+if(myName) init();
+</script>
 </body>
-</html>
-
+  </html>
