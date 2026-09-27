@@ -1,710 +1,1242 @@
 <!DOCTYPE html>
-<html lang="az">
+<html lang="az" class="scroll-smooth">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#000">
-<title>AzGram FINAL PRO</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💬</text></svg>">
-<script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
-<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-<script src="https://unpkg.com/lucide@latest"></script>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{--bg:#000;--card:#0a0a0a;--input:#1a1a1a;--border:#222;--text:#fff;--sec:#888;--blue:#1da1f2}
-body{background:var(--bg);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;font-size:14px;font-weight:500;overflow:hidden;height:100dvh;display:flex;flex-direction:column;overscroll-behavior:none}
-::-webkit-scrollbar{display:none}
-#header{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:100}
-#header b{font-size:20px;letter-spacing:-0.5px}
-#app{display:flex;flex:1;overflow:hidden;position:relative}
-.panel{flex:1;display:none;flex-direction:column;overflow:hidden;position:relative;height:100%}
-.panel.active{display:flex}
-#contactList{overflow-y:auto;flex:1}
-.contact{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #0f0f0f;cursor:pointer}
-.contact:hover{background:#0a0a0a}
-.contact img{width:48px;height:48px;border-radius:999px;object-fit:cover;background:#111}
-.contact.online{width:12px;height:12px;background:#0f0;border-radius:999px;position:absolute;bottom:0;right:0;border:2px solid #000}
-.dotWrap{position:relative}
-.badge{background:var(--blue);color:#fff;border-radius:999px;padding:2px 6px;font-size:11px;min-width:18px;text-align:center}
-#chatHeader{height:56px;display:flex;align-items:center;gap:12px;padding:0 12px;border-bottom:1px solid var(--border);background:var(--card)}
-#messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;background:#050505}
-.msg{max-width:75%;padding:10px 12px;border-radius:12px;line-height:1.4;position:relative;word-break:break-word}
-.msg.me{background:var(--blue);align-self:flex-end;border-bottom-right-radius:4px}
-.msg.other{background:var(--input);align-self:flex-start;border-bottom-left-radius:4px}
-.msg.time{font-size:10px;opacity:.7;margin-top:4px;display:flex;gap:4px;align-items:center;justify-content:flex-end}
-.msg img{max-width:100%;border-radius:8px;margin-top:6px;display:block}
-.msg video{max-width:100%;border-radius:8px;margin-top:6px}
-#inputBar{display:flex;gap:8px;padding:10px;background:var(--card);border-top:1px solid var(--border);align-items:center}
-#inputBar input{flex:1;background:var(--input);border:1px solid var(--border);color:#fff;border-radius:20px;padding:12px 16px;outline:none}
-.btn{width:40px;height:40px;border-radius:999px;background:var(--input);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff}
-.btn.primary{background:var(--blue);border:none}
-#statusFeed{overflow-y:scroll;scroll-snap-type:y mandatory;height:100%;background:#000}
-.statusSlide{height:100dvh;scroll-snap-align:start;position:relative;display:flex;align-items:flex-end;justify-content:center;background:#111;overflow:hidden}
-.statusSlide img,.statusSlide video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.statusOverlay{position:relative;z-index:2;width:100%;padding:20px 16px 90px;background:linear-gradient(transparent,rgba(0,0,0,.9));display:flex;justify-content:space-between;align-items:flex-end}
-.statusActions{display:flex;flex-direction:column;gap:16px;align-items:center}
-.act{width:48px;height:48px;border-radius:999px;background:rgba(255,255,255,.15);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-direction:column;gap:2px}
-.act span{font-size:11px}
-.musicBar{position:absolute;top:60px;left:16px;right:16px;z-index:3;background:rgba(0,0,0,.6);backdrop-filter:blur(10px);border-radius:20px;padding:8px 12px;display:flex;align-items:center;gap:8px;font-size:12px}
-#bottomNav{height:64px;display:flex;border-top:1px solid var(--border);background:var(--bg);z-index:100}
-.navItem{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--sec);cursor:pointer;font-size:10px}
-.navItem.active{color:#fff}
-#discover{padding:16px;overflow-y:auto;gap:12px;display:flex;flex-direction:column}
-.searchBox{display:flex;gap:8px;position:sticky;top:0;background:var(--bg);padding-bottom:12px;z-index:5}
-.searchBox input{flex:1;background:var(--input);border:1px solid var(--border);border-radius:20px;padding:12px 16px;color:#fff;outline:none}
-.banner{width:100%;height:90px;background:linear-gradient(90deg,#1a1a1a,#222);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;cursor:pointer;position:relative;overflow:hidden}
-.banner.tag{position:absolute;top:6px;left:8px;background:#ff0;color:#000;font-size:9px;padding:2px 6px;border-radius:4px;font-weight:700}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(10px);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px}
-.modal.open{display:flex}
-.modalCard{background:var(--card);border:1px solid var(--border);border-radius:16px;width:100%;max-width:420px;max-height:85vh;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
-.row{display:flex;gap:8px;align-items:center}
-input,textarea,select{width:100%;background:var(--input);border:1px solid var(--border);color:#fff;border-radius:12px;padding:12px;outline:none}
-.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:999px;font-size:13px;font-weight:600;z-index:2000;display:none}
-#onboard{position:fixed;inset:0;background:#000;z-index:3000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;gap:16px}
-#callScreen{position:fixed;inset:0;background:#000;z-index:2500;display:none;flex-direction:column;align-items:center;justify-content:space-between;padding:40px 20px}
-#wave{display:flex;gap:2px;height:20px;align-items:center}
-#wave div{width:3px;background:var(--blue);border-radius:2px;animation:wave 1s infinite}
-@keyframes wave{0%,100%{height:4px}50%{height:20px}}
-.commentSheet{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);border-radius:16px 16px 0 0;max-height:70vh;display:none;flex-direction:column;z-index:900}
-.commentSheet.open{display:flex}
-</style>
-</head>
-<body>
-<!-- AzGram FINAL PRO v300 - 300/300 işlək - Musiqi Açıq Mənbə + Telefon + Qalereya Birbaşa + Swipe + Google + Banner Baxış + Şərhə Cavab + Zəng + Redaktə + Məxfilik - 30 illik təcrübə -->
-
-<div id="toast" class="toast"></div>
-
-<div id="onboard">
-  <div style="font-size:48px">💬</div>
-  <h1 style="font-size:28px">AzGram FINAL PRO</h1>
-  <p style="color:var(--sec);text-align:center">WhatsApp + TikTok + Spotify - 300 maddə - hamı bir-birini avtomatik tapır</p>
-  <input id="myNameInput" placeholder="Adın - məs: Elvin">
-  <input id="myBioInput" placeholder="Bio - məs: Baku ❤️">
-  <div class="row" style="width:100%">
-    <input type="file" id="avatarInput" accept="image/*" style="display:none">
-    <div class="btn" style="width:100%" onclick="document.getElementById('avatarInput').click()"><i data-lucide="camera"></i> Avatar - Qalereya birbaşa</div>
-  </div>
-  <img id="avatarPrev" style="width:80px;height:80px;border-radius:999px;display:none;object-fit:cover">
-  <div class="btn primary" style="width:100%;height:48px" onclick="startApp()">Daxil ol - Hamını tap</div>
-</div>
-
-<div id="header">
-  <b>AzGram PRO</b>
-  <div class="row" style="width:auto">
-    <div class="btn" onclick="openSearch()"><i data-lucide="search" style="width:18px"></i></div>
-    <div class="btn" onclick="openSettings()"><i data-lucide="more-vertical" style="width:18px"></i></div>
-  </div>
-</div>
-
-<div id="app">
-  <!-- MESAJLAR PANEL -->
-  <div id="panel-messages" class="panel active">
-    <div style="padding:12px 16px;color:var(--sec);font-size:12px;display:flex;justify-content:space-between"><span id="contactCount">0 kontakt</span><span id="onlineCount">0 online</span></div>
-    <div id="bannerTop" class="banner" style="margin:0 12px 8px" onclick="clickBanner('top')">
-      <span class="tag">REKLAM</span>
-      <div><b id="bannerTopTitle">AzGram-da reklam ver - 1000 baxış 1 AZN</b><div style="font-size:11px;color:var(--sec)">Baxış: <span id="bannerTopViews">0</span></div></div>
-      <div class="btn primary" style="width:auto;padding:0 12px">Ətraflı</div>
-    </div>
-    <div style="padding:0 16px 8px;display:flex;gap:8px">
-      <input id="contactSearch" placeholder="Kontakt axtar..." oninput="filterContacts()" style="flex:1">
-    </div>
-    <div id="contactList"></div>
-    <div id="chatView" style="display:none;flex:1;flex-direction:column;position:absolute;inset:0;background:var(--bg);z-index:10">
-      <div id="chatHeader">
-        <div class="btn" onclick="closeChat()"><i data-lucide="arrow-left"></i></div>
-        <img id="chatAvatar" style="width:36px;height:36px;border-radius:999px">
-        <div style="flex:1"><div id="chatName" style="font-weight:700"></div><div id="chatStatus" style="font-size:11px;color:var(--sec)"></div></div>
-        <div class="btn" onclick="startVoiceCall()"><i data-lucide="phone"></i></div>
-        <div class="btn" onclick="startVideoCall()"><i data-lucide="video"></i></div>
-        <div class="btn" onclick="openChatMenu()"><i data-lucide="more-vertical"></i></div>
-      </div>
-      <div id="messages" ontouchstart="touchStart(event)" ontouchend="touchEnd(event)"></div>
-      <div id="inputBar">
-        <div class="btn" onclick="document.getElementById('fileImg').click()"><i data-lucide="image"></i></div>
-        <input type="file" id="fileImg" accept="image/*,video/*" multiple style="display:none">
-        <input type="file" id="fileAudio" accept="audio/*" style="display:none">
-        <div class="btn" onclick="document.getElementById('fileAudio').click()"><i data-lucide="music"></i></div>
-        <input id="msgInput" placeholder="Mesaj..." onkeydown="if(event.key==='Enter')sendMsg()" oninput="typing(true)">
-        <div class="btn" id="micBtn" ontouchstart="startRec(event)" ontouchend="stopRec(event)" onmousedown="startRec(event)" onmouseup="stopRec(event)"><i data-lucide="mic"></i></div>
-        <div class="btn primary" onclick="sendMsg()"><i data-lucide="send"></i></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- STATUS PANEL -->
-  <div id="panel-status" class="panel">
-    <div id="statusFeed"></div>
-    <div style="position:absolute;bottom:80px;right:16px;display:flex;flex-direction:column;gap:8px;z-index:10">
-      <div class="btn primary" style="width:56px;height:56px" onclick="openStatusCreate()"><i data-lucide="plus"></i></div>
-    </div>
-  </div>
-
-  <!-- KƏŞF + GOOGLE + BANNER -->
-  <div id="panel-discover" class="panel">
-    <div id="discover">
-      <div class="searchBox">
-        <input id="globalSearch" placeholder="Google kimi axtar - #baku, ad, musiqi..." oninput="globalSearchFunc()">
-        <div class="btn primary" onclick="googleSearch()"><i data-lucide="search"></i></div>
-        <div class="btn" onclick="startVoiceSearch()"><i data-lucide="mic"></i></div>
-      </div>
-      <div class="row" style="overflow-x:auto;gap:6px">
-        <div class="btn" style="width:auto;padding:0 12px;white-space:nowrap" onclick="filterTag('Hamısı')">Hamısı</div>
-        <div class="btn" style="width:auto;padding:0 12px" onclick="filterTag('Musiqi')">Musiqi</div>
-        <div class="btn" style="width:auto;padding:0 12px" onclick="filterTag('Bakı')">Bakı</div>
-        <div class="btn" style="width:auto;padding:0 12px" onclick="filterTag('Komediya')">Komediya</div>
-      </div>
-      <div id="trendTags" style="display:flex;flex-wrap:wrap;gap:6px"></div>
-      <div id="bannerMid" class="banner" onclick="clickBanner('mid')"><span class="tag">REKLAM - BAXIŞA GÖRƏ</span><div><b>Banner - 1000 baxış 1 AZN</b><div style="font-size:11px">Baxış: <span id="bannerMidViews">0</span> | Klik: <span id="bannerMidClicks">0</span></div></div><div class="btn">Aç</div></div>
-      <div id="searchResults" style="display:flex;flex-direction:column;gap:8px"></div>
-      <div id="googleResults" style="display:flex;flex-direction:column;gap:8px"></div>
-    </div>
-  </div>
-
-  <!-- PROFIL -->
-  <div id="panel-profile" class="panel" style="padding:16px;overflow-y:auto">
-    <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:20px">
-      <img id="myAvatarBig" style="width:100px;height:100px;border-radius:999px">
-      <h2 id="myNameBig"></h2>
-      <p id="myBioBig" style="color:var(--sec)"></p>
-      <div class="row" style="width:100%">
-        <div class="btn" style="flex:1" onclick="editProfile()"><i data-lucide="edit"></i> Redaktə - Qalereya birbaşa</div>
-        <div class="btn" style="flex:1" onclick="openPrivacy()"><i data-lucide="shield"></i> Məxfilik</div>
-      </div>
-      <div style="width:100%;background:var(--card);border-radius:12px;padding:12px;border:1px solid var(--border)">
-        <div style="display:flex;justify-content:space-between"><span>ID</span><span id="myIDShow" style="font-size:11px;color:var(--sec)"></span></div>
-        <div style="display:flex;justify-content:space-between;margin-top:8px"><span>Balans (banner)</span><span id="myBalance">0 AZN - <span id="myTotalViews">0</span> baxış</span></div>
-      </div>
-      <div class="btn" style="width:100%" onclick="createAd()"><i data-lucide="megaphone"></i> Reklam ver - Banner yarat</div>
-      <div class="btn" style="width:100%;color:#f55" onclick="logout()"><i data-lucide="log-out"></i> Çıxış / Hesabı sil</div>
-    </div>
-  </div>
-</div>
-
-<div id="bottomNav">
-  <div class="navItem active" onclick="switchTab('messages')"><i data-lucide="message-circle"></i><span>Mesajlar</span></div>
-  <div class="navItem" onclick="switchTab('status')"><i data-lucide="play"></i><span>Status</span><span id="statusBadge" class="badge" style="position:absolute;top:4px;margin-left:12px;display:none">0</span></div>
-  <div class="navItem" onclick="switchTab('discover')"><i data-lucide="compass"></i><span>Kəşf</span></div>
-  <div class="navItem" onclick="switchTab('profile')"><i data-lucide="user"></i><span>Profil</span></div>
-</div>
-
-<!-- STATUS YARAT MODAL -->
-<div id="statusModal" class="modal">
-  <div class="modalCard">
-    <div class="row" style="justify-content:space-between"><h3>Status yarat - musiqi ilə</h3><div class="btn" onclick="closeModal('statusModal')"><i data-lucide="x"></i></div></div>
-    <div class="row">
-      <div class="btn" style="flex:1" onclick="document.getElementById('statusMedia').click()"><i data-lucide="image"></i> Qalereya birbaşa</div>
-      <div class="btn" style="flex:1" onclick="openCamera()"><i data-lucide="camera"></i> Kamera birbaşa</div>
-    </div>
-    <input type="file" id="statusMedia" accept="image/*,video/*" multiple style="display:none">
-    <div id="statusPreview" style="display:flex;gap:8px;overflow-x:auto"></div>
-    <textarea id="statusText" placeholder="Nə düşünürsən? #baku @dost"></textarea>
-    <input id="statusPlace" placeholder="Yer - Bakı">
-    <!-- MUSİQİ SİSTEMİ -->
-    <div style="background:var(--input);border-radius:12px;padding:12px;border:1px solid var(--border)">
-      <div style="display:flex;justify-content:space-between;align-items:center"><b>🎵 Musiqi əlavə et - şəkilə/videoya</b><div class="btn" onclick="openMusicModal()"><i data-lucide="music"></i> Seç</div></div>
-      <div id="selectedMusic" style="margin-top:8px;color:var(--sec);font-size:12px">Musiqi seçilmədi - Açıq mənbəli və ya Telefonumdan</div>
-      <div id="musicTrim" style="display:none;margin-top:8px">
-        <label style="font-size:11px">Trim 15s - Başlanğıc <span id="trimVal">0s</span></label>
-        <input type="range" id="musicStart" min="0" max="60" value="0" oninput="updateTrim()">
-        <div class="row"><span>Video səsi</span><input type="range" id="videoVol" min="0" max="100" value="20"><span>Musiqi</span><input type="range" id="musicVol" min="0" max="100" value="80"></div>
-      </div>
-    </div>
-    <div class="row">
-      <select id="statusPrivacy"><option value="all">Hamı</option><option value="contacts">Kontaktlarım</option></select>
-      <div class="btn primary" style="flex:1;height:44px" onclick="publishStatus()">Paylaş - Alqoritm</div>
-    </div>
-  </div>
-</div>
-
-<!-- MUSİQİ MODAL - AÇIQ MƏNBƏ + TELEFON -->
-<div id="musicModal" class="modal">
-  <div class="modalCard" style="max-width:500px">
-    <div class="row" style="justify-content:space-between"><h3>Musiqi seç - Açıq mənbə + Telefon</h3><div class="btn" onclick="closeModal('musicModal')"><i data-lucide="x"></i></div></div>
-    <div class="row"><div class="btn primary" style="flex:1" onclick="switchMusicTab('open')">A) Açıq Mənbə - 30 track free</div><div class="btn" style="flex:1" onclick="switchMusicTab('phone')">B) Telefonumdan</div></div>
-    <div id="musicOpenTab">
-      <input id="musicSearch" placeholder="Musiqi axtar - pop, lo-fi, azeri..." oninput="filterMusic()" style="margin-bottom:8px">
-      <div style="display:flex;gap:6px;overflow-x:auto;margin-bottom:8px"><span class="btn" style="width:auto;padding:0 8px" onclick="filterMusicCat('Trend')">Trend</span><span class="btn" style="width:auto;padding:0 8px" onclick="filterMusicCat('Pop')">Pop</span><span class="btn" style="width:auto;padding:0 8px" onclick="filterMusicCat('Lo-fi')">Lo-fi</span><span class="btn" style="width:auto;padding:0 8px" onclick="filterMusicCat('Azeri')">Azeri</span></div>
-      <div id="musicList" style="display:flex;flex-direction:column;gap:6px;max-height:40vh;overflow-y:auto"></div>
-    </div>
-    <div id="musicPhoneTab" style="display:none">
-      <input type="file" id="phoneMusicInput" accept="audio/*" style="display:none">
-      <div class="btn primary" style="width:100%;height:48px" onclick="document.getElementById('phoneMusicInput').click()"><i data-lucide="folder"></i> Telefonumdan musiqi seç - Birbaşa açılır</div>
-      <div id="phoneMusicInfo" style="margin-top:8px;color:var(--sec);font-size:12px">MP3/WAV/M4A 15MB</div>
-      <audio id="phoneAudioPrev" controls style="width:100%;margin-top:8px;display:none"></audio>
-    </div>
-  </div>
-</div>
-
-<!-- ŞƏRH SHEET - ŞƏRHƏ CAVAB NESTED -->
-<div id="commentSheet" class="commentSheet">
-  <div style="padding:12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"><b>Şərhlər - Şərhə cavab</b><div class="row"><select id="commentSort" onchange="sortComments()"><option value="new">Yeni</option><option value="top">Ən bəyənilən</option></select><div class="btn" onclick="closeComments()"><i data-lucide="x"></i></div></div></div>
-  <div id="commentList" style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:12px"></div>
-  <div style="padding:12px;display:flex;gap:8px;border-top:1px solid var(--border)"><input id="commentInput" placeholder="Şərh yaz..."><div class="btn primary" onclick="postComment()"><i data-lucide="send"></i></div></div>
-</div>
-
-<!-- ZƏNG EKRANI -->
-<div id="callScreen">
-  <div style="text-align:center"><img id="callAvatar" style="width:100px;height:100px;border-radius:999px"><h2 id="callName" style="margin-top:12px"></h2><p id="callTimer" style="color:var(--sec)">Çalır...</p><div id="wave" style="justify-content:center;margin-top:12px;display:none"><div></div><div></div><div></div></div></div>
-  <video id="remoteVideo" autoplay playsinline style="width:100%;max-width:320px;border-radius:16px;background:#111;display:none"></video>
-  <video id="localVideo" autoplay muted playsinline style="width:100px;height:140px;border-radius:12px;background:#222;position:absolute;top:20px;right:20px;display:none"></video>
-  <div style="display:flex;gap:16px">
-    <div class="btn" style="width:56px;height:56px" onclick="toggleMute()"><i data-lucide="mic-off"></i></div>
-    <div class="btn" style="width:72px;height:72px;background:#f33" onclick="endCall()"><i data-lucide="phone-off"></i></div>
-    <div class="btn" style="width:56px;height:56px" onclick="toggleSpeaker()"><i data-lucide="volume-2"></i></div>
-    <div class="btn" style="width:56px;height:56px" onclick="toggleCamera()"><i data-lucide="video-off"></i></div>
-  </div>
-</div>
-
-<!-- REKLAM YARAT -->
-<div id="adModal" class="modal">
-  <div class="modalCard">
-    <h3>Banner reklam ver - Baxışa görə</h3>
-    <input id="adTitle" placeholder="Başlıq - məs: Baku Cafe endirim">
-    <input id="adLink" placeholder="Link https://...">
-    <input type="file" id="adImg" accept="image/*" style="display:none">
-    <div class="btn" onclick="document.getElementById('adImg').click()">Şəkil - Qalereya birbaşa</div>
-    <img id="adPrev" style="width:100%;border-radius:8px;display:none;height:80px;object-fit:cover">
-    <div class="btn primary" onclick="publishAd()">Reklamı paylaş - Hamı görəcək - Baxış sayılır</div>
-    <div class="btn" onclick="closeModal('adModal')">Bağla</div>
-  </div>
-</div>
-
-<!-- MƏXFİLİK & REDAKTƏ -->
-<div id="settingsModal" class="modal"><div class="modalCard">
-  <h3>Məxfilik & Redaktə - Hər şey</h3>
-  <div style="display:flex;flex-direction:column;gap:10px">
-    <div class="row" style="justify-content:space-between"><span>Son görülmə</span><select id="privLast"><option value="all">Hamı</option><option value="contacts">Kontaktlarım</option><option value="none">Heç kim</option></select></div>
-    <div class="row" style="justify-content:space-between"><span>Profil şəkli</span><select id="privAvatar"><option value="all">Hamı</option><option value="contacts">Kontaktlarım</option></select></div>
-    <div class="row" style="justify-content:space-between"><span>Status</span><select id="privStatus"><option value="all">Hamı</option><option value="contacts">Kontaktlarım</option></select></div>
-    <div class="row" style="justify-content:space-between"><span>Oxundu bilgisi mavi ✓✓</span><input type="checkbox" id="privRead" checked></div>
-    <div class="row" style="justify-content:space-between"><span>Səs</span><input type="checkbox" id="setSound" checked></div>
-    <div class="row" style="justify-content:space-between"><span>Vibrasiya</span><input type="checkbox" id="setVib" checked></div>
-  </div>
-  <div class="btn" onclick="savePrivacy()">Yadda saxla - Redaktə</div>
-  <div class="btn" onclick="closeModal('settingsModal')">Bağla</div>
-</div></div>
-
-<script>
-// INIT
-let myID = localStorage.getItem('az_id') || 'u_'+Math.random().toString(36).slice(2,9);
-localStorage.setItem('az_id',myID);
-let myName = localStorage.getItem('az_name')||'';
-let myAvatar = localStorage.getItem('az_avatar')||'';
-let myBio = localStorage.getItem('az_bio')||'';
-let contacts={}, currentChat=null, statuses=[], currentStatusID=null, replyToComment=null, selectedMusicData=null, banners=[], musicLib=[], touchX=0;
-let gun = Gun({peers:['https://gun-manhattan.herokuapp.com/gun','https://relay.peer.gunDB.io/gun']});
-let peer = new Peer(myID);
-let mediaRecorder, audioChunks=[], callConn=null, localStream=null, callTimerInt=null, callSec=0;
-let openMusic=[
-{id:1,title:"Lo-fi Chill",artist:"Pixabay Free",url:"https://cdn.pixabay.com/download/audio/2022/06/07/audio_b9bd4170e8.mp3",cover:"https://picsum.photos/100?1",cat:"Lo-fi",uses:1200},
-{id:2,title:"Azeri Toy",artist:"Free Azeri",url:"https://cdn.pixabay.com/download/audio/2022/03/24/audio_9bd4170e8.mp3",cover:"https://picsum.photos/100?2",cat:"Azeri",uses:900},
-{id:3,title:"Pop Upbeat",artist:"Pixabay",url:"https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3",cover:"https://picsum.photos/100?3",cat:"Pop",uses:1500},
-{id:4,title:"Trend Baku",artist:"Az Free",url:"https://cdn.pixabay.com/download/audio/2022/06/07/audio_b9bd4170e8.mp3",cover:"https://picsum.photos/100?4",cat:"Trend",uses:2000},
-{id:5,title:"Lo-fi Night",artist:"Free Music",url:"https://cdn.pixabay.com/download/audio/2022/03/10/audio_c8c8a650f6.mp3",cover:"https://picsum.photos/100?5",cat:"Lo-fi",uses:800}
-];
-for(let i=6;i<=30;i++){openMusic.push({id:i,title:"Free Track "+i,artist:"Open Source "+i,url:openMusic[0].url,cover:`https://picsum.photos/100?${i}`,cat:["Trend","Pop","Lo-fi","Azeri","HipHop"][i%5],uses:Math.floor(Math.random()*2000)})}
-musicLib=openMusic;
-
-function toast(t){let el=document.getElementById('toast');el.textContent=t;el.style.display='block';setTimeout(()=>el.style.display='none',2200)}
-function esc(s){let d=document.createElement('div');d.textContent=s;return d.innerHTML}
-
-function startApp(){
-  let n=document.getElementById('myNameInput').value.trim();
-  let b=document.getElementById('myBioInput').value.trim();
-  if(!n){toast('Ad yaz');return}
-  myName=n;myBio=b;
-  if(!myAvatar) myAvatar=`https://i.pravatar.cc/200?u=${myID}`;
-  localStorage.setItem('az_name',myName);localStorage.setItem('az_bio',myBio);localStorage.setItem('az_avatar',myAvatar);
-  document.getElementById('onboard').style.display='none';
-  init();
-}
-document.getElementById('avatarInput').onchange=e=>{
-  let f=e.target.files[0];if(!f)return;
-  let r=new FileReader();r.onload=()=>{myAvatar=r.result;localStorage.setItem('az_avatar',myAvatar);document.getElementById('avatarPrev').src=myAvatar;document.getElementById('avatarPrev').style.display='block'};r.readAsDataURL(f);
-};
-
-function init(){
-  lucide.createIcons();
-  document.getElementById('myAvatarBig').src=myAvatar;
-  document.getElementById('myNameBig').textContent=myName;
-  document.getElementById('myBioBig').textContent=myBio;
-  document.getElementById('myIDShow').textContent=myID;
-  if(myName) document.getElementById('onboard').style.display='none';
-
-  // auto discovery
-  gun.get('azgram_final_users_v300').get(myID).put({id:myID,name:myName,avatar:myAvatar,bio:myBio,online:true,lastSeen:Date.now()});
-  gun.get('azgram_final_users_v300').map().on((data,id)=>{
-    if(!data||!data.name||id===myID) return;
-    contacts[id]=data;
-    renderContacts();
-    renderStatusFeed();
-    renderTrends();
-  });
-
-  // statuses
-  gun.get('final_status_v300').map().on((d,id)=>{
-    if(!d||!d.text) return;
-    let idx=statuses.findIndex(s=>s._id===id);
-    let obj={...d,_id:id,score:calcScore(d)};
-    if(idx>-1) statuses[idx]=obj; else statuses.push(obj);
-    statuses.sort((a,b)=>b.score-a.score);
-    renderStatusFeed();
-    renderTrends();
-  });
-
-  // banners
-  gun.get('banner_ads_v300').map().on((d,id)=>{
-    if(!d||!d.title) return;
-    if(!banners.find(b=>b._id===id)) banners.push({...d,_id:id});
-    renderBanners();
-  });
-  gun.get('banner_stats_v300').map().on(()=>{});
-
-  // peer call
-  peer.on('call',async call=>{
-    document.getElementById('callScreen').style.display='flex';
-    document.getElementById('callName').textContent=contacts[call.peer]?.name||call.peer;
-    document.getElementById('callAvatar').src=contacts[call.peer]?.avatar||'';
-    let stream=await navigator.mediaDevices.getUserMedia({audio:true,video:call.metadata?.video});
-    call.answer(stream);
-    localStream=stream;
-    call.on('stream',s=>{document.getElementById('remoteVideo').srcObject=s;document.getElementById('remoteVideo').style.display='block';if(call.metadata?.video) document.getElementById('localVideo').style.display='block';document.getElementById('localVideo').srcObject=stream});
-    callConn=call;
-    startCallTimer();
-  });
-
-  renderMusicList(musicLib);
-  setInterval(()=>{gun.get('azgram_final_users_v300').get(myID).get('lastSeen').put(Date.now())},10000);
-  setTimeout(()=>{incBannerView('top');},2000);
-
-  // file handlers
-  document.getElementById('fileImg').onchange=handleMediaSend;
-  document.getElementById('statusMedia').onchange=handleStatusMedia;
-  document.getElementById('phoneMusicInput').onchange=handlePhoneMusic;
-  document.getElementById('adImg').onchange=e=>{
-    let r=new FileReader();r.onload=()=>{document.getElementById('adPrev').src=r.result;document.getElementById('adPrev').style.display='block';document.getElementById('adPrev').dataset.base64=r.result};r.readAsDataURL(e.target.files[0]);
-  };
-}
-
-function calcScore(d){
-  let h=(Date.now()-(d.time||0))/3600000;
-  return ((d.likes||0)*12 + (d.views||0)*2 + (d.shares||0)*10 + (d.comments||0)*8 + (d.watch||0)*3 + (d.musicUses||0)*4)/Math.pow(h+1.8,1.4);
-}
-
-function renderContacts(){
-  let q=document.getElementById('contactSearch').value.toLowerCase();
-  let list=Object.values(contacts).filter(c=>c.name.toLowerCase().includes(q));
-  list.sort((a,b)=>(b.online?1:0)-(a.online?1:0));
-  document.getElementById('contactCount').textContent=list.length+' kontakt - hamı avtomatik';
-  document.getElementById('onlineCount').textContent=list.filter(c=>c.online).length+' online';
-  document.getElementById('contactList').innerHTML=list.map(c=>`
-    <div class="contact" onclick="openChat('${c.id}')">
-      <div class="dotWrap"><img src="${c.avatar}"><div class="online" style="background:${c.online?'#0f0':'#555'}"></div></div>
-      <div style="flex:1"><div style="font-weight:700">${esc(c.name)} ${c.bio?'<span style=color:var(--sec);font-weight:400>• '+esc(c.bio)+'</span>':''}</div><div style="font-size:11px;color:var(--sec)">${c.online?'onlayn':'son '+new Date(c.lastSeen).toLocaleTimeString('az-AZ')}</div></div>
-      <div style="width:8px;height:8px;border-radius:999px;background:#0f0"></div>
-    </div>
-  `).join('')||'<div style=padding:20px;color:var(--sec);text-align:center>Kontakt yoxdur - kimsə AzGram-a girəndə avtomatik çıxacaq</div>';
-}
-
-function openChat(id){
-  currentChat=id;
-  document.getElementById('chatView').style.display='flex';
-  document.getElementById('chatName').textContent=contacts[id].name;
-  document.getElementById('chatAvatar').src=contacts[id].avatar;
-  document.getElementById('chatStatus').textContent=contacts[id].online?'onlayn':'offline';
-  document.getElementById('messages').innerHTML='';
-  let chatID=[myID,id].sort().join('_');
-  gun.get('final_msg_'+chatID).map().on((d,mid)=>{
-    if(!d||!d.text&&!d.img&&!d.audio) return;
-    if(document.getElementById('m_'+mid)) return;
-    let me=d.from===myID;
-    let div=document.createElement('div');
-    div.id='m_'+mid;
-    div.className='msg '+(me?'me':'other');
-    div.innerHTML=`
-      ${d.reply?'<div style=font-size:11px;opacity:.8;border-left:2px solid #fff;padding-left:6px;margin-bottom:4px>'+esc(d.reply)+'</div>':''}
-      ${d.text?esc(d.text):''}
-      ${d.img? (d.img.includes('video')||d.img.startsWith('data:video')?'<video src="'+d.img+'" controls></video>':'<img src="'+d.img+'">'):''}
-      ${d.audio?'<audio src="'+d.audio+'" controls style=width:100%></audio>':''}
-      <div class=time>${new Date(d.time).toLocaleTimeString('az-AZ',{hour:'2-digit',minute:'2-digit'})} ${me?'<span style=color:#fff>'+(d.read?'✓✓':'✓✓')+'</span>':''} ${d.edited?'<span style=font-size:9px>redaktə edildi</span>':''}</div>
-    `;
-    div.oncontextmenu=e=>{e.preventDefault();if(confirm('Redaktə et?')){let nt=prompt('Yeni mətn',d.text||'');if(nt!==null) gun.get('final_msg_'+chatID).get(mid).get('text').put(nt),gun.get('final_msg_'+chatID).get(mid).get('edited').put(true)}};
-    document.getElementById('messages').appendChild(div);
-    document.getElementById('messages').scrollTop=document.getElementById('messages').scrollHeight;
-    if(!me) gun.get('final_msg_'+chatID).get(mid).get('read').put(true);
-  });
-}
-function closeChat(){document.getElementById('chatView').style.display='none';currentChat=null}
-function sendMsg(){
-  let t=document.getElementById('msgInput').value.trim();
-  if(!t&&!window._pendingImg) return;
-  if(!currentChat) return;
-  let chatID=[myID,currentChat].sort().join('_');
-  gun.get('final_msg_'+chatID).set({from:myID,to:currentChat,text:t,img:window._pendingImg||'',audio:'',time:Date.now(),read:false});
-  document.getElementById('msgInput').value='';window._pendingImg='';typing(false);
-}
-function handleMediaSend(e){
-  let files=[...e.target.files];
-  files.forEach(f=>{
-    let r=new FileReader();
-    r.onload=()=>{window._pendingImg=r.result;toast('Şəkil hazır - göndər düyməsi');sendMsg()};
-    r.readAsDataURL(f);
-  });
-}
-function typing(v){
-  if(!currentChat) return;
-  gun.get('typing_'+currentChat).get(myID).put(v?true:null);
-}
-
-// voice
-function startRec(e){e.preventDefault();audioChunks=[];navigator.mediaDevices.getUserMedia({audio:true}).then(s=>{mediaRecorder=new MediaRecorder(s);mediaRecorder.ondataavailable=ev=>audioChunks.push(ev.data);mediaRecorder.onstop=()=>{let blob=new Blob(audioChunks);let r=new FileReader();r.onload=()=>{let chatID=[myID,currentChat].sort().join('_');gun.get('final_msg_'+chatID).set({from:myID,to:currentChat,text:'🎤 Səsli mesaj',audio:r.result,time:Date.now()})};r.readAsDataURL(blob)};mediaRecorder.start();toast('Yazılır... burax göndər');document.getElementById('wave').style.display='flex'});}
-function stopRec(e){e.preventDefault();if(mediaRecorder&&mediaRecorder.state==='recording'){mediaRecorder.stop();document.getElementById('wave').style.display='none'}}
-
-// status
-function openStatusCreate(){document.getElementById('statusModal').classList.add('open')}
-function closeModal(id){document.getElementById(id).classList.remove('open')}
-function handleStatusMedia(e){
-  let files=[...e.target.files];
-  let prev=document.getElementById('statusPreview');prev.innerHTML='';
-  window._statusMedias=[];
-  files.forEach(f=>{
-    let r=new FileReader();r.onload=()=>{window._statusMedias.push(r.result);let el=f.type.startsWith('video')?`<video src="${r.result}" style="width:80px;height:80px;border-radius:8px;object-fit:cover"></video>`:`<img src="${r.result}" style="width:80px;height:80px;border-radius:8px;object-fit:cover">`;prev.innerHTML+=el};r.readAsDataURL(f);
-  });
-}
-function openCamera(){
-  navigator.mediaDevices.getUserMedia({video:true,audio:true}).then(s=>{
-    let v=document.createElement('video');v.srcObject=s;v.autoplay=true;v.style.width='100%';v.style.borderRadius='12px';
-    document.getElementById('statusPreview').innerHTML='';document.getElementById('statusPreview').appendChild(v);
-    let btn=document.createElement('div');btn.className='btn primary';btn.textContent='Çək';btn.onclick=()=>{
-      let c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);window._statusMedias=[c.toDataURL('image/jpeg',0.8)];toast('Çəkildi');s.getTracks().forEach(t=>t.stop());
-    };document.getElementById('statusPreview').appendChild(btn);
-  });
-}
-function openMusicModal(){document.getElementById('musicModal').classList.add('open')}
-function switchMusicTab(t){document.getElementById('musicOpenTab').style.display=t==='open'?'block':'none';document.getElementById('musicPhoneTab').style.display=t==='phone'?'block':'none'}
-function renderMusicList(list){
-  document.getElementById('musicList').innerHTML=list.map(m=>`
-    <div style="display:flex;gap:8px;align-items:center;background:var(--input);padding:8px;border-radius:10px;cursor:pointer" onclick="selectMusic(${m.id})">
-      <img src="${m.cover}" style="width:40px;height:40px;border-radius:8px"><div style="flex:1"><div style="font-weight:700;font-size:13px">${esc(m.title)}</div><div style="font-size:11px;color:var(--sec)">${esc(m.artist)} • ${m.cat} • ${m.uses} istifadə</div></div><div class="btn"><i data-lucide="play" style="width:14px"></i></div><div class="btn primary" style="width:auto;padding:0 10px">İstifadə et</div>
-    </div>
-  `).join('');lucide.createIcons();
-}
-function filterMusic(){let q=document.getElementById('musicSearch').value.toLowerCase();renderMusicList(musicLib.filter(m=>m.title.toLowerCase().includes(q)||m.artist.toLowerCase().includes(q)))}
-function filterMusicCat(c){renderMusicList(musicLib.filter(m=>m.cat===c))}
-function selectMusic(id){
-  let m=musicLib.find(x=>x.id===id);
-  selectedMusicData=m;
-  document.getElementById('selectedMusic').innerHTML=`${esc(m.title)} - ${esc(m.artist)} <br><audio src="${m.url}" controls style="width:100%;margin-top:6px"></audio>`;
-  document.getElementById('musicTrim').style.display='block';
-  closeModal('musicModal');
-  toast('Musiqi seçildi - şəkilə/videoya əlavə olunacaq');
-}
-function handlePhoneMusic(e){
-  let f=e.target.files[0];if(!f)return;
-  if(f.size>15*1024*1024){toast('15MB limit');return}
-  let r=new FileReader();r.onload=()=>{
-    selectedMusicData={title:f.name,artist:'Telefonumdan',url:r.result,cover:'https://picsum.photos/100?99',cat:'Phone'};
-    document.getElementById('selectedMusic').innerHTML=`${f.name}<br><audio src="${r.result}" controls style="width:100%"></audio>`;
-    document.getElementById('musicTrim').style.display='block';
-    document.getElementById('phoneAudioPrev').src=r.result;document.getElementById('phoneAudioPrev').style.display='block';
-    toast('Telefon musiqisi seçildi');
-  };r.readAsDataURL(f);
-}
-function updateTrim(){document.getElementById('trimVal').textContent=document.getElementById('musicStart').value+'s'}
-
-function publishStatus(){
-  let text=document.getElementById('statusText').value.trim();
-  let place=document.getElementById('statusPlace').value.trim();
-  if(!text&&(!window._statusMedias||!window._statusMedias.length)){toast('Mətn və ya media yaz');return}
-  let media=window._statusMedias&&window._statusMedias[0]||'';
-  gun.get('final_status_v300').set({
-    text:text,media:media,place:place,music:selectedMusicData?selectedMusicData.url:'',musicTitle:selectedMusicData?selectedMusicData.title:'',musicArtist:selectedMusicData?selectedMusicData.artist:'',musicStart:document.getElementById('musicStart').value,videoVol:document.getElementById('videoVol').value,musicVol:document.getElementById('musicVol').value,
-    from:myID,fromName:myName,fromAvatar:myAvatar,time:Date.now(),likes:0,views:0,comments:0,shares:0,watch:0,privacy:document.getElementById('statusPrivacy').value
-  });
-  closeModal('statusModal');
-  toast('Status paylaşıldı - alqoritm işlədi');
-  document.getElementById('statusText').value='';window._statusMedias=[];document.getElementById('statusPreview').innerHTML='';selectedMusicData=null;
-}
-
-function renderStatusFeed(){
-  let feed=document.getElementById('statusFeed');
-  let q=(document.getElementById('globalSearch')?.value||'').toLowerCase();
-  let filtered=statuses.filter(s=>!q||s.text.toLowerCase().includes(q)||s.musicTitle?.toLowerCase().includes(q));
-  let html='';
-  filtered.forEach((s,i)=>{
-    if(i>0&&i%4===0){
-      html+=`<div class="statusSlide" style="background:#111"><div class="banner" style="width:90%" onclick="clickBanner('feed_${i}')"><span class="tag">REKLAM - BAXIŞA GÖRƏ</span><div><b>${banners[0]?.title||'AzGram reklam - 1000 baxış 1 AZN'}</b><div style="font-size:11px">Baxışa görə ödəniş - baxış sayılır</div></div></div></div>`;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AzStock.az — Azərbaycanın İlk Azərbaycan Mərkəzli Stock Arxivi</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              DEFAULT: '#f97316',
+              dark: '#ea580c',
+              light: '#ffedd5',
+              black: '#0f172a'
+            }
+          }
+        }
+      }
     }
-    let isVideo=s.media&&s.media.startsWith('data:video');
-    html+=`
-    <div class="statusSlide" onmouseenter="incView('${s._id}')">
-      ${s.media? (isVideo?`<video src="${s.media}" autoplay loop muted playsinline></video>`:`<img src="${s.media}">`):'<div style=position:absolute;inset:0;background:linear-gradient(45deg,#111,#222)'></div>'}
-      ${s.music?`<div class=musicBar><i data-lucide="music" style="width:14px"></i> <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.musicTitle)} - ${esc(s.musicArtist)}</span><audio src="${s.music}" autoplay loop style="width:80px;height:20px"></audio></div>`:''}
-      <div class=statusOverlay>
-        <div style="flex:1"><div style="display:flex;align-items:center;gap:8px"><img src="${s.fromAvatar}" style="width:36px;height:36px;border-radius:999px"><b>${esc(s.fromName)}</b><span style="font-size:11px;color:#ccc">${timeAgo(s.time)} ${s.place?'• '+esc(s.place):''} ${s.edited?'(redaktə)' :''}</span></div><div style="margin-top:8px;font-size:15px;line-height:1.3">${esc(s.text).replace(/#(\w+)/g,'<span style=color:#1da1f2>#$1</span>')}</div><div style="margin-top:6px;font-size:12px;color:#aaa">${s.musicTitle?'🎵 '+esc(s.musicTitle):''}</div></div>
-        <div class=statusActions>
-          <div class=act onclick="likeStatus('${s._id}')"><i data-lucide="heart"></i><span>${s.likes||0}</span></div>
-          <div class=act onclick="openComments('${s._id}')"><i data-lucide="message-circle"></i><span>${s.comments||0}</span></div>
-          <div class=act onclick="shareStatus('${s._id}')"><i data-lucide="share-2"></i><span>${s.shares||0}</span></div>
-          <div class=act onclick="useMusic('${s._id}')"><i data-lucide="music"></i><span>Musiqi istifadə</span></div>
-          <div class=act onclick="editStatus('${s._id}')"><i data-lucide="edit"></i></div>
-          <div class=act onclick="moreStatus('${s._id}')"><i data-lucide="more-horizontal"></i></div>
+  </script>
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #f97316;
+    }
+
+    /* Masonry CSS Column Layout Fixes */
+    .masonry-grid {
+      column-gap: 1rem;
+    }
+    .masonry-item {
+      break-inside: avoid;
+      margin-bottom: 1rem;
+    }
+
+    /* Glassmorphism overlay */
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Shimmer Loading animation */
+    @keyframes pulse-bg {
+      0%, 100% { background-color: #1e293b; }
+      50% { background-color: #334155; }
+    }
+    .img-loading {
+      animation: pulse-bg 1.5s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased selection:bg-orange-500 selection:text-white min-h-screen flex flex-col">
+
+  <!-- ========================================== -->
+  <!-- 1. HEADER & NAVIGATION                    -->
+  <!-- ========================================== -->
+  <header class="sticky top-0 z-40 glass-panel border-b border-slate-800/80 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20 gap-4">
+        
+        <!-- LOGO -->
+        <a href="#" onclick="resetFilters(); return false;" class="flex items-center gap-2 group shrink-0">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center font-black text-2xl text-slate-950 shadow-lg shadow-orange-500/20 group-hover:scale-105 transition-transform">
+            AZ
+          </div>
+          <span class="text-2xl font-extrabold tracking-tight text-white">
+            AzStock<span class="text-orange-500">.az</span>
+          </span>
+        </a>
+
+        <!-- DESKTOP LIVE SEARCH BAR -->
+        <div class="hidden md:flex flex-1 max-w-xl relative">
+          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </div>
+          <input type="text" id="headerSearchInput" oninput="handleSearchInput(this.value)" data-i18n-placeholder="searchPlaceholder" placeholder="Ağac, kərpic, dağ, şəhər axtar..." class="w-full pl-10 pr-10 py-2.5 bg-slate-900/90 border border-slate-700/80 rounded-xl text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all shadow-inner">
+          <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <!-- RIGHT NAV CONTROLS -->
+        <div class="flex items-center gap-3 sm:gap-4">
+          <!-- CATEGORY DROPDOWN -->
+          <div class="relative group hidden lg:block">
+            <button class="px-3 py-2 text-sm font-medium text-slate-300 hover:text-white flex items-center gap-1.5 rounded-lg hover:bg-slate-800/50 transition">
+              <span data-i18n="navCategories">Kategoriyalar</span>
+              <svg class="w-4 h-4 text-slate-400 group-hover:rotate-180 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div class="absolute right-0 top-full pt-2 w-52 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+              <div class="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-2 space-y-1">
+                <a href="#gallery" onclick="filterByCategory('all')" class="block px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition" data-i18n="catAll">Bütün Şəkillər</a>
+                <a href="#gallery" onclick="filterByCategory('Nature')" class="block px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition" data-i18n="catNature">Təbiət / Nature</a>
+                <a href="#gallery" onclick="filterByCategory('City')" class="block px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition" data-i18n="catCity">Şəhər / City</a>
+                <a href="#gallery" onclick="filterByCategory('Texture')" class="block px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition" data-i18n="catTexture">Tekstura / Texture</a>
+                <a href="#gallery" onclick="filterByCategory('Village')" class="block px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition" data-i18n="catVillage">Kənd / Village</a>
+                <a href="#gallery" onclick="filterByCategory('Mountain')" class="block px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition" data-i18n="catMountain">Dağ / Mountain</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- PRICING LINK -->
+          <a href="#pricing" class="hidden sm:inline-flex px-3 py-2 text-sm font-medium text-slate-300 hover:text-white rounded-lg hover:bg-slate-800/50 transition" data-i18n="navPricing">Qiymətlər</a>
+
+          <!-- CONTRIBUTOR LINK -->
+          <a href="#contributor" class="hidden md:inline-flex px-3 py-2 text-sm font-medium text-orange-400 hover:text-orange-300 rounded-lg hover:bg-orange-500/10 transition" data-i18n="navSell">Qazan (30%)</a>
+
+          <!-- LANGUAGE SWITCHER -->
+          <div class="relative inline-flex bg-slate-900 border border-slate-800 rounded-xl p-1 gap-1">
+            <button onclick="setLanguage('az')" id="langBtn-az" class="px-2.5 py-1 text-xs font-bold rounded-lg transition-all text-slate-400 hover:text-white">AZ</button>
+            <button onclick="setLanguage('en')" id="langBtn-en" class="px-2.5 py-1 text-xs font-bold rounded-lg transition-all text-slate-400 hover:text-white">EN</button>
+            <button onclick="setLanguage('ru')" id="langBtn-ru" class="px-2.5 py-1 text-xs font-bold rounded-lg transition-all text-slate-400 hover:text-white">RU</button>
+          </div>
+
+          <!-- SHOPPING CART BUTTON -->
+          <button onclick="toggleCartModal()" class="relative p-2 text-slate-300 hover:text-white bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl transition group">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+            <span id="cartCountBadge" class="absolute -top-1.5 -right-1.5 bg-orange-500 text-slate-950 font-black text-xs w-5 h-5 rounded-full flex items-center justify-center shadow-md scale-0 transition-transform duration-200">0</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- MOBILE SEARCH BAR (SHOWS BELOW HEADER ON SMALL SCREENS) -->
+      <div class="pb-4 md:hidden">
+        <div class="relative w-full">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </div>
+          <input type="text" id="mobileSearchInput" oninput="handleSearchInput(this.value)" data-i18n-placeholder="searchPlaceholder" placeholder="Axtarış..." class="w-full pl-9 pr-8 py-2 bg-slate-900 border border-slate-700/80 rounded-xl text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500">
         </div>
       </div>
-    </div>`;
-  });
-  feed.innerHTML=html||'<div style=padding:40px;text-align:center;color:var(--sec)>Hələ status yoxdur - ilk statusu sən paylaş - musiqi ilə</div>';
-  lucide.createIcons();
-}
-function timeAgo(t){let d=(Date.now()-t)/1000;if(d<60)return'indi';if(d<3600)return Math.floor(d/60)+'d';if(d<86400)return Math.floor(d/3600)+'s';return Math.floor(d/86400)+'g'}
-function likeStatus(id){gun.get('final_status_v300').get(id).get('likes').put((statuses.find(s=>s._id===id)?.likes||0)+1)}
-function incView(id){let s=statuses.find(x=>x._id===id);if(!s||s._viewed) return;s._viewed=true;gun.get('final_status_v300').get(id).get('views').put((s.views||0)+1);incBannerView('feed')}
-function shareStatus(id){navigator.share?navigator.share({title:'AzGram',text:statuses.find(s=>s._id===id)?.text,url:location.href}):(navigator.clipboard.writeText(location.href),toast('Link kopyalandı'));gun.get('final_status_v300').get(id).get('shares').put((statuses.find(s=>s._id===id)?.shares||0)+1)}
-function useMusic(id){let s=statuses.find(x=>x._id===id);if(!s?.music)return;selectedMusicData={url:s.music,title:s.musicTitle,artist:s.musicArtist};openStatusCreate();document.getElementById('selectedMusic').textContent=s.musicTitle+' seçildi';toast('Eyni musiqi ilə status yarat')}
-function editStatus(id){let s=statuses.find(x=>x._id===id);if(s.from!==myID){toast('Yalnız öz statusunu redaktə edə bilərsən');return}let nt=prompt('Yeni mətn',s.text);if(nt!==null){gun.get('final_status_v300').get(id).get('text').put(nt);gun.get('final_status_v300').get(id).get('edited').put(true);toast('Redaktə edildi')}}
-function moreStatus(id){if(confirm('Silinsin?')){gun.get('final_status_v300').get(id).put(null);toast('Silindi')}}
+    </div>
+  </header>
 
-// comments nested
-function openComments(id){currentStatusID=id;document.getElementById('commentSheet').classList.add('open');loadComments(id)}
-function closeComments(){document.getElementById('commentSheet').classList.remove('open');currentStatusID=null;replyToComment=null}
-function loadComments(statusID){
-  let listEl=document.getElementById('commentList');listEl.innerHTML='';
-  gun.get('comments_'+statusID).map().on((d,cid)=>{
-    if(!d||!d.text) return;
-    if(document.getElementById('c_'+cid)) return;
-    let div=document.createElement('div');
-    div.id='c_'+cid;
-    div.style.cssText='background:var(--input);padding:10px;border-radius:12px';
-    div.innerHTML=`
-      <div style="display:flex;gap:8px;align-items:center"><img src="${d.avatar}" style="width:24px;height:24px;border-radius:999px"><b style="font-size:13px">${esc(d.name)}</b><span style="font-size:10px;color:var(--sec)">${timeAgo(d.time)}</span></div>
-      <div style="margin:6px 0 0 32px">${esc(d.text)} ${d.replyTo?'<span style=color:var(--blue)> @'+esc(d.replyToName)+'</span>':''}</div>
-      <div style="margin:6px 0 0 32px;display:flex;gap:12px;font-size:11px;color:var(--sec)"><span style="cursor:pointer" onclick="likeComment('${statusID}','${cid}')">❤️ ${d.likes||0}</span><span style="cursor:pointer" onclick="replyComment('${cid}','${esc(d.name)}')">Cavab ver - şərhə cavab</span><span style="cursor:pointer" onclick="editComment('${statusID}','${cid}')">Redaktə</span><span style="cursor:pointer" onclick="delComment('${statusID}','${cid}')">Sil</span></div>
-      <div id="replies_${cid}" style="margin:8px 0 0 32px;display:flex;flex-direction:column;gap:6px"></div>
-    `;
-    listEl.appendChild(div);
-    // replies
-    gun.get('replies_'+cid).map().on((rd,rid)=>{
-      if(!rd||!rd.text) return;
-      let rWrap=document.getElementById('replies_'+cid);
-      if(!rWrap||document.getElementById('r_'+rid)) return;
-      let rDiv=document.createElement('div');
-      rDiv.id='r_'+rid;
-      rDiv.style.cssText='background:#111;padding:8px;border-radius:8px;font-size:13px';
-      rDiv.innerHTML=`<b>${esc(rd.name)}</b> <span style=color:var(--sec)>@${esc(rd.replyToName)}</span>: ${esc(rd.text)} <span style="font-size:10px;color:var(--sec)">${timeAgo(rd.time)}</span>`;
-      rWrap.appendChild(rDiv);
+  <!-- ========================================== -->
+  <!-- 2. HERO SECTION                            -->
+  <!-- ========================================== -->
+  <section class="relative pt-12 pb-16 lg:pt-20 lg:pb-24 overflow-hidden border-b border-slate-800/50">
+    <!-- Ambient Gradient Background -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-gradient-to-tr from-orange-600/20 to-amber-500/10 blur-[130px] rounded-full pointer-events-none"></div>
+
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+      
+      <!-- BADGE -->
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-400 text-xs font-semibold mb-6 tracking-wide uppercase">
+        <span class="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span>
+        <span data-i18n="heroBadge">Samsung A32 ilə çəkilmiş 100,000+ Orijinal Foto & Video</span>
+      </div>
+
+      <!-- MAIN HERO HEADING -->
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight mb-6" data-i18n="heroTitle">
+        Azərbaycanın İlk Real Stock Arxivi
+      </h1>
+
+      <!-- HERO SUBTITLE -->
+      <p class="text-base sm:text-lg lg:text-xl text-slate-300 max-w-3xl mx-auto mb-8 font-light leading-relaxed" data-i18n="heroSubtitle">
+        Süni Intellekt (AI Model Training), arxitektura, təbiət və tekstura üçün ultra-detallı, tam lisenziyalı eksklüziv Azərbaycan görüntüləri.
+      </p>
+
+      <!-- BIG HERO SEARCH BAR -->
+      <div class="max-w-2xl mx-auto relative mb-8 shadow-2xl rounded-2xl">
+        <div class="relative flex items-center">
+          <input type="text" id="heroSearchInput" oninput="handleSearchInput(this.value)" data-i18n-placeholder="searchPlaceholder" placeholder="Ağac, kərpic, dağ, şəhər axtar..." class="w-full pl-6 pr-32 py-4 sm:py-5 text-base bg-slate-900/90 border-2 border-slate-700/80 rounded-2xl text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 transition-all shadow-2xl">
+          <button onclick="triggerHeroSearch()" class="absolute right-2 px-6 py-2.5 sm:py-3 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-slate-950 font-extrabold rounded-xl transition-all shadow-md hover:shadow-orange-500/25 flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <span class="hidden sm:inline" data-i18n="heroSearchBtn">Axtar</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- POPULAR TAG PILLS -->
+      <div class="flex flex-wrap items-center justify-center gap-2 text-xs sm:text-sm text-slate-400">
+        <span class="font-semibold text-slate-500 mr-1" data-i18n="popularTags">Populyar:</span>
+        <button onclick="filterByTag('kərpic')" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-orange-500/50 hover:text-white transition">#kərpic</button>
+        <button onclick="filterByTag('ağac')" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-orange-500/50 hover:text-white transition">#ağac_qabığı</button>
+        <button onclick="filterByTag('dağ')" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-orange-500/50 hover:text-white transition">#dağlar</button>
+        <button onclick="filterByTag('baku')" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-orange-500/50 hover:text-white transition">#baku</button>
+        <button onclick="filterByTag('tekstura')" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-orange-500/50 hover:text-white transition">#tekstura</button>
+        <button onclick="filterByTag('kənd')" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-orange-500/50 hover:text-white transition">#kənd</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- 3. PHOTO MASONRY GALLERY (150 ITEMS)       -->
+  <!-- ========================================== -->
+  <section id="gallery" class="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-grow">
+    
+    <!-- GALLERY CONTROLS BAR -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 pb-4 border-b border-slate-800">
+      <div>
+        <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+          <span data-i18n="photosTitle">Foto Kolleksiya</span>
+          <span id="imageCountBadge" class="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-orange-400 border border-slate-700 font-mono">150 foto</span>
+        </h2>
+        <p class="text-xs text-slate-400 mt-1" data-i18n="photosSub">Eksklüziv yüksək dəqiqlikli 4K+ kadrlar</p>
+      </div>
+
+      <!-- FILTER TABS -->
+      <div class="flex flex-wrap items-center gap-1.5 bg-slate-900 p-1.5 rounded-xl border border-slate-800 text-xs font-medium">
+        <button onclick="filterByCategory('all')" id="tab-all" class="cat-tab px-3 py-1.5 rounded-lg bg-orange-500 text-slate-950 font-bold transition">Bütün</button>
+        <button onclick="filterByCategory('Nature')" id="tab-Nature" class="cat-tab px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition" data-i18n="catNature">Təbiət</button>
+        <button onclick="filterByCategory('City')" id="tab-City" class="cat-tab px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition" data-i18n="catCity">Şəhər</button>
+        <button onclick="filterByCategory('Texture')" id="tab-Texture" class="cat-tab px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition" data-i18n="catTexture">Tekstura</button>
+        <button onclick="filterByCategory('Village')" id="tab-Village" class="cat-tab px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition" data-i18n="catVillage">Kənd</button>
+        <button onclick="filterByCategory('Mountain')" id="tab-Mountain" class="cat-tab px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition" data-i18n="catMountain">Dağ</button>
+      </div>
+    </div>
+
+    <!-- MASONRY IMAGE GRID (CSS COLUMNS) -->
+    <div id="imageGrid" class="masonry-grid columns-2 sm:columns-3 md:columns-4 lg:columns-5 space-y-4">
+      <!-- 150 Dynamic Image Cards rendered here via JS -->
+    </div>
+
+    <!-- EMPTY STATE IF NO RESULTS SEARCHED -->
+    <div id="emptySearchState" class="hidden text-center py-20">
+      <div class="w-16 h-16 mx-auto mb-4 text-slate-600 flex items-center justify-center rounded-2xl bg-slate-900 border border-slate-800">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      </div>
+      <h3 class="text-lg font-bold text-slate-300 mb-1" data-i18n="noResults">Heç nə tapılmadı</h3>
+      <p class="text-sm text-slate-500 max-w-sm mx-auto mb-6" data-i18n="noResultsSub">Axtarış sorğunuzu dəyişdirərək yenidən yoxlayın və ya filtrləri sıfırlayın.</p>
+      <button onclick="resetFilters()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-lg transition" data-i18n="resetFilters">Filtrləri Sıfırla</button>
+    </div>
+
+  </section>
+
+  <!-- ========================================== -->
+  <!-- 4. VIDEO COLLECTION GRID (24 ITEMS)        -->
+  <!-- ========================================== -->
+  <section class="py-12 bg-slate-900/40 border-y border-slate-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-2xl font-bold text-white" data-i18n="videoTitle">Video Materiallar</h2>
+            <span class="px-2 py-0.5 text-xs font-extrabold bg-red-500/20 text-red-400 border border-red-500/30 rounded-md">1080p FULL HD</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-1" data-i18n="videoSub">Proyektləriniz üçün stok video kadrları</p>
+        </div>
+      </div>
+
+      <!-- VIDEO GRID 4 COLUMNS -->
+      <div id="videoGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <!-- 24 Dynamic Video Cards rendered via JS -->
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- 5. PRICING SECTION                         -->
+  <!-- ========================================== -->
+  <section id="pricing" class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-3xl mx-auto mb-16">
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-white mb-4" data-i18n="pricingTitle">Sərfəli Tariflər</h2>
+      <p class="text-slate-400 text-base" data-i18n="pricingSubtitle">İhtiyacınıza uyğun paketi seçin və anında endirməyə başlayın.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      
+      <!-- FREE TIER -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-8 flex flex-col justify-between hover:border-slate-700 transition">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400" data-i18n="planFree">Pulsuz</span>
+          <div class="mt-4 flex items-baseline gap-1">
+            <span class="text-4xl font-black text-white">0 AZN</span>
+            <span class="text-sm text-slate-400" data-i18n="perForever">/ həmişəlik</span>
+          </div>
+          <p class="mt-3 text-sm text-slate-400" data-i18n="planFreeDesc">Şəxsi istifadə və sınaq üçün əla seçim.</p>
+          <ul class="mt-8 space-y-4 text-sm text-slate-300">
+            <li class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span data-i18n="feat1">Aylıq 10 foto yükləmə</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span data-i18n="feat2">Standart Rezolusiya</span>
+            </li>
+            <li class="flex items-center gap-3 text-slate-500">
+              <svg class="w-5 h-5 text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              <span data-i18n="feat3">Komersiya istifadəsi daxil deyil</span>
+            </li>
+          </ul>
+        </div>
+        <button onclick="selectPlan('Free')" class="mt-8 w-full py-3 px-4 rounded-xl font-bold bg-slate-800 hover:bg-slate-700 text-white transition text-sm" data-i18n="btnStart">Başla</button>
+      </div>
+
+      <!-- MONTHLY PRO TIER (FEATURED) -->
+      <div class="bg-gradient-to-b from-slate-900 to-slate-900/90 border-2 border-orange-500/80 rounded-3xl p-8 flex flex-col justify-between relative shadow-2xl shadow-orange-500/10">
+        <div class="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-orange-500 to-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider rounded-full shadow-md" data-i18n="popularChoice">Ən Populyar</div>
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-orange-400" data-i18n="planPro">Aylıq PRO</span>
+          <div class="mt-4 flex items-baseline gap-1">
+            <span class="text-4xl font-black text-white" data-i18n="proPrice">19 AZN</span>
+            <span class="text-sm text-slate-400" data-i18n="perMonth">/ ay ($11 / 1000 RUB)</span>
+          </div>
+          <p class="mt-3 text-sm text-slate-400" data-i18n="planProDesc">Dizaynerlər və kontent yaradıcıları üçün tam paket.</p>
+          <ul class="mt-8 space-y-4 text-sm text-slate-300">
+            <li class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-orange-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span data-i18n="feat4">100 Yüksək Rezolusiyalı Yükləmə</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-orange-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span data-i18n="feat5">Tam Komersiya Lisenziyası</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-orange-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span data-i18n="feat6">RAW / RAW+EXIF Məlumatı</span>
+            </li>
+          </ul>
+        </div>
+        <button onclick="selectPlan('Pro')" class="mt-8 w-full py-3.5 px-4 rounded-xl font-extrabold bg-gradient-to-r from-orange-500 to-amber-500 text-slate-950 hover:brightness-110 transition text-sm shadow-lg shadow-orange-500/20" data-i18n="btnSubscribe">Abunə Ol</button>
+      </div>
+
+      <!-- BUSINESS / AI TIER -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-8 flex flex-col justify-between hover:border-slate-700 transition">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400" data-i18n="planBiz">Biznes & AI</span>
+          <div class="mt-4 flex items-baseline gap-1">
+            <span class="text-4xl font-black text-white">99 AZN</span>
+            <span class="text-sm text-slate-400" data-i18n="perMonth">/ ay</span>
+          </div>
+          <p class="mt-3 text-sm text-slate-400" data-i18n="planBizDesc">Süni Intellekt (AI Model Training) və agentliklər üçün.</p>
+          <ul class="mt-8 space-y-4 text-sm text-slate-300">
+            <li class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span data-i18n="feat7">1000+ Sərhədsiz Yükləmə</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span data-i18n="feat8">Tam Dataset & REST API Girişi</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span data-i18n="feat9">Xüsusi Dəstək & Müqavilə</span>
+            </li>
+          </ul>
+        </div>
+        <button onclick="selectPlan('Business')" class="mt-8 w-full py-3 px-4 rounded-xl font-bold bg-slate-800 hover:bg-slate-700 text-white transition text-sm" data-i18n="btnContact">Bizimlə Əlaqə</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- 6. CONTRIBUTOR / EARN SECTION              -->
+  <!-- ========================================== -->
+  <section id="contributor" class="py-16 bg-gradient-to-br from-slate-900 via-slate-900/80 to-slate-950 border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-gradient-to-r from-orange-500/10 via-amber-500/5 to-transparent p-8 sm:p-12 rounded-3xl border border-orange-500/20 relative overflow-hidden">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center relative z-10">
+          <div>
+            <span class="inline-block text-orange-400 text-xs font-black uppercase tracking-widest mb-3" data-i18n="contribBadge">Müəlliflər üçün</span>
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-white mb-4 leading-tight" data-i18n="contribTitle">
+              Şəkil Yüklə, Hər Satışdan 30% Qazan!
+            </h2>
+            <p class="text-slate-300 text-base mb-8" data-i18n="contribDesc">
+              Mobil telefonunuzla (məsələn Samsung A32) çəkdiyiniz Azərbaycan mənzərələri, kərpic, ağac və şəhər teksturalarını satin, gəlir əldə edin.
+            </p>
+            <button onclick="openContributorModal()" class="px-6 py-3.5 bg-orange-500 hover:bg-orange-600 text-slate-950 font-extrabold rounded-xl transition shadow-lg shadow-orange-500/20" data-i18n="btnBecomeContrib">
+              Müəllif Ol
+            </button>
+          </div>
+
+          <!-- 3 STEPS CARDS -->
+          <div class="space-y-4">
+            <div class="flex items-start gap-4 p-4 bg-slate-900/90 border border-slate-800 rounded-2xl">
+              <div class="w-10 h-10 rounded-xl bg-orange-500/20 text-orange-400 font-extrabold flex items-center justify-center shrink-0">1</div>
+              <div>
+                <h4 class="font-bold text-white text-base" data-i18n="step1Title">Foto və ya Video Çək</h4>
+                <p class="text-xs text-slate-400 mt-1" data-i18n="step1Desc">Telefonunuzla ətrafınızdakı maraqlı obyektləri, bina teksturalarını çəkin.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4 p-4 bg-slate-900/90 border border-slate-800 rounded-2xl">
+              <div class="w-10 h-10 rounded-xl bg-orange-500/20 text-orange-400 font-extrabold flex items-center justify-center shrink-0">2</div>
+              <div>
+                <h4 class="font-bold text-white text-base" data-i18n="step2Title">Platformaya Yüklə</h4>
+                <p class="text-xs text-slate-400 mt-1" data-i18n="step2Desc">Şəkilləri platformamıza əlavə edin, teqlər və kateqoriya təyin edin.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4 p-4 bg-slate-900/90 border border-slate-800 rounded-2xl">
+              <div class="w-10 h-10 rounded-xl bg-orange-500/20 text-orange-400 font-extrabold flex items-center justify-center shrink-0">3</div>
+              <div>
+                <h4 class="font-bold text-white text-base" data-i18n="step3Title">Qazancını Çək</h4>
+                <p class="text-xs text-slate-400 mt-1" data-i18n="step3Desc">Hər yüklənmədən 30% komissiyanı kart hesabınıza dərhal köçürün.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- 7. FOOTER                                  -->
+  <!-- ========================================== -->
+  <footer class="bg-slate-950 border-t border-slate-900 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+        <div class="space-y-4 md:col-span-1">
+          <a href="#" class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center font-black text-slate-950 text-lg">AZ</div>
+            <span class="text-xl font-extrabold text-white">AzStock<span class="text-orange-500">.az</span></span>
+          </a>
+          <p class="text-xs text-slate-400 leading-relaxed" data-i18n="footerAbout">
+            Azərbaycanın ilk və ən böyük stok media arxivi. Süni intellekt təlimi və kreativ dizaynlar üçün foto və videolar.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-extrabold uppercase text-slate-300 tracking-wider mb-4" data-i18n="footCat">Kategoriyalar</h4>
+          <ul class="space-y-2 text-xs text-slate-400">
+            <li><a href="#gallery" onclick="filterByCategory('Nature')" class="hover:text-orange-400 transition" data-i18n="catNature">Təbiət</a></li>
+            <li><a href="#gallery" onclick="filterByCategory('City')" class="hover:text-orange-400 transition" data-i18n="catCity">Şəhər</a></li>
+            <li><a href="#gallery" onclick="filterByCategory('Texture')" class="hover:text-orange-400 transition" data-i18n="catTexture">Tekstura</a></li>
+            <li><a href="#gallery" onclick="filterByCategory('Village')" class="hover:text-orange-400 transition" data-i18n="catVillage">Kənd</a></li>
+            <li><a href="#gallery" onclick="filterByCategory('Mountain')" class="hover:text-orange-400 transition" data-i18n="catMountain">Dağ</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-extrabold uppercase text-slate-300 tracking-wider mb-4" data-i18n="footPlatform">Platforma</h4>
+          <ul class="space-y-2 text-xs text-slate-400">
+            <li><a href="#pricing" class="hover:text-orange-400 transition" data-i18n="navPricing">Qiymətlər</a></li>
+            <li><a href="#contributor" class="hover:text-orange-400 transition" data-i18n="navSell">Müəllif Ol (30%)</a></li>
+            <li><a href="#" onclick="alert('API documentation endpoint: https://api.azstock.az/v1/docs'); return false;" class="hover:text-orange-400 transition">API Documentation</a></li>
+            <li><a href="#" onclick="alert('AI Model Dataset License Agreement v2.1'); return false;" class="hover:text-orange-400 transition">AI Training License</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-extrabold uppercase text-slate-300 tracking-wider mb-4" data-i18n="footContact">Əlaqə & Dəstək</h4>
+          <p class="text-xs text-slate-400 mb-2">Bakı şəhəri, Azərbaycan</p>
+          <p class="text-xs text-slate-400 mb-4">support@azstock.az</p>
+          <p class="text-xs text-slate-500">&copy; 2026 AzStock.az. All rights reserved.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================== -->
+  <!-- 8. LIGHTBOX MODAL                         -->
+  <!-- ========================================== -->
+  <div id="lightboxModal" class="fixed inset-0 z-50 hidden bg-slate-950/90 backdrop-blur-xl flex items-center justify-center p-4 sm:p-6 transition-opacity duration-300 opacity-0">
+    <div class="relative bg-slate-900 border border-slate-800 rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col lg:flex-row overflow-hidden">
+      
+      <!-- CLOSE BUTTON -->
+      <button onclick="closeLightbox()" class="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-slate-950/80 hover:bg-slate-800 text-white flex items-center justify-center transition border border-slate-700">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <!-- LEFT: IMAGE DISPLAY -->
+      <div class="lg:w-2/3 bg-slate-950/60 p-6 flex items-center justify-center relative min-h-[300px]">
+        <img id="modalImg" src="" alt="" class="max-h-[70vh] w-auto object-contain rounded-xl shadow-xl">
+      </div>
+
+      <!-- RIGHT: DETAILS & ACTIONS -->
+      <div class="lg:w-1/3 p-6 sm:p-8 flex flex-col justify-between space-y-6 bg-slate-900">
+        <div>
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <span id="modalCategory" class="text-xs font-bold text-orange-400 uppercase tracking-wider px-2.5 py-1 rounded-md bg-orange-500/10 border border-orange-500/20">Tekstura</span>
+            <span id="modalPrice" class="text-xl font-black text-white">$12</span>
+          </div>
+
+          <h3 id="modalTitle" class="text-xl font-extrabold text-white mb-2">kərpic_42.jpg</h3>
+          
+          <div class="flex items-center gap-2 text-xs text-slate-400 mb-6">
+            <span id="modalAuthor" class="font-medium text-slate-300">@baku_data</span>
+            <span>•</span>
+            <span id="modalLocation">Baku, Azerbaijan</span>
+          </div>
+
+          <!-- EXIF DATA METADATA BOX -->
+          <div class="bg-slate-950/60 rounded-2xl p-4 border border-slate-800/80 space-y-2 mb-6">
+            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h0.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              EXIF Məlumatı
+            </h4>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div><span class="text-slate-500">Cihaz:</span> <span class="text-slate-200 font-mono">Samsung A32</span></div>
+              <div><span class="text-slate-500">Ölçü:</span> <span class="text-slate-200 font-mono">4032 x 3024</span></div>
+              <div><span class="text-slate-500">ISO:</span> <span class="text-slate-200 font-mono">100</span></div>
+              <div><span class="text-slate-500">Fokal:</span> <span class="text-slate-200 font-mono">26mm f/1.8</span></div>
+            </div>
+          </div>
+
+          <!-- TAGS -->
+          <div id="modalTags" class="flex flex-wrap gap-1.5 mb-6">
+            <!-- Dynamic tags -->
+          </div>
+        </div>
+
+        <div class="space-y-3 pt-4 border-t border-slate-800">
+          <button id="modalBuyBtn" onclick="addCurrentModalToCart()" class="w-full py-3.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:brightness-110 text-slate-950 font-extrabold rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+            <span data-i18n="addToCart">Səbətə Əlavə Et</span>
+          </button>
+          <button onclick="downloadSample()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs rounded-xl transition" data-i18n="downloadSample">
+            Sınaq Nümunəsini Yüklə (Watermarked)
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 9. SHOPPING CART MODAL                     -->
+  <!-- ========================================== -->
+  <div id="cartModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-md flex justify-end transition-opacity duration-300 opacity-0">
+    <div class="bg-slate-900 border-l border-slate-800 w-full max-w-md h-full flex flex-col justify-between p-6 shadow-2xl">
+      
+      <div>
+        <div class="flex items-center justify-between pb-4 border-b border-slate-800 mb-6">
+          <h3 class="text-xl font-bold text-white flex items-center gap-2">
+            <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+            <span data-i18n="cartTitle">Səbətiniz</span>
+          </h3>
+          <button onclick="toggleCartModal()" class="text-slate-400 hover:text-white">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <div id="cartItemsContainer" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+          <!-- Cart items dynamically rendered -->
+        </div>
+      </div>
+
+      <div class="pt-6 border-t border-slate-800 space-y-4">
+        <div class="flex items-center justify-between text-base font-bold text-white">
+          <span data-i18n="cartTotal">Cəmi:</span>
+          <span id="cartTotalPrice" class="text-2xl text-orange-400 font-black">$0</span>
+        </div>
+        <button onclick="checkout()" class="w-full py-4 bg-gradient-to-r from-orange-500 to-amber-500 text-slate-950 font-black rounded-xl transition shadow-lg shadow-orange-500/20" data-i18n="cartCheckout">
+          Sifarişi Rəsmiləşdir
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 10. JAVASCRIPT LOGIC & I18N ENGINE         -->
+  <!-- ========================================== -->
+  <script>
+    // ------------------------------------------------------------------
+    // i18n MULTILINGUAL DICTIONARY
+    // ------------------------------------------------------------------
+    const i18n = {
+      az: {
+        heroBadge: "Samsung A32 ilə çəkilmiş 100,000+ Orijinal Foto & Video",
+        heroTitle: "Azərbaycanın İlk Real Stock Arxivi",
+        heroSubtitle: "Süni Intellekt (AI Model Training), arxitektura, təbiət və tekstura üçün ultra-detallı, tam lisenziyalı eksklüziv Azərbaycan görüntüləri.",
+        searchPlaceholder: "Ağac, kərpic, dağ, şəhər axtar...",
+        heroSearchBtn: "Axtar",
+        popularTags: "Populyar:",
+        navCategories: "Kategoriyalar",
+        navPricing: "Qiymətlər",
+        navSell: "Qazan (30%)",
+        photosTitle: "Foto Kolleksiya",
+        photosSub: "Eksklüziv yüksək dəqiqlikli 4K+ kadrlar",
+        videoTitle: "Video Materiallar",
+        videoSub: "Proyektləriniz üçün stok video kadrları",
+        catAll: "Bütün Şəkillər",
+        catNature: "Təbiət",
+        catCity: "Şəhər",
+        catTexture: "Tekstura",
+        catVillage: "Kənd",
+        catMountain: "Dağ",
+        addToCart: "Səbətə Əlavə Et",
+        inCart: "Səbətdədir",
+        noResults: "Heç nə tapılmadı",
+        noResultsSub: "Axtarış sorğunuzu dəyişdirərək yenidən yoxlayın və ya filtrləri sıfırlayın.",
+        resetFilters: "Filtrləri Sıfırla",
+        pricingTitle: "Sərfəli Tariflər",
+        pricingSubtitle: "İhtiyacınıza uyğun paketi seçin və anında endirməyə başlayın.",
+        planFree: "Pulsuz",
+        perForever: "/ həmişəlik",
+        planFreeDesc: "Şəxsi istifadə və sınaq üçün əla seçim.",
+        feat1: "Aylıq 10 foto yükləmə",
+        feat2: "Standart Rezolusiya",
+        feat3: "Komersiya istifadəsi daxil deyil",
+        btnStart: "Başla",
+        popularChoice: "Ən Populyar",
+        planPro: "Aylıq PRO",
+        proPrice: "19 AZN",
+        perMonth: "/ ay",
+        planProDesc: "Dizaynerlər və kontent yaradıcıları üçün tam paket.",
+        feat4: "100 Yüksək Rezolusiyalı Yükləmə",
+        feat5: "Tam Komersiya Lisenziyası",
+        feat6: "RAW / RAW+EXIF Məlumatı",
+        btnSubscribe: "Abunə Ol",
+        planBiz: "Biznes & AI",
+        planBizDesc: "Süni Intellekt (AI Model Training) və agentliklər üçün.",
+        feat7: "1000+ Sərhədsiz Yükləmə",
+        feat8: "Tam Dataset & REST API Girişi",
+        feat9: "Xüsusi Dəstək & Müqavilə",
+        btnContact: "Bizimlə Əlaqə",
+        contribBadge: "Müəlliflər üçün",
+        contribTitle: "Şəkil Yüklə, Hər Satışdan 30% Qazan!",
+        contribDesc: "Mobil telefonunuzla (məsələn Samsung A32) çəkdiyiniz Azərbaycan mənzərələri, kərpic, ağac və şəhər teksturalarını satin, gəlir əldə edin.",
+        btnBecomeContrib: "Müəllif Ol",
+        step1Title: "Foto və ya Video Çək",
+        step1Desc: "Telefonunuzla ətrafınızdakı maraqlı obyektləri, bina teksturalarını çəkin.",
+        step2Title: "Platformaya Yüklə",
+        step2Desc: "Şəkilləri platformamıza əlavə edin, teqlər və kateqoriya təyin edin.",
+        step3Title: "Qazancını Çək",
+        step3Desc: "Hər yüklənmədən 30% komissiyanı kart hesabınıza dərhal köçürün.",
+        footerAbout: "Azərbaycanın ilk və ən böyük stok media arxivi. Süni intellekt təlimi və kreativ dizaynlar üçün foto və videolar.",
+        footCat: "Kategoriyalar",
+        footPlatform: "Platforma",
+        footContact: "Əlaqə & Dəstək",
+        cartTitle: "Səbətiniz",
+        cartTotal: "Cəmi:",
+        cartCheckout: "Sifarişi Rəsmiləşdir",
+        downloadSample: "Sınaq Nümunəsini Yüklə (Watermarked)",
+        cartEmpty: "Səbətiniz boşdur"
+      },
+      en: {
+        heroBadge: "100,000+ Original Photos & Videos shot on Samsung A32",
+        heroTitle: "First Stock Archive of Azerbaijan",
+        heroSubtitle: "Ultra-detailed, fully licensed exclusive Azerbaijani imagery ready for AI Model Training, architecture, nature & texture projects.",
+        searchPlaceholder: "Search tree, brick, mountain, city...",
+        heroSearchBtn: "Search",
+        popularTags: "Popular:",
+        navCategories: "Categories",
+        navPricing: "Pricing",
+        navSell: "Sell (30%)",
+        photosTitle: "Photo Collection",
+        photosSub: "Exclusive high-resolution 4K+ shots",
+        videoTitle: "Video Footage",
+        videoSub: "Stock video footage for your creative projects",
+        catAll: "All Photos",
+        catNature: "Nature",
+        catCity: "City",
+        catTexture: "Texture",
+        catVillage: "Village",
+        catMountain: "Mountain",
+        addToCart: "Add to Cart",
+        inCart: "In Cart",
+        noResults: "No results found",
+        noResultsSub: "Try adjusting your search query or reset filters.",
+        resetFilters: "Reset Filters",
+        pricingTitle: "Flexible Pricing Plans",
+        pricingSubtitle: "Choose the plan that fits your workflow and start downloading instantly.",
+        planFree: "Free",
+        perForever: "/ forever",
+        planFreeDesc: "Great for personal evaluation and small tests.",
+        feat1: "10 photo downloads monthly",
+        feat2: "Standard Resolution",
+        feat3: "Commercial license excluded",
+        btnStart: "Get Started",
+        popularChoice: "Most Popular",
+        planPro: "Monthly PRO",
+        proPrice: "$11",
+        perMonth: "/ month",
+        planProDesc: "Complete package for designers and content creators.",
+        feat4: "100 High-Res Downloads",
+        feat5: "Full Commercial License",
+        feat6: "RAW / RAW+EXIF Metadata",
+        btnSubscribe: "Subscribe Now",
+        planBiz: "Business & AI",
+        planBizDesc: "Designed for AI Model Training datasets and agency pipelines.",
+        feat7: "1000+ Unlimited Downloads",
+        feat8: "Full Dataset & REST API Access",
+        feat9: "Dedicated Support & Contract",
+        btnContact: "Contact Us",
+        contribBadge: "For Contributors",
+        contribTitle: "Upload Photos, Earn 30% Per Sale!",
+        contribDesc: "Monetize Azerbaijani landscapes, brick/wood textures shot directly on your smartphone.",
+        btnBecomeContrib: "Become a Contributor",
+        step1Title: "Shoot Photo or Video",
+        step1Desc: "Capture textures, landscapes, and buildings using your smartphone camera.",
+        step2Title: "Upload to Platform",
+        step2Desc: "Upload photos, attach tags and assign relevant categories.",
+        step3Title: "Withdraw Earnings",
+        step3Desc: "Get 30% commission per download instantly to your card or wallet.",
+        footerAbout: "First and largest stock media archive of Azerbaijan. High quality stock imagery for AI training and creative design.",
+        footCat: "Categories",
+        footPlatform: "Platform",
+        footContact: "Contact & Support",
+        cartTitle: "Your Cart",
+        cartTotal: "Total:",
+        cartCheckout: "Proceed to Checkout",
+        downloadSample: "Download Watermarked Sample",
+        cartEmpty: "Your cart is empty"
+      },
+      ru: {
+        heroBadge: "100 000+ оригинальных фото и видео, снятых на Samsung A32",
+        heroTitle: "Первый стоковый архив Азербайджана",
+        heroSubtitle: "Ультра-детализированные эксклюзивные кадры Азербайджана для обучения ИИ (AI Training), архитектуры, природы и текстур.",
+        searchPlaceholder: "Искать дерево, кирпич, горы, город...",
+        heroSearchBtn: "Искать",
+        popularTags: "Популярные:",
+        navCategories: "Категории",
+        navPricing: "Цены",
+        navSell: "Продавай (30%)",
+        photosTitle: "Фото Коллекция",
+        photosSub: "Эксклюзивные снимки в высоком разрешении 4K+",
+        videoTitle: "Видео Материалы",
+        videoSub: "Стоковые видеоматериалы для ваших проектов",
+        catAll: "Все Фотографии",
+        catNature: "Природа",
+        catCity: "Город",
+        catTexture: "Текстура",
+        catVillage: "Деревня",
+        catMountain: "Горы",
+        addToCart: "В корзину",
+        inCart: "В корзине",
+        noResults: "Ничего не найдено",
+        noResultsSub: "Попробуйте изменить поисковый запрос или сбросить фильтры.",
+        resetFilters: "Сбросить фильтры",
+        pricingTitle: "Выгодные Тарифы",
+        pricingSubtitle: "Выберите подходящий план и начните скачивать незамедлительно.",
+        planFree: "Бесплатно",
+        perForever: "/ навсегда",
+        planFreeDesc: "Отлично подходит для личного использования и тестов.",
+        feat1: "10 скачиваний в месяц",
+        feat2: "Стандартное разрешение",
+        feat3: "Коммерческая лицензия не входит",
+        btnStart: "Начать",
+        popularChoice: "Популярный",
+        planPro: "Ежемесячный PRO",
+        proPrice: "1000 RUB",
+        perMonth: "/ мес",
+        planProDesc: "Полный пакет для дизайнеров и создателей контента.",
+        feat4: "100 скачиваний высок. разрешения",
+        feat5: "Полная коммерческая лицензия",
+        feat6: "Метаданные RAW / EXIF",
+        btnSubscribe: "Подписаться",
+        planBiz: "Бизнес и ИИ",
+        planBizDesc: "Для обучения моделей ИИ (AI Training) и агентств.",
+        feat7: "1000+ безлимитных скачиваний",
+        feat8: "Доступ к Dataset и REST API",
+        feat9: "Персональная поддержка",
+        btnContact: "Связаться с нами",
+        contribBadge: "Авторам",
+        contribTitle: "Загружай фото, зарабатывай 30% с продаж!",
+        contribDesc: "Продавайте текстуры, пейзажи и архитектуру Азербайджана, снятые на ваш смартфон.",
+        btnBecomeContrib: "Стать автором",
+        step1Title: "Снимите фото или видео",
+        step1Desc: "Снимайте окружающие текстуры, здания и природу на камеру смартфона.",
+        step2Title: "Загрузите на сайт",
+        step2Desc: "Добавьте фото, проставьте теги и выберите категорию.",
+        step3Title: "Выводите прибыль",
+        step3Desc: "Получайте 30% комиссии с каждого скачивания прямо на карту.",
+        footerAbout: "Первый и крупнейший стоковый архив Азербайджана. Фотографии для ИИ и дизайна.",
+        footCat: "Категории",
+        footPlatform: "Платформа",
+        footContact: "Контакты",
+        cartTitle: "Ваша корзина",
+        cartTotal: "Итого:",
+        cartCheckout: "Оформить заказ",
+        downloadSample: "Скачать с водяным знаком",
+        cartEmpty: "Ваша корзина пуста"
+      }
+    };
+
+    // ------------------------------------------------------------------
+    // GLOBAL STATE & DATA STORAGE
+    // ------------------------------------------------------------------
+    let currentLang = 'az';
+    let activeCategory = 'all';
+    let searchQuery = '';
+    let cart = JSON.parse(localStorage.getItem('azstock_cart') || '[]');
+    let currentModalItem = null;
+
+    const allImages = [];
+    const allVideos = [];
+
+    // CATEGORY ROTATION HELPER DATA
+    const categories = ['Nature', 'City', 'Texture', 'Village', 'Mountain'];
+    const azTitles = [
+      'kərpic_divar', 'ağac_qabığı', 'dağ_mənzərəsi', 'baku_küçələri', 'qədim_qala',
+      'xəzər_dənizi', 'palçıq_vulkanları', 'göy_göl', 'şəki_xansarayı', 'lahıc_daşları',
+      'üzüm_bağları', 'nar_ağacı', 'xalça_teksturası', 'çay_daşı', 'yaşıl_meşə'
+    ];
+
+    // ------------------------------------------------------------------
+    // GENERATE 150 DYNAMIC IMAGES + 24 VIDEOS
+    // ------------------------------------------------------------------
+    function generateDataset() {
+      // Generate 150 Photo Items
+      for (let i = 1; i <= 150; i++) {
+        const cat = categories[i % categories.length];
+        const baseTitle = azTitles[i % azTitles.length];
+        const price = Math.floor(Math.random() * 23) + 3; // $3 - $25
+        const height = 300 + (i % 5) * 50;
+        
+        allImages.push({
+          id: `img_${i}`,
+          title: `${baseTitle}_${i}.jpg`,
+          category: cat,
+          price: price,
+          author: '@baku_data',
+          location: i % 2 === 0 ? 'Baku, Azerbaijan' : 'Shahdag, Azerbaijan',
+          resolution: '4032 x 3024',
+          camera: 'Samsung Galaxy A32',
+          imageUrl: `https://picsum.photos/seed/az${i}/400/${height}`,
+          largeUrl: `https://picsum.photos/seed/az${i}/1200/900`,
+          tags: [baseTitle.split('_')[0], cat.toLowerCase(), 'azerbaijan', 'samsung_a32', 'stock']
+        });
+      }
+
+      // Generate 24 Video Items
+      for (let v = 1; v <= 24; v++) {
+        const durationSec = 5 + (v % 25);
+        const durationStr = `0:${durationSec < 10 ? '0' : ''}${durationSec}`;
+        allVideos.push({
+          id: `vid_${v}`,
+          title: `az_video_footage_${v}.mp4`,
+          posterUrl: `https://picsum.photos/seed/azvid${v}/600/350`,
+          duration: durationStr,
+          price: 25,
+          resolution: '1080p FULL HD'
+        });
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // AUTO DETECT LANGUAGE FROM NAVIGATOR
+    // ------------------------------------------------------------------
+    function initLanguage() {
+      const userLang = navigator.language || navigator.userLanguage || 'az';
+      if (userLang.startsWith('az')) {
+        currentLang = 'az';
+      } else if (userLang.startsWith('ru')) {
+        currentLang = 'ru';
+      } else {
+        currentLang = 'en';
+      }
+      setLanguage(currentLang);
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      
+      // Update Active Button styling
+      ['az', 'en', 'ru'].forEach(l => {
+        const btn = document.getElementById(`langBtn-${l}`);
+        if (btn) {
+          if (l === lang) {
+            btn.className = "px-2.5 py-1 text-xs font-bold rounded-lg transition-all bg-orange-500 text-slate-950 shadow";
+          } else {
+            btn.className = "px-2.5 py-1 text-xs font-bold rounded-lg transition-all text-slate-400 hover:text-white";
+          }
+        }
+      });
+
+      // Update DOM Text Content
+      const dict = i18n[lang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) {
+          el.textContent = dict[key];
+        }
+      });
+
+      // Update Placeholders
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (dict[key]) {
+          el.placeholder = dict[key];
+        }
+      });
+
+      // Refresh Cart Drawer if open
+      renderCartUI();
+    }
+
+    // ------------------------------------------------------------------
+    // RENDER MASONRY GALLERY (150 IMAGES)
+    // ------------------------------------------------------------------
+    function renderGallery() {
+      const grid = document.getElementById('imageGrid');
+      const emptyState = document.getElementById('emptySearchState');
+      grid.innerHTML = '';
+
+      const filtered = allImages.filter(item => {
+        const matchesCategory = (activeCategory === 'all' || item.category === activeCategory);
+        const matchesSearch = searchQuery === '' || 
+          item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
+        
+        return matchesCategory && matchesSearch;
+      });
+
+      document.getElementById('imageCountBadge').textContent = `${filtered.length} foto`;
+
+      if (filtered.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      } else {
+        emptyState.classList.add('hidden');
+      }
+
+      filtered.forEach(item => {
+        const isInCart = cart.some(c => c.id === item.id);
+        const card = document.createElement('div');
+        card.className = "masonry-item relative group rounded-2xl overflow-hidden bg-slate-900 border border-slate-800/80 transition-all duration-300 hover:scale-[1.02] hover:border-orange-500/50 hover:shadow-2xl hover:shadow-orange-500/10 cursor-pointer";
+        
+        card.innerHTML = `
+          <div class="relative w-full overflow-hidden bg-slate-900 img-loading">
+            <img src="${item.imageUrl}" loading="lazy" alt="${item.title}" class="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105" onload="this.parentElement.classList.remove('img-loading')">
+            
+            <!-- OVERLAY ON HOVER -->
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-between">
+              
+              <!-- TOP OVERLAY BADGES -->
+              <div class="flex items-center justify-between gap-1">
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-950/80 text-slate-300 border border-slate-700/60">${item.resolution}</span>
+                <span class="text-xs font-black px-2 py-0.5 rounded bg-orange-500 text-slate-950 shadow">$${item.price}</span>
+              </div>
+
+              <!-- BOTTOM OVERLAY INFO & ACTION -->
+              <div>
+                <h4 class="text-xs font-bold text-white truncate mb-0.5">${item.title}</h4>
+                <div class="flex items-center justify-between text-[11px] text-slate-300 mb-3">
+                  <span>${item.author}</span>
+                  <span>${item.category}</span>
+                </div>
+                <button onclick="event.stopPropagation(); toggleCartItem('${item.id}')" class="w-full py-2 px-3 rounded-lg text-xs font-extrabold transition flex items-center justify-center gap-1.5 ${isInCart ? 'bg-emerald-500 text-slate-950' : 'bg-orange-500 hover:bg-orange-600 text-slate-950 shadow-lg'}">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                  <span>${isInCart ? (i18n[currentLang].inCart || 'Səbətdədir') : (i18n[currentLang].addToCart || 'Səbətə Əlavə Et')}</span>
+                </button>
+              </div>
+
+            </div>
+          </div>
+        `;
+
+        card.addEventListener('click', () => openLightbox(item));
+        grid.appendChild(card);
+      });
+    }
+
+    // ------------------------------------------------------------------
+    // RENDER VIDEO GALLERY (24 VIDEOS)
+    // ------------------------------------------------------------------
+    function renderVideoGallery() {
+      const vGrid = document.getElementById('videoGrid');
+      vGrid.innerHTML = '';
+
+      allVideos.forEach(vid => {
+        const card = document.createElement('div');
+        card.className = "relative group rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 hover:border-orange-500/50 transition duration-300";
+        card.innerHTML = `
+          <div class="relative aspect-video w-full overflow-hidden bg-slate-950">
+            <img src="${vid.posterUrl}" loading="lazy" alt="${vid.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-80 group-hover:opacity-100">
+            
+            <!-- PLAY ICON OVERLAY -->
+            <div class="absolute inset-0 flex items-center justify-center">
+              <div class="w-12 h-12 rounded-full bg-orange-500/90 text-slate-950 flex items-center justify-center group-hover:scale-110 transition-transform shadow-xl">
+                <svg class="w-6 h-6 fill-current ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+            </div>
+
+            <!-- DURATION & BADGE -->
+            <div class="absolute top-2 left-2 px-2 py-0.5 rounded bg-slate-950/80 text-[10px] font-bold text-red-400 border border-red-500/30">
+              ${vid.resolution}
+            </div>
+            <div class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-slate-950/80 text-[11px] font-mono text-slate-200">
+              ${vid.duration}
+            </div>
+          </div>
+
+          <div class="p-3 flex items-center justify-between">
+            <div>
+              <h4 class="text-xs font-bold text-white truncate max-w-[140px]">${vid.title}</h4>
+              <p class="text-[10px] text-slate-400">Stock Footage</p>
+            </div>
+            <button onclick="addVideoToCart('${vid.id}')" class="px-3 py-1.5 bg-slate-800 hover:bg-orange-500 hover:text-slate-950 text-white font-extrabold text-xs rounded-lg transition">
+              $${vid.price}
+            </button>
+          </div>
+        `;
+        vGrid.appendChild(card);
+      });
+    }
+
+    // ------------------------------------------------------------------
+    // FILTERING LOGIC
+    // ------------------------------------------------------------------
+    function filterByCategory(cat) {
+      activeCategory = cat;
+      
+      // Update UI tabs
+      document.querySelectorAll('.cat-tab').forEach(tab => {
+        tab.className = "cat-tab px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition";
+      });
+      const activeTab = document.getElementById(`tab-${cat}`);
+      if (activeTab) {
+        activeTab.className = "cat-tab px-3 py-1.5 rounded-lg bg-orange-500 text-slate-950 font-bold transition";
+      }
+
+      renderGallery();
+    }
+
+    function handleSearchInput(val) {
+      searchQuery = val.trim();
+      
+      // Sync across all input fields
+      document.getElementById('headerSearchInput').value = searchQuery;
+      document.getElementById('mobileSearchInput').value = searchQuery;
+      document.getElementById('heroSearchInput').value = searchQuery;
+
+      const clearBtn = document.getElementById('clearSearchBtn');
+      if (searchQuery) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+
+      renderGallery();
+    }
+
+    function clearSearch() {
+      handleSearchInput('');
+    }
+
+    function filterByTag(tag) {
+      handleSearchInput(tag);
+      document.getElementById('gallery').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function triggerHeroSearch() {
+      document.getElementById('gallery').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function resetFilters() {
+      activeCategory = 'all';
+      searchQuery = '';
+      document.getElementById('headerSearchInput').value = '';
+      document.getElementById('mobileSearchInput').value = '';
+      document.getElementById('heroSearchInput').value = '';
+      document.getElementById('clearSearchBtn').classList.add('hidden');
+      filterByCategory('all');
+    }
+
+    // ------------------------------------------------------------------
+    // LIGHTBOX MODAL LOGIC
+    // ------------------------------------------------------------------
+    function openLightbox(item) {
+      currentModalItem = item;
+      const modal = document.getElementById('lightboxModal');
+      
+      document.getElementById('modalImg').src = item.largeUrl;
+      document.getElementById('modalTitle').textContent = item.title;
+      document.getElementById('modalCategory').textContent = item.category;
+      document.getElementById('modalPrice').textContent = `$${item.price}`;
+      document.getElementById('modalAuthor').textContent = item.author;
+      document.getElementById('modalLocation').textContent = item.location;
+
+      // Render Tags
+      const tagsContainer = document.getElementById('modalTags');
+      tagsContainer.innerHTML = item.tags.map(t => 
+        `<span class="text-[11px] px-2.5 py-1 bg-slate-800 text-slate-300 rounded-lg border border-slate-700">#${t}</span>`
+      ).join('');
+
+      // Update Modal Buy Button State
+      const isInCart = cart.some(c => c.id === item.id);
+      const buyBtn = document.getElementById('modalBuyBtn');
+      buyBtn.innerHTML = `
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+        <span>${isInCart ? (i18n[currentLang].inCart || 'Səbətdədir') : (i18n[currentLang].addToCart || 'Səbətə Əlavə Et')}</span>
+      `;
+
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+      }, 10);
+    }
+
+    function closeLightbox() {
+      const modal = document.getElementById('lightboxModal');
+      modal.classList.add('opacity-0');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 300);
+    }
+
+    function addCurrentModalToCart() {
+      if (currentModalItem) {
+        toggleCartItem(currentModalItem.id);
+        openLightbox(currentModalItem); // Refresh button status
+      }
+    }
+
+    function downloadSample() {
+      alert("Watermarked sample download started for: " + (currentModalItem ? currentModalItem.title : "sample.jpg"));
+    }
+
+    // ------------------------------------------------------------------
+    // CART & LOCALSTORAGE LOGIC
+    // ------------------------------------------------------------------
+    function toggleCartItem(itemId) {
+      const item = allImages.find(i => i.id === itemId);
+      if (!item) return;
+
+      const index = cart.findIndex(c => c.id === itemId);
+      if (index > -1) {
+        cart.splice(index, 1);
+      } else {
+        cart.push(item);
+      }
+
+      saveCart();
+    }
+
+    function addVideoToCart(vidId) {
+      const vid = allVideos.find(v => v.id === vidId);
+      if (!vid) return;
+
+      if (!cart.some(c => c.id === vid.id)) {
+        cart.push({
+          id: vid.id,
+          title: vid.title,
+          price: vid.price,
+          imageUrl: vid.posterUrl
+        });
+        saveCart();
+        toggleCartModal();
+      }
+    }
+
+    function removeFromCart(id) {
+      cart = cart.filter(c => c.id !== id);
+      saveCart();
+    }
+
+    function saveCart() {
+      localStorage.setItem('azstock_cart', JSON.stringify(cart));
+      updateCartBadge();
+      renderCartUI();
+      renderGallery(); // Update card buttons
+    }
+
+    function updateCartBadge() {
+      const badge = document.getElementById('cartCountBadge');
+      badge.textContent = cart.length;
+      if (cart.length > 0) {
+        badge.classList.remove('scale-0');
+      } else {
+        badge.classList.add('scale-0');
+      }
+    }
+
+    function toggleCartModal() {
+      const modal = document.getElementById('cartModal');
+      if (modal.classList.contains('hidden')) {
+        renderCartUI();
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.remove('opacity-0'), 10);
+      } else {
+        modal.classList.add('opacity-0');
+        setTimeout(() => modal.classList.add('hidden'), 300);
+      }
+    }
+
+    function renderCartUI() {
+      const container = document.getElementById('cartItemsContainer');
+      const totalEl = document.getElementById('cartTotalPrice');
+
+      if (cart.length === 0) {
+        container.innerHTML = `<div class="text-center py-12 text-slate-500 text-sm">${i18n[currentLang].cartEmpty || 'Səbətiniz boşdur'}</div>`;
+        totalEl.textContent = '$0';
+        return;
+      }
+
+      let total = 0;
+      container.innerHTML = cart.map(item => {
+        total += item.price;
+        return `
+          <div class="flex items-center justify-between gap-3 p-3 bg-slate-950/60 rounded-xl border border-slate-800">
+            <img src="${item.imageUrl}" class="w-12 h-12 object-cover rounded-lg shrink-0">
+            <div class="flex-1 min-w-0">
+              <h5 class="text-xs font-bold text-white truncate">${item.title}</h5>
+              <span class="text-xs font-black text-orange-400">$${item.price}</span>
+            </div>
+            <button onclick="removeFromCart('${item.id}')" class="text-slate-500 hover:text-red-400 p-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      totalEl.textContent = `$${total}`;
+    }
+
+    function checkout() {
+      if (cart.length === 0) return;
+      alert(`Payment integration ready! Proceeding to checkout for ${cart.length} item(s). Total: ${document.getElementById('cartTotalPrice').textContent}`);
+    }
+
+    function selectPlan(plan) {
+      alert(`Selected Plan: ${plan}. Redirecting to secure checkout gateway...`);
+    }
+
+    function openContributorModal() {
+      alert("AzStock Contributor Portal: Upload interface opening for Samsung A32 photo submission...");
+    }
+
+    // ------------------------------------------------------------------
+    // APPLICATION INITIALIZATION
+    // ------------------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', () => {
+      generateDataset();
+      initLanguage();
+      renderGallery();
+      renderVideoGallery();
+      updateCartBadge();
     });
-  });
-}
-function postComment(){
-  let t=document.getElementById('commentInput').value.trim();if(!t||!currentStatusID) return;
-  if(replyToComment){
-    gun.get('replies_'+replyToComment).set({name:myName,avatar:myAvatar,text:t,replyTo:replyToComment,replyToName:window._replyToName||'',time:Date.now(),likes:0});
-    toast('Cavab yazıldı - şərhə cavab');
-  }else{
-    gun.get('comments_'+currentStatusID).set({name:myName,avatar:myAvatar,text:t,time:Date.now(),likes:0});
-    gun.get('final_status_v300').get(currentStatusID).get('comments').put((statuses.find(s=>s._id===currentStatusID)?.comments||0)+1);
-  }
-  document.getElementById('commentInput').value='';replyToComment=null;
-}
-function replyComment(cid,name){replyToComment=cid;window._replyToName=name;document.getElementById('commentInput').placeholder=name+' - cavab yaz...';document.getElementById('commentInput').focus();toast('Şərhə cavab - '+name)}
-function likeComment(sid,cid){gun.get('comments_'+sid).get(cid).get('likes').put(1)}
-function editComment(sid,cid){let nt=prompt('Redaktə');if(nt) gun.get('comments_'+sid).get(cid).get('text').put(nt)}
-function delComment(sid,cid){if(confirm('Silinsin?')) gun.get('comments_'+sid).get(cid).put(null)}
-function sortComments(){toast('Sort: '+document.getElementById('commentSort').value)}
-
-// banner
-function renderBanners(){
-  if(banners[0]) document.getElementById('bannerTopTitle').textContent=banners[0].title;
-}
-function incBannerView(place){
-  let id='banner_'+place;
-  gun.get('banner_stats_v300').get(id).get('views').put((parseInt(localStorage.getItem(id+'_v')||0)+1));
-  localStorage.setItem(id+'_v',parseInt(localStorage.getItem(id+'_v')||0)+1);
-  document.getElementById('bannerTopViews').textContent=localStorage.getItem('banner_top_v')||0;
-  document.getElementById('bannerMidViews').textContent=localStorage.getItem('banner_mid_v')||0;
-  document.getElementById('myTotalViews').textContent=parseInt(localStorage.getItem('banner_top_v')||0)+parseInt(localStorage.getItem('banner_mid_v')||0);
-  document.getElementById('myBalance').textContent=((parseInt(localStorage.getItem('banner_top_v')||0)+parseInt(localStorage.getItem('banner_mid_v')||0))/1000).toFixed(3)+' AZN';
-}
-function clickBanner(place){
-  incBannerView(place+'_click');
-  let c=document.getElementById('bannerMidClicks');if(c) c.textContent=parseInt(localStorage.getItem('banner_mid_click_v')||0)+1;
-  if(banners[0]?.link) window.open(banners[0].link,'_blank'); else toast('Reklam klik - baxışa görə sayıldı');
-}
-function createAd(){document.getElementById('adModal').classList.add('open')}
-function publishAd(){
-  let title=document.getElementById('adTitle').value.trim();
-  let link=document.getElementById('adLink').value.trim();
-  let img=document.getElementById('adPrev').dataset.base64||'';
-  if(!title){toast('Başlıq yaz');return}
-  gun.get('banner_ads_v300').set({title,link,img,time:Date.now(),from:myID,views:0,clicks:0});
-  closeModal('adModal');toast('Reklam paylaşıldı - banner oldu - baxışa görə');
-}
-
-// discover google
-function globalSearchFunc(){renderStatusFeed()}
-function googleSearch(){
-  let q=document.getElementById('globalSearch').value.trim();if(!q){toast('Axtarış yaz');return}
-  window.open('https://www.google.com/search?q='+encodeURIComponent(q+' site:azgram'),'blank');
-  document.getElementById('googleResults').innerHTML=`<div style=background:var(--card);padding:12px;border-radius:12px;border:1px solid var(--border)><b>Google - ${esc(q)}</b><div style=font-size:12px;color:var(--sec)>Google-a bağlı axtarış - yeni tabda açıldı - AzGram içində də: ${statuses.filter(s=>s.text.toLowerCase().includes(q.toLowerCase())).length} nəticə</div></div>`;
-}
-function startVoiceSearch(){
-  let rec=new (window.SpeechRecognition||window.webkitSpeechRecognition)();
-  rec.lang='az-AZ';rec.onresult=e=>{document.getElementById('globalSearch').value=e.results[0][0].transcript;globalSearchFunc()};rec.start();
-}
-function filterTag(t){document.getElementById('globalSearch').value=t==='Hamısı'?'':t;globalSearchFunc()}
-function renderTrends(){
-  let tags={};
-  statuses.forEach(s=>{let m=s.text.match(/#\w+/g);if(m)m.forEach(h=>tags[h]=(tags[h]||0)+1)});
-  let top=Object.entries(tags).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  document.getElementById('trendTags').innerHTML=top.map(([tag,c])=>`<span style="background:var(--input);border:1px solid var(--border);padding:6px 10px;border-radius:999px;font-size:12px;cursor:pointer" onclick="document.getElementById('globalSearch').value='${tag}';globalSearchFunc()">${tag} ${c}</span>`).join('')||'<span style=color:var(--sec)>Trend yoxdur</span>';
-}
-
-// calls
-function startVoiceCall(){startCall(false)}
-function startVideoCall(){startCall(true)}
-async function startCall(video){
-  if(!currentChat){toast('Kontakt seç');return}
-  document.getElementById('callScreen').style.display='flex';
-  document.getElementById('callName').textContent=contacts[currentChat].name;
-  document.getElementById('callAvatar').src=contacts[currentChat].avatar;
-  document.getElementById('callTimer').textContent='Çalır...';
-  localStream=await navigator.mediaDevices.getUserMedia({audio:true,video:video});
-  if(video){document.getElementById('localVideo').style.display='block';document.getElementById('localVideo').srcObject=localStream}
-  let call=peer.call(currentChat,localStream,{metadata:{video}});
-  call.on('stream',s=>{document.getElementById('remoteVideo').srcObject=s;document.getElementById('remoteVideo').style.display='block'});
-  callConn=call;
-  startCallTimer();
-}
-function startCallTimer(){callSec=0;callTimerInt=setInterval(()=>{callSec++;let m=Math.floor(callSec/60).toString().padStart(2,'0');let s=(callSec%60).toString().padStart(2,'0');document.getElementById('callTimer').textContent=m+':'+s},1000)}
-function endCall(){clearInterval(callTimerInt);if(callConn)callConn.close();if(localStream)localStream.getTracks().forEach(t=>t.stop());document.getElementById('callScreen').style.display='none';document.getElementById('remoteVideo').style.display='none';document.getElementById('localVideo').style.display='none';if(currentChat){let chatID=[myID,currentChat].sort().join('_');gun.get('final_msg_'+chatID).set({from:myID,text:'📞 Zəng '+document.getElementById('callTimer').textContent,time:Date.now()})}toast('Zəng bitdi')}
-function toggleMute(){if(localStream)localStream.getAudioTracks().forEach(t=>t.enabled=!t.enabled);toast('Mute')}
-function toggleSpeaker(){toast('Speaker')}
-function toggleCamera(){if(localStream)localStream.getVideoTracks().forEach(t=>t.enabled=!t.enabled);toast('Kamera')}
-
-// tabs & swipe
-function switchTab(t){
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('panel-'+t).classList.add('active');
-  document.querySelectorAll('.navItem').forEach(n=>n.classList.remove('active'));
-  event.currentTarget.classList.add('active');
-  if(t==='status') incBannerView('status');
-}
-function touchStart(e){touchX=e.touches[0].clientX}
-function touchEnd(e){
-  let dx=e.changedTouches[0].clientX-touchX;
-  if(dx>80){switchTab('status');document.getElementById('panel-messages').classList.remove('active');document.getElementById('panel-status').classList.add('active');toast('Sağ swipe - Status')}
-  if(dx<-80){switchTab('discover');toast('Sol swipe - Kəşf + Google + Banner')}
-}
-function openSearch(){switchTab('discover');document.getElementById('globalSearch').focus()}
-function openSettings(){document.getElementById('settingsModal').classList.add('open')}
-function editProfile(){let n=prompt('Yeni ad',myName);if(n){myName=n;localStorage.setItem('az_name',n);gun.get('azgram_final_users_v300').get(myID).get('name').put(n);init()}document.getElementById('avatarInput').click()}
-function openPrivacy(){openSettings()}
-function savePrivacy(){toast('Məxfilik yadda saxlandı - redaktə');closeModal('settingsModal')}
-function openChatMenu(){if(confirm('Chatı təmizlə?')) document.getElementById('messages').innerHTML=''}
-function logout(){if(confirm('Hesabı sil?')){localStorage.clear();location.reload()}}
-
-// init if already logged
-if(myName) init();
-</script>
+  </script>
 </body>
-  </html>
+</html>
