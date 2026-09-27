@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark h-full">
+<html lang="az" class="dark h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -18,23 +18,12 @@
                             accent: '#00f0ff',
                             secondary: '#ff007f'
                         }
-                    },
-                    animation: {
-                        'pulse-fast': 'pulse 0.6s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'glow': 'glow 1.5s ease-in-out infinite alternate'
-                    },
-                    keyframes: {
-                        glow: {
-                            '0%': { boxShadow: '0 0 5px rgba(0,240,255,0.4)' },
-                            '100%': { boxShadow: '0 0 20px rgba(0,240,255,0.8), 0 0 30px rgba(255,0,127,0.6)' }
-                        }
                     }
                 }
             }
         };
     </script>
     <style>
-        /* Custom Key Styling and Animations */
         * {
             user-select: none;
             -webkit-user-select: none;
@@ -49,7 +38,6 @@
             overflow: hidden;
         }
 
-        /* Glassmorphism Surface */
         .glass-panel {
             background: rgba(18, 24, 36, 0.85);
             backdrop-filter: blur(16px);
@@ -64,7 +52,6 @@
             box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.8), 0 0 15px rgba(var(--theme-glow-rgb, 0, 240, 255), 0.3);
         }
 
-        /* Keyboard Key Style */
         .keyboard-key {
             position: relative;
             background: var(--key-bg, rgba(255, 255, 255, 0.07));
@@ -102,7 +89,6 @@
             box-shadow: 0 3px 0 rgba(0,0,0,0.5), 0 0 10px var(--theme-accent, #00f0ff);
         }
 
-        /* Particle Canvas overlay */
         #particle-canvas {
             position: absolute;
             top: 0;
@@ -113,7 +99,6 @@
             z-index: 40;
         }
 
-        /* F1 Track Canvas overlay */
         #f1-canvas {
             position: absolute;
             top: -12px;
@@ -125,7 +110,6 @@
             border-radius: 2.2rem;
         }
 
-        /* Accent Popup Matrix */
         .accent-popup {
             position: absolute;
             bottom: 110%;
@@ -164,7 +148,6 @@
             color: black;
         }
 
-        /* Custom Scrollbars */
         ::-webkit-scrollbar {
             height: 4px;
             width: 4px;
@@ -177,7 +160,6 @@
             border-radius: 10px;
         }
 
-        /* Resizable Handle for Mini Windows */
         .resize-handle {
             position: absolute;
             right: 2px;
@@ -189,7 +171,6 @@
             border-bottom: 2px solid var(--theme-accent, #00f0ff);
         }
 
-        /* Key Subscript text for numbers/symbols */
         .subscript-symbol {
             position: absolute;
             top: 2px;
@@ -199,7 +180,6 @@
             font-weight: 400;
         }
 
-        /* Mini Window Scale Animations */
         .window-open {
             animation: windowPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
@@ -216,37 +196,47 @@
             100% { opacity: 0; transform: scale(0.7) translateY(20px); }
         }
 
-        /* Nitro Glow Flash */
         .nitro-boost {
             box-shadow: 0 0 35px var(--theme-accent, #00f0ff), inset 0 0 15px rgba(255,255,255,0.5) !important;
         }
+
+        /* Virtual Cursor Blink */
+        .custom-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.2em;
+            background-color: var(--theme-accent, #00f0ff);
+            vertical-align: middle;
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
     </style>
 </head>
-<body class="h-full w-full flex flex-col justify-between overflow-hidden bg-slate-950 text-slate-100 antialiased selection:bg-cyan-500 selection:text-black">
+<body class="h-full w-full flex flex-col justify-between overflow-hidden bg-slate-950 text-slate-100 antialiased">
 
-    <!-- TOP SECTION: MAIN TEXT DISPLAY AREA & COCKPIT HEADER -->
-    <main class="flex-1 flex flex-col p-4 max-w-4xl w-full mx-auto relative z-10">
-        <!-- Top Cockpit Header / Status -->
-        <header class="flex items-center justify-between pb-3 border-b border-slate-800/80 mb-3">
+    <!-- TOP SECTION: DISPLAY AREA -->
+    <main class="flex-1 flex flex-col p-3 max-w-4xl w-full mx-auto relative z-10 min-h-0">
+        <header class="flex items-center justify-between pb-2 border-b border-slate-800/80 mb-2 shrink-0">
             <div class="flex items-center gap-2">
-                <div class="w-3 h-3 rounded-full bg-cyan-400 animate-pulse"></div>
+                <div class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></div>
                 <h1 class="text-xs font-black tracking-widest uppercase text-cyan-400 font-mono">Gboard 2030 // F1 Cockpit</h1>
             </div>
             <div class="flex items-center gap-3 text-xs font-mono text-slate-400">
                 <span id="speed-telemetry" class="text-cyan-400 font-bold">300 KM/H</span>
                 <span id="fps-counter" class="text-emerald-400">60 FPS</span>
-                <button id="theme-reset-btn" title="Reset Theme Settings" class="hover:text-white transition">↺</button>
             </div>
         </header>
 
-        <!-- Dynamic Output Textarea Display (Simulator Target) -->
-        <div class="relative flex-1 flex flex-col">
-            <textarea id="app-display" 
-                class="w-full flex-1 glass-panel rounded-2xl p-4 text-lg md:text-xl font-normal text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 resize-none transition-all shadow-inner font-sans"
-                placeholder="Tap keyboard or type here... Try long-pressing vowels for AZ accents, swiping spacebar to navigate cursor, or clicking [G] Search & [🌐] Translate..." 
-                spellcheck="false"></textarea>
+        <!-- Dynamic Output Box (Virtual Display - Native Keyboard Disabled) -->
+        <div class="relative flex-1 flex flex-col min-h-0">
+            <div id="app-display" 
+                class="w-full flex-1 glass-panel rounded-2xl p-4 text-lg font-normal text-slate-100 overflow-y-auto whitespace-pre-wrap break-words leading-relaxed"
+                tabindex="-1">
+                <span id="text-content"></span><span class="custom-cursor"></span>
+            </div>
             
-            <!-- Quick Action Floating Tools over textarea -->
             <div class="absolute bottom-3 right-3 flex items-center gap-2">
                 <button id="clear-text-btn" class="px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-rose-900/40 text-slate-300 hover:text-rose-400 text-xs font-mono border border-slate-700/50 transition">
                     CLEAR
@@ -258,210 +248,122 @@
         </div>
     </main>
 
-    <!-- BOTTOM SECTION: REVOLUTIONARY F1 COCKPIT KEYBOARD CONTAINER -->
-    <div id="keyboard-wrapper" class="relative w-full max-w-4xl mx-auto px-2 pb-2 z-20 transition-all duration-300">
+    <!-- KEYBOARD CONTAINER -->
+    <div id="keyboard-wrapper" class="relative w-full max-w-4xl mx-auto px-2 pb-2 z-20 transition-all duration-300 shrink-0">
         
-        <!-- F1 Neon Track Canvas Layer (Positioned absolute around perimeter) -->
         <canvas id="f1-canvas"></canvas>
-
-        <!-- Visual Particle Explosion Canvas -->
         <canvas id="particle-canvas"></canvas>
 
-        <!-- Main Keyboard Shell Container -->
-        <div id="keyboard-container" class="relative glass-panel rounded-t-[2rem] rounded-b-2xl p-2 md:p-3 shadow-2xl transition-colors duration-300 flex flex-col justify-between" style="height: 48vh; max-height: 480px; min-height: 320px;">
+        <div id="keyboard-container" class="relative glass-panel rounded-t-[2rem] rounded-b-2xl p-2 shadow-2xl transition-colors duration-300 flex flex-col justify-between" style="height: 46vh; max-height: 440px; min-height: 300px;">
             
-            <!-- TOP BAR 1: AUTO-CORRECT & SUGGESTIONS BAR -->
-            <div id="suggestion-bar" class="flex items-center justify-between px-2 py-1 mb-1 border-b border-white/5 text-sm font-medium h-9 gap-2">
+            <!-- SUGGESTIONS BAR -->
+            <div id="suggestion-bar" class="flex items-center justify-between px-2 py-1 mb-1 border-b border-white/5 text-sm font-medium h-8 gap-2 shrink-0">
                 <div class="flex items-center gap-1 text-xs text-slate-400 font-mono pr-2 border-r border-white/10 shrink-0">
                     <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                     <span id="current-lang-indicator">AZ</span>
                 </div>
-                <!-- 3 Word Suggestions -->
                 <div class="flex-1 grid grid-cols-3 gap-2 text-center">
-                    <button class="suggestion-chip truncate px-2 py-0.5 rounded-md hover:bg-white/10 text-slate-200 transition active:scale-95">salam</button>
-                    <button class="suggestion-chip truncate px-2 py-0.5 rounded-md hover:bg-white/10 font-semibold text-cyan-300 transition active:scale-95">necəsiniz</button>
-                    <button class="suggestion-chip truncate px-2 py-0.5 rounded-md hover:bg-white/10 text-slate-200 transition active:scale-95">yaxşı</button>
+                    <button class="suggestion-chip truncate px-2 py-0.5 rounded-md hover:bg-white/10 text-slate-200 transition">salam</button>
+                    <button class="suggestion-chip truncate px-2 py-0.5 rounded-md hover:bg-white/10 font-semibold text-cyan-300 transition">necəsiniz</button>
+                    <button class="suggestion-chip truncate px-2 py-0.5 rounded-md hover:bg-white/10 text-slate-200 transition">yaxşı</button>
                 </div>
-                <!-- Nitro/F1 Toggle & Dictation Mock -->
                 <div class="flex items-center gap-1 shrink-0 pl-1">
-                    <button id="f1-toggle-btn" class="p-1 rounded-md bg-white/5 hover:bg-white/10 text-xs font-mono transition" title="Toggle F1 Racing Effect">
+                    <button id="f1-toggle-btn" class="p-1 rounded-md bg-white/5 hover:bg-white/10 text-xs font-mono transition">
                         🏁 <span id="f1-status-text" class="text-[10px] text-cyan-400 font-bold">ON</span>
                     </button>
                 </div>
             </div>
 
-            <!-- TOP BAR 2: GBOARD QUICK TOOLBAR & HORIZONTAL THEME CHIPS -->
-            <div class="flex items-center justify-between gap-1 mb-1.5 px-1">
-                <!-- Toolbar Quick Actions -->
+            <!-- TOOLBAR & THEMES -->
+            <div class="flex items-center justify-between gap-1 mb-1 px-1 shrink-0">
                 <div class="flex items-center gap-1 shrink-0">
-                    <!-- Google Search Mini Window Trigger -->
-                    <button id="google-search-btn" class="w-8 h-8 rounded-full bg-slate-800/80 border border-slate-700/60 flex items-center justify-center font-black text-cyan-400 text-sm shadow hover:scale-105 active:scale-90 transition" title="Google Search Mini Window">
-                        G
+                    <button id="google-search-btn" class="w-7 h-7 rounded-full bg-slate-800/80 border border-slate-700/60 flex items-center justify-center font-black text-cyan-400 text-xs shadow">G</button>
+                    <button id="translator-btn" class="px-2 h-7 rounded-full bg-slate-800/80 border border-slate-700/60 flex items-center gap-1 font-medium text-xs text-slate-200 shadow">
+                        <span>🌐</span> <span class="hidden sm:inline">Tərcümə</span>
                     </button>
-                    <!-- Built-in Translator Trigger -->
-                    <button id="translator-btn" class="px-2.5 h-8 rounded-full bg-slate-800/80 border border-slate-700/60 flex items-center gap-1 font-medium text-xs text-slate-200 shadow hover:scale-105 active:scale-90 transition" title="Open Translator">
-                        <span>🌐</span>
-                        <span class="hidden sm:inline">Tərcümə</span>
-                    </button>
-                    <!-- Sound Toggle Trigger -->
-                    <button id="sound-toggle-btn" class="w-8 h-8 rounded-full bg-slate-800/80 border border-slate-700/60 flex items-center justify-center text-xs shadow hover:scale-105 active:scale-90 transition" title="Toggle Mechanical Audio">
-                        🔊
-                    </button>
+                    <button id="sound-toggle-btn" class="w-7 h-7 rounded-full bg-slate-800/80 border border-slate-700/60 flex items-center justify-center text-xs shadow">🔊</button>
                 </div>
 
-                <!-- Theme Selector Horizontal Scroll Chips -->
                 <div class="flex-1 overflow-x-auto no-scrollbar flex items-center gap-1.5 px-2 py-0.5">
-                    <span class="text-[10px] font-mono text-slate-500 uppercase tracking-widest shrink-0">Theme:</span>
-                    <button data-theme="neon-blue" class="theme-chip shrink-0 px-2 py-0.5 rounded-full text-[11px] font-medium bg-cyan-950 text-cyan-400 border border-cyan-500/50">Neon Blue</button>
-                    <button data-theme="cyber-pink" class="theme-chip shrink-0 px-2 py-0.5 rounded-full text-[11px] font-medium bg-pink-950 text-pink-400 border border-pink-500/30">Cyber Pink</button>
-                    <button data-theme="fire-red" class="theme-chip shrink-0 px-2 py-0.5 rounded-full text-[11px] font-medium bg-red-950 text-red-400 border border-red-500/30">Fire Red</button>
-                    <button data-theme="acid-green" class="theme-chip shrink-0 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-950 text-emerald-400 border border-emerald-500/30">Acid Green</button>
-                    <button data-theme="az-flag" class="theme-chip shrink-0 px-2 py-0.5 rounded-full text-[11px] font-medium bg-gradient-to-r from-blue-900 via-red-900 to-emerald-900 text-white border border-white/20">AZ Flag</button>
-                    <button data-theme="ocean" class="theme-chip shrink-0 px-2 py-0.5 rounded-full text-[11px] font-medium bg-teal-950 text-teal-300 border border-teal-500/30">Ocean</button>
-                    <button data-theme="midnight" class="theme-chip shrink-0 px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-900 text-slate-300 border border-slate-700">Midnight</button>
-                    <button data-theme="sunset" class="theme-chip shrink-0 px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-950 text-orange-400 border border-orange-500/30">Sunset</button>
-                    <button data-theme="matrix" class="theme-chip shrink-0 px-2 py-0.5 rounded-full text-[11px] font-medium bg-black text-green-500 border border-green-600/50">Matrix</button>
-                    <button data-theme="titanium" class="theme-chip shrink-0 px-2 py-0.5 rounded-full text-[11px] font-medium bg-zinc-800 text-zinc-200 border border-zinc-600">Titanium</button>
-                    <button data-theme="royal-purple" class="theme-chip shrink-0 px-2 py-0.5 rounded-full text-[11px] font-medium bg-purple-950 text-purple-300 border border-purple-500/30">Royal Purple</button>
-                    <button data-theme="rainbow" class="theme-chip shrink-0 px-2 py-0.5 rounded-full text-[11px] font-medium bg-gradient-to-r from-red-500 via-green-500 to-blue-500 text-black font-bold">Pure RGB</button>
+                    <button data-theme="neon-blue" class="theme-chip shrink-0 px-2 py-0.5 rounded-full text-[10px] bg-cyan-950 text-cyan-400 border border-cyan-500/50">Neon Blue</button>
+                    <button data-theme="cyber-pink" class="theme-chip shrink-0 px-2 py-0.5 rounded-full text-[10px] bg-pink-950 text-pink-400 border border-pink-500/30">Cyber Pink</button>
+                    <button data-theme="fire-red" class="theme-chip shrink-0 px-2 py-0.5 rounded-full text-[10px] bg-red-950 text-red-400 border border-red-500/30">Fire Red</button>
+                    <button data-theme="acid-green" class="theme-chip shrink-0 px-2 py-0.5 rounded-full text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-500/30">Acid Green</button>
+                    <button data-theme="az-flag" class="theme-chip shrink-0 px-2 py-0.5 rounded-full text-[10px] bg-gradient-to-r from-blue-900 via-red-900 to-emerald-900 text-white border border-white/20">AZ Flag</button>
                 </div>
             </div>
 
-            <!-- KEYBOARD LAYOUT GRID MATRIX -->
-            <div id="keyboard-grid" class="flex-1 flex flex-col justify-between gap-1 select-none relative">
-                <!-- Dynamically populated via JavaScript according to layout state (Alpha / Symbol / Emoji) -->
-            </div>
+            <!-- KEYBOARD GRID -->
+            <div id="keyboard-grid" class="flex-1 flex flex-col justify-between gap-1 select-none relative"></div>
         </div>
 
-        <!-- ACCENT POPUP OVERLAY TEMPLATE CONTAINER -->
         <div id="accent-popup-container" class="accent-popup"></div>
 
-        <!-- MINI WINDOW SYSTEM CONTAINER (DRAGGABLE & RESIZABLE OVERLAY INSIDE KEYBOARD) -->
-        
-        <!-- 1. GOOGLE SEARCH MINI WINDOW -->
-        <div id="google-window" class="hidden absolute top-2 left-1/2 -translate-x-1/2 glass-window rounded-xl border border-cyan-500/40 z-50 flex flex-col overflow-hidden shadow-2xl transition-shadow" style="width: 88%; height: 210px;">
-            <!-- Header / Drag Handle -->
+        <!-- MINI WINDOWS -->
+        <div id="google-window" class="hidden absolute top-2 left-1/2 -translate-x-1/2 glass-window rounded-xl border border-cyan-500/40 z-50 flex flex-col overflow-hidden shadow-2xl" style="width: 88%; height: 200px;">
             <div class="window-drag-handle bg-slate-900/90 px-3 py-1.5 flex items-center justify-between cursor-move border-b border-white/10">
-                <div class="flex items-center gap-2">
-                    <span class="w-4 h-4 rounded-full bg-cyan-500 flex items-center justify-center text-[10px] text-black font-black">G</span>
-                    <span class="text-xs font-bold text-slate-200">Google Search Cockpit</span>
-                </div>
-                <button class="window-close-btn p-1 hover:bg-rose-500/20 hover:text-rose-400 rounded-lg text-slate-400 transition" text-xs">✕</button>
+                <span class="text-xs font-bold text-slate-200">Google Search Cockpit</span>
+                <button class="window-close-btn p-1 text-slate-400">✕</button>
             </div>
-            <!-- Window Body -->
-            <div class="p-2.5 flex-1 flex flex-col gap-2 overflow-hidden bg-slate-950/80">
+            <div class="p-2 flex-1 flex flex-col gap-2 bg-slate-950/80">
                 <form id="google-search-form" class="flex items-center gap-1.5">
-                    <input id="google-search-input" type="text" placeholder="Search Google..." class="flex-1 bg-slate-900/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400" />
-                    <button type="submit" class="px-3 py-1.5 bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs rounded-lg transition">Go</button>
+                    <input id="google-search-input" type="text" placeholder="Search Google..." class="flex-1 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-white" />
+                    <button type="submit" class="px-2.5 py-1 bg-cyan-500 text-black font-bold text-xs rounded">Go</button>
                 </form>
-                <!-- Search Output Container / Simulated Results -->
-                <div id="google-results-container" class="flex-1 overflow-y-auto rounded-lg bg-slate-900/50 p-2 text-xs text-slate-300 border border-white/5 space-y-2">
-                    <div class="text-slate-500 text-center py-4">Enter query above to search directly inside keyboard cockpit.</div>
-                </div>
+                <div id="google-results-container" class="flex-1 overflow-y-auto rounded bg-slate-900/50 p-2 text-xs text-slate-300"></div>
             </div>
             <div class="resize-handle"></div>
         </div>
 
-        <!-- 2. BUILT-IN TRANSLATOR MINI WINDOW -->
-        <div id="translator-window" class="hidden absolute top-2 left-1/2 -translate-x-1/2 glass-window rounded-xl border border-indigo-500/40 z-50 flex flex-col overflow-hidden shadow-2xl transition-shadow" style="width: 90%; height: 220px;">
-            <!-- Header / Drag Handle -->
+        <div id="translator-window" class="hidden absolute top-2 left-1/2 -translate-x-1/2 glass-window rounded-xl border border-indigo-500/40 z-50 flex flex-col overflow-hidden shadow-2xl" style="width: 90%; height: 210px;">
             <div class="window-drag-handle bg-slate-900/90 px-3 py-1.5 flex items-center justify-between cursor-move border-b border-white/10">
-                <div class="flex items-center gap-2">
-                    <span class="text-xs">🌐</span>
-                    <span class="text-xs font-bold text-slate-200">Neural Instant Translator</span>
-                </div>
-                <button class="window-close-btn p-1 hover:bg-rose-500/20 hover:text-rose-400 rounded-lg text-slate-400 transition">✕</button>
+                <span class="text-xs font-bold text-slate-200">Neural Instant Translator</span>
+                <button class="window-close-btn p-1 text-slate-400">✕</button>
             </div>
-            <!-- Translator Body -->
-            <div class="p-2.5 flex-1 flex flex-col justify-between gap-1.5 overflow-y-auto bg-slate-950/80">
-                <!-- Language Selector Row -->
-                <div class="flex items-center justify-between gap-2 text-xs">
-                    <select id="trans-lang-pair" class="bg-slate-900 border border-slate-700 text-cyan-300 rounded px-2 py-1 focus:outline-none font-mono">
+            <div class="p-2 flex-1 flex flex-col justify-between gap-1.5 bg-slate-950/80">
+                <div class="flex items-center justify-between text-xs">
+                    <select id="trans-lang-pair" class="bg-slate-900 border border-slate-700 text-cyan-300 rounded px-1.5 py-0.5">
                         <option value="az|en">AZ ➔ EN</option>
                         <option value="en|az">EN ➔ AZ</option>
                         <option value="en|ru">EN ➔ RU</option>
-                        <option value="ru|az">RU ➔ AZ</option>
-                        <option value="az|tr">AZ ➔ TR</option>
                     </select>
-                    <span id="trans-status" class="text-[10px] text-slate-400 font-mono">Ready</span>
-                    <button id="exec-translate-btn" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded transition">Translate</button>
+                    <button id="exec-translate-btn" class="px-2.5 py-0.5 bg-indigo-600 text-white font-bold text-xs rounded">Translate</button>
                 </div>
-                <!-- Source and Translation Grid -->
                 <div class="grid grid-cols-2 gap-2 flex-1 min-h-0">
-                    <textarea id="trans-source-text" class="bg-slate-900/80 border border-slate-800 rounded p-1.5 text-xs text-slate-200 resize-none focus:outline-none placeholder-slate-600" placeholder="Source text..."></textarea>
-                    <div id="trans-target-text" class="bg-slate-900/40 border border-slate-800 rounded p-1.5 text-xs text-emerald-300 overflow-y-auto font-sans select-text">
-                        <span class="text-slate-600 italic">Translation output...</span>
-                    </div>
+                    <textarea id="trans-source-text" class="bg-slate-900 border border-slate-800 rounded p-1 text-xs text-slate-200 resize-none" placeholder="Source text..."></textarea>
+                    <div id="trans-target-text" class="bg-slate-900/40 border border-slate-800 rounded p-1 text-xs text-emerald-300 overflow-y-auto"></div>
                 </div>
-                <!-- Action Buttons -->
-                <div class="flex items-center justify-end gap-1.5 pt-1 border-t border-white/5">
-                    <button id="trans-copy-btn" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] rounded transition">Copy</button>
-                    <button id="trans-replace-btn" class="px-2.5 py-1 bg-cyan-600 hover:bg-cyan-500 text-black font-bold text-[11px] rounded transition">Replace Display</button>
+                <div class="flex items-center justify-end gap-1.5">
+                    <button id="trans-copy-btn" class="px-2 py-0.5 bg-slate-800 text-slate-200 text-xs rounded">Copy</button>
+                    <button id="trans-replace-btn" class="px-2 py-0.5 bg-cyan-600 text-black font-bold text-xs rounded">Replace</button>
                 </div>
             </div>
             <div class="resize-handle"></div>
         </div>
-
-        <!-- 3. EMOJI PICKER MINI WINDOW -->
-        <div id="emoji-window" class="hidden absolute top-2 left-1/2 -translate-x-1/2 glass-window rounded-xl border border-amber-500/40 z-50 flex flex-col overflow-hidden shadow-2xl transition-shadow" style="width: 88%; height: 210px;">
-            <div class="window-drag-handle bg-slate-900/90 px-3 py-1.5 flex items-center justify-between cursor-move border-b border-white/10">
-                <div class="flex items-center gap-2">
-                    <span class="text-xs">😊</span>
-                    <span class="text-xs font-bold text-amber-400">Emoji Cockpit Matrix</span>
-                </div>
-                <button class="window-close-btn p-1 hover:bg-rose-500/20 hover:text-rose-400 rounded-lg text-slate-400 transition">✕</button>
-            </div>
-            <div id="emoji-grid-container" class="p-2 flex-1 grid grid-cols-8 gap-1 overflow-y-auto bg-slate-950/90 text-xl text-center">
-                <!-- Dynamically Populated 64 Emoji Grid -->
-            </div>
-        </div>
-
     </div>
 
-    <!-- JAVASCRIPT: PRODUCTION GRADE KEYBOARD ENGINE & F1 COCKPIT -->
     <script>
-        /**
-         * SENIOR UI ENGINEER KEYBOARD CORE ARCHITECTURE
-         * - 60 FPS Canvas Race Simulator (F1 Light Trails)
-         * - WebAudio Synthesizer Engine (Mechanical Key Clicks & Nitro Beeps)
-         * - Multi-layout Touch Engine with Long-press Azerbaijani Accents
-         * - Window Manager for Floating Glass Panels
-         * - Offline-capable Translation Matrix
-         */
-
-        // --- 1. STATE MANAGEMENT & CONSTANTS ---
         const state = {
-            currentLang: 'AZ', // AZ, EN, RU
-            layoutMode: 'alpha', // alpha, symbol, emoji
+            currentLang: 'AZ',
+            layoutMode: 'alpha',
             isShifted: false,
             isCapsLocked: false,
             f1Enabled: true,
             soundEnabled: true,
             theme: 'neon-blue',
-            nitroActive: false,
             nitroEndTime: 0,
-            activeKeyTimer: null,
-            spaceDragStartX: 0,
-            spaceDragging: false
+            textBuffer: '',
+            cursorPos: 0
         };
 
-        // Theme Definitions (CSS Variables Mapping)
         const THEMES = {
-            'neon-blue': { accent: '#00f0ff', glowRgb: '0, 240, 255', bg: '#0a0d14', keyBg: 'rgba(0, 240, 255, 0.08)', keyText: '#e2e8f0', cars: ['#00f0ff', '#ff007f', '#00ff88'] },
-            'cyber-pink': { accent: '#ff007f', glowRgb: '255, 0, 127', bg: '#12040d', keyBg: 'rgba(255, 0, 127, 0.08)', keyText: '#fce7f3', cars: ['#ff007f', '#00f0ff', '#ffb700'] },
-            'fire-red': { accent: '#ff3300', glowRgb: '255, 51, 0', bg: '#140503', keyBg: 'rgba(255, 51, 0, 0.1)', keyText: '#fee2e2', cars: ['#ff3300', '#ffcc00', '#ff0055'] },
-            'acid-green': { accent: '#00ff66', glowRgb: '0, 255, 102', bg: '#021208', keyBg: 'rgba(0, 255, 102, 0.08)', keyText: '#dcfce7', cars: ['#00ff66', '#00ffff', '#ccff00'] },
-            'az-flag': { accent: '#e11d48', glowRgb: '225, 29, 72', bg: '#03101e', keyBg: 'rgba(14, 165, 233, 0.12)', keyText: '#ffffff', cars: ['#00a8ff', '#e11d48', '#00b894'] },
-            'ocean': { accent: '#0d9488', glowRgb: '13, 148, 136', bg: '#041316', keyBg: 'rgba(13, 148, 136, 0.12)', keyText: '#ccfbf1', cars: ['#14b8a6', '#38bdf8', '#818cf8'] },
-            'midnight': { accent: '#6366f1', glowRgb: '99, 102, 241', bg: '#0f172a', keyBg: 'rgba(255, 255, 255, 0.05)', keyText: '#f1f5f9', cars: ['#818cf8', '#c084fc', '#38bdf8'] },
-            'sunset': { accent: '#f97316', glowRgb: '249, 115, 22', bg: '#180c05', keyBg: 'rgba(249, 115, 22, 0.1)', keyText: '#ffedd5', cars: ['#f97316', '#a855f7', '#ec4899'] },
-            'matrix': { accent: '#22c55e', glowRgb: '34, 197, 94', bg: '#000500', keyBg: 'rgba(34, 197, 94, 0.1)', keyText: '#4ade80', cars: ['#22c55e', '#16a34a', '#86efac'] },
-            'titanium': { accent: '#94a3b8', glowRgb: '148, 163, 184', bg: '#18181b', keyBg: 'rgba(255, 255, 255, 0.08)', keyText: '#f4f4f5', cars: ['#e4e4e7', '#a1a1aa', '#71717a'] },
-            'royal-purple': { accent: '#a855f7', glowRgb: '168, 85, 247', bg: '#120524', keyBg: 'rgba(168, 85, 247, 0.12)', keyText: '#f3e8ff', cars: ['#c084fc', '#f472b6', '#38bdf8'] },
-            'rainbow': { accent: '#f43f5e', glowRgb: '244, 63, 94', bg: '#09090b', keyBg: 'rgba(255, 255, 255, 0.08)', keyText: '#ffffff', cars: ['#ff0055', '#00e5ff', '#ffbe00'] }
+            'neon-blue': { accent: '#00f0ff', glowRgb: '0, 240, 255', keyBg: 'rgba(0, 240, 255, 0.08)', keyText: '#e2e8f0', cars: ['#00f0ff', '#ff007f', '#00ff88'] },
+            'cyber-pink': { accent: '#ff007f', glowRgb: '255, 0, 127', keyBg: 'rgba(255, 0, 127, 0.08)', keyText: '#fce7f3', cars: ['#ff007f', '#00f0ff', '#ffb700'] },
+            'fire-red': { accent: '#ff3300', glowRgb: '255, 51, 0', keyBg: 'rgba(255, 51, 0, 0.1)', keyText: '#fee2e2', cars: ['#ff3300', '#ffcc00', '#ff0055'] },
+            'acid-green': { accent: '#00ff66', glowRgb: '0, 255, 102', keyBg: 'rgba(0, 255, 102, 0.08)', keyText: '#dcfce7', cars: ['#00ff66', '#00ffff', '#ccff00'] },
+            'az-flag': { accent: '#e11d48', glowRgb: '225, 29, 72', keyBg: 'rgba(14, 165, 233, 0.12)', keyText: '#ffffff', cars: ['#00a8ff', '#e11d48', '#00b894'] }
         };
 
-        // Layout Definitions for Azerbaijani QWERTY with Accent Keys
         const LAYOUTS = {
             AZ: [
                 ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'ö', 'ü'],
@@ -475,68 +377,19 @@
                 ['shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'backspace'],
                 ['123', 'globe', 'space', '.', 'enter']
             ],
-            RU: [
-                ['й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ'],
-                ['ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э'],
-                ['shift', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', 'backspace'],
-                ['123', 'globe', 'space', '.', 'enter']
-            ],
             NUMBERS: [
                 ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
                 ['@', '#', '$', '_', '&', '-', '+', '(', ')', '/'],
-                ['symbols', '*', '"', '\'', ':', ';', '!', '?', 'backspace'],
-                ['ABC', 'globe', 'space', ',', 'enter']
-            ],
-            SYMBOLS: [
-                ['~', '`', '|', '•', '√', 'π', '÷', '×', '¶', '∆'],
-                ['£', '¥', '€', '¢', '^', '°', '=', '{', '}', '\\'],
-                ['123', '%', '[', ']', '<', '>', '§', '©', '®', 'backspace'],
+                ['ABC', '*', '"', '\'', ':', ';', '!', '?', 'backspace'],
                 ['ABC', 'globe', 'space', ',', 'enter']
             ]
         };
 
-        // Long-Press Accent Mappings for Azerbaijani / Special Characters
         const ACCENT_MAP = {
-            'a': ['a', 'ə', 'á', 'à', 'ä', 'â'],
-            'e': ['e', 'ə', 'é', 'è', 'ë', 'ê'],
-            'o': ['o', 'ö', 'ó', 'ò', 'ô', 'ø'],
-            'u': ['u', 'ü', 'ú', 'ù', 'û'],
-            'i': ['i', 'ı', 'í', 'î', 'ï'],
-            's': ['s', 'ş', 'š'],
-            'c': ['c', 'ç'],
-            'g': ['g', 'ğ'],
-            'n': ['n', 'ñ']
+            'a': ['a', 'ə'], 'e': ['e', 'ə'], 'o': ['o', 'ö'], 'u': ['u', 'ü'], 'i': ['i', 'ı'], 's': ['s', 'ş'], 'c': ['c', 'ç'], 'g': ['g', 'ğ']
         };
 
-        // Top Row Number Subscripts for Fast Swipe/Longpress
-        const NUMBER_SUBSCRIPTS = {
-            'q': '1', 'w': '2', 'e': '3', 'r': '4', 't': '5', 'y': '6', 'u': '7', 'i': '8', 'o': '9', 'p': '0'
-        };
-
-        // 64 Emoji Matrix
-        const EMOJI_LIST = [
-            "😀","😃","😄","😁","😆","😅","🤣","😂","🙂","🙃","😉","😊","😇","🥰","😍","🤩",
-            "😘","😗","😚","😙","😋","😛","😜","🤪","😝","🤑","🤗","🤭","🤫","🤔","🤐","🤨",
-            "😐","😑","😶","😏","😒","🙄","😬","🤥","😌","😔","😪","🤤","😴","😷","🤒","🤕",
-            "🤢","🤮","🤧","🥵","🥶","🥴","😵","🤯","🤠","🥳","😎","🤓","🧐","😕","😟","🙁"
-        ];
-
-        // Offline Fallback Dictionary (1000 Words Mock Mapping)
-        const OFFLINE_DICT = {
-            "salam": { "en": "hello", "ru": "привет", "tr": "merhaba" },
-            "necəsiniz": { "en": "how are you", "ru": "как дела", "tr": "nasılsınız" },
-            "yaxşı": { "en": "good", "ru": "хорошо", "tr": "iyi" },
-            "bəli": { "en": "yes", "ru": "да", "tr": "evet" },
-            "xeyr": { "en": "no", "ru": "нет", "tr": "hayır" },
-            "təşəkkür": { "en": "thank you", "ru": "спасибо", "tr": "teşekkürler" },
-            "sağ ol": { "en": "thanks", "ru": "спасибо", "tr": "sağol" },
-            "klaviatura": { "en": "keyboard", "ru": "клавиатура", "tr": "klavye" },
-            "kompüter": { "en": "computer", "ru": "компьютер", "tr": "bilgisayar" },
-            "hello": { "az": "salam", "ru": "привет", "tr": "merhaba" }
-        };
-
-        // Elements Ref
-        const displayEl = document.getElementById('app-display');
+        const textContentEl = document.getElementById('text-content');
         const keyboardGridEl = document.getElementById('keyboard-grid');
         const accentPopupEl = document.getElementById('accent-popup-container');
         const currentLangEl = document.getElementById('current-lang-indicator');
@@ -545,80 +398,47 @@
         const particleCanvas = document.getElementById('particle-canvas');
         const particleCtx = particleCanvas.getContext('2d');
 
-        // --- 2. WEBAUDIO SYNTHESIZER ENGINE ---
-        let audioCtx = null;
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
+        function updateDisplay() {
+            textContentEl.textContent = state.textBuffer;
         }
 
-        function playKeyClickSound() {
+        let audioCtx = null;
+        function playClickSound() {
             if (!state.soundEnabled) return;
             try {
-                initAudio();
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(400 + Math.random() * 200, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.03);
-                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(450, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.03);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.start();
                 osc.stop(audioCtx.currentTime + 0.035);
-            } catch (e) {}
+            } catch(e){}
         }
 
-        function playNitroBeep() {
-            if (!state.soundEnabled) return;
-            try {
-                initAudio();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.15);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.16);
-            } catch (e) {}
-        }
-
-        // Haptic Feedback Helper
         function triggerHaptic() {
-            if (navigator.vibrate) {
-                navigator.vibrate(10);
-            }
+            if (navigator.vibrate) navigator.vibrate(10);
         }
 
-        // --- 3. FORMULA 1 NEON RACE CANVAS ENGINE ---
-        let f1Cars = [];
-        let lightTrails = [];
-
+        // F1 ENGINE
+        let f1Cars = [], lightTrails = [];
         function resizeCanvases() {
             const kbWrapper = document.getElementById('keyboard-wrapper');
             const rect = kbWrapper.getBoundingClientRect();
-            
             f1Canvas.width = rect.width + 24;
             f1Canvas.height = rect.height + 24;
-            
             particleCanvas.width = rect.width;
             particleCanvas.height = rect.height;
-
             initF1Cars();
         }
 
         function initF1Cars() {
-            const w = f1Canvas.width;
-            const h = f1Canvas.height;
-            const perimeter = 2 * (w + h);
+            const w = f1Canvas.width, h = f1Canvas.height, perimeter = 2 * (w + h);
             const activeTheme = THEMES[state.theme] || THEMES['neon-blue'];
-
             f1Cars = [
                 { progress: 0, speed: 3.5, color: activeTheme.cars[0], size: 5 },
                 { progress: perimeter * 0.33, speed: 3.8, color: activeTheme.cars[1], size: 5 },
@@ -626,284 +446,118 @@
             ];
         }
 
-        // Convert 1D perimeter progress into 2D (x,y) coordinates around perimeter
         function getPerimeterPos(dist, w, h) {
             const total = 2 * (w + h);
             dist = (dist % total + total) % total;
-
-            if (dist < w) {
-                return { x: dist, y: 0 }; // Top edge
-            } else if (dist < w + h) {
-                return { x: w, y: dist - w }; // Right edge
-            } else if (dist < 2 * w + h) {
-                return { x: w - (dist - (w + h)), y: h }; // Bottom edge
-            } else {
-                return { x: 0, y: h - (dist - (2 * w + h)) }; // Left edge
-            }
-        }
-
-        function triggerNitroBoost() {
-            state.nitroActive = true;
-            state.nitroEndTime = Date.now() + 300;
-            playNitroBeep();
-            
-            // Visual Nitro pulse indicator on keyboard border
-            const kbContainer = document.getElementById('keyboard-container');
-            kbContainer.classList.add('nitro-boost');
-            setTimeout(() => kbContainer.classList.remove('nitro-boost'), 300);
+            if (dist < w) return { x: dist, y: 0 };
+            else if (dist < w + h) return { x: w, y: dist - w };
+            else if (dist < 2 * w + h) return { x: w - (dist - (w + h)), y: h };
+            else return { x: 0, y: h - (dist - (2 * w + h)) };
         }
 
         function renderF1Loop() {
-            if (!f1Ctx) return;
-
-            const w = f1Canvas.width;
-            const h = f1Canvas.height;
-            const perimeter = 2 * (w + h);
-
-            // Semi-transparent clear for smooth light trail fade
+            const w = f1Canvas.width, h = f1Canvas.height;
             f1Ctx.fillStyle = 'rgba(10, 13, 20, 0.25)';
             f1Ctx.fillRect(0, 0, w, h);
 
-            if (state.f1Enabled && w > 0 && h > 0) {
+            if (state.f1Enabled && w > 0) {
                 const isNitro = Date.now() < state.nitroEndTime;
-                const currentSpeedMultiplier = isNitro ? 3.2 : 1.0;
-
-                // Telemetry speed update
-                const telemetryEl = document.getElementById('speed-telemetry');
-                if (telemetryEl) {
-                    telemetryEl.textContent = isNitro ? "480 KM/H [NITRO]" : "300 KM/H";
-                    telemetryEl.style.color = isNitro ? "#ff007f" : "var(--theme-accent, #00f0ff)";
-                }
-
                 f1Cars.forEach(car => {
-                    car.progress += car.speed * currentSpeedMultiplier;
+                    car.progress += car.speed * (isNitro ? 2.8 : 1.0);
                     const pos = getPerimeterPos(car.progress, w, h);
+                    lightTrails.push({ x: pos.x, y: pos.y, color: car.color, alpha: 1.0, radius: car.size });
 
-                    // Add trail particle
-                    lightTrails.push({
-                        x: pos.x,
-                        y: pos.y,
-                        color: car.color,
-                        alpha: 1.0,
-                        radius: car.size + (isNitro ? 3 : 0)
-                    });
-
-                    // Draw F1 Car Dot Head
                     f1Ctx.beginPath();
-                    f1Ctx.arc(pos.x, pos.y, car.size + (isNitro ? 2 : 0), 0, Math.PI * 2);
+                    f1Ctx.arc(pos.x, pos.y, car.size, 0, Math.PI * 2);
                     f1Ctx.fillStyle = '#ffffff';
-                    f1Ctx.shadowColor = car.color;
-                    f1Ctx.shadowBlur = isNitro ? 20 : 10;
                     f1Ctx.fill();
-                    f1Ctx.shadowBlur = 0;
                 });
 
-                // Render & Update Light Trails
                 for (let i = lightTrails.length - 1; i >= 0; i--) {
-                    const trail = lightTrails[i];
+                    const t = lightTrails[i];
                     f1Ctx.beginPath();
-                    f1Ctx.arc(trail.x, trail.y, trail.radius, 0, Math.PI * 2);
-                    f1Ctx.fillStyle = trail.color;
-                    f1Ctx.globalAlpha = trail.alpha;
+                    f1Ctx.arc(t.x, t.y, t.radius, 0, Math.PI * 2);
+                    f1Ctx.fillStyle = t.color;
+                    f1Ctx.globalAlpha = t.alpha;
                     f1Ctx.fill();
-
-                    trail.alpha -= 0.04;
-                    trail.radius *= 0.96;
-
-                    if (trail.alpha <= 0) {
-                        lightTrails.splice(i, 1);
-                    }
+                    t.alpha -= 0.05;
+                    if (t.alpha <= 0) lightTrails.splice(i, 1);
                 }
                 f1Ctx.globalAlpha = 1.0;
             }
-
-            renderParticles();
             requestAnimationFrame(renderF1Loop);
         }
 
-        // --- 4. PARTICLE BURST ENGINE (6 PARTICLES PER KEY) ---
-        let activeParticles = [];
-
-        function spawnParticleBurst(x, y) {
-            const activeTheme = THEMES[state.theme] || THEMES['neon-blue'];
-            for (let i = 0; i < 6; i++) {
-                const angle = Math.random() * Math.PI * 2;
-                const speed = 2 + Math.random() * 4;
-                activeParticles.push({
-                    x: x,
-                    y: y,
-                    vx: Math.cos(angle) * speed,
-                    vy: Math.sin(angle) * speed,
-                    radius: 2 + Math.random() * 3,
-                    color: activeTheme.accent,
-                    alpha: 1.0,
-                    life: 1.0
-                });
-            }
-        }
-
-        function renderParticles() {
-            particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
-
-            for (let i = activeParticles.length - 1; i >= 0; i--) {
-                const p = activeParticles[i];
-                p.x += p.vx;
-                p.y += p.vy;
-                p.alpha -= 0.05;
-                p.radius *= 0.94;
-
-                particleCtx.beginPath();
-                particleCtx.arc(p.x, p.y, Math.max(0.1, p.radius), 0, Math.PI * 2);
-                particleCtx.fillStyle = p.color;
-                particleCtx.globalAlpha = Math.max(0, p.alpha);
-                particleCtx.fill();
-
-                if (p.alpha <= 0) {
-                    activeParticles.splice(i, 1);
-                }
-            }
-            particleCtx.globalAlpha = 1.0;
-        }
-
-        // --- 5. KEYBOARD RENDER ENGINE & INTERACTION ---
+        // RENDER KEYBOARD
         function renderKeyboard() {
             keyboardGridEl.innerHTML = '';
-            
             let currentLayout = LAYOUTS[state.currentLang] || LAYOUTS.AZ;
-            if (state.layoutMode === 'symbol') {
-                currentLayout = LAYOUTS.NUMBERS;
-            } else if (state.layoutMode === 'alt_symbol') {
-                currentLayout = LAYOUTS.SYMBOLS;
-            }
+            if (state.layoutMode === 'symbol') currentLayout = LAYOUTS.NUMBERS;
 
             currentLangEl.textContent = state.currentLang;
 
-            currentLayout.forEach((row, rowIndex) => {
+            currentLayout.forEach(row => {
                 const rowEl = document.createElement('div');
                 rowEl.className = 'flex items-center justify-center gap-1 w-full flex-1 my-0.5';
 
-                row.forEach((key) => {
+                row.forEach(key => {
                     const keyEl = document.createElement('button');
                     keyEl.className = 'keyboard-key flex-1 h-full select-none';
-                    keyEl.setAttribute('data-key', key);
+                    let displayChar = (state.isShifted || state.isCapsLocked) ? key.toUpperCase() : key.toLowerCase();
 
-                    let displayChar = key;
-                    
-                    // Handle Shift / Caps Formatting
-                    if (state.layoutMode === 'alpha') {
-                        displayChar = (state.isShifted || state.isCapsLocked) ? key.toUpperCase() : key.toLowerCase();
-                    }
-
-                    // Top Row Subscript Numbers
-                    if (rowIndex === 0 && state.layoutMode === 'alpha' && NUMBER_SUBSCRIPTS[key]) {
-                        const sub = document.createElement('span');
-                        sub.className = 'subscript-symbol';
-                        sub.textContent = NUMBER_SUBSCRIPTS[key];
-                        keyEl.appendChild(sub);
-                    }
-
-                    // Key Styling & Labels
                     if (key === 'shift') {
-                        keyEl.classList.add('special-key');
-                        keyEl.classList.add('w-[13%]');
-                        keyEl.innerHTML = state.isCapsLocked ? '⇪' : (state.isShifted ? '▲' : '⇧');
-                        if (state.isShifted || state.isCapsLocked) keyEl.classList.add('!bg-cyan-500', '!text-black');
+                        keyEl.classList.add('special-key', 'w-[13%]');
+                        keyEl.textContent = state.isCapsLocked ? '⇪' : (state.isShifted ? '▲' : '⇧');
                     } else if (key === 'backspace') {
-                        keyEl.classList.add('special-key');
-                        keyEl.classList.add('w-[13%]');
+                        keyEl.classList.add('special-key', 'w-[13%]');
                         keyEl.textContent = '⌫';
-                    } else if (key === '123' || key === 'ABC' || key === 'symbols') {
-                        keyEl.classList.add('special-key');
-                        keyEl.classList.add('w-[12%]');
-                        keyEl.textContent = key === '123' ? '?123' : (key === 'ABC' ? 'ABC' : '=\\<');
+                    } else if (key === '123' || key === 'ABC') {
+                        keyEl.classList.add('special-key', 'w-[12%]');
+                        keyEl.textContent = key === '123' ? '?123' : 'ABC';
                     } else if (key === 'globe') {
                         keyEl.classList.add('special-key');
                         keyEl.textContent = '🌐';
                     } else if (key === 'space') {
-                        keyEl.classList.add('w-[42%]');
-                        keyEl.textContent = state.currentLang + ' • Cockpit';
-                        keyEl.classList.add('text-xs', 'tracking-wider', 'text-slate-400');
+                        keyEl.classList.add('w-[40%]');
+                        keyEl.textContent = state.currentLang;
                     } else if (key === 'enter') {
                         keyEl.classList.add('action-key', 'w-[18%]');
                         keyEl.textContent = '↵';
                     } else {
-                        const charSpan = document.createElement('span');
-                        charSpan.textContent = displayChar;
-                        keyEl.appendChild(charSpan);
+                        keyEl.textContent = displayChar;
                     }
 
-                    // Attach Touch & Mouse Event Handlers
                     attachKeyEvents(keyEl, key);
-
                     rowEl.appendChild(keyEl);
                 });
-
                 keyboardGridEl.appendChild(rowEl);
             });
         }
 
         function attachKeyEvents(keyEl, keyVal) {
-            let pressTimer = null;
-
-            const handlePressStart = (e) => {
+            let timer = null;
+            const start = (e) => {
                 e.preventDefault();
                 triggerHaptic();
-                playKeyClickSound();
-                triggerNitroBoost();
-
+                playClickSound();
+                state.nitroEndTime = Date.now() + 300;
                 keyEl.classList.add('key-pressed');
 
-                // Compute position for Particle Explosion
-                const rect = keyEl.getBoundingClientRect();
-                const kbRect = document.getElementById('keyboard-wrapper').getBoundingClientRect();
-                spawnParticleBurst(rect.left - kbRect.left + rect.width / 2, rect.top - kbRect.top + rect.height / 2);
-
-                // Long Press Detection for Accent Popup Matrix
                 if (ACCENT_MAP[keyVal.toLowerCase()] && state.layoutMode === 'alpha') {
-                    pressTimer = setTimeout(() => {
-                        showAccentPopup(keyEl, ACCENT_MAP[keyVal.toLowerCase()]);
-                    }, 350);
-                }
-
-                // Spacebar Drag Engine Setup
-                if (keyVal === 'space') {
-                    state.spaceDragging = true;
-                    state.spaceDragStartX = (e.touches ? e.touches[0].clientX : e.clientX);
+                    timer = setTimeout(() => showAccentPopup(keyEl, ACCENT_MAP[keyVal.toLowerCase()]), 300);
                 }
             };
 
-            const handlePressEnd = (e) => {
-                clearTimeout(pressTimer);
+            const end = (e) => {
+                clearTimeout(timer);
                 keyEl.classList.remove('key-pressed');
-
-                if (state.spaceDragging) {
-                    state.spaceDragging = false;
-                }
-
-                // If Accent Popup was open, avoid double key execution
-                if (accentPopupEl.classList.contains('active')) {
-                    return;
-                }
-
-                processKeyInput(keyVal);
+                if (!accentPopupEl.classList.contains('active')) processKeyInput(keyVal);
             };
 
-            keyEl.addEventListener('touchstart', handlePressStart, { passive: false });
-            keyEl.addEventListener('touchend', handlePressEnd);
-            keyEl.addEventListener('mousedown', handlePressStart);
-            keyEl.addEventListener('mouseup', handlePressEnd);
-
-            // Cursor movement via Spacebar Touchmove
-            keyEl.addEventListener('touchmove', (e) => {
-                if (keyVal === 'space' && state.spaceDragging) {
-                    const currentX = e.touches[0].clientX;
-                    const diff = currentX - state.spaceDragStartX;
-                    if (Math.abs(diff) > 15) {
-                        moveCursor(diff > 0 ? 1 : -1);
-                        state.spaceDragStartX = currentX;
-                    }
-                }
-            });
+            keyEl.addEventListener('touchstart', start, { passive: false });
+            keyEl.addEventListener('touchend', end);
+            keyEl.addEventListener('mousedown', start);
+            keyEl.addEventListener('mouseup', end);
         }
 
         function showAccentPopup(keyEl, accents) {
@@ -911,44 +565,22 @@
             accents.forEach(acc => {
                 const opt = document.createElement('div');
                 opt.className = 'accent-option';
-                opt.textContent = state.isShifted || state.isCapsLocked ? acc.toUpperCase() : acc;
+                opt.textContent = state.isShifted ? acc.toUpperCase() : acc;
                 opt.onclick = () => {
                     insertText(opt.textContent);
-                    hideAccentPopup();
+                    accentPopupEl.classList.remove('active');
                 };
                 accentPopupEl.appendChild(opt);
             });
-
             const rect = keyEl.getBoundingClientRect();
             const kbWrapper = document.getElementById('keyboard-wrapper').getBoundingClientRect();
-            
             accentPopupEl.style.left = `${rect.left - kbWrapper.left + rect.width / 2}px`;
             accentPopupEl.classList.add('active');
-
-            // Global click outside listener to dismiss
-            setTimeout(() => {
-                window.addEventListener('click', hideAccentPopup, { once: true });
-            }, 50);
-        }
-
-        function hideAccentPopup() {
-            accentPopupEl.classList.remove('active');
-        }
-
-        function moveCursor(direction) {
-            const pos = displayEl.selectionStart;
-            displayEl.setSelectionRange(pos + direction, pos + direction);
-            displayEl.focus();
         }
 
         function insertText(text) {
-            const start = displayEl.selectionStart;
-            const end = displayEl.selectionEnd;
-            const val = displayEl.value;
-            displayEl.value = val.substring(0, start) + text + val.substring(end);
-            displayEl.selectionStart = displayEl.selectionEnd = start + text.length;
-            displayEl.focus();
-
+            state.textBuffer += text;
+            updateDisplay();
             if (state.isShifted && !state.isCapsLocked) {
                 state.isShifted = false;
                 renderKeyboard();
@@ -957,28 +589,11 @@
 
         function processKeyInput(key) {
             if (key === 'shift') {
-                if (state.isShifted) {
-                    state.isShifted = false;
-                    state.isCapsLocked = true;
-                } else if (state.isCapsLocked) {
-                    state.isCapsLocked = false;
-                } else {
-                    state.isShifted = true;
-                }
+                state.isShifted = !state.isShifted;
                 renderKeyboard();
             } else if (key === 'backspace') {
-                const start = displayEl.selectionStart;
-                const end = displayEl.selectionEnd;
-                const val = displayEl.value;
-
-                if (start !== end) {
-                    displayEl.value = val.substring(0, start) + val.substring(end);
-                    displayEl.selectionStart = displayEl.selectionEnd = start;
-                } else if (start > 0) {
-                    displayEl.value = val.substring(0, start - 1) + val.substring(start);
-                    displayEl.selectionStart = displayEl.selectionEnd = start - 1;
-                }
-                displayEl.focus();
+                state.textBuffer = state.textBuffer.slice(0, -1);
+                updateDisplay();
             } else if (key === 'space') {
                 insertText(' ');
             } else if (key === 'enter') {
@@ -986,343 +601,47 @@
             } else if (key === '123') {
                 state.layoutMode = 'symbol';
                 renderKeyboard();
-            } else if (key === 'symbols') {
-                state.layoutMode = 'alt_symbol';
-                renderKeyboard();
             } else if (key === 'ABC') {
                 state.layoutMode = 'alpha';
                 renderKeyboard();
             } else if (key === 'globe') {
-                // Cycle Language Matrix (AZ -> EN -> RU)
-                if (state.currentLang === 'AZ') state.currentLang = 'EN';
-                else if (state.currentLang === 'EN') state.currentLang = 'RU';
-                else state.currentLang = 'AZ';
+                state.currentLang = state.currentLang === 'AZ' ? 'EN' : 'AZ';
                 renderKeyboard();
             } else {
-                let char = key;
-                if (state.layoutMode === 'alpha') {
-                    char = (state.isShifted || state.isCapsLocked) ? key.toUpperCase() : key.toLowerCase();
-                }
+                let char = (state.isShifted || state.isCapsLocked) ? key.toUpperCase() : key.toLowerCase();
                 insertText(char);
             }
         }
 
-        // --- 6. MINI WINDOW SYSTEM (DRAGGABLE & RESIZABLE) ---
-        class MiniWindowManager {
-            constructor(windowEl) {
-                this.windowEl = windowEl;
-                this.dragHandle = windowEl.querySelector('.window-drag-handle');
-                this.closeBtn = windowEl.querySelector('.window-close-btn');
-                this.resizeHandle = windowEl.querySelector('.resize-handle');
-
-                this.isDragging = false;
-                this.isResizing = false;
-                this.startX = 0;
-                this.startY = 0;
-                this.initialLeft = 0;
-                this.initialTop = 0;
-                this.initialWidth = 0;
-                this.initialHeight = 0;
-
-                this.initEvents();
-            }
-
-            initEvents() {
-                // Drag Logic
-                const startDrag = (e) => {
-                    this.isDragging = true;
-                    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                    
-                    this.startX = clientX;
-                    this.startY = clientY;
-                    
-                    const rect = this.windowEl.getBoundingClientRect();
-                    const parentRect = document.getElementById('keyboard-wrapper').getBoundingClientRect();
-                    
-                    this.initialLeft = rect.left - parentRect.left;
-                    this.initialTop = rect.top - parentRect.top;
-
-                    document.addEventListener('mousemove', onDrag);
-                    document.addEventListener('touchmove', onDrag, { passive: false });
-                    document.addEventListener('mouseup', stopDrag);
-                    document.addEventListener('touchend', stopDrag);
-                };
-
-                const onDrag = (e) => {
-                    if (!this.isDragging) return;
-                    if (e.cancelable) e.preventDefault();
-                    
-                    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-                    const dx = clientX - this.startX;
-                    const dy = clientY - this.startY;
-
-                    this.windowEl.style.left = `${this.initialLeft + dx}px`;
-                    this.windowEl.style.top = `${this.initialTop + dy}px`;
-                    this.windowEl.style.transform = 'none';
-                };
-
-                const stopDrag = () => {
-                    this.isDragging = false;
-                    document.removeEventListener('mousemove', onDrag);
-                    document.removeEventListener('touchmove', onDrag);
-                    document.removeEventListener('mouseup', stopDrag);
-                    document.removeEventListener('touchend', stopDrag);
-                };
-
-                this.dragHandle.addEventListener('mousedown', startDrag);
-                this.dragHandle.addEventListener('touchstart', startDrag, { passive: false });
-
-                // Resize Logic
-                if (this.resizeHandle) {
-                    const startResize = (e) => {
-                        e.stopPropagation();
-                        this.isResizing = true;
-                        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-                        this.startX = clientX;
-                        this.startY = clientY;
-                        this.initialWidth = this.windowEl.offsetWidth;
-                        this.initialHeight = this.windowEl.offsetHeight;
-
-                        document.addEventListener('mousemove', onResize);
-                        document.addEventListener('touchmove', onResize, { passive: false });
-                        document.addEventListener('mouseup', stopResize);
-                        document.addEventListener('touchend', stopResize);
-                    };
-
-                    const onResize = (e) => {
-                        if (!this.isResizing) return;
-                        if (e.cancelable) e.preventDefault();
-
-                        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-                        const w = Math.max(200, this.initialWidth + (clientX - this.startX));
-                        const h = Math.max(120, this.initialHeight + (clientY - this.startY));
-
-                        this.windowEl.style.width = `${w}px`;
-                        this.windowEl.style.height = `${h}px`;
-                    };
-
-                    const stopResize = () => {
-                        this.isResizing = false;
-                        document.removeEventListener('mousemove', onResize);
-                        document.removeEventListener('touchmove', onResize);
-                        document.removeEventListener('mouseup', stopResize);
-                        document.removeEventListener('touchend', stopResize);
-                    };
-
-                    this.resizeHandle.addEventListener('mousedown', startResize);
-                    this.resizeHandle.addEventListener('touchstart', startResize, { passive: false });
-                }
-
-                // Close Button Logic with Animation
-                if (this.closeBtn) {
-                    this.closeBtn.onclick = () => this.close();
-                }
-            }
-
-            open() {
-                this.windowEl.classList.remove('hidden', 'window-close');
-                this.windowEl.classList.add('window-open');
-            }
-
-            close() {
-                this.windowEl.classList.remove('window-open');
-                this.windowEl.classList.add('window-close');
-                setTimeout(() => {
-                    this.windowEl.classList.add('hidden');
-                }, 180);
-            }
-        }
-
-        // Initialize Window Instances
-        const googleWin = new MiniWindowManager(document.getElementById('google-window'));
-        const transWin = new MiniWindowManager(document.getElementById('translator-window'));
-        const emojiWin = new MiniWindowManager(document.getElementById('emoji-window'));
-
-        // Attach Tool Triggers
-        document.getElementById('google-search-btn').onclick = () => {
-            googleWin.open();
-            document.getElementById('google-search-input').focus();
-        };
-
-        document.getElementById('translator-btn').onclick = () => {
-            // Auto capture selected text from display if available
-            const selectedText = displayEl.value.substring(displayEl.selectionStart, displayEl.selectionEnd) || displayEl.value;
-            if (selectedText) {
-                document.getElementById('trans-source-text').value = selectedText;
-            }
-            transWin.open();
-        };
-
-        // Populate and Manage Emoji Picker Window
-        const emojiGridContainer = document.getElementById('emoji-grid-container');
-        EMOJI_LIST.forEach(emoji => {
-            const btn = document.createElement('button');
-            btn.className = 'hover:scale-125 transition active:scale-95 p-1 rounded hover:bg-white/10';
-            btn.textContent = emoji;
-            btn.onclick = () => {
-                insertText(emoji);
-                triggerHaptic();
-            };
-            emojiGridContainer.appendChild(btn);
-        });
-
-        // --- 7. GOOGLE SEARCH API / IFRAME SIMULATION ---
-        document.getElementById('google-search-form').onsubmit = (e) => {
-            e.preventDefault();
-            const query = document.getElementById('google-search-input').value.trim();
-            if (!query) return;
-
-            const resultsContainer = document.getElementById('google-results-container');
-            resultsContainer.innerHTML = `
-                <div class="p-2 bg-slate-800/80 rounded border border-cyan-500/30">
-                    <div class="text-[10px] text-cyan-400 font-mono">Google Web Search</div>
-                    <a href="https://www.google.com/search?q=${encodeURIComponent(query)}" target="_blank" class="font-bold text-cyan-300 hover:underline text-xs block my-1">
-                        "${query}" - View Google Results ↗
-                    </a>
-                    <div class="text-[11px] text-slate-300">Clicking above opens real Google Search in browser window. Integrated cockpit query ready.</div>
-                </div>
-            `;
-        };
-
-        // --- 8. TRANSLATOR API MATRIX (MYMEMORY API + OFFLINE DICTIONARY) ---
-        document.getElementById('exec-translate-btn').onclick = async () => {
-            const sourceText = document.getElementById('trans-source-text').value.trim();
-            const langPair = document.getElementById('trans-lang-pair').value;
-            const targetEl = document.getElementById('trans-target-text');
-            const statusEl = document.getElementById('trans-status');
-
-            if (!sourceText) return;
-
-            statusEl.textContent = "Translating...";
-            statusEl.className = "text-[10px] text-amber-400 font-mono";
-
-            try {
-                const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(sourceText)}&langpair=${langPair}`);
-                const data = await res.json();
-
-                if (data && data.responseData && data.responseData.translatedText) {
-                    targetEl.textContent = data.responseData.translatedText;
-                    statusEl.textContent = "Online API Success";
-                    statusEl.className = "text-[10px] text-emerald-400 font-mono";
-                } else {
-                    throw new Error("API Limit or Invalid Payload");
-                }
-            } catch (err) {
-                // Fallback to Offline Dictionary Matrix
-                statusEl.textContent = "Offline Fallback Dict";
-                statusEl.className = "text-[10px] text-orange-400 font-mono";
-
-                const wordKey = sourceText.toLowerCase();
-                const targetLang = langPair.split('|')[1];
-
-                if (OFFLINE_DICT[wordKey] && OFFLINE_DICT[wordKey][targetLang]) {
-                    targetEl.textContent = OFFLINE_DICT[wordKey][targetLang];
-                } else {
-                    targetEl.textContent = `[Offline Dict] ${sourceText} (${targetLang.toUpperCase()})`;
-                }
-            }
-        };
-
-        document.getElementById('trans-copy-btn').onclick = () => {
-            const text = document.getElementById('trans-target-text').textContent;
-            navigator.clipboard.writeText(text);
-            triggerHaptic();
-        };
-
-        document.getElementById('trans-replace-btn').onclick = () => {
-            const text = document.getElementById('trans-target-text').textContent;
-            if (text) {
-                displayEl.value = text;
-                transWin.close();
-            }
-        };
-
-        // --- 9. THEME ENGINE & PERSISTENCE ---
+        // THEMES
         function applyTheme(themeKey) {
             const theme = THEMES[themeKey] || THEMES['neon-blue'];
             state.theme = themeKey;
-            localStorage.setItem('gboard_2030_theme', themeKey);
-
-            const root = document.documentElement;
-            root.style.setProperty('--theme-accent', theme.accent);
-            root.style.setProperty('--theme-glow-rgb', theme.glowRgb);
-            root.style.setProperty('--key-bg', theme.keyBg);
-            root.style.setProperty('--key-text', theme.keyText);
-
-            // Re-init car neon colors
+            document.documentElement.style.setProperty('--theme-accent', theme.accent);
+            document.documentElement.style.setProperty('--key-bg', theme.keyBg);
+            document.documentElement.style.setProperty('--key-text', theme.keyText);
             initF1Cars();
-
-            // Highlight active theme chip
-            document.querySelectorAll('.theme-chip').forEach(chip => {
-                if (chip.getAttribute('data-theme') === themeKey) {
-                    chip.classList.add('ring-2', 'ring-white', 'scale-105');
-                } else {
-                    chip.classList.remove('ring-2', 'ring-white', 'scale-105');
-                }
-            });
         }
 
         document.querySelectorAll('.theme-chip').forEach(chip => {
             chip.onclick = () => applyTheme(chip.getAttribute('data-theme'));
         });
 
-        document.getElementById('theme-reset-btn').onclick = () => {
-            applyTheme('neon-blue');
-        };
-
-        // --- 10. POLISH & UTILITIES ---
-        // F1 Race Toggle Button
-        document.getElementById('f1-toggle-btn').onclick = () => {
-            state.f1Enabled = !state.f1Enabled;
-            document.getElementById('f1-status-text').textContent = state.f1Enabled ? 'ON' : 'OFF';
-            document.getElementById('f1-status-text').style.color = state.f1Enabled ? '#00f0ff' : '#94a3b8';
-        };
-
-        // Sound Toggle Button
-        document.getElementById('sound-toggle-btn').onclick = () => {
-            state.soundEnabled = !state.soundEnabled;
-            document.getElementById('sound-toggle-btn').textContent = state.soundEnabled ? '🔊' : '🔇';
-        };
-
-        // Clear and Copy Text Display Action Buttons
         document.getElementById('clear-text-btn').onclick = () => {
-            displayEl.value = '';
-            displayEl.focus();
+            state.textBuffer = '';
+            updateDisplay();
         };
 
         document.getElementById('copy-text-btn').onclick = () => {
-            navigator.clipboard.writeText(displayEl.value);
+            navigator.clipboard.writeText(state.textBuffer);
             triggerHaptic();
         };
 
-        // Suggestion Chips Click Handler
-        document.querySelectorAll('.suggestion-chip').forEach(chip => {
-            chip.onclick = () => {
-                insertText(chip.textContent + ' ');
-                triggerHaptic();
-            };
-        });
-
-        // Window Initialization
         window.addEventListener('resize', resizeCanvases);
-
-        // --- INIT APP ENTRY POINT ---
         window.addEventListener('DOMContentLoaded', () => {
             renderKeyboard();
             resizeCanvases();
-            
-            // Saved Theme Restore
-            const savedTheme = localStorage.getItem('gboard_2030_theme') || 'neon-blue';
-            applyTheme(savedTheme);
-
-            // Start 60 FPS F1 Race Animation Loop
+            applyTheme('neon-blue');
             requestAnimationFrame(renderF1Loop);
         });
     </script>
