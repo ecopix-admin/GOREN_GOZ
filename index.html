@@ -1,1052 +1,420 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="az">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Drone Celebration Stickers</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>LinguaKey — Multi-Lang Social Keyboard Engine</title>
 <style>
-*{box-sizing:border-box}
-html,body{margin:0;min-height:100%;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-body{
-  background:
-    radial-gradient(circle at 10% 10%,rgba(168,85,247,.16),transparent 28%),
-    radial-gradient(circle at 90% 15%,rgba(6,182,212,.13),transparent 25%),
-    radial-gradient(circle at 50% 100%,rgba(236,72,153,.10),transparent 30%),
-    #070912;
-  color:#fff;
-}
-body.light{
-  background:
-    radial-gradient(circle at 10% 10%,rgba(236,72,153,.12),transparent 30%),
-    radial-gradient(circle at 90% 20%,rgba(59,130,246,.12),transparent 30%),
-    #f5f7fb;
-  color:#111827;
+:root {
+    --bg: #090b10;
+    --surface: #11151d;
+    --border: #202631;
+    --accent: #ff3b6b;
+    --accent-glow: rgba(255, 59, 107, 0.3);
+    --key-bg: #1a202c;
+    --text: #f1f3f6;
+    --muted: #7e8998;
+    --success: #5de07e;
 }
 
-::-webkit-scrollbar{width:8px}
-::-webkit-scrollbar-thumb{background:#34384c;border-radius:20px}
-
-.app{
-  width:min(1500px,100%);
-  margin:auto;
-  padding:22px 18px 170px;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
 
-/* HEADER */
-.header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:20px;
-  margin-bottom:20px;
-}
-.brand{
-  display:flex;
-  align-items:center;
-  gap:13px;
-}
-.brandIcon{
-  width:52px;height:52px;border-radius:17px;
-  display:grid;place-items:center;
-  font-size:29px;
-  background:linear-gradient(135deg,#ec4899,#8b5cf6,#06b6d4);
-  box-shadow:0 0 35px rgba(236,72,153,.35);
-}
-.brand h1{font-size:22px;margin:0;font-weight:900;letter-spacing:-.6px}
-.brand p{margin:2px 0 0;color:#9299ad;font-size:12px}
-
-.topActions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.btn{
-  border:1px solid rgba(255,255,255,.10);
-  color:#fff;background:rgba(255,255,255,.055);
-  border-radius:13px;padding:10px 14px;
-  font-weight:800;font-size:12px;
-  cursor:pointer;transition:.2s;
-  backdrop-filter:blur(12px);
-}
-.btn:hover{transform:translateY(-2px);background:rgba(255,255,255,.10)}
-.launch{
-  border:0;
-  background:linear-gradient(135deg,#ec4899,#8b5cf6);
-  box-shadow:0 8px 30px rgba(139,92,246,.28);
-}
-.buy{
-  border:0;
-  background:linear-gradient(135deg,#22c55e,#06b6d4);
-  box-shadow:0 8px 30px rgba(34,197,94,.2);
+body {
+    background: #040507;
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
 }
 
-body.light .btn{color:#111827;background:#fff;border-color:#e5e7eb}
-body.light .brand p{color:#6b7280}
-
-/* CONTROLS */
-.controlPanel{
-  padding:13px;
-  border:1px solid rgba(255,255,255,.09);
-  background:rgba(15,18,32,.72);
-  border-radius:18px;
-  backdrop-filter:blur(18px);
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap;
-  margin-bottom:20px;
-}
-body.light .controlPanel{
-  background:rgba(255,255,255,.86);
-  border-color:#e5e7eb;
-}
-.filters{display:flex;gap:7px;flex-wrap:wrap}
-.filter{
-  border:1px solid rgba(255,255,255,.08);
-  background:rgba(255,255,255,.04);
-  color:#aeb4c4;
-  padding:8px 13px;border-radius:10px;
-  cursor:pointer;font-size:12px;font-weight:800;
-}
-.filter.active{
-  color:#fff;
-  background:linear-gradient(135deg,#8b5cf6,#ec4899);
-  border-color:transparent;
-}
-body.light .filter{color:#667085;background:#f3f4f6;border-color:#e5e7eb}
-body.light .filter.active{color:#fff}
-
-.themeToggle{
-  display:flex;align-items:center;gap:7px;
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:10px;padding:8px 12px;
-  background:rgba(255,255,255,.04);
-  color:#aaa;cursor:pointer;font-size:12px;font-weight:800;
+.app {
+    width: 100%;
+    max-width: 460px;
+    height: 100vh;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border);
+    position: relative;
 }
 
-/* GRID */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:16px;
-}
-@media(max-width:1050px){
-  .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-}
-@media(max-width:720px){
-  .app{padding:14px 10px 170px}
-  .header{align-items:flex-start}
-  .topActions{justify-content:flex-end}
-  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-  .brand h1{font-size:18px}
-  .brandIcon{width:44px;height:44px}
-  .btn{padding:9px 10px}
-}
-@media(max-width:430px){
-  .header{flex-direction:column}
-  .topActions{width:100%}
+/* HEADER & BRANDING */
+.header {
+    height: 56px;
+    padding: 0 14px;
+    background: #0d1016;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-/* CARD */
-.card{
-  position:relative;
-  overflow:hidden;
-  border:1px solid rgba(255,255,255,.09);
-  border-radius:21px;
-  background:
-    linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.025));
-  box-shadow:
-    0 15px 45px rgba(0,0,0,.25),
-    inset 0 1px rgba(255,255,255,.04);
-  transition:.3s;
-}
-.card:hover{
-  transform:translateY(-5px);
-  border-color:rgba(255,255,255,.18);
-  box-shadow:0 20px 55px rgba(0,0,0,.35);
-}
-body.light .card{
-  background:#fff;
-  border-color:#e5e7eb;
-  box-shadow:0 12px 35px rgba(15,23,42,.08);
+.social-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.stage{
-  height:180px;
-  position:relative;
-  overflow:hidden;
-  background:
-    radial-gradient(circle at 50% 45%,var(--glow),transparent 40%),
-    linear-gradient(180deg,rgba(255,255,255,.025),transparent);
-}
-.stage:before{
-  content:"";
-  position:absolute;inset:0;
-  background-image:
-    radial-gradient(circle,rgba(255,255,255,.45) 1px,transparent 1px);
-  background-size:36px 36px;
-  opacity:.08;
-  animation:stars 7s linear infinite;
-}
-@keyframes stars{
-  to{background-position:-36px 36px}
+.social-logo {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), #ff6688);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    box-shadow: 0 4px 12px var(--accent-glow);
 }
 
-.flightPath{
-  position:absolute;
-  left:-65px;
-  top:48%;
-  width:360px;
-  height:80px;
-  animation:flight 3.8s linear infinite;
-}
-@keyframes flight{
-  0%{transform:translateX(-80px) translateY(10px)}
-  45%{transform:translateX(75px) translateY(-13px)}
-  100%{transform:translateX(300px) translateY(8px)}
+.room-info {
+    font-size: 11px;
+    color: var(--muted);
 }
 
-.drone{
-  position:absolute;
-  left:50%;
-  top:28px;
-  transform:translateX(-50%);
-  width:64px;height:55px;
-  display:grid;place-items:center;
-  font-size:45px;
-  z-index:5;
-  filter:drop-shadow(0 0 12px var(--glow));
-}
-.drone:before,.drone:after{
-  content:"";
-  position:absolute;
-  width:42px;height:6px;
-  top:5px;
-  border-radius:50%;
-  background:rgba(255,255,255,.32);
-  filter:blur(3px);
-  animation:propeller .08s linear infinite;
-}
-.drone:before{left:-17px}
-.drone:after{right:-17px}
-@keyframes propeller{
-  50%{transform:scaleX(.45)}
-}
-.flightPath .drone{
-  animation:droneBob .55s ease-in-out infinite alternate;
-}
-@keyframes droneBob{
-  from{margin-top:-2px}
-  to{margin-top:5px}
+.room-id {
+    color: var(--success);
+    font-weight: 700;
 }
 
-.trail{
-  position:absolute;
-  left:5px;top:51px;
-  width:145px;height:4px;
-  border-radius:99px;
-  background:linear-gradient(90deg,transparent,var(--glow));
-  filter:blur(3px);
-  opacity:.85;
+/* CHAT VIEWPORT */
+.chat-box {
+    flex: 1;
+    padding: 12px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
-/* PARTICLES */
-.particles{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-}
-.particle{
-  position:absolute;
-  left:50%;
-  top:67px;
-  font-size:22px;
-  z-index:4;
-  animation:drop 1.2s linear forwards;
-  filter:drop-shadow(0 2px 5px rgba(0,0,0,.25));
-}
-@keyframes drop{
-  0%{
-    opacity:0;
-    transform:translate(-50%,0) rotate(0deg) scale(.45);
-  }
-  12%{opacity:1}
-  100%{
-    opacity:0;
-    transform:
-      translate(calc(-50% + var(--x)),var(--y))
-      rotate(var(--r))
-      scale(1.05);
-  }
+.msg {
+    max-width: 82%;
+    display: flex;
+    flex-direction: column;
 }
 
-.cardBody{padding:12px 13px 13px}
-.cardTop{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:6px;
-}
-.cardName{
-  font-weight:900;
-  font-size:13px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-.category{
-  font-size:9px;
-  padding:4px 6px;
-  border-radius:7px;
-  background:rgba(255,255,255,.08);
-  color:#9fa6b8;
-  font-weight:900;
-}
-.cardButtons{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:7px;
-  margin-top:10px;
-}
-.smallBtn{
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:9px;
-  padding:8px 5px;
-  background:rgba(255,255,255,.045);
-  color:#c5cad5;
-  font-size:10px;
-  font-weight:900;
-  cursor:pointer;
-}
-.smallBtn:hover{background:rgba(255,255,255,.1);color:#fff}
-body.light .smallBtn{background:#f8fafc;border-color:#e5e7eb;color:#475467}
+.msg.in { align-self: flex-start; }
+.msg.out { align-self: flex-end; }
 
-/* BOOST */
-.card.boost .stage{
-  animation:boostStage .35s ease;
-}
-.card.boost .flightPath{
-  animation-duration:.8s;
-}
-@keyframes boostStage{
-  50%{transform:scale(1.035)}
+.bubble {
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 14px;
+    line-height: 1.4;
 }
 
-/* LAUNCH */
-body.epic .card{
-  animation:epicCard .7s ease both;
+.msg.in .bubble {
+    background: #171d27;
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 4px;
 }
-@keyframes epicCard{
-  50%{transform:translateY(-8px) scale(1.025)}
-}
-body.epic .flightPath{animation-duration:1.1s}
 
-/* PREVIEW */
-.preview{
-  position:fixed;
-  z-index:50;
-  bottom:0;left:0;right:0;
-  padding:10px max(12px,calc((100vw - 1500px)/2 + 12px));
-  background:rgba(6,8,17,.88);
-  border-top:1px solid rgba(255,255,255,.10);
-  backdrop-filter:blur(22px);
+.msg.out .bubble {
+    background: linear-gradient(135deg, var(--accent), #ff527b);
+    border-bottom-right-radius: 4px;
 }
-body.light .preview{
-  background:rgba(255,255,255,.91);
-  border-color:#e5e7eb;
+
+.tr-text {
+    font-size: 11px;
+    margin-top: 4px;
+    opacity: 0.85;
 }
-.previewInner{
-  display:flex;
-  align-items:center;
-  gap:10px;
+
+.msg.in .tr-text { color: var(--success); }
+.msg.out .tr-text { text-align: right; }
+
+/* TOOLBAR & INPUT */
+.input-panel {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 8px;
 }
-.chat{
-  min-width:0;
-  flex:1;
-  height:54px;
-  border-radius:17px;
-  background:rgba(255,255,255,.06);
-  border:1px solid rgba(255,255,255,.08);
-  display:flex;
-  align-items:center;
-  padding:5px 8px;
-  gap:7px;
+
+.input-row {
+    display: flex;
+    gap: 6px;
 }
-body.light .chat{background:#f8fafc;border-color:#e5e7eb}
-.chatLabel{
-  font-size:9px;color:#7f8799;
-  padding:0 5px;font-weight:900;
+
+textarea {
+    flex: 1;
+    height: 42px;
+    resize: none;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: #090b10;
+    color: #fff;
+    padding: 10px;
+    font-size: 14px;
+    outline: none;
 }
-.sentSticker{
-  width:43px;height:43px;
-  display:grid;place-items:center;
-  font-size:29px;
-  border-radius:12px;
-  background:rgba(255,255,255,.06);
-  animation:sendPop .25s ease;
+
+.btn-action {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--key-bg);
+    color: #fff;
+    cursor: pointer;
+    font-size: 16px;
 }
-@keyframes sendPop{
-  from{transform:scale(.4);opacity:0}
-  to{transform:scale(1);opacity:1}
+
+.btn-send {
+    background: linear-gradient(135deg, var(--accent), #ff527b);
+    border: none;
 }
-.chatHint{
-  color:#71798b;font-size:11px;
-  overflow:hidden;white-space:nowrap;
+
+.link-bar {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
 }
-.buyButton{
-  flex-shrink:0;
-  border:0;border-radius:13px;
-  color:white;font-weight:900;
-  font-size:11px;padding:12px 15px;
-  cursor:pointer;
-  background:linear-gradient(135deg,#22c55e,#06b6d4);
+
+.btn-share-link {
+    flex: 1;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255, 59, 107, 0.15);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* KEYBOARD */
+.keyboard {
+    background: #07090d;
+    padding: 6px 3px 10px;
+    border-top: 1px solid var(--border);
+}
+
+.row {
+    display: flex;
+    gap: 3px;
+    margin-bottom: 5px;
+    justify-content: center;
+}
+
+.key {
+    flex: 1;
+    height: 40px;
+    max-width: 42px;
+    border: 0;
+    border-radius: 6px;
+    background: var(--key-bg);
+    color: var(--text);
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 2px 0 #000;
+}
+
+.key:active { transform: translateY(2px); }
+
+.key.sp {
+    flex: 1.5;
+    background: #111620;
+}
+
+.key.space { flex: 4; max-width: none; }
+
+.key.tr-btn {
+    background: linear-gradient(135deg, var(--accent), #ff527b);
+    font-weight: 700;
+    flex: 2;
 }
 
 /* TOAST */
-.toast{
-  position:fixed;
-  left:50%;
-  bottom:86px;
-  transform:translate(-50%,20px);
-  background:#171a28;
-  border:1px solid rgba(255,255,255,.12);
-  padding:11px 15px;
-  border-radius:12px;
-  font-size:12px;font-weight:800;
-  opacity:0;pointer-events:none;
-  transition:.25s;z-index:100;
-  box-shadow:0 15px 40px rgba(0,0,0,.35);
+.toast {
+    position: absolute;
+    top: 66px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    color: #000;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    z-index: 10;
 }
-.toast.show{
-  opacity:1;transform:translate(-50%,0)
-}
-
-/* MODAL */
-.modal{
-  position:fixed;inset:0;
-  background:rgba(0,0,0,.72);
-  backdrop-filter:blur(10px);
-  z-index:200;
-  display:none;
-  place-items:center;
-  padding:20px;
-}
-.modal.show{display:grid}
-.modalBox{
-  width:min(520px,100%);
-  background:#111522;
-  border:1px solid rgba(255,255,255,.1);
-  border-radius:24px;
-  padding:24px;
-  box-shadow:0 30px 100px rgba(0,0,0,.55);
-}
-body.light .modalBox{background:#fff;color:#111827}
-.modalBox h2{margin:0 0 10px;font-size:20px}
-.modalBox p,.modalBox li{color:#949caf;font-size:12px;line-height:1.7}
-.modalClose{
-  width:100%;margin-top:14px;
-  border:0;border-radius:12px;padding:11px;
-  background:#8b5cf6;color:#fff;font-weight:900;
-}
+.toast.show { opacity: 1; }
 </style>
 </head>
-
 <body>
 
 <div class="app">
+    <header class="header">
+        <div class="social-brand">
+            <div class="social-logo">LK</div>
+            <div>
+                <div style="font-weight:800; font-size:14px;">LinguaSocial</div>
+                <div class="room-info">Otaq: <span class="room-id" id="lblRoom">#LOBBY</span></div>
+            </div>
+        </div>
+        <div style="font-size:11px; color:var(--success);">● ONLINE</div>
+    </header>
 
-  <header class="header">
-    <div class="brand">
-      <div class="brandIcon">🚁</div>
-      <div>
-        <h1>Drone Celebration</h1>
-        <p>20 premium flying sticker designs</p>
-      </div>
+    <div class="chat-box" id="chatBox">
+        <div class="msg in">
+            <div class="bubble">Salam! Bu çata xoş gəldiniz. Qarşı tərəfə dəvət linki ataraq real-vaxt tərcüməli yazışa bilərsiniz.</div>
+            <div class="tr-text">🇬🇧 Welcome! Share the link to start live translation.</div>
+        </div>
     </div>
 
-    <div class="topActions">
-      <button class="btn launch" id="launchBtn">🚀 Launch All 20</button>
-      <button class="btn" id="exportBtn">📦 Export Pack ZIP</button>
-      <button class="btn buy">💎 Buy Full Pack $0.99</button>
-    </div>
-  </header>
-
-  <section class="controlPanel">
-    <div class="filters">
-      <button class="filter active" data-filter="All">All</button>
-      <button class="filter" data-filter="Love">❤️ Love</button>
-      <button class="filter" data-filter="Party">🎉 Party</button>
-      <button class="filter" data-filter="Az">🇦🇿 Az</button>
-      <button class="filter" data-filter="Business">💼 Business</button>
+    <div class="input-panel">
+        <div class="input-row">
+            <textarea id="txtInput" placeholder="Mesajı yazın..."></textarea>
+            <button class="btn-action btn-send" id="btnSend">➤</button>
+        </div>
+        <div class="link-bar">
+            <button class="btn-share-link" id="btnGenLink">🔗 Qarşı tərəf üçün Dəvət Linki Yarat</button>
+        </div>
     </div>
 
-    <button class="themeToggle" id="themeBtn">
-      🌙 Dark Neon / ☀️ Light
-    </button>
-  </section>
-
-  <main class="grid" id="grid"></main>
-</div>
-
-<!-- KEYBOARD PREVIEW -->
-<div class="preview">
-  <div class="previewInner">
-    <div class="chat">
-      <span class="chatLabel">KEYBOARD</span>
-      <div id="sentSticker" class="sentSticker">😊</div>
-      <span class="chatHint" id="chatHint">Tap a sticker to send it into the chat...</span>
+    <!-- AZERBAIJANI KEYBOARD -->
+    <div class="keyboard" id="keyboard">
+        <div class="row">
+            <button class="key">Q</button><button class="key">Ü</button><button class="key">E</button>
+            <button class="key">R</button><button class="key">T</button><button class="key">Y</button>
+            <button class="key">U</button><button class="key">İ</button><button class="key">O</button>
+            <button class="key">P</button><button class="key">Ö</button><button class="key">Ğ</button>
+        </div>
+        <div class="row">
+            <button class="key">A</button><button class="key">S</button><button class="key">D</button>
+            <button class="key">F</button><button class="key">G</button><button class="key">H</button>
+            <button class="key">J</button><button class="key">K</button><button class="key">L</button>
+            <button class="key">I</button><button class="key">Ə</button>
+        </div>
+        <div class="row">
+            <button class="key sp">⇧</button>
+            <button class="key">Z</button><button class="key">X</button><button class="key">C</button>
+            <button class="key">V</button><button class="key">B</button><button class="key">N</button>
+            <button class="key">M</button><button class="key">Ç</button><button class="key">Ş</button>
+            <button class="key sp" id="btnBack">⌫</button>
+        </div>
+        <div class="row">
+            <button class="key sp">123</button>
+            <button class="key space" id="btnSpace">space</button>
+            <button class="key tr-btn" id="btnTranslate">TƏRCÜMƏ</button>
+        </div>
     </div>
-    <button class="buyButton">💎 $0.99</button>
-  </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<div class="modal" id="modal">
-  <div class="modalBox">
-    <h2>📦 Export Sticker Pack</h2>
-    <p>This demo generates the 512×512 transparent PNG stickers directly in your browser.</p>
-    <ul>
-      <li>Download each PNG from its card.</li>
-      <li>Telegram: use a sticker pack bot and upload the PNG files.</li>
-      <li>WhatsApp: import the PNG stickers through a compatible sticker-pack app.</li>
-      <li>Recommended final format: 512×512 transparent PNG/WebP.</li>
-    </ul>
-    <p><strong>ZIP creation:</strong> a real ZIP requires a ZIP library or server-side packaging. This single-file version keeps the project dependency-free and provides the export workflow without pretending a ZIP was created.</p>
-    <button class="modalClose" id="closeModal">Close</button>
-  </div>
-</div>
-
 <script>
-/* =========================================================
-   DRONE DATA
-========================================================= */
-
-const drones = [
-  {
-    id:1,name:"Heart Drone",emoji:"🛸",
-    drops:["❤️","❤️","💗","💕"],
-    category:"Love",color:"#ec4899"
-  },
-  {
-    id:2,name:"Rose Drone",emoji:"🚁",
-    drops:["🌹","🌹","🌺","🌹"],
-    category:"Love",color:"#ef4444"
-  },
-  {
-    id:3,name:"Gift Drone",emoji:"🛸",
-    drops:["🎁","🎁","🎀","🎁"],
-    category:"Party",color:"#f59e0b"
-  },
-  {
-    id:4,name:"Confetti Drone",emoji:"🚁",
-    drops:["🎉","🎊","✨","🎉"],
-    category:"Party",color:"#a855f7"
-  },
-  {
-    id:5,name:"Az Flag Drone",emoji:"🛸",
-    drops:["🇦🇿","⭐","🇦🇿","✨"],
-    category:"Az",color:"#06b6d4"
-  },
-  {
-    id:6,name:"Love Letter Drone",emoji:"🚁",
-    drops:["💌","💌","💕","💌"],
-    category:"Love",color:"#f43f5e"
-  },
-  {
-    id:7,name:"Star Drone",emoji:"🛸",
-    drops:["⭐","🌟","✨","⭐"],
-    category:"Party",color:"#eab308"
-  },
-  {
-    id:8,name:"Camera Drone",emoji:"📸",
-    drops:["📸","🖼️","📸","✨"],
-    category:"Business",color:"#38bdf8"
-  },
-  {
-    id:9,name:"Money Drone",emoji:"🛸",
-    drops:["💸","💰","💵","💸"],
-    category:"Business",color:"#22c55e"
-  },
-  {
-    id:10,name:"Party Drone",emoji:"🚁",
-    drops:["🥳","🎂","🎉","🥳"],
-    category:"Party",color:"#d946ef"
-  },
-  {
-    id:11,name:"Flower Field Drone",emoji:"🛸",
-    drops:["🌸","🌺","🌷","🌻"],
-    category:"Love",color:"#fb7185"
-  },
-  {
-    id:12,name:"Kiss Drone",emoji:"🚁",
-    drops:["😘","💋","❤️","😘"],
-    category:"Love",color:"#f43f5e"
-  },
-  {
-    id:13,name:"Fireworks Drone",emoji:"🛸",
-    drops:["🎆","🎇","✨","🎆"],
-    category:"Party",color:"#8b5cf6"
-  },
-  {
-    id:14,name:"Rainbow Drone",emoji:"🚁",
-    drops:["🌈","✨","🌈","💖"],
-    category:"Party",color:"#06b6d4"
-  },
-  {
-    id:15,name:"Balloon Drone",emoji:"🛸",
-    drops:["🎈","🎈","🎈","💖"],
-    category:"Party",color:"#f97316"
-  },
-  {
-    id:16,name:"Crown Drone",emoji:"🚁",
-    drops:["👑","✨","👑","⭐"],
-    category:"Business",color:"#facc15"
-  },
-  {
-    id:17,name:"Angel Drone",emoji:"🛸",
-    drops:["😇","🕊️","✨","🤍"],
-    category:"Love",color:"#e2e8f0"
-  },
-  {
-    id:18,name:"Music Drone",emoji:"🚁",
-    drops:["🎵","🎶","🎵","🎶"],
-    category:"Party",color:"#6366f1"
-  },
-  {
-    id:19,name:"Sunset Drone",emoji:"🛸",
-    drops:["🌅","✨","🧡","🌅"],
-    category:"Party",color:"#f97316"
-  },
-  {
-    id:20,name:"Neon Cyber Drone",emoji:"🛸",
-    drops:["💎","💎","✨","🔷"],
-    category:"Business",color:"#00f5ff"
-  }
-];
-
-/* =========================================================
-   DOM
-========================================================= */
-
-const grid = document.getElementById("grid");
-const toast = document.getElementById("toast");
-const sentSticker = document.getElementById("sentSticker");
-const chatHint = document.getElementById("chatHint");
-
-let currentFilter = "All";
-let epicTimer = null;
-
-/* =========================================================
-   CREATE CARD
-========================================================= */
-
-function createCard(item){
-
-  const card = document.createElement("article");
-  card.className = "card";
-  card.dataset.category = item.category;
-
-  card.innerHTML = `
-    <div class="stage" style="--glow:${item.color}">
-      <div class="particles"></div>
-
-      <div class="flightPath">
-        <div class="trail"></div>
-        <div class="drone">${item.emoji}</div>
-      </div>
-    </div>
-
-    <div class="cardBody">
-      <div class="cardTop">
-        <div class="cardName">${item.id}. ${item.name}</div>
-        <div class="category">${item.category}</div>
-      </div>
-
-      <div class="cardButtons">
-        <button class="smallBtn copyBtn">COPY</button>
-        <button class="smallBtn pngBtn">DOWNLOAD PNG</button>
-      </div>
-    </div>
-  `;
-
-  const stage = card.querySelector(".stage");
-  const particles = card.querySelector(".particles");
-
-  /* Automatic 200ms drops */
-  let dropIndex = 0;
-
-  setInterval(()=>{
-    if(!document.body.contains(card)) return;
-
-    spawnParticle(
-      particles,
-      item.drops[dropIndex % item.drops.length]
-    );
-
-    dropIndex++;
-  },200);
-
-  /* Hover / tap boost */
-  const boost = ()=>{
-    card.classList.remove("boost");
-    void card.offsetWidth;
-    card.classList.add("boost");
-
-    for(let i=0;i<10;i++){
-      setTimeout(()=>{
-        spawnParticle(
-          particles,
-          item.drops[Math.floor(Math.random()*item.drops.length)],
-          true
-        );
-      },i*55);
+/**
+ * LinguaKey Social Core Engine
+ */
+class LinguaSocialEngine {
+    constructor() {
+        this.roomId = this.getOrCreateRoom();
+        this.input = document.getElementById('txtInput');
+        this.chat = document.getElementById('chatBox');
+        this.toast = document.getElementById('toast');
+        
+        document.getElementById('lblRoom').textContent = `#${this.roomId}`;
+        this.initEvents();
     }
-  };
 
-  stage.addEventListener("mouseenter",boost);
-  stage.addEventListener("click",()=>{
-    boost();
-    sendSticker(item);
-  });
-
-  /* Mobile tap card */
-  stage.addEventListener("touchstart",()=>{
-    boost();
-  },{passive:true});
-
-  card.querySelector(".copyBtn").addEventListener("click",(e)=>{
-    e.stopPropagation();
-    navigator.clipboard?.writeText(item.drops.join(" "));
-    showToast(item.name + " copied ✨");
-  });
-
-  card.querySelector(".pngBtn").addEventListener("click",(e)=>{
-    e.stopPropagation();
-    downloadPNG(item);
-  });
-
-  return card;
-}
-
-/* =========================================================
-   PARTICLES
-========================================================= */
-
-function spawnParticle(container,emoji,boost=false){
-
-  const p = document.createElement("div");
-  p.className = "particle";
-  p.textContent = emoji;
-
-  const x = (Math.random()*170-85).toFixed(0) + "px";
-  const y = (90+Math.random()*70).toFixed(0) + "px";
-  const r = (Math.random()*720-360).toFixed(0) + "deg";
-
-  p.style.setProperty("--x",x);
-  p.style.setProperty("--y",y);
-  p.style.setProperty("--r",r);
-
-  p.style.left = (45+Math.random()*10) + "%";
-  p.style.top = (55+Math.random()*12) + "px";
-
-  if(boost){
-    p.style.fontSize = (19+Math.random()*13) + "px";
-  }
-
-  container.appendChild(p);
-
-  setTimeout(()=>{
-    p.remove();
-  },1250);
-}
-
-/* =========================================================
-   RENDER
-========================================================= */
-
-function render(){
-
-  grid.innerHTML = "";
-
-  drones
-    .filter(d => currentFilter==="All" || d.category===currentFilter)
-    .forEach(d => grid.appendChild(createCard(d)));
-}
-
-render();
-
-/* =========================================================
-   FILTER
-========================================================= */
-
-document.querySelectorAll(".filter").forEach(button=>{
-  button.addEventListener("click",()=>{
-    document.querySelectorAll(".filter")
-      .forEach(b=>b.classList.remove("active"));
-
-    button.classList.add("active");
-    currentFilter = button.dataset.filter;
-
-    render();
-  });
-});
-
-/* =========================================================
-   LAUNCH ALL
-========================================================= */
-
-document.getElementById("launchBtn").addEventListener("click",()=>{
-
-  document.body.classList.remove("epic");
-  void document.body.offsetWidth;
-  document.body.classList.add("epic");
-
-  clearTimeout(epicTimer);
-
-  const cards = [...document.querySelectorAll(".card")];
-
-  cards.forEach((card,i)=>{
-    setTimeout(()=>{
-      card.classList.add("boost");
-
-      const particles = card.querySelector(".particles");
-      const item = drones.find(d =>
-        d.name === card.querySelector(".cardName").textContent.split(". ").slice(1).join(". ")
-      );
-
-      if(item){
-        for(let j=0;j<10;j++){
-          setTimeout(()=>{
-            spawnParticle(
-              particles,
-              item.drops[Math.floor(Math.random()*item.drops.length)],
-              true
-            );
-          },j*65);
+    getOrCreateRoom() {
+        const params = new URLSearchParams(window.location.search);
+        let room = params.get('room');
+        if (!room) {
+            room = Math.random().toString(36).substring(2, 8).toUpperCase();
         }
-      }
-    },i*45);
-  });
+        return room;
+    }
 
-  showToast("🚀 ALL DRONES LAUNCHED!");
+    initEvents() {
+        // Keyboard Handling
+        document.getElementById('keyboard').addEventListener('click', (e) => {
+            const btn = e.target.closest('.key');
+            if (!btn) return;
+            const txt = btn.textContent.trim();
 
-  epicTimer = setTimeout(()=>{
-    document.body.classList.remove("epic");
-  },2500);
-});
+            if (txt === '⌫') {
+                this.input.value = this.input.value.slice(0, -1);
+            } else if (txt === 'space') {
+                this.input.value += ' ';
+            } else if (txt === 'TƏRCÜMƏ') {
+                this.translateInput();
+            } else if (txt !== '123' && txt !== '⇧') {
+                this.input.value += txt;
+            }
+        });
 
-/* =========================================================
-   SEND TO KEYBOARD PREVIEW
-========================================================= */
+        document.getElementById('btnSend').onclick = () => this.sendMessage();
+        document.getElementById('btnGenLink').onclick = () => this.copyInviteLink();
+    }
 
-function sendSticker(item){
+    async translateText(text, fromLang, toLang) {
+        try {
+            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${fromLang}|${toLang}`;
+            const res = await fetch(url);
+            const data = await res.json();
+            return data.responseData ? data.responseData.translatedText : text;
+        } catch {
+            return text;
+        }
+    }
 
-  sentSticker.textContent = item.drops[
-    Math.floor(Math.random()*item.drops.length)
-  ];
+    async translateInput() {
+        const val = this.input.value.trim();
+        if (!val) return;
+        this.showToast('Tərcümə olunur...');
+        const tr = await this.translateText(val, 'az', 'en');
+        this.input.value = tr;
+    }
 
-  sentSticker.style.animation = "none";
-  void sentSticker.offsetWidth;
-  sentSticker.style.animation = "sendPop .25s ease";
+    async sendMessage() {
+        const val = this.input.value.trim();
+        if (!val) return;
 
-  chatHint.textContent = item.name + " sent to chat 💬";
+        const tr = await this.translateText(val, 'az', 'en');
+
+        const msgEl = document.createElement('div');
+        msgEl.className = 'msg out';
+        msgEl.innerHTML = `
+            <div class="bubble">${this.escape(val)}</div>
+            <div class="tr-text">🇬🇧 ${this.escape(tr)}</div>
+        `;
+        this.chat.appendChild(msgEl);
+        this.input.value = '';
+        this.chat.scrollTop = this.chat.scrollHeight;
+    }
+
+    copyInviteLink() {
+        const link = `${window.location.origin}${window.location.pathname}?room=${this.roomId}`;
+        navigator.clipboard.writeText(link);
+        this.showToast('Link kopyalandı! WhatsApp-da qarşı tərəfə atın.');
+    }
+
+    showToast(msg) {
+        this.toast.textContent = msg;
+        this.toast.classList.add('show');
+        setTimeout(() => this.toast.classList.remove('show'), 2500);
+    }
+
+    escape(str) {
+        return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+    }
 }
 
-/* =========================================================
-   CANVAS PNG EXPORT
-========================================================= */
-
-function downloadPNG(item){
-
-  const canvas = document.createElement("canvas");
-  canvas.width = 512;
-  canvas.height = 512;
-
-  const ctx = canvas.getContext("2d");
-
-  /*
-    Transparent background.
-    We create a premium soft glow without a background box.
-  */
-
-  const gradient = ctx.createRadialGradient(
-    256,256,20,
-    256,256,210
-  );
-
-  gradient.addColorStop(0,
-    hexToRGBA(item.color,.26)
-  );
-
-  gradient.addColorStop(1,
-    hexToRGBA(item.color,0)
-  );
-
-  ctx.fillStyle = gradient;
-  ctx.fillRect(30,30,452,452);
-
-  /* glow */
-  ctx.save();
-  ctx.shadowColor = item.color;
-  ctx.shadowBlur = 40;
-  ctx.font = "170px Arial";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText(item.emoji,256,245);
-  ctx.restore();
-
-  /* main emoji */
-  ctx.font = "170px Arial";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText(item.emoji,256,245);
-
-  /* small celebration accents */
-  ctx.font = "48px Arial";
-
-  const accents = item.drops.slice(0,3);
-
-  accents.forEach((em,i)=>{
-    const positions = [
-      [120,130],
-      [390,145],
-      [390,360]
-    ];
-
-    ctx.fillText(
-      em,
-      positions[i][0],
-      positions[i][1]
-    );
-  });
-
-  /* download */
-  const link = document.createElement("a");
-
-  link.download =
-    item.name.toLowerCase().replace(/[^a-z0-9]+/g,"-")
-    + "-512.png";
-
-  link.href = canvas.toDataURL("image/png");
-
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-
-  showToast("PNG exported • 512×512");
-}
-
-function hexToRGBA(hex,alpha){
-
-  hex = hex.replace("#","");
-
-  if(hex.length===3){
-    hex = hex.split("").map(x=>x+x).join("");
-  }
-
-  const r=parseInt(hex.substring(0,2),16);
-  const g=parseInt(hex.substring(2,4),16);
-  const b=parseInt(hex.substring(4,6),16);
-
-  return `rgba(${r},${g},${b},${alpha})`;
-}
-
-/* =========================================================
-   EXPORT PACK INFO
-========================================================= */
-
-document.getElementById("exportBtn").addEventListener("click",()=>{
-  document.getElementById("modal").classList.add("show");
-});
-
-document.getElementById("closeModal").addEventListener("click",()=>{
-  document.getElementById("modal").classList.remove("show");
-});
-
-document.getElementById("modal").addEventListener("click",(e)=>{
-  if(e.target.id==="modal"){
-    document.getElementById("modal").classList.remove("show");
-  }
-});
-
-/* =========================================================
-   THEME
-========================================================= */
-
-document.getElementById("themeBtn").addEventListener("click",()=>{
-  document.body.classList.toggle("light");
-
-  showToast(
-    document.body.classList.contains("light")
-      ? "☀️ Light theme"
-      : "🌙 Dark Neon theme"
-  );
-});
-
-/* =========================================================
-   BUY BUTTONS
-========================================================= */
-
-document.querySelectorAll(".buy,.buyButton").forEach(button=>{
-  button.addEventListener("click",()=>{
-    showToast("💎 Full Pack checkout placeholder • $0.99");
-  });
-});
-
-/* =========================================================
-   TOAST
-========================================================= */
-
-let toastTimer;
-
-function showToast(message){
-
-  toast.textContent = message;
-  toast.classList.add("show");
-
-  clearTimeout(toastTimer);
-
-  toastTimer = setTimeout(()=>{
-    toast.classList.remove("show");
-  },1800);
-}
-
-/* =========================================================
-   60FPS MICRO ANIMATION LOOP
-========================================================= */
-
-let animationTime = 0;
-
-function animationLoop(time){
-
-  animationTime = time;
-
-  /*
-    requestAnimationFrame keeps the visual engine synchronized
-    with the browser's display refresh rate.
-  */
-
-  requestAnimationFrame(animationLoop);
-}
-
-requestAnimationFrame(animationLoop);
-
-/* =========================================================
-   KEYBOARD SHORTCUTS
-========================================================= */
-
-document.addEventListener("keydown",(e)=>{
-
-  if(e.code==="Space" && e.target.tagName!=="INPUT"){
-    e.preventDefault();
-    document.getElementById("launchBtn").click();
-  }
-
-  if(e.key==="Escape"){
-    document.getElementById("modal").classList.remove("show");
-  }
-});
+document.addEventListener('DOMContentLoaded', () => new LinguaSocialEngine());
 </script>
-
 </body>
-    </html>
+</html>
