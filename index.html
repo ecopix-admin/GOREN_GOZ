@@ -1,649 +1,1052 @@
 <!DOCTYPE html>
-<html lang="az" class="dark h-full">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gboard 2030 - F1 Cockpit Edition</title>
-    <!-- Tailwind CSS v3 CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        cyber: {
-                            bg: '#0a0d14',
-                            surface: '#121824',
-                            accent: '#00f0ff',
-                            secondary: '#ff007f'
-                        }
-                    }
-                }
-            }
-        };
-    </script>
-    <style>
-        * {
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Drone Celebration Stickers</title>
 
-        body {
-            background-color: #080a0f;
-            color: #e2e8f0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            overflow: hidden;
-        }
+<script src="https://cdn.tailwindcss.com"></script>
 
-        .glass-panel {
-            background: rgba(18, 24, 36, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{
+  background:
+    radial-gradient(circle at 10% 10%,rgba(168,85,247,.16),transparent 28%),
+    radial-gradient(circle at 90% 15%,rgba(6,182,212,.13),transparent 25%),
+    radial-gradient(circle at 50% 100%,rgba(236,72,153,.10),transparent 30%),
+    #070912;
+  color:#fff;
+}
+body.light{
+  background:
+    radial-gradient(circle at 10% 10%,rgba(236,72,153,.12),transparent 30%),
+    radial-gradient(circle at 90% 20%,rgba(59,130,246,.12),transparent 30%),
+    #f5f7fb;
+  color:#111827;
+}
 
-        .glass-window {
-            background: rgba(15, 20, 32, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.8), 0 0 15px rgba(var(--theme-glow-rgb, 0, 240, 255), 0.3);
-        }
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-thumb{background:#34384c;border-radius:20px}
 
-        .keyboard-key {
-            position: relative;
-            background: var(--key-bg, rgba(255, 255, 255, 0.07));
-            border: 1px solid var(--key-border, rgba(255, 255, 255, 0.08));
-            color: var(--key-text, #f1f5f9);
-            border-radius: 0.625rem;
-            box-shadow: 0 3px 0 var(--key-shadow, rgba(0,0,0,0.4)), inset 0 1px 0 rgba(255,255,255,0.1);
-            transition: transform 0.06s ease, background-color 0.1s ease, box-shadow 0.06s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 500;
-            font-size: 1.15rem;
-            cursor: pointer;
-            overflow: hidden;
-        }
+.app{
+  width:min(1500px,100%);
+  margin:auto;
+  padding:22px 18px 170px;
+}
 
-        .keyboard-key:active, .keyboard-key.key-pressed {
-            transform: scale(0.88) translateY(2px);
-            box-shadow: 0 0 12px var(--theme-accent, #00f0ff), inset 0 1px 0 rgba(255,255,255,0.3);
-            background: var(--key-active-bg, rgba(0, 240, 255, 0.25)) !important;
-            color: #ffffff;
-        }
+/* HEADER */
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  margin-bottom:20px;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:13px;
+}
+.brandIcon{
+  width:52px;height:52px;border-radius:17px;
+  display:grid;place-items:center;
+  font-size:29px;
+  background:linear-gradient(135deg,#ec4899,#8b5cf6,#06b6d4);
+  box-shadow:0 0 35px rgba(236,72,153,.35);
+}
+.brand h1{font-size:22px;margin:0;font-weight:900;letter-spacing:-.6px}
+.brand p{margin:2px 0 0;color:#9299ad;font-size:12px}
 
-        .keyboard-key.special-key {
-            background: var(--special-key-bg, rgba(255, 255, 255, 0.12));
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
+.topActions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{
+  border:1px solid rgba(255,255,255,.10);
+  color:#fff;background:rgba(255,255,255,.055);
+  border-radius:13px;padding:10px 14px;
+  font-weight:800;font-size:12px;
+  cursor:pointer;transition:.2s;
+  backdrop-filter:blur(12px);
+}
+.btn:hover{transform:translateY(-2px);background:rgba(255,255,255,.10)}
+.launch{
+  border:0;
+  background:linear-gradient(135deg,#ec4899,#8b5cf6);
+  box-shadow:0 8px 30px rgba(139,92,246,.28);
+}
+.buy{
+  border:0;
+  background:linear-gradient(135deg,#22c55e,#06b6d4);
+  box-shadow:0 8px 30px rgba(34,197,94,.2);
+}
 
-        .keyboard-key.action-key {
-            background: var(--theme-accent, #00f0ff);
-            color: #000000;
-            font-weight: 700;
-            box-shadow: 0 3px 0 rgba(0,0,0,0.5), 0 0 10px var(--theme-accent, #00f0ff);
-        }
+body.light .btn{color:#111827;background:#fff;border-color:#e5e7eb}
+body.light .brand p{color:#6b7280}
 
-        #particle-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 40;
-        }
+/* CONTROLS */
+.controlPanel{
+  padding:13px;
+  border:1px solid rgba(255,255,255,.09);
+  background:rgba(15,18,32,.72);
+  border-radius:18px;
+  backdrop-filter:blur(18px);
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:20px;
+}
+body.light .controlPanel{
+  background:rgba(255,255,255,.86);
+  border-color:#e5e7eb;
+}
+.filters{display:flex;gap:7px;flex-wrap:wrap}
+.filter{
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.04);
+  color:#aeb4c4;
+  padding:8px 13px;border-radius:10px;
+  cursor:pointer;font-size:12px;font-weight:800;
+}
+.filter.active{
+  color:#fff;
+  background:linear-gradient(135deg,#8b5cf6,#ec4899);
+  border-color:transparent;
+}
+body.light .filter{color:#667085;background:#f3f4f6;border-color:#e5e7eb}
+body.light .filter.active{color:#fff}
 
-        #f1-canvas {
-            position: absolute;
-            top: -12px;
-            left: -12px;
-            width: calc(100% + 24px);
-            height: calc(100% + 24px);
-            pointer-events: none;
-            z-index: 30;
-            border-radius: 2.2rem;
-        }
+.themeToggle{
+  display:flex;align-items:center;gap:7px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:10px;padding:8px 12px;
+  background:rgba(255,255,255,.04);
+  color:#aaa;cursor:pointer;font-size:12px;font-weight:800;
+}
 
-        .accent-popup {
-            position: absolute;
-            bottom: 110%;
-            left: 50%;
-            transform: translateX(-50%) scale(0.9);
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            background: rgba(18, 24, 38, 0.95);
-            border: 1px solid var(--theme-accent, #00f0ff);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5), 0 0 15px var(--theme-accent, #00f0ff);
-            border-radius: 0.75rem;
-            display: flex;
-            gap: 0.25rem;
-            padding: 0.35rem;
-            z-index: 100;
-        }
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:16px;
+}
+@media(max-width:1050px){
+  .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:720px){
+  .app{padding:14px 10px 170px}
+  .header{align-items:flex-start}
+  .topActions{justify-content:flex-end}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .brand h1{font-size:18px}
+  .brandIcon{width:44px;height:44px}
+  .btn{padding:9px 10px}
+}
+@media(max-width:430px){
+  .header{flex-direction:column}
+  .topActions{width:100%}
+}
 
-        .accent-popup.active {
-            opacity: 1;
-            pointer-events: auto;
-            transform: translateX(-50%) scale(1);
-        }
+/* CARD */
+.card{
+  position:relative;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:21px;
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.025));
+  box-shadow:
+    0 15px 45px rgba(0,0,0,.25),
+    inset 0 1px rgba(255,255,255,.04);
+  transition:.3s;
+}
+.card:hover{
+  transform:translateY(-5px);
+  border-color:rgba(255,255,255,.18);
+  box-shadow:0 20px 55px rgba(0,0,0,.35);
+}
+body.light .card{
+  background:#fff;
+  border-color:#e5e7eb;
+  box-shadow:0 12px 35px rgba(15,23,42,.08);
+}
 
-        .accent-option {
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.5rem;
-            background: rgba(255,255,255,0.05);
-            color: white;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
+.stage{
+  height:180px;
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 45%,var(--glow),transparent 40%),
+    linear-gradient(180deg,rgba(255,255,255,.025),transparent);
+}
+.stage:before{
+  content:"";
+  position:absolute;inset:0;
+  background-image:
+    radial-gradient(circle,rgba(255,255,255,.45) 1px,transparent 1px);
+  background-size:36px 36px;
+  opacity:.08;
+  animation:stars 7s linear infinite;
+}
+@keyframes stars{
+  to{background-position:-36px 36px}
+}
 
-        .accent-option:hover, .accent-option:active {
-            background: var(--theme-accent, #00f0ff);
-            color: black;
-        }
+.flightPath{
+  position:absolute;
+  left:-65px;
+  top:48%;
+  width:360px;
+  height:80px;
+  animation:flight 3.8s linear infinite;
+}
+@keyframes flight{
+  0%{transform:translateX(-80px) translateY(10px)}
+  45%{transform:translateX(75px) translateY(-13px)}
+  100%{transform:translateX(300px) translateY(8px)}
+}
 
-        ::-webkit-scrollbar {
-            height: 4px;
-            width: 4px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.1);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2);
-            border-radius: 10px;
-        }
+.drone{
+  position:absolute;
+  left:50%;
+  top:28px;
+  transform:translateX(-50%);
+  width:64px;height:55px;
+  display:grid;place-items:center;
+  font-size:45px;
+  z-index:5;
+  filter:drop-shadow(0 0 12px var(--glow));
+}
+.drone:before,.drone:after{
+  content:"";
+  position:absolute;
+  width:42px;height:6px;
+  top:5px;
+  border-radius:50%;
+  background:rgba(255,255,255,.32);
+  filter:blur(3px);
+  animation:propeller .08s linear infinite;
+}
+.drone:before{left:-17px}
+.drone:after{right:-17px}
+@keyframes propeller{
+  50%{transform:scaleX(.45)}
+}
+.flightPath .drone{
+  animation:droneBob .55s ease-in-out infinite alternate;
+}
+@keyframes droneBob{
+  from{margin-top:-2px}
+  to{margin-top:5px}
+}
 
-        .resize-handle {
-            position: absolute;
-            right: 2px;
-            bottom: 2px;
-            width: 16px;
-            height: 16px;
-            cursor: se-resize;
-            border-right: 2px solid var(--theme-accent, #00f0ff);
-            border-bottom: 2px solid var(--theme-accent, #00f0ff);
-        }
+.trail{
+  position:absolute;
+  left:5px;top:51px;
+  width:145px;height:4px;
+  border-radius:99px;
+  background:linear-gradient(90deg,transparent,var(--glow));
+  filter:blur(3px);
+  opacity:.85;
+}
 
-        .subscript-symbol {
-            position: absolute;
-            top: 2px;
-            right: 4px;
-            font-size: 0.6rem;
-            opacity: 0.5;
-            font-weight: 400;
-        }
+/* PARTICLES */
+.particles{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
+.particle{
+  position:absolute;
+  left:50%;
+  top:67px;
+  font-size:22px;
+  z-index:4;
+  animation:drop 1.2s linear forwards;
+  filter:drop-shadow(0 2px 5px rgba(0,0,0,.25));
+}
+@keyframes drop{
+  0%{
+    opacity:0;
+    transform:translate(-50%,0) rotate(0deg) scale(.45);
+  }
+  12%{opacity:1}
+  100%{
+    opacity:0;
+    transform:
+      translate(calc(-50% + var(--x)),var(--y))
+      rotate(var(--r))
+      scale(1.05);
+  }
+}
 
-        .window-open {
-            animation: windowPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-        .window-close {
-            animation: windowShrink 0.2s ease-in forwards;
-        }
+.cardBody{padding:12px 13px 13px}
+.cardTop{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+}
+.cardName{
+  font-weight:900;
+  font-size:13px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.category{
+  font-size:9px;
+  padding:4px 6px;
+  border-radius:7px;
+  background:rgba(255,255,255,.08);
+  color:#9fa6b8;
+  font-weight:900;
+}
+.cardButtons{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin-top:10px;
+}
+.smallBtn{
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:9px;
+  padding:8px 5px;
+  background:rgba(255,255,255,.045);
+  color:#c5cad5;
+  font-size:10px;
+  font-weight:900;
+  cursor:pointer;
+}
+.smallBtn:hover{background:rgba(255,255,255,.1);color:#fff}
+body.light .smallBtn{background:#f8fafc;border-color:#e5e7eb;color:#475467}
 
-        @keyframes windowPop {
-            0% { opacity: 0; transform: scale(0.7) translateY(20px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        @keyframes windowShrink {
-            0% { opacity: 1; transform: scale(1) translateY(0); }
-            100% { opacity: 0; transform: scale(0.7) translateY(20px); }
-        }
+/* BOOST */
+.card.boost .stage{
+  animation:boostStage .35s ease;
+}
+.card.boost .flightPath{
+  animation-duration:.8s;
+}
+@keyframes boostStage{
+  50%{transform:scale(1.035)}
+}
 
-        .nitro-boost {
-            box-shadow: 0 0 35px var(--theme-accent, #00f0ff), inset 0 0 15px rgba(255,255,255,0.5) !important;
-        }
+/* LAUNCH */
+body.epic .card{
+  animation:epicCard .7s ease both;
+}
+@keyframes epicCard{
+  50%{transform:translateY(-8px) scale(1.025)}
+}
+body.epic .flightPath{animation-duration:1.1s}
 
-        /* Virtual Cursor Blink */
-        .custom-cursor {
-            display: inline-block;
-            width: 2px;
-            height: 1.2em;
-            background-color: var(--theme-accent, #00f0ff);
-            vertical-align: middle;
-            animation: blink 1s step-end infinite;
-        }
-        @keyframes blink {
-            50% { opacity: 0; }
-        }
-    </style>
+/* PREVIEW */
+.preview{
+  position:fixed;
+  z-index:50;
+  bottom:0;left:0;right:0;
+  padding:10px max(12px,calc((100vw - 1500px)/2 + 12px));
+  background:rgba(6,8,17,.88);
+  border-top:1px solid rgba(255,255,255,.10);
+  backdrop-filter:blur(22px);
+}
+body.light .preview{
+  background:rgba(255,255,255,.91);
+  border-color:#e5e7eb;
+}
+.previewInner{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.chat{
+  min-width:0;
+  flex:1;
+  height:54px;
+  border-radius:17px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.08);
+  display:flex;
+  align-items:center;
+  padding:5px 8px;
+  gap:7px;
+}
+body.light .chat{background:#f8fafc;border-color:#e5e7eb}
+.chatLabel{
+  font-size:9px;color:#7f8799;
+  padding:0 5px;font-weight:900;
+}
+.sentSticker{
+  width:43px;height:43px;
+  display:grid;place-items:center;
+  font-size:29px;
+  border-radius:12px;
+  background:rgba(255,255,255,.06);
+  animation:sendPop .25s ease;
+}
+@keyframes sendPop{
+  from{transform:scale(.4);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+.chatHint{
+  color:#71798b;font-size:11px;
+  overflow:hidden;white-space:nowrap;
+}
+.buyButton{
+  flex-shrink:0;
+  border:0;border-radius:13px;
+  color:white;font-weight:900;
+  font-size:11px;padding:12px 15px;
+  cursor:pointer;
+  background:linear-gradient(135deg,#22c55e,#06b6d4);
+}
+
+/* TOAST */
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:86px;
+  transform:translate(-50%,20px);
+  background:#171a28;
+  border:1px solid rgba(255,255,255,.12);
+  padding:11px 15px;
+  border-radius:12px;
+  font-size:12px;font-weight:800;
+  opacity:0;pointer-events:none;
+  transition:.25s;z-index:100;
+  box-shadow:0 15px 40px rgba(0,0,0,.35);
+}
+.toast.show{
+  opacity:1;transform:translate(-50%,0)
+}
+
+/* MODAL */
+.modal{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.72);
+  backdrop-filter:blur(10px);
+  z-index:200;
+  display:none;
+  place-items:center;
+  padding:20px;
+}
+.modal.show{display:grid}
+.modalBox{
+  width:min(520px,100%);
+  background:#111522;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:24px;
+  padding:24px;
+  box-shadow:0 30px 100px rgba(0,0,0,.55);
+}
+body.light .modalBox{background:#fff;color:#111827}
+.modalBox h2{margin:0 0 10px;font-size:20px}
+.modalBox p,.modalBox li{color:#949caf;font-size:12px;line-height:1.7}
+.modalClose{
+  width:100%;margin-top:14px;
+  border:0;border-radius:12px;padding:11px;
+  background:#8b5cf6;color:#fff;font-weight:900;
+}
+</style>
 </head>
-<body class="h-full w-full flex flex-col justify-between overflow-hidden bg-slate-950 text-slate-100 antialiased">
 
-    <!-- TOP SECTION: DISPLAY AREA -->
-    <main class="flex-1 flex flex-col p-3 max-w-4xl w-full mx-auto relative z-10 min-h-0">
-        <header class="flex items-center justify-between pb-2 border-b border-slate-800/80 mb-2 shrink-0">
-            <div class="flex items-center gap-2">
-                <div class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></div>
-                <h1 class="text-xs font-black tracking-widest uppercase text-cyan-400 font-mono">Gboard 2030 // F1 Cockpit</h1>
-            </div>
-            <div class="flex items-center gap-3 text-xs font-mono text-slate-400">
-                <span id="speed-telemetry" class="text-cyan-400 font-bold">300 KM/H</span>
-                <span id="fps-counter" class="text-emerald-400">60 FPS</span>
-            </div>
-        </header>
+<body>
 
-        <!-- Dynamic Output Box (Virtual Display - Native Keyboard Disabled) -->
-        <div class="relative flex-1 flex flex-col min-h-0">
-            <div id="app-display" 
-                class="w-full flex-1 glass-panel rounded-2xl p-4 text-lg font-normal text-slate-100 overflow-y-auto whitespace-pre-wrap break-words leading-relaxed"
-                tabindex="-1">
-                <span id="text-content"></span><span class="custom-cursor"></span>
-            </div>
-            
-            <div class="absolute bottom-3 right-3 flex items-center gap-2">
-                <button id="clear-text-btn" class="px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-rose-900/40 text-slate-300 hover:text-rose-400 text-xs font-mono border border-slate-700/50 transition">
-                    CLEAR
-                </button>
-                <button id="copy-text-btn" class="px-3 py-1.5 rounded-lg bg-cyan-950/60 hover:bg-cyan-900/80 text-cyan-400 text-xs font-mono border border-cyan-800/50 transition flex items-center gap-1">
-                    <span>COPY</span>
-                </button>
-            </div>
-        </div>
-    </main>
+<div class="app">
 
-    <!-- KEYBOARD CONTAINER -->
-    <div id="keyboard-wrapper" class="relative w-full max-w-4xl mx-auto px-2 pb-2 z-20 transition-all duration-300 shrink-0">
-        
-        <canvas id="f1-canvas"></canvas>
-        <canvas id="particle-canvas"></canvas>
-
-        <div id="keyboard-container" class="relative glass-panel rounded-t-[2rem] rounded-b-2xl p-2 shadow-2xl transition-colors duration-300 flex flex-col justify-between" style="height: 46vh; max-height: 440px; min-height: 300px;">
-            
-            <!-- SUGGESTIONS BAR -->
-            <div id="suggestion-bar" class="flex items-center justify-between px-2 py-1 mb-1 border-b border-white/5 text-sm font-medium h-8 gap-2 shrink-0">
-                <div class="flex items-center gap-1 text-xs text-slate-400 font-mono pr-2 border-r border-white/10 shrink-0">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                    <span id="current-lang-indicator">AZ</span>
-                </div>
-                <div class="flex-1 grid grid-cols-3 gap-2 text-center">
-                    <button class="suggestion-chip truncate px-2 py-0.5 rounded-md hover:bg-white/10 text-slate-200 transition">salam</button>
-                    <button class="suggestion-chip truncate px-2 py-0.5 rounded-md hover:bg-white/10 font-semibold text-cyan-300 transition">necəsiniz</button>
-                    <button class="suggestion-chip truncate px-2 py-0.5 rounded-md hover:bg-white/10 text-slate-200 transition">yaxşı</button>
-                </div>
-                <div class="flex items-center gap-1 shrink-0 pl-1">
-                    <button id="f1-toggle-btn" class="p-1 rounded-md bg-white/5 hover:bg-white/10 text-xs font-mono transition">
-                        🏁 <span id="f1-status-text" class="text-[10px] text-cyan-400 font-bold">ON</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- TOOLBAR & THEMES -->
-            <div class="flex items-center justify-between gap-1 mb-1 px-1 shrink-0">
-                <div class="flex items-center gap-1 shrink-0">
-                    <button id="google-search-btn" class="w-7 h-7 rounded-full bg-slate-800/80 border border-slate-700/60 flex items-center justify-center font-black text-cyan-400 text-xs shadow">G</button>
-                    <button id="translator-btn" class="px-2 h-7 rounded-full bg-slate-800/80 border border-slate-700/60 flex items-center gap-1 font-medium text-xs text-slate-200 shadow">
-                        <span>🌐</span> <span class="hidden sm:inline">Tərcümə</span>
-                    </button>
-                    <button id="sound-toggle-btn" class="w-7 h-7 rounded-full bg-slate-800/80 border border-slate-700/60 flex items-center justify-center text-xs shadow">🔊</button>
-                </div>
-
-                <div class="flex-1 overflow-x-auto no-scrollbar flex items-center gap-1.5 px-2 py-0.5">
-                    <button data-theme="neon-blue" class="theme-chip shrink-0 px-2 py-0.5 rounded-full text-[10px] bg-cyan-950 text-cyan-400 border border-cyan-500/50">Neon Blue</button>
-                    <button data-theme="cyber-pink" class="theme-chip shrink-0 px-2 py-0.5 rounded-full text-[10px] bg-pink-950 text-pink-400 border border-pink-500/30">Cyber Pink</button>
-                    <button data-theme="fire-red" class="theme-chip shrink-0 px-2 py-0.5 rounded-full text-[10px] bg-red-950 text-red-400 border border-red-500/30">Fire Red</button>
-                    <button data-theme="acid-green" class="theme-chip shrink-0 px-2 py-0.5 rounded-full text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-500/30">Acid Green</button>
-                    <button data-theme="az-flag" class="theme-chip shrink-0 px-2 py-0.5 rounded-full text-[10px] bg-gradient-to-r from-blue-900 via-red-900 to-emerald-900 text-white border border-white/20">AZ Flag</button>
-                </div>
-            </div>
-
-            <!-- KEYBOARD GRID -->
-            <div id="keyboard-grid" class="flex-1 flex flex-col justify-between gap-1 select-none relative"></div>
-        </div>
-
-        <div id="accent-popup-container" class="accent-popup"></div>
-
-        <!-- MINI WINDOWS -->
-        <div id="google-window" class="hidden absolute top-2 left-1/2 -translate-x-1/2 glass-window rounded-xl border border-cyan-500/40 z-50 flex flex-col overflow-hidden shadow-2xl" style="width: 88%; height: 200px;">
-            <div class="window-drag-handle bg-slate-900/90 px-3 py-1.5 flex items-center justify-between cursor-move border-b border-white/10">
-                <span class="text-xs font-bold text-slate-200">Google Search Cockpit</span>
-                <button class="window-close-btn p-1 text-slate-400">✕</button>
-            </div>
-            <div class="p-2 flex-1 flex flex-col gap-2 bg-slate-950/80">
-                <form id="google-search-form" class="flex items-center gap-1.5">
-                    <input id="google-search-input" type="text" placeholder="Search Google..." class="flex-1 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-white" />
-                    <button type="submit" class="px-2.5 py-1 bg-cyan-500 text-black font-bold text-xs rounded">Go</button>
-                </form>
-                <div id="google-results-container" class="flex-1 overflow-y-auto rounded bg-slate-900/50 p-2 text-xs text-slate-300"></div>
-            </div>
-            <div class="resize-handle"></div>
-        </div>
-
-        <div id="translator-window" class="hidden absolute top-2 left-1/2 -translate-x-1/2 glass-window rounded-xl border border-indigo-500/40 z-50 flex flex-col overflow-hidden shadow-2xl" style="width: 90%; height: 210px;">
-            <div class="window-drag-handle bg-slate-900/90 px-3 py-1.5 flex items-center justify-between cursor-move border-b border-white/10">
-                <span class="text-xs font-bold text-slate-200">Neural Instant Translator</span>
-                <button class="window-close-btn p-1 text-slate-400">✕</button>
-            </div>
-            <div class="p-2 flex-1 flex flex-col justify-between gap-1.5 bg-slate-950/80">
-                <div class="flex items-center justify-between text-xs">
-                    <select id="trans-lang-pair" class="bg-slate-900 border border-slate-700 text-cyan-300 rounded px-1.5 py-0.5">
-                        <option value="az|en">AZ ➔ EN</option>
-                        <option value="en|az">EN ➔ AZ</option>
-                        <option value="en|ru">EN ➔ RU</option>
-                    </select>
-                    <button id="exec-translate-btn" class="px-2.5 py-0.5 bg-indigo-600 text-white font-bold text-xs rounded">Translate</button>
-                </div>
-                <div class="grid grid-cols-2 gap-2 flex-1 min-h-0">
-                    <textarea id="trans-source-text" class="bg-slate-900 border border-slate-800 rounded p-1 text-xs text-slate-200 resize-none" placeholder="Source text..."></textarea>
-                    <div id="trans-target-text" class="bg-slate-900/40 border border-slate-800 rounded p-1 text-xs text-emerald-300 overflow-y-auto"></div>
-                </div>
-                <div class="flex items-center justify-end gap-1.5">
-                    <button id="trans-copy-btn" class="px-2 py-0.5 bg-slate-800 text-slate-200 text-xs rounded">Copy</button>
-                    <button id="trans-replace-btn" class="px-2 py-0.5 bg-cyan-600 text-black font-bold text-xs rounded">Replace</button>
-                </div>
-            </div>
-            <div class="resize-handle"></div>
-        </div>
+  <header class="header">
+    <div class="brand">
+      <div class="brandIcon">🚁</div>
+      <div>
+        <h1>Drone Celebration</h1>
+        <p>20 premium flying sticker designs</p>
+      </div>
     </div>
 
-    <script>
-        const state = {
-            currentLang: 'AZ',
-            layoutMode: 'alpha',
-            isShifted: false,
-            isCapsLocked: false,
-            f1Enabled: true,
-            soundEnabled: true,
-            theme: 'neon-blue',
-            nitroEndTime: 0,
-            textBuffer: '',
-            cursorPos: 0
-        };
+    <div class="topActions">
+      <button class="btn launch" id="launchBtn">🚀 Launch All 20</button>
+      <button class="btn" id="exportBtn">📦 Export Pack ZIP</button>
+      <button class="btn buy">💎 Buy Full Pack $0.99</button>
+    </div>
+  </header>
 
-        const THEMES = {
-            'neon-blue': { accent: '#00f0ff', glowRgb: '0, 240, 255', keyBg: 'rgba(0, 240, 255, 0.08)', keyText: '#e2e8f0', cars: ['#00f0ff', '#ff007f', '#00ff88'] },
-            'cyber-pink': { accent: '#ff007f', glowRgb: '255, 0, 127', keyBg: 'rgba(255, 0, 127, 0.08)', keyText: '#fce7f3', cars: ['#ff007f', '#00f0ff', '#ffb700'] },
-            'fire-red': { accent: '#ff3300', glowRgb: '255, 51, 0', keyBg: 'rgba(255, 51, 0, 0.1)', keyText: '#fee2e2', cars: ['#ff3300', '#ffcc00', '#ff0055'] },
-            'acid-green': { accent: '#00ff66', glowRgb: '0, 255, 102', keyBg: 'rgba(0, 255, 102, 0.08)', keyText: '#dcfce7', cars: ['#00ff66', '#00ffff', '#ccff00'] },
-            'az-flag': { accent: '#e11d48', glowRgb: '225, 29, 72', keyBg: 'rgba(14, 165, 233, 0.12)', keyText: '#ffffff', cars: ['#00a8ff', '#e11d48', '#00b894'] }
-        };
+  <section class="controlPanel">
+    <div class="filters">
+      <button class="filter active" data-filter="All">All</button>
+      <button class="filter" data-filter="Love">❤️ Love</button>
+      <button class="filter" data-filter="Party">🎉 Party</button>
+      <button class="filter" data-filter="Az">🇦🇿 Az</button>
+      <button class="filter" data-filter="Business">💼 Business</button>
+    </div>
 
-        const LAYOUTS = {
-            AZ: [
-                ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'ö', 'ü'],
-                ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'ı', 'ə'],
-                ['shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'ş', 'ç', 'ğ', 'backspace'],
-                ['123', 'globe', 'space', '.', 'enter']
-            ],
-            EN: [
-                ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
-                ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-                ['shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'backspace'],
-                ['123', 'globe', 'space', '.', 'enter']
-            ],
-            NUMBERS: [
-                ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
-                ['@', '#', '$', '_', '&', '-', '+', '(', ')', '/'],
-                ['ABC', '*', '"', '\'', ':', ';', '!', '?', 'backspace'],
-                ['ABC', 'globe', 'space', ',', 'enter']
-            ]
-        };
+    <button class="themeToggle" id="themeBtn">
+      🌙 Dark Neon / ☀️ Light
+    </button>
+  </section>
 
-        const ACCENT_MAP = {
-            'a': ['a', 'ə'], 'e': ['e', 'ə'], 'o': ['o', 'ö'], 'u': ['u', 'ü'], 'i': ['i', 'ı'], 's': ['s', 'ş'], 'c': ['c', 'ç'], 'g': ['g', 'ğ']
-        };
+  <main class="grid" id="grid"></main>
+</div>
 
-        const textContentEl = document.getElementById('text-content');
-        const keyboardGridEl = document.getElementById('keyboard-grid');
-        const accentPopupEl = document.getElementById('accent-popup-container');
-        const currentLangEl = document.getElementById('current-lang-indicator');
-        const f1Canvas = document.getElementById('f1-canvas');
-        const f1Ctx = f1Canvas.getContext('2d');
-        const particleCanvas = document.getElementById('particle-canvas');
-        const particleCtx = particleCanvas.getContext('2d');
+<!-- KEYBOARD PREVIEW -->
+<div class="preview">
+  <div class="previewInner">
+    <div class="chat">
+      <span class="chatLabel">KEYBOARD</span>
+      <div id="sentSticker" class="sentSticker">😊</div>
+      <span class="chatHint" id="chatHint">Tap a sticker to send it into the chat...</span>
+    </div>
+    <button class="buyButton">💎 $0.99</button>
+  </div>
+</div>
 
-        function updateDisplay() {
-            textContentEl.textContent = state.textBuffer;
+<div class="toast" id="toast"></div>
+
+<div class="modal" id="modal">
+  <div class="modalBox">
+    <h2>📦 Export Sticker Pack</h2>
+    <p>This demo generates the 512×512 transparent PNG stickers directly in your browser.</p>
+    <ul>
+      <li>Download each PNG from its card.</li>
+      <li>Telegram: use a sticker pack bot and upload the PNG files.</li>
+      <li>WhatsApp: import the PNG stickers through a compatible sticker-pack app.</li>
+      <li>Recommended final format: 512×512 transparent PNG/WebP.</li>
+    </ul>
+    <p><strong>ZIP creation:</strong> a real ZIP requires a ZIP library or server-side packaging. This single-file version keeps the project dependency-free and provides the export workflow without pretending a ZIP was created.</p>
+    <button class="modalClose" id="closeModal">Close</button>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   DRONE DATA
+========================================================= */
+
+const drones = [
+  {
+    id:1,name:"Heart Drone",emoji:"🛸",
+    drops:["❤️","❤️","💗","💕"],
+    category:"Love",color:"#ec4899"
+  },
+  {
+    id:2,name:"Rose Drone",emoji:"🚁",
+    drops:["🌹","🌹","🌺","🌹"],
+    category:"Love",color:"#ef4444"
+  },
+  {
+    id:3,name:"Gift Drone",emoji:"🛸",
+    drops:["🎁","🎁","🎀","🎁"],
+    category:"Party",color:"#f59e0b"
+  },
+  {
+    id:4,name:"Confetti Drone",emoji:"🚁",
+    drops:["🎉","🎊","✨","🎉"],
+    category:"Party",color:"#a855f7"
+  },
+  {
+    id:5,name:"Az Flag Drone",emoji:"🛸",
+    drops:["🇦🇿","⭐","🇦🇿","✨"],
+    category:"Az",color:"#06b6d4"
+  },
+  {
+    id:6,name:"Love Letter Drone",emoji:"🚁",
+    drops:["💌","💌","💕","💌"],
+    category:"Love",color:"#f43f5e"
+  },
+  {
+    id:7,name:"Star Drone",emoji:"🛸",
+    drops:["⭐","🌟","✨","⭐"],
+    category:"Party",color:"#eab308"
+  },
+  {
+    id:8,name:"Camera Drone",emoji:"📸",
+    drops:["📸","🖼️","📸","✨"],
+    category:"Business",color:"#38bdf8"
+  },
+  {
+    id:9,name:"Money Drone",emoji:"🛸",
+    drops:["💸","💰","💵","💸"],
+    category:"Business",color:"#22c55e"
+  },
+  {
+    id:10,name:"Party Drone",emoji:"🚁",
+    drops:["🥳","🎂","🎉","🥳"],
+    category:"Party",color:"#d946ef"
+  },
+  {
+    id:11,name:"Flower Field Drone",emoji:"🛸",
+    drops:["🌸","🌺","🌷","🌻"],
+    category:"Love",color:"#fb7185"
+  },
+  {
+    id:12,name:"Kiss Drone",emoji:"🚁",
+    drops:["😘","💋","❤️","😘"],
+    category:"Love",color:"#f43f5e"
+  },
+  {
+    id:13,name:"Fireworks Drone",emoji:"🛸",
+    drops:["🎆","🎇","✨","🎆"],
+    category:"Party",color:"#8b5cf6"
+  },
+  {
+    id:14,name:"Rainbow Drone",emoji:"🚁",
+    drops:["🌈","✨","🌈","💖"],
+    category:"Party",color:"#06b6d4"
+  },
+  {
+    id:15,name:"Balloon Drone",emoji:"🛸",
+    drops:["🎈","🎈","🎈","💖"],
+    category:"Party",color:"#f97316"
+  },
+  {
+    id:16,name:"Crown Drone",emoji:"🚁",
+    drops:["👑","✨","👑","⭐"],
+    category:"Business",color:"#facc15"
+  },
+  {
+    id:17,name:"Angel Drone",emoji:"🛸",
+    drops:["😇","🕊️","✨","🤍"],
+    category:"Love",color:"#e2e8f0"
+  },
+  {
+    id:18,name:"Music Drone",emoji:"🚁",
+    drops:["🎵","🎶","🎵","🎶"],
+    category:"Party",color:"#6366f1"
+  },
+  {
+    id:19,name:"Sunset Drone",emoji:"🛸",
+    drops:["🌅","✨","🧡","🌅"],
+    category:"Party",color:"#f97316"
+  },
+  {
+    id:20,name:"Neon Cyber Drone",emoji:"🛸",
+    drops:["💎","💎","✨","🔷"],
+    category:"Business",color:"#00f5ff"
+  }
+];
+
+/* =========================================================
+   DOM
+========================================================= */
+
+const grid = document.getElementById("grid");
+const toast = document.getElementById("toast");
+const sentSticker = document.getElementById("sentSticker");
+const chatHint = document.getElementById("chatHint");
+
+let currentFilter = "All";
+let epicTimer = null;
+
+/* =========================================================
+   CREATE CARD
+========================================================= */
+
+function createCard(item){
+
+  const card = document.createElement("article");
+  card.className = "card";
+  card.dataset.category = item.category;
+
+  card.innerHTML = `
+    <div class="stage" style="--glow:${item.color}">
+      <div class="particles"></div>
+
+      <div class="flightPath">
+        <div class="trail"></div>
+        <div class="drone">${item.emoji}</div>
+      </div>
+    </div>
+
+    <div class="cardBody">
+      <div class="cardTop">
+        <div class="cardName">${item.id}. ${item.name}</div>
+        <div class="category">${item.category}</div>
+      </div>
+
+      <div class="cardButtons">
+        <button class="smallBtn copyBtn">COPY</button>
+        <button class="smallBtn pngBtn">DOWNLOAD PNG</button>
+      </div>
+    </div>
+  `;
+
+  const stage = card.querySelector(".stage");
+  const particles = card.querySelector(".particles");
+
+  /* Automatic 200ms drops */
+  let dropIndex = 0;
+
+  setInterval(()=>{
+    if(!document.body.contains(card)) return;
+
+    spawnParticle(
+      particles,
+      item.drops[dropIndex % item.drops.length]
+    );
+
+    dropIndex++;
+  },200);
+
+  /* Hover / tap boost */
+  const boost = ()=>{
+    card.classList.remove("boost");
+    void card.offsetWidth;
+    card.classList.add("boost");
+
+    for(let i=0;i<10;i++){
+      setTimeout(()=>{
+        spawnParticle(
+          particles,
+          item.drops[Math.floor(Math.random()*item.drops.length)],
+          true
+        );
+      },i*55);
+    }
+  };
+
+  stage.addEventListener("mouseenter",boost);
+  stage.addEventListener("click",()=>{
+    boost();
+    sendSticker(item);
+  });
+
+  /* Mobile tap card */
+  stage.addEventListener("touchstart",()=>{
+    boost();
+  },{passive:true});
+
+  card.querySelector(".copyBtn").addEventListener("click",(e)=>{
+    e.stopPropagation();
+    navigator.clipboard?.writeText(item.drops.join(" "));
+    showToast(item.name + " copied ✨");
+  });
+
+  card.querySelector(".pngBtn").addEventListener("click",(e)=>{
+    e.stopPropagation();
+    downloadPNG(item);
+  });
+
+  return card;
+}
+
+/* =========================================================
+   PARTICLES
+========================================================= */
+
+function spawnParticle(container,emoji,boost=false){
+
+  const p = document.createElement("div");
+  p.className = "particle";
+  p.textContent = emoji;
+
+  const x = (Math.random()*170-85).toFixed(0) + "px";
+  const y = (90+Math.random()*70).toFixed(0) + "px";
+  const r = (Math.random()*720-360).toFixed(0) + "deg";
+
+  p.style.setProperty("--x",x);
+  p.style.setProperty("--y",y);
+  p.style.setProperty("--r",r);
+
+  p.style.left = (45+Math.random()*10) + "%";
+  p.style.top = (55+Math.random()*12) + "px";
+
+  if(boost){
+    p.style.fontSize = (19+Math.random()*13) + "px";
+  }
+
+  container.appendChild(p);
+
+  setTimeout(()=>{
+    p.remove();
+  },1250);
+}
+
+/* =========================================================
+   RENDER
+========================================================= */
+
+function render(){
+
+  grid.innerHTML = "";
+
+  drones
+    .filter(d => currentFilter==="All" || d.category===currentFilter)
+    .forEach(d => grid.appendChild(createCard(d)));
+}
+
+render();
+
+/* =========================================================
+   FILTER
+========================================================= */
+
+document.querySelectorAll(".filter").forEach(button=>{
+  button.addEventListener("click",()=>{
+    document.querySelectorAll(".filter")
+      .forEach(b=>b.classList.remove("active"));
+
+    button.classList.add("active");
+    currentFilter = button.dataset.filter;
+
+    render();
+  });
+});
+
+/* =========================================================
+   LAUNCH ALL
+========================================================= */
+
+document.getElementById("launchBtn").addEventListener("click",()=>{
+
+  document.body.classList.remove("epic");
+  void document.body.offsetWidth;
+  document.body.classList.add("epic");
+
+  clearTimeout(epicTimer);
+
+  const cards = [...document.querySelectorAll(".card")];
+
+  cards.forEach((card,i)=>{
+    setTimeout(()=>{
+      card.classList.add("boost");
+
+      const particles = card.querySelector(".particles");
+      const item = drones.find(d =>
+        d.name === card.querySelector(".cardName").textContent.split(". ").slice(1).join(". ")
+      );
+
+      if(item){
+        for(let j=0;j<10;j++){
+          setTimeout(()=>{
+            spawnParticle(
+              particles,
+              item.drops[Math.floor(Math.random()*item.drops.length)],
+              true
+            );
+          },j*65);
         }
+      }
+    },i*45);
+  });
 
-        let audioCtx = null;
-        function playClickSound() {
-            if (!state.soundEnabled) return;
-            try {
-                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(450, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.03);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.035);
-            } catch(e){}
-        }
+  showToast("🚀 ALL DRONES LAUNCHED!");
 
-        function triggerHaptic() {
-            if (navigator.vibrate) navigator.vibrate(10);
-        }
+  epicTimer = setTimeout(()=>{
+    document.body.classList.remove("epic");
+  },2500);
+});
 
-        // F1 ENGINE
-        let f1Cars = [], lightTrails = [];
-        function resizeCanvases() {
-            const kbWrapper = document.getElementById('keyboard-wrapper');
-            const rect = kbWrapper.getBoundingClientRect();
-            f1Canvas.width = rect.width + 24;
-            f1Canvas.height = rect.height + 24;
-            particleCanvas.width = rect.width;
-            particleCanvas.height = rect.height;
-            initF1Cars();
-        }
+/* =========================================================
+   SEND TO KEYBOARD PREVIEW
+========================================================= */
 
-        function initF1Cars() {
-            const w = f1Canvas.width, h = f1Canvas.height, perimeter = 2 * (w + h);
-            const activeTheme = THEMES[state.theme] || THEMES['neon-blue'];
-            f1Cars = [
-                { progress: 0, speed: 3.5, color: activeTheme.cars[0], size: 5 },
-                { progress: perimeter * 0.33, speed: 3.8, color: activeTheme.cars[1], size: 5 },
-                { progress: perimeter * 0.66, speed: 3.2, color: activeTheme.cars[2], size: 5 }
-            ];
-        }
+function sendSticker(item){
 
-        function getPerimeterPos(dist, w, h) {
-            const total = 2 * (w + h);
-            dist = (dist % total + total) % total;
-            if (dist < w) return { x: dist, y: 0 };
-            else if (dist < w + h) return { x: w, y: dist - w };
-            else if (dist < 2 * w + h) return { x: w - (dist - (w + h)), y: h };
-            else return { x: 0, y: h - (dist - (2 * w + h)) };
-        }
+  sentSticker.textContent = item.drops[
+    Math.floor(Math.random()*item.drops.length)
+  ];
 
-        function renderF1Loop() {
-            const w = f1Canvas.width, h = f1Canvas.height;
-            f1Ctx.fillStyle = 'rgba(10, 13, 20, 0.25)';
-            f1Ctx.fillRect(0, 0, w, h);
+  sentSticker.style.animation = "none";
+  void sentSticker.offsetWidth;
+  sentSticker.style.animation = "sendPop .25s ease";
 
-            if (state.f1Enabled && w > 0) {
-                const isNitro = Date.now() < state.nitroEndTime;
-                f1Cars.forEach(car => {
-                    car.progress += car.speed * (isNitro ? 2.8 : 1.0);
-                    const pos = getPerimeterPos(car.progress, w, h);
-                    lightTrails.push({ x: pos.x, y: pos.y, color: car.color, alpha: 1.0, radius: car.size });
+  chatHint.textContent = item.name + " sent to chat 💬";
+}
 
-                    f1Ctx.beginPath();
-                    f1Ctx.arc(pos.x, pos.y, car.size, 0, Math.PI * 2);
-                    f1Ctx.fillStyle = '#ffffff';
-                    f1Ctx.fill();
-                });
+/* =========================================================
+   CANVAS PNG EXPORT
+========================================================= */
 
-                for (let i = lightTrails.length - 1; i >= 0; i--) {
-                    const t = lightTrails[i];
-                    f1Ctx.beginPath();
-                    f1Ctx.arc(t.x, t.y, t.radius, 0, Math.PI * 2);
-                    f1Ctx.fillStyle = t.color;
-                    f1Ctx.globalAlpha = t.alpha;
-                    f1Ctx.fill();
-                    t.alpha -= 0.05;
-                    if (t.alpha <= 0) lightTrails.splice(i, 1);
-                }
-                f1Ctx.globalAlpha = 1.0;
-            }
-            requestAnimationFrame(renderF1Loop);
-        }
+function downloadPNG(item){
 
-        // RENDER KEYBOARD
-        function renderKeyboard() {
-            keyboardGridEl.innerHTML = '';
-            let currentLayout = LAYOUTS[state.currentLang] || LAYOUTS.AZ;
-            if (state.layoutMode === 'symbol') currentLayout = LAYOUTS.NUMBERS;
+  const canvas = document.createElement("canvas");
+  canvas.width = 512;
+  canvas.height = 512;
 
-            currentLangEl.textContent = state.currentLang;
+  const ctx = canvas.getContext("2d");
 
-            currentLayout.forEach(row => {
-                const rowEl = document.createElement('div');
-                rowEl.className = 'flex items-center justify-center gap-1 w-full flex-1 my-0.5';
+  /*
+    Transparent background.
+    We create a premium soft glow without a background box.
+  */
 
-                row.forEach(key => {
-                    const keyEl = document.createElement('button');
-                    keyEl.className = 'keyboard-key flex-1 h-full select-none';
-                    let displayChar = (state.isShifted || state.isCapsLocked) ? key.toUpperCase() : key.toLowerCase();
+  const gradient = ctx.createRadialGradient(
+    256,256,20,
+    256,256,210
+  );
 
-                    if (key === 'shift') {
-                        keyEl.classList.add('special-key', 'w-[13%]');
-                        keyEl.textContent = state.isCapsLocked ? '⇪' : (state.isShifted ? '▲' : '⇧');
-                    } else if (key === 'backspace') {
-                        keyEl.classList.add('special-key', 'w-[13%]');
-                        keyEl.textContent = '⌫';
-                    } else if (key === '123' || key === 'ABC') {
-                        keyEl.classList.add('special-key', 'w-[12%]');
-                        keyEl.textContent = key === '123' ? '?123' : 'ABC';
-                    } else if (key === 'globe') {
-                        keyEl.classList.add('special-key');
-                        keyEl.textContent = '🌐';
-                    } else if (key === 'space') {
-                        keyEl.classList.add('w-[40%]');
-                        keyEl.textContent = state.currentLang;
-                    } else if (key === 'enter') {
-                        keyEl.classList.add('action-key', 'w-[18%]');
-                        keyEl.textContent = '↵';
-                    } else {
-                        keyEl.textContent = displayChar;
-                    }
+  gradient.addColorStop(0,
+    hexToRGBA(item.color,.26)
+  );
 
-                    attachKeyEvents(keyEl, key);
-                    rowEl.appendChild(keyEl);
-                });
-                keyboardGridEl.appendChild(rowEl);
-            });
-        }
+  gradient.addColorStop(1,
+    hexToRGBA(item.color,0)
+  );
 
-        function attachKeyEvents(keyEl, keyVal) {
-            let timer = null;
-            const start = (e) => {
-                e.preventDefault();
-                triggerHaptic();
-                playClickSound();
-                state.nitroEndTime = Date.now() + 300;
-                keyEl.classList.add('key-pressed');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(30,30,452,452);
 
-                if (ACCENT_MAP[keyVal.toLowerCase()] && state.layoutMode === 'alpha') {
-                    timer = setTimeout(() => showAccentPopup(keyEl, ACCENT_MAP[keyVal.toLowerCase()]), 300);
-                }
-            };
+  /* glow */
+  ctx.save();
+  ctx.shadowColor = item.color;
+  ctx.shadowBlur = 40;
+  ctx.font = "170px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(item.emoji,256,245);
+  ctx.restore();
 
-            const end = (e) => {
-                clearTimeout(timer);
-                keyEl.classList.remove('key-pressed');
-                if (!accentPopupEl.classList.contains('active')) processKeyInput(keyVal);
-            };
+  /* main emoji */
+  ctx.font = "170px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(item.emoji,256,245);
 
-            keyEl.addEventListener('touchstart', start, { passive: false });
-            keyEl.addEventListener('touchend', end);
-            keyEl.addEventListener('mousedown', start);
-            keyEl.addEventListener('mouseup', end);
-        }
+  /* small celebration accents */
+  ctx.font = "48px Arial";
 
-        function showAccentPopup(keyEl, accents) {
-            accentPopupEl.innerHTML = '';
-            accents.forEach(acc => {
-                const opt = document.createElement('div');
-                opt.className = 'accent-option';
-                opt.textContent = state.isShifted ? acc.toUpperCase() : acc;
-                opt.onclick = () => {
-                    insertText(opt.textContent);
-                    accentPopupEl.classList.remove('active');
-                };
-                accentPopupEl.appendChild(opt);
-            });
-            const rect = keyEl.getBoundingClientRect();
-            const kbWrapper = document.getElementById('keyboard-wrapper').getBoundingClientRect();
-            accentPopupEl.style.left = `${rect.left - kbWrapper.left + rect.width / 2}px`;
-            accentPopupEl.classList.add('active');
-        }
+  const accents = item.drops.slice(0,3);
 
-        function insertText(text) {
-            state.textBuffer += text;
-            updateDisplay();
-            if (state.isShifted && !state.isCapsLocked) {
-                state.isShifted = false;
-                renderKeyboard();
-            }
-        }
+  accents.forEach((em,i)=>{
+    const positions = [
+      [120,130],
+      [390,145],
+      [390,360]
+    ];
 
-        function processKeyInput(key) {
-            if (key === 'shift') {
-                state.isShifted = !state.isShifted;
-                renderKeyboard();
-            } else if (key === 'backspace') {
-                state.textBuffer = state.textBuffer.slice(0, -1);
-                updateDisplay();
-            } else if (key === 'space') {
-                insertText(' ');
-            } else if (key === 'enter') {
-                insertText('\n');
-            } else if (key === '123') {
-                state.layoutMode = 'symbol';
-                renderKeyboard();
-            } else if (key === 'ABC') {
-                state.layoutMode = 'alpha';
-                renderKeyboard();
-            } else if (key === 'globe') {
-                state.currentLang = state.currentLang === 'AZ' ? 'EN' : 'AZ';
-                renderKeyboard();
-            } else {
-                let char = (state.isShifted || state.isCapsLocked) ? key.toUpperCase() : key.toLowerCase();
-                insertText(char);
-            }
-        }
+    ctx.fillText(
+      em,
+      positions[i][0],
+      positions[i][1]
+    );
+  });
 
-        // THEMES
-        function applyTheme(themeKey) {
-            const theme = THEMES[themeKey] || THEMES['neon-blue'];
-            state.theme = themeKey;
-            document.documentElement.style.setProperty('--theme-accent', theme.accent);
-            document.documentElement.style.setProperty('--key-bg', theme.keyBg);
-            document.documentElement.style.setProperty('--key-text', theme.keyText);
-            initF1Cars();
-        }
+  /* download */
+  const link = document.createElement("a");
 
-        document.querySelectorAll('.theme-chip').forEach(chip => {
-            chip.onclick = () => applyTheme(chip.getAttribute('data-theme'));
-        });
+  link.download =
+    item.name.toLowerCase().replace(/[^a-z0-9]+/g,"-")
+    + "-512.png";
 
-        document.getElementById('clear-text-btn').onclick = () => {
-            state.textBuffer = '';
-            updateDisplay();
-        };
+  link.href = canvas.toDataURL("image/png");
 
-        document.getElementById('copy-text-btn').onclick = () => {
-            navigator.clipboard.writeText(state.textBuffer);
-            triggerHaptic();
-        };
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
 
-        window.addEventListener('resize', resizeCanvases);
-        window.addEventListener('DOMContentLoaded', () => {
-            renderKeyboard();
-            resizeCanvases();
-            applyTheme('neon-blue');
-            requestAnimationFrame(renderF1Loop);
-        });
-    </script>
+  showToast("PNG exported • 512×512");
+}
+
+function hexToRGBA(hex,alpha){
+
+  hex = hex.replace("#","");
+
+  if(hex.length===3){
+    hex = hex.split("").map(x=>x+x).join("");
+  }
+
+  const r=parseInt(hex.substring(0,2),16);
+  const g=parseInt(hex.substring(2,4),16);
+  const b=parseInt(hex.substring(4,6),16);
+
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+/* =========================================================
+   EXPORT PACK INFO
+========================================================= */
+
+document.getElementById("exportBtn").addEventListener("click",()=>{
+  document.getElementById("modal").classList.add("show");
+});
+
+document.getElementById("closeModal").addEventListener("click",()=>{
+  document.getElementById("modal").classList.remove("show");
+});
+
+document.getElementById("modal").addEventListener("click",(e)=>{
+  if(e.target.id==="modal"){
+    document.getElementById("modal").classList.remove("show");
+  }
+});
+
+/* =========================================================
+   THEME
+========================================================= */
+
+document.getElementById("themeBtn").addEventListener("click",()=>{
+  document.body.classList.toggle("light");
+
+  showToast(
+    document.body.classList.contains("light")
+      ? "☀️ Light theme"
+      : "🌙 Dark Neon theme"
+  );
+});
+
+/* =========================================================
+   BUY BUTTONS
+========================================================= */
+
+document.querySelectorAll(".buy,.buyButton").forEach(button=>{
+  button.addEventListener("click",()=>{
+    showToast("💎 Full Pack checkout placeholder • $0.99");
+  });
+});
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+let toastTimer;
+
+function showToast(message){
+
+  toast.textContent = message;
+  toast.classList.add("show");
+
+  clearTimeout(toastTimer);
+
+  toastTimer = setTimeout(()=>{
+    toast.classList.remove("show");
+  },1800);
+}
+
+/* =========================================================
+   60FPS MICRO ANIMATION LOOP
+========================================================= */
+
+let animationTime = 0;
+
+function animationLoop(time){
+
+  animationTime = time;
+
+  /*
+    requestAnimationFrame keeps the visual engine synchronized
+    with the browser's display refresh rate.
+  */
+
+  requestAnimationFrame(animationLoop);
+}
+
+requestAnimationFrame(animationLoop);
+
+/* =========================================================
+   KEYBOARD SHORTCUTS
+========================================================= */
+
+document.addEventListener("keydown",(e)=>{
+
+  if(e.code==="Space" && e.target.tagName!=="INPUT"){
+    e.preventDefault();
+    document.getElementById("launchBtn").click();
+  }
+
+  if(e.key==="Escape"){
+    document.getElementById("modal").classList.remove("show");
+  }
+});
+</script>
+
 </body>
-</html>
+    </html>
