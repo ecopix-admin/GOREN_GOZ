@@ -2,9 +2,9 @@
 <html lang="az">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure P2P Chat Network</title>
-    <!-- PeerJS CDN: P2P Video/Audio və Data əlaqəsi üçün -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WhatsApp P2P Mobile</title>
+    <!-- PeerJS CDN -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <!-- FontAwesome Iconlar -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -12,13 +12,13 @@
         :root {
             --bg-dark: #0b141a;
             --panel-bg: #111b21;
-            --chat-bg: #0d1418;
+            --chat-bg: #0b141a;
             --message-out: #005c4b;
             --message-in: #202c33;
             --text-main: #e9edef;
             --text-muted: #8696a0;
             --accent: #00a884;
-            --accent-hover: #06cf9c;
+            --header-bg: #202c33;
         }
 
         * {
@@ -26,90 +26,107 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        body {
+        body, html {
             background-color: var(--bg-dark);
             color: var(--text-main);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
         }
 
         .app-container {
             width: 100%;
-            max-width: 1200px;
-            height: 95vh;
-            background: var(--panel-bg);
+            height: 100%;
             display: flex;
-            border-radius: 8px;
+            position: relative;
             overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
 
-        /* Sol Panel - İd və Kontaktlar */
+        /* 1. Sol Siyahı Ekranı */
         .sidebar {
-            width: 320px;
-            border-right: 1px solid #222d34;
+            width: 100%;
+            height: 100%;
+            background: var(--panel-bg);
             display: flex;
             flex-direction: column;
-            background: var(--panel-bg);
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 10;
+            transition: transform 0.3s ease;
         }
 
-        .user-profile {
-            padding: 15px;
-            background: #202c33;
+        /* 2. Sağ Çat Ekranı */
+        .chat-area {
+            width: 100%;
+            height: 100%;
+            background: var(--chat-bg);
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 20;
+            transform: translateX(100%); /* Başlanğıcda gizli tutulur */
+            transition: transform 0.3s ease;
+        }
+
+        /* Ekran Keçid Klası */
+        .app-container.chat-active .chat-area {
+            transform: translateX(0); /* Çat açılır */
+        }
+
+        /* Başlıq Paneli */
+        .header {
+            padding: 12px 15px;
+            background: var(--header-bg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 60px;
         }
 
         .user-id-box {
             background: #111b21;
             padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            word-break: break-all;
+            border-radius: 8px;
+            font-size: 0.8rem;
             color: var(--accent);
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        .copy-btn {
-            background: none;
-            border: none;
-            color: var(--text-main);
-            cursor: pointer;
-            padding: 4px;
+            margin: 10px 15px;
+            border: 1px solid #222d34;
         }
 
         .connect-box {
-            padding: 15px;
+            padding: 0 15px 15px 15px;
             display: flex;
             gap: 8px;
-            border-bottom: 1px solid #222d34;
         }
 
         .connect-box input {
             flex: 1;
-            padding: 10px;
-            border-radius: 6px;
+            padding: 12px;
+            border-radius: 8px;
             border: 1px solid #222d34;
             background: #111b21;
             color: #fff;
             outline: none;
+            font-size: 0.9rem;
         }
 
         .connect-box button {
             background: var(--accent);
             border: none;
             color: #fff;
-            padding: 10px 15px;
-            border-radius: 6px;
-            cursor: pointer;
+            padding: 0 18px;
+            border-radius: 8px;
             font-weight: bold;
+            cursor: pointer;
         }
 
         .chat-list {
@@ -120,78 +137,78 @@
         .chat-item {
             padding: 15px;
             border-bottom: 1px solid #222d34;
+            display: flex;
+            align-items: center;
+            gap: 12px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
-        .chat-item:hover, .chat-item.active {
+        .chat-item:active {
             background: #202c33;
         }
 
-        /* Sağ Panel - Çat Ərazisi */
-        .chat-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: var(--chat-bg);
-            position: relative;
-        }
-
+        /* Çat Header */
         .chat-header {
-            padding: 15px 20px;
-            background: #202c33;
+            padding: 10px 15px;
+            background: var(--header-bg);
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            border-left: 1px solid #222d34;
+            gap: 12px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 5px;
         }
 
         .call-actions {
+            margin-left: auto;
             display: flex;
-            gap: 15px;
+            gap: 18px;
         }
 
         .call-btn {
             background: none;
             border: none;
-            color: var(--text-muted);
-            font-size: 1.2rem;
+            color: var(--text-main);
+            font-size: 1.1rem;
             cursor: pointer;
-            transition: 0.2s;
         }
 
-        .call-btn:hover {
-            color: var(--accent);
-        }
-
+        /* Mesaj Siyahısı */
         .messages-container {
             flex: 1;
-            padding: 20px;
+            padding: 15px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
+            background-image: radial-gradient(#202c33 1px, transparent 0);
+            background-size: 20px 20px;
         }
 
         .message {
-            max-width: 65%;
+            max-width: 80%;
             padding: 8px 12px;
             border-radius: 8px;
-            font-size: 0.95rem;
-            position: relative;
+            font-size: 0.9rem;
             word-wrap: break-word;
         }
 
         .message.sent {
             align-self: flex-end;
             background: var(--message-out);
+            border-top-right-radius: 2px;
         }
 
         .message.received {
             align-self: flex-start;
             background: var(--message-in);
+            border-top-left-radius: 2px;
         }
 
         .message img, .message video {
@@ -201,46 +218,44 @@
         }
 
         .message audio {
+            width: 200px;
             margin-top: 5px;
-            width: 250px;
         }
 
         .message-time {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: var(--text-muted);
             text-align: right;
-            margin-top: 4px;
+            margin-top: 3px;
         }
 
-        /* Giriş Paneli (İnput) */
+        /* Giriş Paneli */
         .input-area {
-            padding: 10px 15px;
-            background: #202c33;
+            padding: 8px 10px;
+            background: var(--header-bg);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .input-area input[type="text"] {
             flex: 1;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 10px 14px;
+            border-radius: 20px;
             border: none;
             background: #2a3942;
             color: #fff;
             outline: none;
+            font-size: 0.95rem;
         }
 
         .action-btn {
             background: none;
             border: none;
             color: var(--text-muted);
-            font-size: 1.3rem;
+            font-size: 1.2rem;
+            padding: 6px;
             cursor: pointer;
-        }
-
-        .action-btn:hover {
-            color: var(--accent);
         }
 
         .action-btn.recording {
@@ -250,47 +265,54 @@
 
         @keyframes pulse {
             0% { opacity: 1; }
-            50% { opacity: 0.4; }
+            50% { opacity: 0.3; }
             100% { opacity: 1; }
         }
 
-        /* Video Zəng Konteyneri overlay */
+        /* Video Call Modal */
         .video-call-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(11, 20, 26, 0.95);
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
             display: none;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
+            z-index: 1000;
         }
 
         .video-grid {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
+            flex: 1;
+            position: relative;
         }
 
-        .video-grid video {
-            width: 350px;
-            height: 260px;
-            background: #000;
-            border-radius: 10px;
+        #remote-video {
+            width: 100%;
+            height: 100%;
             object-fit: cover;
         }
 
+        #local-video {
+            width: 100px;
+            height: 140px;
+            object-fit: cover;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            border-radius: 10px;
+            border: 2px solid var(--accent);
+        }
+
         .end-call-btn {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
             background: #ff4b4b;
             color: white;
             border: none;
-            padding: 12px 25px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 1rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 1.5rem;
         }
 
         #file-input { display: none; }
@@ -298,72 +320,68 @@
 </head>
 <body>
 
-<div class="app-container">
-    <!-- Sol Panel: İstifadəçi Məlumatı və Kontakt Yığma -->
+<div class="app-container" id="app-container">
+    <!-- Sol Ekran: Siyahı və İD -->
     <div class="sidebar">
-        <div class="user-profile">
-            <span>Sizin Məxfi İD Ünvanınız:</span>
-            <div class="user-id-box">
-                <strong id="my-peer-id">Yüklənir...</strong>
-                <button class="copy-btn" onclick="copyMyId()" title="Kopyala"><i class="fa-regular fa-copy"></i></button>
-            </div>
+        <div class="header">
+            <h3 style="color: var(--accent);">WhatsApp P2P</h3>
+        </div>
+
+        <div style="font-size:0.75rem; color:var(--text-muted); margin: 10px 15px 0 15px;">SİZİN MƏXFİ İD ÜNVANINIZ:</div>
+        <div class="user-id-box">
+            <span id="my-peer-id" style="word-break: break-all;">Yüklənir...</span>
+            <button style="background:none; border:none; color:#fff; margin-left:10px;" onclick="copyMyId()"><i class="fa-regular fa-copy"></i></button>
         </div>
 
         <div class="connect-box">
             <input type="text" id="remote-id-input" placeholder="Qarşı tərəfin İD-si...">
-            <button onclick="connectToPeer()"><i class="fa-solid fa-user-plus"></i></button>
+            <button onclick="connectToPeer()"><i class="fa-solid fa-arrow-right"></i></button>
         </div>
 
         <div class="chat-list" id="chat-list">
-            <div class="chat-item active" id="active-chat-item" style="display:none;">
-                <i class="fa-solid fa-user-lock" style="font-size: 1.5rem; color: var(--accent);"></i>
-                <div>
-                    <div id="active-peer-name" style="font-weight:bold;">Təhlükəsiz Kanal</div>
-                    <div style="font-size:0.75rem; color: var(--text-muted);">P2P Şifrələnib</div>
+            <div class="chat-item" onclick="openChatScreen()" id="active-chat-item" style="display:none;">
+                <i class="fa-solid fa-user-shield" style="font-size: 1.8rem; color: var(--accent);"></i>
+                <div style="flex:1;">
+                    <div id="active-peer-name" style="font-weight:bold;">Şifrələnmiş Kanal</div>
+                    <div id="status-text-sub" style="font-size:0.75rem; color: var(--accent);">Əlaqə quruldu</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Sağ Panel: Əsas Çat Şəbəkəsi -->
+    <!-- Sağ Ekran: Çat Pəncərəsi -->
     <div class="chat-area">
         <div class="chat-header">
+            <button class="back-btn" onclick="closeChatScreen()"><i class="fa-solid fa-arrow-left"></i></button>
             <div>
-                <h4 id="chat-title">Təhlükəsiz Çat Bölməsi</h4>
-                <small id="status-text" style="color: var(--text-muted);">Əlaqə yoxdur</small>
+                <h4 id="chat-title" style="font-size:0.95rem;">Şifrələnmiş Çat</h4>
+                <small id="status-text" style="font-size:0.7rem; color: var(--accent);">P2P Aktivdir</small>
             </div>
             <div class="call-actions">
-                <button class="call-btn" onclick="startCall(false)" title="Səsli Zəng"><i class="fa-solid fa-phone"></i></button>
-                <button class="call-btn" onclick="startCall(true)" title="Video Zəng"><i class="fa-solid fa-video"></i></button>
+                <button class="call-btn" onclick="startCall(false)"><i class="fa-solid fa-phone"></i></button>
+                <button class="call-btn" onclick="startCall(true)"><i class="fa-solid fa-video"></i></button>
             </div>
         </div>
 
-        <!-- Mesajların Siyahısı -->
         <div class="messages-container" id="messages-container"></div>
 
-        <!-- Məlumat Daxiletmə Paneli -->
         <div class="input-area">
-            <!-- Qalereya / Şəkil və Video Göndərmə -->
             <button class="action-btn" onclick="document.getElementById('file-input').click()"><i class="fa-solid fa-paperclip"></i></button>
             <input type="file" id="file-input" accept="image/*,video/*" onchange="sendFile(this.files[0])">
 
-            <!-- Mətn Mesajı -->
-            <input type="text" id="message-input" placeholder="Şifrələnmiş mesaj yazın..." onkeypress="handleKeyPress(event)">
+            <input type="text" id="message-input" placeholder="Mesaj..." onkeypress="handleKeyPress(event)">
 
-            <!-- Səsli Mesaj Düyməsi -->
             <button class="action-btn" id="record-btn" onclick="toggleAudioRecord()"><i class="fa-solid fa-microphone"></i></button>
-
-            <!-- Göndər Düyməsi -->
             <button class="action-btn" style="color: var(--accent);" onclick="sendTextMessage()"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
 
-        <!-- Video Zəng Modalı -->
+        <!-- Video Zəng -->
         <div class="video-call-overlay" id="video-overlay">
             <div class="video-grid">
-                <video id="local-video" autoplay muted></video>
-                <video id="remote-video" autoplay></video>
+                <video id="remote-video" autoplay playsinline></video>
+                <video id="local-video" autoplay muted playsinline></video>
             </div>
-            <button class="end-call-btn" onclick="endCall()"><i class="fa-solid fa-phone-slash"></i> Zəngi Bitir</button>
+            <button class="end-call-btn" onclick="endCall()"><i class="fa-solid fa-phone-slash"></i></button>
         </div>
     </div>
 </div>
@@ -377,7 +395,6 @@
     let audioChunks = [];
     let isRecording = false;
 
-    // 1. Peer Obyektinin Yaradılması və Sistem Quraşdırılması
     function initPeer() {
         peer = new Peer();
 
@@ -385,20 +402,17 @@
             document.getElementById('my-peer-id').innerText = id;
         });
 
-        // Daxil olan mesaj əlaqəsi
         peer.on('connection', (connection) => {
             conn = connection;
             setupConnectionListeners();
         });
 
-        // Daxil olan səsli/videolu zəng
         peer.on('call', (call) => {
             if (confirm("Gələn zəng var! Qəbul edirsiniz?")) {
                 navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
                     localStream = stream;
                     document.getElementById('local-video').srcObject = stream;
                     document.getElementById('video-overlay').style.display = 'flex';
-                    
                     call.answer(stream);
                     currentCall = call;
 
@@ -410,22 +424,19 @@
         });
     }
 
-    // 2. Başqa İD-yə Qoşulmaq
     function connectToPeer() {
         const remoteId = document.getElementById('remote-id-input').value.trim();
-        if (!remoteId) return alert("Xahiş olunur qarşı tərəfin İD-sini daxil edin!");
+        if (!remoteId) return alert("İD daxil edin!");
 
         conn = peer.connect(remoteId);
         setupConnectionListeners();
     }
 
-    // 3. Əlaqə Dinləyicilərinin Tənzimlənməsi
     function setupConnectionListeners() {
         conn.on('open', () => {
-            document.getElementById('status-text').innerText = 'Təhlükəsiz Kanal Yaradıldı (P2P E2EE Active)';
-            document.getElementById('status-text').style.color = 'var(--accent)';
             document.getElementById('active-chat-item').style.display = 'flex';
-            document.getElementById('active-peer-name').innerText = "Kanal: " + conn.peer.substring(0, 8) + "...";
+            document.getElementById('active-peer-name').innerText = "İD: " + conn.peer.substring(0, 10) + "...";
+            openChatScreen();
         });
 
         conn.on('data', (data) => {
@@ -433,12 +444,19 @@
         });
 
         conn.on('close', () => {
-            document.getElementById('status-text').innerText = 'Əlaqə kəsildi';
-            document.getElementById('status-text').style.color = '#ff4b4b';
+            alert("Əlaqə kəsildi");
+            closeChatScreen();
         });
     }
 
-    // 4. Mətn Mesajı Göndərmə
+    function openChatScreen() {
+        document.getElementById('app-container').classList.add('chat-active');
+    }
+
+    function closeChatScreen() {
+        document.getElementById('app-container').classList.remove('chat-active');
+    }
+
     function sendTextMessage() {
         const input = document.getElementById('message-input');
         const text = input.value.trim();
@@ -450,7 +468,6 @@
         input.value = '';
     }
 
-    // 5. Fayl Göndərmə (Foto və Video qalereyadan)
     function sendFile(file) {
         if (!file || !conn) return;
 
@@ -468,7 +485,6 @@
         reader.readAsDataURL(file);
     }
 
-    // 6. Səsli Mesaj Yazma və Göndərmə
     async function toggleAudioRecord() {
         const btn = document.getElementById('record-btn');
 
@@ -507,9 +523,8 @@
         }
     }
 
-    // 7. Video və Səsli Zəngin Başladılması
     function startCall(isVideo) {
-        if (!conn) return alert("Əvvəlcə qarşı tərəfə qoşulun!");
+        if (!conn) return alert("Əvvəlcə əlaqə yaradın!");
 
         navigator.mediaDevices.getUserMedia({ video: isVideo, audio: true }).then((stream) => {
             localStream = stream;
@@ -531,7 +546,6 @@
         document.getElementById('video-overlay').style.display = 'none';
     }
 
-    // 8. Mesajların Ekranda Göstərilməsi
     function renderIncomingData(data) {
         appendMessage(data, 'received');
     }
@@ -545,7 +559,7 @@
         if (data.type === 'text') {
             innerContent = `<div>${escapeHtml(data.content)}</div>`;
         } else if (data.type === 'image') {
-            innerContent = `<img src="${data.content}" alt="Görünş">`;
+            innerContent = `<img src="${data.content}">`;
         } else if (data.type === 'video') {
             innerContent = `<video src="${data.content}" controls></video>`;
         } else if (data.type === 'audio') {
@@ -564,14 +578,13 @@
     function copyMyId() {
         const idText = document.getElementById('my-peer-id').innerText;
         navigator.clipboard.writeText(idText);
-        alert("Sizin məxfi P2P İD-niz kopyalandı!");
+        alert("İD kopyalandı!");
     }
 
     function escapeHtml(text) {
         return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
-    // Tətbiqi işə sal
     window.onload = initPeer;
 </script>
 </body>
