@@ -1,664 +1,1134 @@
-<!DOCTYPE html>
-<html lang="az">
+<!DOCTYPE html><html lang="az">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AzChat P2P</title>
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --bg-dark: #0b141a;
-            --panel-bg: #111b21;
-            --chat-bg: #0b141a;
-            --message-out: #005c4b;
-            --message-in: #202c33;
-            --text-main: #e9edef;
-            --text-muted: #8696a0;
-            --accent: #00a884;
-            --header-bg: #202c33;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0; padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body, html {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            height: 100%; width: 100%;
-            overflow: hidden;
-        }
-
-        .app-container {
-            width: 100%; height: 100%;
-            display: flex; position: relative;
-            overflow: hidden;
-        }
-
-        /* Modal - Giriş */
-        .profile-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(11, 20, 26, 0.98);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 2000; padding: 20px;
-        }
-
-        .modal-box {
-            background: var(--panel-bg);
-            padding: 25px; border-radius: 12px;
-            width: 100%; max-width: 360px;
-            text-align: center; border: 1px solid #222d34;
-        }
-
-        .modal-box input {
-            width: 100%; padding: 12px; margin: 15px 0;
-            border-radius: 8px; border: 1px solid #222d34;
-            background: #111b21; color: #fff; outline: none; font-size: 1rem;
-        }
-
-        .modal-box button {
-            width: 100%; padding: 12px; background: var(--accent);
-            border: none; color: #fff; border-radius: 8px;
-            font-weight: bold; cursor: pointer; font-size: 1rem;
-        }
-
-        /* Ekranlar */
-        .sidebar {
-            width: 100%; height: 100%;
-            background: var(--panel-bg);
-            display: flex; flex-direction: column;
-            position: absolute; left: 0; top: 0; z-index: 10;
-            transition: transform 0.3s ease;
-        }
-
-        .chat-area {
-            width: 100%; height: 100%;
-            background: var(--chat-bg);
-            display: flex; flex-direction: column;
-            position: absolute; left: 0; top: 0; z-index: 20;
-            transform: translateX(100%);
-            transition: transform 0.3s ease;
-        }
-
-        .app-container.chat-active .chat-area {
-            transform: translateX(0);
-        }
-
-        .header {
-            padding: 12px 15px; background: var(--header-bg);
-            display: flex; align-items: center; justify-content: space-between;
-        }
-
-        .user-info-bar {
-            background: #111b21; padding: 12px 15px;
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #222d34;
-        }
-
-        .add-friend-box {
-            padding: 12px 15px; background: var(--panel-bg);
-            border-bottom: 1px solid #222d34;
-        }
-
-        .add-friend-title {
-            font-size: 0.8rem; color: var(--accent); margin-bottom: 8px; font-weight: bold;
-        }
-
-        .inputs-row {
-            display: flex; gap: 8px;
-        }
-
-        .inputs-row input {
-            padding: 10px; border-radius: 8px;
-            border: 1px solid #222d34; background: #111b21;
-            color: #fff; outline: none; font-size: 0.85rem;
-        }
-
-        .inputs-row input:nth-child(1) { flex: 1.2; }
-        .inputs-row input:nth-child(2) { flex: 1; }
-
-        .add-btn {
-            background: var(--accent); border: none; color: #fff;
-            padding: 0 16px; border-radius: 8px; cursor: pointer;
-            font-weight: bold; font-size: 1rem;
-        }
-
-        .chat-list { flex: 1; overflow-y: auto; }
-
-        .chat-item {
-            padding: 14px 15px; border-bottom: 1px solid #222d34;
-            display: flex; align-items: center; gap: 12px; cursor: pointer;
-        }
-
-        .chat-item:active { background: #202c33; }
-
-        .avatar {
-            width: 45px; height: 45px; border-radius: 50%;
-            background: var(--accent); display: flex;
-            justify-content: center; align-items: center;
-            font-weight: bold; font-size: 1.2rem; color: #fff;
-        }
-
-        /* Çat İnterfeysi */
-        .chat-header {
-            padding: 10px 15px; background: var(--header-bg);
-            display: flex; align-items: center; gap: 10px;
-        }
-
-        .back-btn { background: none; border: none; color: var(--text-main); font-size: 1.2rem; cursor: pointer; }
-        .call-actions { margin-left: auto; display: flex; gap: 18px; }
-        .call-btn { background: none; border: none; color: var(--text-main); font-size: 1.1rem; cursor: pointer; }
-
-        .messages-container {
-            flex: 1; padding: 15px; overflow-y: auto;
-            display: flex; flex-direction: column; gap: 10px;
-            background-image: radial-gradient(#202c33 1px, transparent 0);
-            background-size: 20px 20px;
-        }
-
-        .message {
-            max-width: 80%; padding: 8px 12px; border-radius: 8px;
-            font-size: 0.9rem; word-wrap: break-word;
-        }
-
-        .message.sent { align-self: flex-end; background: var(--message-out); border-top-right-radius: 2px; }
-        .message.received { align-self: flex-start; background: var(--message-in); border-top-left-radius: 2px; }
-        .message img, .message video { max-width: 100%; border-radius: 6px; margin-top: 5px; }
-        .message audio { width: 200px; margin-top: 5px; }
-        .message-time { font-size: 0.65rem; color: var(--text-muted); text-align: right; margin-top: 3px; }
-
-        .input-area {
-            padding: 8px 10px; background: var(--header-bg);
-            display: flex; align-items: center; gap: 8px;
-        }
-
-        .input-area input[type="text"] {
-            flex: 1; padding: 10px 14px; border-radius: 20px;
-            border: none; background: #2a3942; color: #fff; outline: none; font-size: 0.95rem;
-        }
-
-        .action-btn { background: none; border: none; color: var(--text-muted); font-size: 1.2rem; padding: 6px; cursor: pointer; }
-        .action-btn.recording { color: #ff4b4b; animation: pulse 1s infinite; }
-
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-
-        /* Zəng Modalı */
-        .video-call-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; display: none; flex-direction: column; z-index: 1000;
-        }
-
-        .video-grid { flex: 1; position: relative; }
-        #remote-video { width: 100%; height: 100%; object-fit: cover; }
-        #local-video { width: 100px; height: 140px; object-fit: cover; position: absolute; top: 20px; right: 20px; border-radius: 10px; border: 2px solid var(--accent); }
-        .end-call-btn { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); background: #ff4b4b; color: white; border: none; width: 60px; height: 60px; border-radius: 50%; font-size: 1.5rem; }
-
-        #file-input { display: none; }
-    </style>
-</head>
-<body>
-
-<!-- Giriş Modalı -->
-<div class="profile-modal" id="profile-modal">
-    <div class="modal-box">
-        <h3 style="color:var(--accent); margin-bottom:10px;">AzChat P2P</h3>
-        <p style="font-size: 0.85rem; color: var(--text-muted);">Profil adınızı yazın</p>
-        <input type="text" id="username-input" placeholder="Adınız (məs: Şamxal)">
-        <button onclick="saveProfile()">Təsdiqlə</button>
-    </div>
-</div>
-
-<div class="app-container" id="app-container">
-    <!-- Sol Panel: Kontaktlar -->
-    <div class="sidebar">
-        <div class="header">
-            <h3 style="color: var(--accent);"><i class="fa-brands fa-whatsapp"></i> AzChat P2P</h3>
-            <button class="action-btn" onclick="requestNotificationPermission()"><i class="fa-solid fa-bell"></i></button>
-        </div>
-
-        <div class="user-info-bar">
-            <div>
-                <strong id="my-name-display">...</strong>
-                <div style="font-size:0.75rem; color:var(--accent); font-weight:bold; margin-top:2px;" id="my-id-display">ID: Yüklənir...</div>
-            </div>
-            <button class="action-btn" onclick="copyMyId()"><i class="fa-regular fa-copy"></i></button>
-        </div>
-
-        <!-- Dost Əlavə Etmə Qutusu -->
-        <div class="add-friend-box">
-            <div class="add-friend-title">YENİ DOST ƏLAVƏ ET</div>
-            <div class="inputs-row">
-                <input type="text" id="contact-name-input" placeholder="Dostun adı">
-                <input type="text" id="remote-id-input" placeholder="AZ-XXXXX">
-                <button class="add-btn" onclick="addContactAndConnect()"><i class="fa-solid fa-plus"></i></button>
-            </div>
-        </div>
-
-        <div class="chat-list" id="chat-list"></div>
-    </div>
-
-    <!-- Sağ Panel: Çat Ekranı -->
-    <div class="chat-area">
-        <div class="chat-header">
-            <button class="back-btn" onclick="closeChatScreen()"><i class="fa-solid fa-arrow-left"></i></button>
-            <div class="avatar" id="chat-avatar">?</div>
-            <div>
-                <h4 id="chat-title" style="font-size:0.95rem;">Çat</h4>
-                <small id="status-text" style="font-size:0.7rem; color: var(--accent);">Oflayn</small>
-            </div>
-            <div class="call-actions">
-                <button class="call-btn" onclick="startCall(false)"><i class="fa-solid fa-phone"></i></button>
-                <button class="call-btn" onclick="startCall(true)"><i class="fa-solid fa-video"></i></button>
-            </div>
-        </div>
-
-        <div class="messages-container" id="messages-container"></div>
-
-        <div class="input-area">
-            <button class="action-btn" onclick="document.getElementById('file-input').click()"><i class="fa-solid fa-paperclip"></i></button>
-            <input type="file" id="file-input" accept="image/*,video/*" onchange="sendFile(this.files[0])">
-
-            <input type="text" id="message-input" placeholder="Mesaj yazın..." onkeypress="handleKeyPress(event)">
-
-            <button class="action-btn" id="record-btn" onclick="toggleAudioRecord()"><i class="fa-solid fa-microphone"></i></button>
-            <button class="action-btn" style="color: var(--accent);" onclick="sendTextMessage()"><i class="fa-solid fa-paper-plane"></i></button>
-        </div>
-
-        <!-- Video Zəng Modal -->
-        <div class="video-call-overlay" id="video-overlay">
-            <div class="video-grid">
-                <video id="remote-video" autoplay playsinline></video>
-                <video id="local-video" autoplay muted playsinline></video>
-            </div>
-            <button class="end-call-btn" onclick="endCall()"><i class="fa-solid fa-phone-slash"></i></button>
-        </div>
-    </div>
-</div>
-
-<script>
-    let peer = null;
-    let conn = null;
-    let currentCall = null;
-    let localStream = null;
-    let mediaRecorder = null;
-    let audioChunks = [];
-    let isRecording = false;
-
-    let myProfile = JSON.parse(localStorage.getItem('azchat_profile')) || null;
-    let contacts = JSON.parse(localStorage.getItem('azchat_contacts')) || {};
-    let chatHistory = JSON.parse(localStorage.getItem('azchat_history')) || {};
-    let activePeerId = null;
-
-    // Səs Sintezatoru (Qudok və Zəng Səsi Üçün)
-    let audioCtx = null;
-    let ringInterval = null;
-
-    function initAudio() {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-    }
-
-    function playTone(freq1, freq2, duration) {
-        initAudio();
-        let osc1 = audioCtx.createOscillator();
-        let osc2 = audioCtx.createOscillator();
-        let gain = audioCtx.createGain();
-
-        osc1.frequency.value = freq1;
-        osc2.frequency.value = freq2;
-
-        osc1.connect(gain);
-        osc2.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        gain.gain.value = 0.1;
-        osc1.start();
-        osc2.start();
-
-        setTimeout(() => {
-            osc1.stop();
-            osc2.stop();
-        }, duration);
-    }
-
-    function startRingbackSound() { // Qudok Səsi (tut... tut...)
-        stopRingtone();
-        playTone(425, 425, 1000);
-        ringInterval = setInterval(() => {
-            playTone(425, 425, 1000);
-        }, 3000);
-    }
-
-    function startIncomingRingtone() { // Gələn Zəng Səsi
-        stopRingtone();
-        playTone(800, 900, 1500);
-        ringInterval = setInterval(() => {
-            playTone(800, 900, 1500);
-        }, 2500);
-    }
-
-    function stopRingtone() {
-        if (ringInterval) {
-            clearInterval(ringInterval);
-            ringInterval = null;
-        }
-    }
-
-    // Bildiriş Göndərmə
-    function requestNotificationPermission() {
-        if ("Notification" in window) {
-            Notification.requestPermission().then(permission => {
-                if (permission === "granted") {
-                    alert("Bildirişlər aktiv edildi!");
-                }
-            });
-        }
-    }
-
-    function sendNotification(title, body) {
-        if ("Notification" in window && Notification.permission === "granted") {
-            new Notification(title, { body: body, icon: 'https://cdn-icons-png.flaticon.com/512/124/124034.png' });
-        }
-    }
-
-    // Profil və İD Tənzimləməsi
-    function checkProfile() {
-        if (!myProfile) {
-            document.getElementById('profile-modal').style.display = 'flex';
-        } else {
-            document.getElementById('profile-modal').style.display = 'none';
-            initApp();
-        }
-    }
-
-    function saveProfile() {
-        const name = document.getElementById('username-input').value.trim();
-        if (!name) return alert("Xahiş olunur adınızı yazın!");
-
-        // AZ-XXXXX formatında dəyişməz İD
-        const randomNum = Math.floor(10000 + Math.random() * 90000);
-        const fixedId = "AZ-" + randomNum;
-
-        myProfile = { name: name, id: fixedId };
-        localStorage.setItem('azchat_profile', JSON.stringify(myProfile));
-
-        document.getElementById('profile-modal').style.display = 'none';
-        initApp();
-    }
-
-    function initApp() {
-        document.getElementById('my-name-display').innerText = myProfile.name;
-        document.getElementById('my-id-display').innerText = "ID: " + myProfile.id;
-
-        peer = new Peer(myProfile.id);
-
-        peer.on('open', (id) => {
-            console.log("P2P Şəbəkə hazır. ID:", id);
-        });
-
-        peer.on('connection', (connection) => {
-            conn = connection;
-            setupConnectionListeners();
-        });
-
-        peer.on('call', (call) => {
-            startIncomingRingtone();
-            sendNotification("Gələn Zəng", "Sizə zəng gəlir...");
-
-            if (confirm("Gələn zəng var! Cavab verirsiniz?")) {
-                stopRingtone();
-                navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
-                    localStream = stream;
-                    document.getElementById('local-video').srcObject = stream;
-                    document.getElementById('video-overlay').style.display = 'flex';
-                    call.answer(stream);
-                    currentCall = call;
-
-                    call.on('stream', (remoteStream) => {
-                        document.getElementById('remote-video').srcObject = remoteStream;
-                    });
-                });
-            } else {
-                stopRingtone();
-            }
-        });
-
-        renderContactsList();
-    }
-
-    // Dost Əlavə Etmə
-    function addContactAndConnect() {
-        const cName = document.getElementById('contact-name-input').value.trim();
-        let cId = document.getElementById('remote-id-input').value.trim().toUpperCase();
-
-        if (!cName || !cId) return alert("Həm adı, həm də İD-ni daxil edin!");
-
-        contacts[cId] = { name: cName, id: cId };
-        localStorage.setItem('azchat_contacts', JSON.stringify(contacts));
-
-        document.getElementById('contact-name-input').value = '';
-        document.getElementById('remote-id-input').value = '';
-
-        renderContactsList();
-        selectContact(cId);
-    }
-
-    function renderContactsList() {
-        const listDiv = document.getElementById('chat-list');
-        listDiv.innerHTML = '';
-
-        for (let id in contacts) {
-            const item = contacts[id];
-            const div = document.createElement('div');
-            div.className = 'chat-item';
-            div.onclick = () => selectContact(id);
-            div.innerHTML = `
-                <div class="avatar">${item.name[0].toUpperCase()}</div>
-                <div>
-                    <div style="font-weight:bold; font-size:0.95rem;">${escapeHtml(item.name)}</div>
-                    <div style="font-size:0.75rem; color:var(--accent); font-weight:bold; margin-top:2px;">${item.id}</div>
-                </div>
-            `;
-            listDiv.appendChild(div);
-        }
-    }
-
-    function selectContact(targetId) {
-        activePeerId = targetId;
-        const targetName = contacts[targetId] ? contacts[targetId].name : "Dost";
-
-        document.getElementById('chat-title').innerText = targetName;
-        document.getElementById('chat-avatar').innerText = targetName[0].toUpperCase();
-
-        loadChatHistory(targetId);
-        openChatScreen();
-
-        if (!conn || conn.peer !== targetId) {
-            document.getElementById('status-text').innerText = 'Qoşulur...';
-            document.getElementById('status-text').style.color = '#e2a03f';
-            conn = peer.connect(targetId);
-            setupConnectionListeners();
-        }
-    }
-
-    function setupConnectionListeners() {
-        conn.on('open', () => {
-            document.getElementById('status-text').innerText = 'Onlayn (P2P E2EE)';
-            document.getElementById('status-text').style.color = 'var(--accent)';
-
-            if (!contacts[conn.peer]) {
-                contacts[conn.peer] = { name: "Dost (" + conn.peer + ")", id: conn.peer };
-                localStorage.setItem('azchat_contacts', JSON.stringify(contacts));
-                renderContactsList();
-            }
-        });
-
-        conn.on('data', (data) => {
-            saveMessageToHistory(conn.peer, data, 'received');
-            if (activePeerId === conn.peer) {
-                appendMessage(data, 'received');
-            } else {
-                sendNotification("Yeni Mesaj", data.content || "Media faylı");
-            }
-        });
-
-        conn.on('close', () => {
-            document.getElementById('status-text').innerText = 'Oflayn';
-            document.getElementById('status-text').style.color = '#ff4b4b';
-        });
-    }
-
-    function saveMessageToHistory(peerId, payload, side) {
-        if (!chatHistory[peerId]) chatHistory[peerId] = [];
-        chatHistory[peerId].push({ ...payload, side: side });
-        localStorage.setItem('azchat_history', JSON.stringify(chatHistory));
-    }
-
-    function loadChatHistory(peerId) {
-        const container = document.getElementById('messages-container');
-        container.innerHTML = '';
-        const history = chatHistory[peerId] || [];
-        history.forEach(data => appendMessage(data, data.side));
-    }
-
-    function sendTextMessage() {
-        const input = document.getElementById('message-input');
-        const text = input.value.trim();
-        if (!text || !activePeerId) return;
-
-        const payload = { type: 'text', content: text, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) };
-
-        if (conn && conn.open) conn.send(payload);
-
-        saveMessageToHistory(activePeerId, payload, 'sent');
-        appendMessage(payload, 'sent');
-        input.value = '';
-    }
-
-    function sendFile(file) {
-        if (!file || !activePeerId) return;
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const fileType = file.type.startsWith('image/') ? 'image' : 'video';
-            const payload = {
-                type: fileType,
-                content: e.target.result,
-                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-            };
-
-            if (conn && conn.open) conn.send(payload);
-
-            saveMessageToHistory(activePeerId, payload, 'sent');
-            appendMessage(payload, 'sent');
-        };
-        reader.readAsDataURL(file);
-    }
-
-    async function toggleAudioRecord() {
-        const btn = document.getElementById('record-btn');
-
-        if (!isRecording) {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-
-                mediaRecorder.ondataavailable = (event) => audioChunks.push(event.data);
-                mediaRecorder.onstop = () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const payload = {
-                            type: 'audio',
-                            content: e.target.result,
-                            time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-                        };
-
-                        if (conn && conn.open) conn.send(payload);
-
-                        saveMessageToHistory(activePeerId, payload, 'sent');
-                        appendMessage(payload, 'sent');
-                    };
-                    reader.readAsDataURL(audioBlob);
-                };
-
-                mediaRecorder.start();
-                isRecording = true;
-                btn.classList.add('recording');
-            } catch (err) {
-                alert("Mikrofon icazəsi yoxdur.");
-            }
-        } else {
-            mediaRecorder.stop();
-            isRecording = false;
-            btn.classList.remove('recording');
-        }
-    }
-
-    function startCall(isVideo) {
-        if (!conn || !conn.open) return alert("Əvvəlcə qarşı tərəf onlayn olmalıdır!");
-
-        startRingbackSound();
-
-        navigator.mediaDevices.getUserMedia({ video: isVideo, audio: true }).then((stream) => {
-            localStream = stream;
-            document.getElementById('local-video').srcObject = stream;
-            document.getElementById('video-overlay').style.display = 'flex';
-
-            const call = peer.call(conn.peer, stream);
-            currentCall = call;
-
-            call.on('stream', (remoteStream) => {
-                stopRingtone();
-                document.getElementById('remote-video').srcObject = remoteStream;
-            });
-        });
-    }
-
-    function endCall() {
-        stopRingtone();
-        if (currentCall) currentCall.close();
-        if (localStream) localStream.getTracks().forEach(track => track.stop());
-        document.getElementById('video-overlay').style.display = 'none';
-    }
-
-    function openChatScreen() { document.getElementById('app-container').classList.add('chat-active'); }
-    function closeChatScreen() { document.getElementById('app-container').classList.remove('chat-active'); }
-
-    function appendMessage(data, side) {
-        const container = document.getElementById('messages-container');
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `message ${side}`;
-
-        let innerContent = '';
-        if (data.type === 'text') innerContent = `<div>${escapeHtml(data.content)}</div>`;
-        else if (data.type === 'image') innerContent = `<img src="${data.content}">`;
-        else if (data.type === 'video') innerContent = `<video src="${data.content}" controls></video>`;
-        else if (data.type === 'audio') innerContent = `<audio src="${data.content}" controls></audio>`;
-
-        msgDiv.innerHTML = `${innerContent}<div class="message-time">${data.time}</div>`;
-        container.appendChild(msgDiv);
-        container.scrollTop = container.scrollHeight;
-    }
-
-    function handleKeyPress(e) { if (e.key === 'Enter') sendTextMessage(); }
-
-    function copyMyId() {
-        navigator.clipboard.writeText(myProfile.id);
-        alert("Sizin İD kopyalandı: " + myProfile.id);
-    }
-
-    function escapeHtml(text) {
-        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    }
-
-    window.onload = checkProfile;
-</script>
-</body>
-</html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#111b21">
+<title>AZChat P2P</title><script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script><style>
+*{box-sizing:border-box}
+:root{
+ --bg:#0b141a;
+ --panel:#111b21;
+ --panel2:#202c33;
+ --green:#00a884;
+ --green2:#25d366;
+ --text:#e9edef;
+ --muted:#8696a0;
+ --line:#26353d;
+ --bubble:#005c4b;
+ --bubble2:#202c33;
+ --danger:#ef4444;
+}
+html,body{
+ margin:0;width:100%;height:100%;
+ background:#000;color:var(--text);
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+ overflow:hidden;
+}
+button,input{font:inherit}
+button{border:0}
+.app{
+ width:100%;height:100dvh;max-width:700px;margin:auto;
+ background:var(--bg);position:relative;overflow:hidden;
+}
+.screen{position:absolute;inset:0;display:none;background:var(--bg)}
+.screen.active{display:flex;flex-direction:column}
+
+/* PROFILE */
+#welcome{
+ justify-content:center;padding:28px;
+ background:
+ radial-gradient(circle at 50% 15%,rgba(0,168,132,.20),transparent 35%),
+ var(--bg);
+}
+.logo{
+ width:88px;height:88px;border-radius:50%;
+ background:var(--green);display:grid;place-items:center;
+ margin:0 auto 22px;font-size:42px;font-weight:800;
+ box-shadow:0 10px 40px rgba(0,168,132,.25);
+}
+.welcome-title{text-align:center;font-size:27px;font-weight:700}
+.welcome-sub{text-align:center;color:var(--muted);line-height:1.5;margin:8px 0 26px}
+.field{
+ width:100%;background:var(--panel2);border:1px solid transparent;
+ border-radius:12px;padding:15px;color:var(--text);outline:none;
+ margin-bottom:10px;
+}
+.field:focus{border-color:var(--green)}
+.primary{
+ width:100%;padding:14px;border-radius:12px;background:var(--green);
+ color:white;font-weight:700;cursor:pointer;
+}
+.small-note{font-size:12px;color:var(--muted);text-align:center;margin-top:14px}
+
+/* HOME */
+.topbar{
+ height:64px;background:var(--panel);display:flex;align-items:center;
+ padding:0 15px;gap:10px;flex-shrink:0;
+}
+.brand{font-size:21px;font-weight:700;margin-right:auto}
+.iconbtn{
+ width:42px;height:42px;border-radius:50%;background:transparent;
+ color:var(--text);font-size:22px;cursor:pointer;
+}
+.iconbtn:active{background:var(--panel2)}
+.profile-chip{
+ display:flex;align-items:center;gap:8px;background:var(--panel2);
+ padding:7px 10px;border-radius:20px;font-size:12px;color:var(--muted);
+}
+.avatar{
+ width:46px;height:46px;border-radius:50%;background:#334954;
+ display:grid;place-items:center;font-weight:700;font-size:18px;
+ flex-shrink:0;
+}
+.avatar.big{width:58px;height:58px;font-size:22px}
+.addbox{
+ padding:12px;background:var(--panel);
+ border-bottom:1px solid var(--line);
+ display:flex;gap:7px;flex-wrap:wrap;
+}
+.addbox input{
+ background:var(--panel2);border:0;border-radius:9px;padding:11px;
+ color:white;outline:none;min-width:0;flex:1;
+}
+.addbtn{
+ width:46px;border-radius:9px;background:var(--green);color:#fff;
+ font-size:25px;cursor:pointer;
+}
+.contacts{overflow:auto;flex:1}
+.contact{
+ display:flex;align-items:center;gap:12px;padding:13px 15px;
+ border-bottom:1px solid rgba(38,53,61,.55);cursor:pointer;
+}
+.contact:active{background:var(--panel2)}
+.contact-info{min-width:0;flex:1}
+.contact-name{font-weight:600}
+.contact-id{font-size:12px;color:var(--muted);margin-top:3px}
+.empty{text-align:center;color:var(--muted);padding:45px 20px}
+
+/* CHAT */
+.chat-head{
+ height:64px;background:var(--panel);display:flex;align-items:center;
+ padding:0 7px;gap:7px;flex-shrink:0;
+}
+.back{font-size:27px}
+.head-info{flex:1;min-width:0}
+.head-name{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.head-id{font-size:11px;color:var(--muted)}
+.chat-actions{display:flex;gap:0}
+.messages{
+ flex:1;overflow:auto;padding:12px 9px;
+ background:
+ linear-gradient(rgba(11,20,26,.93),rgba(11,20,26,.93)),
+ repeating-linear-gradient(45deg,#0e181e 0 8px,#0c151a 8px 16px);
+}
+.message-row{display:flex;margin:4px 0}
+.message-row.mine{justify-content:flex-end}
+.bubble{
+ max-width:82%;padding:8px 10px;border-radius:9px;
+ background:var(--bubble2);position:relative;word-wrap:break-word;
+ box-shadow:0 1px 1px rgba(0,0,0,.2);
+}
+.mine .bubble{background:var(--bubble)}
+.msg-time{
+ font-size:10px;color:#aeb9be;float:right;margin:7px 0 0 10px;
+}
+.msg-text{white-space:pre-wrap;line-height:1.35}
+.msg-img,.msg-video{display:block;max-width:100%;border-radius:7px;margin-bottom:4px}
+.msg-audio{width:220px;max-width:100%}
+.file-name{font-size:13px;margin-bottom:5px}
+.composer{
+ min-height:62px;background:var(--panel);display:flex;align-items:center;
+ gap:6px;padding:8px;flex-shrink:0;
+}
+.attach{
+ width:42px;height:42px;border-radius:50%;background:transparent;
+ color:#b8c3c7;font-size:22px;cursor:pointer;
+}
+#messageInput{
+ flex:1;min-width:0;background:var(--panel2);border:0;outline:none;
+ color:white;border-radius:22px;padding:11px 15px;resize:none;
+ max-height:100px;
+}
+.send{
+ width:44px;height:44px;border-radius:50%;background:var(--green);
+ color:#fff;font-size:19px;cursor:pointer;
+}
+
+/* CALL */
+.call-screen{
+ background:#061014;z-index:50;
+}
+.remote-video{
+ position:absolute;inset:0;width:100%;height:100%;
+ object-fit:cover;background:#0a151a;
+}
+.local-video{
+ position:absolute;right:15px;top:75px;width:115px;height:165px;
+ object-fit:cover;border-radius:12px;background:#18262d;
+ border:1px solid rgba(255,255,255,.2);
+ z-index:2;
+}
+.call-overlay{
+ position:absolute;inset:0;z-index:3;
+ display:flex;flex-direction:column;
+ pointer-events:none;
+}
+.call-top{text-align:center;padding-top:35px;text-shadow:0 2px 8px #000}
+.call-name{font-size:22px;font-weight:700}
+.call-status{font-size:13px;color:#d5dde0;margin-top:5px}
+.call-controls{
+ margin-top:auto;display:flex;justify-content:center;gap:18px;
+ padding:30px;pointer-events:auto;
+ background:linear-gradient(transparent,rgba(0,0,0,.8));
+}
+.call-btn{
+ width:58px;height:58px;border-radius:50%;background:#25343b;color:white;
+ font-size:22px;cursor:pointer;
+}
+.call-btn.end{background:var(--danger);transform:rotate(135deg)}
+.incoming{
+ position:absolute;inset:0;z-index:100;background:rgba(0,0,0,.78);
+ display:none;align-items:center;justify-content:center;padding:25px;
+}
+.incoming.show{display:flex}
+.incoming-card{
+ width:100%;max-width:360px;background:var(--panel);
+ border-radius:22px;padding:28px;text-align:center;
+ box-shadow:0 20px 80px #000;
+}
+.incoming-avatar{
+ width:82px;height:82px;border-radius:50%;background:#334954;
+ display:grid;place-items:center;margin:0 auto 15px;font-size:30px;
+}
+.incoming-type{color:var(--muted);margin:6px 0 25px}
+.incoming-actions{display:flex;justify-content:center;gap:25px}
+.accept,.reject{
+ width:58px;height:58px;border-radius:50%;color:#fff;font-size:23px;
+ cursor:pointer;
+}
+.accept{background:var(--green)}
+.reject{background:var(--danger)}
+
+/* TOAST */
+.toast{
+ position:absolute;left:50%;bottom:80px;transform:translateX(-50%) translateY(20px);
+ background:#26343b;color:white;padding:11px 16px;border-radius:9px;
+ opacity:0;pointer-events:none;transition:.25s;z-index:200;
+ font-size:13px;max-width:90%;text-align:center;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.status-dot{
+ display:inline-block;width:7px;height:7px;border-radius:50%;
+ background:#777;margin-right:4px;
+}
+.status-dot.online{background:#22c55e}
+
+.hidden{display:none!important}
+@media(min-width:701px){
+ .app{height:100dvh;box-shadow:0 0 50px #000}
+}
+</style></head><body>
+<div class="app"><section id="welcome" class="screen active">
+ <div class="logo">AZ</div>
+ <div class="welcome-title">AZChat</div>
+ <div class="welcome-sub">
+   Serverdə hesab yaratmadan P2P mesajlaşma.<br>
+   Adını daxil et və öz AZ-ID-ni yarat.
+ </div>
+ <input id="nameInput" class="field" maxlength="30" placeholder="Adınız">
+ <button id="createBtn" class="primary">AZChat-a daxil ol</button>
+ <div class="small-note">PeerJS P2P • Local Storage • WebRTC</div>
+</section><section id="home" class="screen">
+ <div class="topbar">
+   <div class="brand">AZChat</div>
+   <div id="myChip" class="profile-chip">AZ-00000</div>
+ </div> <div class="addbox">
+   <input id="friendName" maxlength="30" placeholder="Dostun Adı">
+   <input id="friendId" maxlength="8" placeholder="AZ-XXXXX">
+   <button id="addFriend" class="addbtn" title="Əlavə et">+</button>
+ </div> <div id="contacts" class="contacts"></div>
+</section><section id="chat" class="screen">
+ <div class="chat-head">
+   <button id="backHome" class="iconbtn back">‹</button>
+   <div id="chatAvatar" class="avatar">A</div>
+   <div class="head-info">
+     <div id="chatName" class="head-name">Dost</div>
+     <div id="chatStatus" class="head-id">
+       <span class="status-dot"></span>qoşulmayıb
+     </div>
+   </div>
+   <div class="chat-actions">
+     <button id="audioCall" class="iconbtn">☎</button>
+     <button id="videoCall" class="iconbtn">▣</button>
+   </div>
+ </div> <div id="messages" class="messages"></div> <div class="composer">
+   <button id="imageBtn" class="attach">＋</button>
+   <button id="micBtn" class="attach">🎙</button>
+   <textarea id="messageInput" rows="1" placeholder="Mesaj yazın"></textarea>
+   <button id="sendBtn" class="send">➤</button>
+ </div> <input id="mediaInput" type="file" accept="image/*,video/*" hidden>
+</section><section id="callScreen" class="screen call-screen">
+ <video id="remoteVideo" class="remote-video" autoplay playsinline></video>
+ <video id="localVideo" class="local-video" autoplay muted playsinline></video> <div class="call-overlay">
+   <div class="call-top">
+     <div id="callName" class="call-name">AZChat</div>
+     <div id="callStatus" class="call-status">Qoşulur...</div>
+   </div>   <div class="call-controls">
+     <button id="muteBtn" class="call-btn">🎙</button>
+     <button id="cameraBtn" class="call-btn">▣</button>
+     <button id="endCall" class="call-btn end">☎</button>
+   </div>
+ </div>
+</section><div id="incoming" class="incoming">
+ <div class="incoming-card">
+   <div id="incomingAvatar" class="incoming-avatar">A</div>
+   <div id="incomingName" style="font-size:22px;font-weight:700">Dost</div>
+   <div id="incomingType" class="incoming-type">Gələn zəng</div>
+   <div class="incoming-actions">
+     <button id="rejectCall" class="reject">✕</button>
+     <button id="acceptCall" class="accept">☎</button>
+   </div>
+ </div>
+</div><div id="toast" class="toast"></div>
+</div><script>
+"use strict";
+
+/*
+ AZChat SINGLE-FILE P2P
+ ----------------------------------------
+ - PeerJS/WebRTC
+ - Text DataConnection
+ - Image/video Blob transfer
+ - Audio recording
+ - Audio/video calls
+ - LocalStorage contacts/messages/profile
+ - Browser Notification API
+ - Web Audio ringing tones
+
+ IMPORTANT:
+ PeerJS still needs signaling infrastructure.
+ This file uses PeerJS's default cloud PeerServer.
+ A completely serverless Internet P2P application cannot
+ perform initial peer discovery using WebRTC alone.
+*/
+
+const $ = id => document.getElementById(id);
+
+const KEY_PROFILE = "azchat_profile_v1";
+const KEY_CONTACTS = "azchat_contacts_v1";
+const KEY_MESSAGES = "azchat_messages_v1";
+
+let profile = JSON.parse(localStorage.getItem(KEY_PROFILE) || "null");
+let contacts = JSON.parse(localStorage.getItem(KEY_CONTACTS) || "[]");
+let messages = JSON.parse(localStorage.getItem(KEY_MESSAGES) || "{}");
+
+let peer = null;
+let connections = new Map();
+let currentFriend = null;
+let currentConn = null;
+
+let mediaStream = null;
+let currentCall = null;
+let pendingCall = null;
+let pendingCaller = null;
+
+let recorder = null;
+let recordingChunks = [];
+let recording = false;
+
+let audioCtx = null;
+let ringTimer = null;
+
+function save(){
+ localStorage.setItem(KEY_CONTACTS,JSON.stringify(contacts));
+ localStorage.setItem(KEY_MESSAGES,JSON.stringify(messages));
+}
+
+function escapeHTML(s){
+ return String(s).replace(/[&<>"']/g,c=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",
+  '"':"&quot;","'":"&#039;"
+ }[c]));
+}
+
+function initials(name){
+ return String(name||"?").trim().split(/\s+/).slice(0,2)
+   .map(x=>x[0]).join("").toUpperCase() || "?";
+}
+
+function showScreen(id){
+ document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));
+ $(id).classList.add("active");
+}
+
+function toast(text){
+ const el=$("toast");
+ el.textContent=text;
+ el.classList.add("show");
+ clearTimeout(el._t);
+ el._t=setTimeout(()=>el.classList.remove("show"),2600);
+}
+
+function generateID(){
+ let id;
+ do{
+   id="AZ-"+Math.floor(10000+Math.random()*90000);
+ }while(profile && id===profile.id);
+ return id;
+}
+
+function normalizeID(id){
+ return String(id||"").trim().toUpperCase().replace(/\s/g,"");
+}
+
+function validID(id){
+ return /^AZ-\d{5}$/.test(id);
+}
+
+/* PROFILE */
+function start(){
+ if(profile){
+   $("myChip").textContent=profile.id;
+   initPeer();
+   renderContacts();
+   showScreen("home");
+ }else{
+   showScreen("welcome");
+ }
+}
+
+$("createBtn").onclick=()=>{
+ const name=$("nameInput").value.trim();
+ if(name.length<2){
+   toast("Adınızı daxil edin");
+   return;
+ }
+ profile={name,id:generateID()};
+ localStorage.setItem(KEY_PROFILE,JSON.stringify(profile));
+
+ if("Notification" in window){
+   Notification.requestPermission().catch(()=>{});
+ }
+
+ $("myChip").textContent=profile.id;
+ initPeer();
+ renderContacts();
+ showScreen("home");
+};
+
+$("nameInput").addEventListener("keydown",e=>{
+ if(e.key==="Enter") $("createBtn").click();
+});
+
+/* PEER */
+function initPeer(){
+ if(peer) return;
+
+ /*
+   Default PeerJS cloud server.
+   This is the signaling component; actual data/media is WebRTC P2P.
+ */
+ peer=new Peer(profile.id,{
+   debug:1
+ });
+
+ peer.on("open",id=>{
+   console.log("Peer open:",id);
+ });
+
+ peer.on("connection",conn=>{
+   setupConnection(conn);
+ });
+
+ peer.on("call",call=>{
+   handleIncomingCall(call);
+ });
+
+ peer.on("error",err=>{
+   console.error(err);
+   if(err.type==="unavailable-id"){
+     toast("Bu ID artıq istifadə olunur. Səhifəni yenilə.");
+   }else if(err.type==="peer-unavailable"){
+     toast("Dost hazırda qoşulu deyil.");
+   }else{
+     toast("P2P əlaqə xətası: "+err.type);
+   }
+ });
+
+ peer.on("disconnected",()=>{
+   console.log("Peer disconnected");
+ });
+
+ peer.on("close",()=>{
+   peer=null;
+ });
+}
+
+function connectFriend(friend){
+ if(!peer || !peer.open){
+   toast("P2P sistemi hələ hazır deyil");
+   return null;
+ }
+
+ if(connections.has(friend.id)){
+   return connections.get(friend.id);
+ }
+
+ const conn=peer.connect(friend.id,{
+   reliable:true,
+   serialization:"json"
+ });
+
+ setupConnection(conn);
+ return conn;
+}
+
+function setupConnection(conn){
+ if(!conn || !conn.peer) return;
+
+ connections.set(conn.peer,conn);
+
+ conn.on("open",()=>{
+   if(currentFriend && currentFriend.id===conn.peer){
+     setChatOnline(true);
+   }
+ });
+
+ conn.on("data",data=>{
+   receiveData(data,conn);
+ });
+
+ conn.on("close",()=>{
+   connections.delete(conn.peer);
+   if(currentFriend && currentFriend.id===conn.peer){
+     setChatOnline(false);
+   }
+ });
+
+ conn.on("error",e=>{
+   console.error("connection error",e);
+ });
+}
+
+function getConn(friend){
+ let conn=connections.get(friend.id);
+ if(conn && conn.open) return conn;
+ return connectFriend(friend);
+}
+
+/* CONTACTS */
+$("addFriend").onclick=addFriend;
+
+function addFriend(){
+ const name=$("friendName").value.trim();
+ const id=normalizeID($("friendId").value);
+
+ if(name.length<2){
+   toast("Dostun adını daxil edin");
+   return;
+ }
+ if(!validID(id)){
+   toast("ID AZ-XXXXX formatında olmalıdır");
+   return;
+ }
+ if(profile && id===profile.id){
+   toast("Öz ID-nizi dost kimi əlavə edə bilməzsiniz");
+   return;
+ }
+ if(contacts.some(c=>c.id===id)){
+   toast("Bu dost artıq siyahıdadır");
+   return;
+ }
+
+ const friend={name,id,created:Date.now()};
+ contacts.unshift(friend);
+ messages[id]=messages[id]||[];
+ save();
+
+ $("friendName").value="";
+ $("friendId").value="";
+ renderContacts();
+
+ openChat(friend);
+}
+
+function renderContacts(){
+ const box=$("contacts");
+
+ if(!contacts.length){
+   box.innerHTML=`
+    <div class="empty">
+      Hələ kontakt yoxdur.<br><br>
+      Dostunuzun adını və AZ-ID-sini yuxarıdakı xanalara daxil edin.
+    </div>`;
+   return;
+ }
+
+ box.innerHTML=contacts.map(c=>`
+   <div class="contact" data-id="${escapeHTML(c.id)}">
+     <div class="avatar">${escapeHTML(initials(c.name))}</div>
+     <div class="contact-info">
+       <div class="contact-name">${escapeHTML(c.name)}</div>
+       <div class="contact-id">${escapeHTML(c.id)}</div>
+     </div>
+   </div>
+ `).join("");
+
+ box.querySelectorAll(".contact").forEach(el=>{
+   el.onclick=()=>{
+     const friend=contacts.find(c=>c.id===el.dataset.id);
+     if(friend) openChat(friend);
+   };
+ });
+}
+
+/* CHAT */
+function openChat(friend){
+ currentFriend=friend;
+ currentConn=connections.get(friend.id)||null;
+
+ $("chatAvatar").textContent=initials(friend.name);
+ $("chatName").textContent=friend.name;
+ setChatOnline(!!(currentConn && currentConn.open));
+
+ renderMessages();
+
+ showScreen("chat");
+
+ if(!currentConn || !currentConn.open){
+   setTimeout(()=>{
+     currentConn=getConn(friend);
+   },100);
+ }
+}
+
+function setChatOnline(online){
+ $("chatStatus").innerHTML=
+  `<span class="status-dot ${online?"online":""}"></span>`+
+  (online?"online":"qoşulmayıb");
+}
+
+$("backHome").onclick=()=>{
+ currentFriend=null;
+ currentConn=null;
+ showScreen("home");
+};
+
+function renderMessages(){
+ const box=$("messages");
+ const arr=messages[currentFriend.id]||[];
+
+ box.innerHTML=arr.map(renderMessage).join("");
+ box.scrollTop=box.scrollHeight;
+}
+
+function renderMessage(m){
+ const mine=m.sender===profile.id;
+ let body="";
+
+ if(m.type==="text"){
+   body=`<div class="msg-text">${escapeHTML(m.text)}</div>`;
+ }
+ else if(m.type==="image"){
+   body=`<img class="msg-img" src="${m.data}" alt="Şəkil">`;
+ }
+ else if(m.type==="video"){
+   body=`<video class="msg-video" src="${m.data}" controls playsinline></video>`;
+ }
+ else if(m.type==="audio"){
+   body=`<audio class="msg-audio" src="${m.data}" controls></audio>`;
+ }
+ else if(m.type==="file"){
+   body=`<div class="file-name">📎 ${escapeHTML(m.name||"Fayl")}</div>`;
+ }
+
+ return `
+  <div class="message-row ${mine?"mine":""}">
+   <div class="bubble">
+    ${body}
+    <div class="msg-time">${new Date(m.time).toLocaleTimeString([],{
+      hour:"2-digit",minute:"2-digit"
+    })}</div>
+   </div>
+  </div>
+ `;
+}
+
+function storeMessage(friendId,msg,render=true){
+ if(!messages[friendId]) messages[friendId]=[];
+ messages[friendId].push(msg);
+
+ /* Prevent uncontrolled local storage growth */
+ if(messages[friendId].length>500){
+   messages[friendId]=messages[friendId].slice(-500);
+ }
+
+ save();
+ if(render && currentFriend && currentFriend.id===friendId){
+   renderMessages();
+ }
+}
+
+function sendPacket(packet){
+ if(!currentFriend) return false;
+
+ const conn=getConn(currentFriend);
+
+ if(!conn || !conn.open){
+   toast("Dost hazırda onlayn deyil");
+   return false;
+ }
+
+ try{
+   conn.send(packet);
+   return true;
+ }catch(e){
+   toast("Göndərmək mümkün olmadı");
+   return false;
+ }
+}
+
+function createMessage(type,extra={}){
+ return {
+   type,
+   sender:profile.id,
+   senderName:profile.name,
+   time:Date.now(),
+   ...extra
+ };
+}
+
+function sendText(){
+ const text=$("messageInput").value.trim();
+ if(!text || !currentFriend) return;
+
+ const msg=createMessage("text",{text});
+
+ if(sendPacket({kind:"message",message:msg})){
+   storeMessage(currentFriend.id,msg);
+   $("messageInput").value="";
+   $("messageInput").style.height="auto";
+ }
+}
+
+$("sendBtn").onclick=sendText;
+
+$("messageInput").addEventListener("keydown",e=>{
+ if(e.key==="Enter"&&!e.shiftKey){
+   e.preventDefault();
+   sendText();
+ }
+});
+
+$("messageInput").addEventListener("input",()=>{
+ $("messageInput").style.height="auto";
+ $("messageInput").style.height=
+   Math.min($("messageInput").scrollHeight,100)+"px";
+});
+
+/* MEDIA */
+$("imageBtn").onclick=()=>$("mediaInput").click();
+
+$("mediaInput").onchange=async()=>{
+ const file=$("mediaInput").files[0];
+ $("mediaInput").value="";
+ if(!file || !currentFriend) return;
+
+ if(file.size>12*1024*1024){
+   toast("Bu demo üçün maksimum 12 MB media göndərin");
+   return;
+ }
+
+ const data=await fileToDataURL(file);
+ const type=file.type.startsWith("image/")?"image":
+            file.type.startsWith("video/")?"video":"file";
+
+ const msg=createMessage(type,{
+   name:file.name,
+   mime:file.type,
+   size:file.size,
+   data
+ });
+
+ if(sendPacket({kind:"message",message:msg})){
+   storeMessage(currentFriend.id,msg);
+ }
+};
+
+function fileToDataURL(file){
+ return new Promise((resolve,reject)=>{
+   const reader=new FileReader();
+   reader.onload=()=>resolve(reader.result);
+   reader.onerror=reject;
+   reader.readAsDataURL(file);
+ });
+}
+
+/* RECEIVE */
+function receiveData(data,conn){
+ if(!data) return;
+
+ if(data.kind==="message"){
+   const m=data.message;
+   if(!m) return;
+
+   const friend=contacts.find(c=>c.id===conn.peer);
+   if(friend){
+     /*
+       Store using the known contact ID.
+       If not currently in chat, still keep history.
+     */
+     storeMessage(conn.peer,m,currentFriend?.id===conn.peer);
+
+     if(currentFriend?.id!==conn.peer){
+       notifyMessage(m,friend);
+     }
+   }
+ }
+ else if(data.kind==="profile"){
+   /* Optional future profile synchronization */
+ }
+}
+
+function notifyMessage(m,friend){
+ if("Notification" in window &&
+    Notification.permission==="granted" &&
+    document.hidden){
+   try{
+     new Notification(friend.name,{
+       body:m.type==="text"?m.text:
+            m.type==="image"?"📷 Şəkil":
+            m.type==="video"?"🎥 Video":
+            m.type==="audio"?"🎙 Səsli mesaj":"📎 Fayl",
+       icon:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='128' height='128'><rect width='128' height='128' rx='64' fill='%2300a884'/><text x='64' y='78' font-size='55' text-anchor='middle' fill='white'>AZ</text></svg>"
+     });
+   }catch(e){}
+ }
+}
+
+/* AUDIO RECORDING */
+$("micBtn").onclick=async()=>{
+ if(recording){
+   recorder?.stop();
+   return;
+ }
+
+ if(!navigator.mediaDevices?.getUserMedia){
+   toast("Mikrofon bu brauzerdə dəstəklənmir");
+   return;
+ }
+
+ try{
+   const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+   recordingChunks=[];
+   recorder=new MediaRecorder(stream);
+   recording=true;
+   $("micBtn").textContent="⏹";
+   toast("Səs yazılır... dayandırmaq üçün mikrofona bas");
+
+   recorder.ondataavailable=e=>{
+     if(e.data.size) recordingChunks.push(e.data);
+   };
+
+   recorder.onstop=async()=>{
+     recording=false;
+     $("micBtn").textContent="🎙";
+     stream.getTracks().forEach(t=>t.stop());
+
+     const blob=new Blob(recordingChunks,{type:recorder.mimeType||"audio/webm"});
+     if(blob.size>8*1024*1024){
+       toast("Səs faylı çox böyükdür");
+       return;
+     }
+
+     const data=await fileToDataURL(blob);
+     const msg=createMessage("audio",{
+       data,
+       mime:blob.type,
+       name:"voice-message.webm"
+     });
+
+     if(sendPacket({kind:"message",message:msg})){
+       storeMessage(currentFriend.id,msg);
+     }
+   };
+
+   recorder.start();
+ }catch(e){
+   recording=false;
+   $("micBtn").textContent="🎙";
+   toast("Mikrofon icazəsi verilmədi");
+ }
+};
+
+/* CALLS */
+$("audioCall").onclick=()=>startCall(false);
+$("videoCall").onclick=()=>startCall(true);
+
+async function getLocalMedia(video){
+ try{
+   return await navigator.mediaDevices.getUserMedia({
+     audio:true,
+     video:video
+   });
+ }catch(e){
+   toast("Kamera/mikrofon icazəsi verilmədi");
+   throw e;
+ }
+}
+
+async function startCall(video){
+ if(!currentFriend) return;
+
+ if(!peer || !peer.open){
+   toast("P2P sistemi hazır deyil");
+   return;
+ }
+
+ try{
+   mediaStream=await getLocalMedia(video);
+
+   $("localVideo").srcObject=mediaStream;
+   $("localVideo").style.display=video?"block":"none";
+   $("remoteVideo").style.display=video?"block":"none";
+
+   $("callName").textContent=currentFriend.name;
+   $("callStatus").textContent="Zəng edilir...";
+   showScreen("callScreen");
+
+   startRingback();
+
+   currentCall=peer.call(
+     currentFriend.id,
+     mediaStream,
+     {metadata:{
+       callerName:profile.name,
+       callerId:profile.id,
+       video:video
+     }}
+   );
+
+   setupCall(currentCall,video);
+
+ }catch(e){
+   stopCall(false);
+ }
+}
+
+function setupCall(call,video){
+ currentCall=call;
+
+ call.on("stream",remote=>{
+   stopRingback();
+   $("remoteVideo").srcObject=remote;
+   $("callStatus").textContent="Bağlandı";
+ });
+
+ call.on("close",()=>{
+   stopCall(false);
+ });
+
+ call.on("error",e=>{
+   console.error(e);
+   stopCall(false);
+   toast("Zəng əlaqəsi kəsildi");
+ });
+}
+
+function handleIncomingCall(call){
+ pendingCall=call;
+
+ const md=call.metadata||{};
+ pendingCaller={
+   id:call.peer,
+   name:md.callerName||call.peer,
+   video:!!md.video
+ };
+
+ $("incomingAvatar").textContent=initials(pendingCaller.name);
+ $("incomingName").textContent=pendingCaller.name;
+ $("incomingType").textContent=
+   pendingCaller.video?"Gələn görüntülü zəng":"Gələn səsli zəng";
+
+ $("incoming").classList.add("show");
+ startIncomingRing();
+
+ if("Notification" in window &&
+    Notification.permission==="granted" &&
+    document.hidden){
+   try{
+     new Notification("AZChat — gələn zəng",{
+       body:pendingCaller.name+" sizə zəng edir"
+     });
+   }catch(e){}
+ }
+}
+
+$("acceptCall").onclick=async()=>{
+ if(!pendingCall) return;
+
+ stopIncomingRing();
+ $("incoming").classList.remove("show");
+
+ try{
+   const video=pendingCaller?.video||false;
+   mediaStream=await getLocalMedia(video);
+
+   $("localVideo").srcObject=mediaStream;
+   $("localVideo").style.display=video?"block":"none";
+   $("remoteVideo").style.display=video?"block":"none";
+
+   $("callName").textContent=pendingCaller?.name||"Dost";
+   $("callStatus").textContent="Qoşulur...";
+   showScreen("callScreen");
+
+   pendingCall.answer(mediaStream);
+   setupCall(pendingCall,video);
+
+   pendingCall=null;
+ }catch(e){
+   try{pendingCall.close()}catch(_){}
+   pendingCall=null;
+ }
+};
+
+$("rejectCall").onclick=()=>{
+ stopIncomingRing();
+ if(pendingCall){
+   try{pendingCall.close()}catch(e){}
+ }
+ pendingCall=null;
+ $("incoming").classList.remove("show");
+};
+
+/* END CALL */
+$("endCall").onclick=()=>stopCall(true);
+
+function stopCall(sendClose){
+ stopRingback();
+ stopIncomingRing();
+
+ if(sendClose && currentCall){
+   try{currentCall.close()}catch(e){}
+ }
+
+ currentCall=null;
+
+ if(mediaStream){
+   mediaStream.getTracks().forEach(t=>t.stop());
+   mediaStream=null;
+ }
+
+ $("remoteVideo").srcObject=null;
+ $("localVideo").srcObject=null;
+
+ $("remoteVideo").style.display="none";
+ $("localVideo").style.display="none";
+
+ if(currentFriend) showScreen("chat");
+ else showScreen("home");
+}
+
+/* MUTE / CAMERA */
+$("muteBtn").onclick=()=>{
+ if(!mediaStream) return;
+ const track=mediaStream.getAudioTracks()[0];
+ if(!track) return;
+ track.enabled=!track.enabled;
+ $("muteBtn").textContent=track.enabled?"🎙":"🔇";
+};
+
+$("cameraBtn").onclick=()=>{
+ if(!mediaStream) return;
+ const track=mediaStream.getVideoTracks()[0];
+ if(!track) return;
+ track.enabled=!track.enabled;
+ $("cameraBtn").textContent=track.enabled?"▣":"□";
+};
+
+/* RINGBACK AUDIO */
+function ensureAudio(){
+ if(!audioCtx){
+   audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+ }
+ if(audioCtx.state==="suspended") audioCtx.resume();
+ return audioCtx;
+}
+
+function beep(freq,duration,startTime,volume=.035){
+ const ctx=ensureAudio();
+ const osc=ctx.createOscillator();
+ const gain=ctx.createGain();
+
+ osc.frequency.value=freq;
+ osc.type="sine";
+ gain.gain.setValueAtTime(0.0001,startTime);
+ gain.gain.exponentialRampToValueAtTime(volume,startTime+.02);
+ gain.gain.exponentialRampToValueAtTime(0.0001,startTime+duration);
+
+ osc.connect(gain);
+ gain.connect(ctx.destination);
+ osc.start(startTime);
+ osc.stop(startTime+duration+.03);
+}
+
+function ringOnce(){
+ const ctx=ensureAudio();
+ const t=ctx.currentTime;
+ beep(440,.28,t);
+ beep(480,.28,t+.34);
+}
+
+function startRingback(){
+ stopRingback();
+ ringOnce();
+ ringTimer=setInterval(ringOnce,3000);
+}
+
+function stopRingback(){
+ if(ringTimer){
+   clearInterval(ringTimer);
+   ringTimer=null;
+ }
+}
+
+function startIncomingRing(){
+ stopIncomingRing();
+ function r(){
+   const ctx=ensureAudio();
+   const t=ctx.currentTime;
+   beep(660,.18,t,.055);
+   beep(880,.25,t+.22,.055);
+   beep(660,.18,t+.55,.055);
+ }
+ r();
+ ringTimer=setInterval(r,2600);
+}
+
+function stopIncomingRing(){
+ if(ringTimer){
+   clearInterval(ringTimer);
+   ringTimer=null;
+ }
+}
+
+/* NOTIFICATION PERMISSION */
+document.addEventListener("visibilitychange",()=>{
+ if(!document.hidden && currentFriend){
+   setChatOnline(!!(connections.get(currentFriend.id)?.open));
+ }
+});
+
+/* REQUEST NOTIFICATION ON FIRST USER ACTION */
+document.addEventListener("click",()=>{
+ if("Notification" in window &&
+    Notification.permission==="default"){
+   Notification.requestPermission().catch(()=>{});
+ }
+},{once:true});
+
+/* START */
+start();
+</script></body>
+    </html>
