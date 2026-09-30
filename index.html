@@ -1,372 +1,1728 @@
 <!DOCTYPE html>
 <html lang="az">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>3D Canlı Naviqasiya & Məkan Sistemi</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background-color: #0f172a;
-      color: #ffffff;
-    }
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 
-    /* Modal / Seçim Ekrani */
-    #mode-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(15, 23, 42, 0.95);
-      backdrop-filter: blur(8px);
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-    .modal-title {
-      font-size: 22px;
-      font-weight: bold;
-      margin-bottom: 25px;
-      text-align: center;
-      color: #38bdf8;
-    }
-    .btn-group {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      width: 100%;
-      max-width: 320px;
-    }
-    .select-btn {
-      padding: 16px 20px;
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    }
-    .btn-3d {
-      background: linear-gradient(135deg, #10b981, #059669);
-      color: white;
-    }
-    .btn-2d {
-      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-      color: white;
-    }
-    .select-btn:active {
-      transform: scale(0.97);
-    }
+<title>3D Live Navigator PRO</title>
 
-    /* Əsas Konteynetlər */
-    #view-container {
-      width: 100%;
-      height: 100%;
-      position: relative;
-    }
-    #map, #pano {
-      width: 100%;
-      height: 100%;
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
-    #pano {
-      display: none;
-    }
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  -webkit-tap-highlight-color:transparent;
+  font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;
+}
 
-    /* Ust Naviqasiya Paneli */
-    #nav-header {
-      position: absolute;
-      top: 15px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 90%;
-      max-width: 400px;
-      background: rgba(30, 41, 59, 0.85);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 12px 16px;
-      z-index: 100;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-    }
-    .nav-info {
-      display: flex;
-      flex-direction: column;
-    }
-    .nav-status {
-      font-size: 12px;
-      color: #94a3b8;
-    }
-    .nav-dist {
-      font-size: 18px;
-      font-weight: bold;
-      color: #10b981;
-    }
+html,body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#07111f;
+  color:#fff;
+}
 
-    /* Alt İdarəetmə Paneli */
-    #bottom-bar {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 100;
-      display: flex;
-      gap: 12px;
-    }
-    .action-btn {
-      background: #1e293b;
-      color: white;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      padding: 12px 20px;
-      border-radius: 30px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    }
-    .share-btn {
-      background: #25d366;
-      color: white;
-    }
-  </style>
+button{
+  border:0;
+  outline:0;
+  cursor:pointer;
+}
+
+#app{
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+}
+
+#map,
+#pano{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+}
+
+#pano{
+  display:none;
+}
+
+/* =========================
+   START SCREEN
+========================= */
+
+#modeModal{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:
+    radial-gradient(circle at 50% 20%,rgba(0,229,255,.15),transparent 35%),
+    linear-gradient(145deg,#07111f,#0d1728);
+}
+
+.start-card{
+  width:100%;
+  max-width:390px;
+  padding:28px 22px 24px;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:28px;
+  background:rgba(15,27,45,.88);
+  box-shadow:0 25px 70px rgba(0,0,0,.5);
+  backdrop-filter:blur(20px);
+}
+
+.logo{
+  width:70px;
+  height:70px;
+  margin:0 auto 18px;
+  border-radius:22px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:34px;
+  background:linear-gradient(135deg,#00e5ff,#2563eb);
+  box-shadow:0 10px 35px rgba(0,229,255,.25);
+}
+
+.start-card h1{
+  text-align:center;
+  font-size:23px;
+  margin-bottom:8px;
+}
+
+.start-card p{
+  text-align:center;
+  color:#94a3b8;
+  font-size:13px;
+  line-height:1.5;
+  margin-bottom:24px;
+}
+
+.mode-btn{
+  width:100%;
+  padding:17px;
+  margin-top:11px;
+  border-radius:16px;
+  color:white;
+  font-weight:700;
+  font-size:15px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  box-shadow:0 8px 25px rgba(0,0,0,.25);
+  transition:.18s;
+}
+
+.mode-btn:active{
+  transform:scale(.97);
+}
+
+.mode-3d{
+  background:linear-gradient(135deg,#10b981,#047857);
+}
+
+.mode-2d{
+  background:linear-gradient(135deg,#2563eb,#1d4ed8);
+}
+
+/* =========================
+   TOP HUD
+========================= */
+
+#topHud{
+  position:absolute;
+  z-index:1000;
+  top:max(14px,env(safe-area-inset-top));
+  left:12px;
+  right:12px;
+  display:flex;
+  gap:9px;
+  pointer-events:none;
+}
+
+.hud-main{
+  flex:1;
+  min-width:0;
+  padding:13px 15px;
+  border-radius:18px;
+  background:rgba(10,22,38,.88);
+  border:1px solid rgba(255,255,255,.1);
+  backdrop-filter:blur(16px);
+  box-shadow:0 10px 30px rgba(0,0,0,.3);
+}
+
+.direction{
+  font-size:12px;
+  color:#94a3b8;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.distance{
+  font-size:25px;
+  line-height:1.15;
+  font-weight:800;
+  color:#22c55e;
+  margin-top:2px;
+}
+
+.eta{
+  font-size:11px;
+  color:#cbd5e1;
+  margin-top:3px;
+}
+
+.gps-box{
+  width:52px;
+  min-width:52px;
+  border-radius:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  background:rgba(10,22,38,.88);
+  border:1px solid rgba(255,255,255,.1);
+  backdrop-filter:blur(16px);
+}
+
+.gps-icon{
+  font-size:18px;
+}
+
+.gps-accuracy{
+  font-size:9px;
+  margin-top:2px;
+  color:#22c55e;
+}
+
+/* =========================
+   FLOATING BUTTONS
+========================= */
+
+#floatingControls{
+  position:absolute;
+  z-index:1000;
+  right:12px;
+  top:145px;
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+}
+
+.float-btn{
+  width:47px;
+  height:47px;
+  border-radius:15px;
+  color:white;
+  font-size:19px;
+  background:rgba(10,22,38,.9);
+  border:1px solid rgba(255,255,255,.12);
+  backdrop-filter:blur(15px);
+  box-shadow:0 8px 22px rgba(0,0,0,.3);
+}
+
+.float-btn:active{
+  transform:scale(.93);
+}
+
+/* =========================
+   BOTTOM SHEET
+========================= */
+
+#bottomSheet{
+  position:absolute;
+  z-index:1000;
+  left:10px;
+  right:10px;
+  bottom:max(10px,env(safe-area-inset-bottom));
+  padding:13px;
+  border-radius:23px;
+  background:rgba(8,19,34,.93);
+  border:1px solid rgba(255,255,255,.1);
+  backdrop-filter:blur(20px);
+  box-shadow:0 15px 40px rgba(0,0,0,.4);
+}
+
+.sheet-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+
+.info-item{
+  flex:1;
+  min-width:0;
+}
+
+.info-label{
+  font-size:9px;
+  color:#64748b;
+  text-transform:uppercase;
+}
+
+.info-value{
+  font-size:13px;
+  font-weight:700;
+  margin-top:2px;
+}
+
+.bottom-actions{
+  display:flex;
+  gap:8px;
+  margin-top:11px;
+}
+
+.bottom-btn{
+  flex:1;
+  padding:12px 8px;
+  border-radius:13px;
+  color:#fff;
+  font-size:12px;
+  font-weight:700;
+  background:#17263a;
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.share{
+  background:#16a34a;
+}
+
+.bottom-btn:active{
+  transform:scale(.97);
+}
+
+/* =========================
+   LOADING
+========================= */
+
+#loading{
+  position:absolute;
+  inset:0;
+  z-index:5000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(3,10,20,.55);
+  backdrop-filter:blur(4px);
+}
+
+.loader-card{
+  padding:20px 25px;
+  border-radius:18px;
+  background:#0f1d30;
+  text-align:center;
+  box-shadow:0 15px 40px rgba(0,0,0,.4);
+}
+
+.spinner{
+  width:35px;
+  height:35px;
+  margin:0 auto 10px;
+  border:3px solid rgba(255,255,255,.15);
+  border-top-color:#00e5ff;
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg)}
+}
+
+/* =========================
+   TOAST
+========================= */
+
+#toast{
+  position:absolute;
+  z-index:6000;
+  left:50%;
+  bottom:145px;
+  transform:translateX(-50%) translateY(20px);
+  max-width:90%;
+  padding:11px 15px;
+  border-radius:13px;
+  background:rgba(15,23,42,.96);
+  border:1px solid rgba(255,255,255,.12);
+  font-size:12px;
+  opacity:0;
+  pointer-events:none;
+  transition:.25s;
+  text-align:center;
+}
+
+#toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+/* =========================
+   ERROR
+========================= */
+
+#errorBox{
+  display:none;
+  position:absolute;
+  z-index:7000;
+  left:20px;
+  right:20px;
+  top:50%;
+  transform:translateY(-50%);
+  padding:22px;
+  border-radius:20px;
+  background:#111d30;
+  border:1px solid rgba(239,68,68,.4);
+  text-align:center;
+}
+
+#errorBox h3{
+  margin-bottom:8px;
+}
+
+#errorBox p{
+  color:#94a3b8;
+  font-size:13px;
+  line-height:1.5;
+}
+
+#errorBox button{
+  margin-top:15px;
+  padding:11px 18px;
+  border-radius:12px;
+  background:#2563eb;
+  color:#fff;
+  font-weight:700;
+}
+
+/* Google controls */
+.gm-style-cc,
+.gm-fullscreen-control{
+  display:none!important;
+}
+
+@media(max-height:650px){
+  #bottomSheet{
+    padding:9px;
+  }
+
+  .bottom-actions{
+    margin-top:7px;
+  }
+
+  .bottom-btn{
+    padding:9px;
+  }
+}
+</style>
 </head>
+
 <body>
 
-  <!-- MODAL: Gəlişdə Rejim Seçimi -->
-  <div id="mode-modal">
-    <div class="modal-title">Gələn Məkan Naviqasiyası<br><span style="font-size: 14px; color: #94a3b8;">Baxış rejimini seçin</span></div>
-    <div class="btn-group">
-      <button class="select-btn btn-3d" onclick="setMode('3D')">
-        🌐 3D Canlı Ətraf (Sürücü/Piyada)
+<div id="app">
+
+  <div id="map"></div>
+  <div id="pano"></div>
+
+  <!-- START -->
+  <div id="modeModal">
+    <div class="start-card">
+
+      <div class="logo">🧭</div>
+
+      <h1>Live Navigator PRO</h1>
+
+      <p>
+        Canlı GPS mövqeyi, marşrut, məsafə,
+        ETA və 2D/3D görünüş.
+      </p>
+
+      <button class="mode-btn mode-3d" onclick="startApp('3D')">
+        🌐 3D Canlı Görünüş
       </button>
-      <button class="select-btn btn-2d" onclick="setMode('2D')">
-        🗺️ Xəritə Görünüşü (2D/Meylli)
+
+      <button class="mode-btn mode-2d" onclick="startApp('2D')">
+        🗺️ 2D Naviqasiya
       </button>
+
     </div>
   </div>
 
-  <!-- NAVİQASİYA BAŞLIĞI -->
-  <div id="nav-header">
-    <div class="nav-info">
-      <span class="nav-status" id="status-text">Məfəsa hesablanır...</span>
-      <span class="nav-dist" id="distance-text">-- m</span>
+  <!-- TOP HUD -->
+  <div id="topHud">
+
+    <div class="hud-main">
+      <div class="direction" id="instruction">
+        GPS gözlənilir...
+      </div>
+
+      <div class="distance" id="distance">
+        -- m
+      </div>
+
+      <div class="eta" id="eta">
+        Marşrut hesablanır...
+      </div>
     </div>
-    <button class="action-btn" onclick="toggleView()" id="toggle-btn">3D/2D Dəyiş</button>
+
+    <div class="gps-box">
+      <div class="gps-icon" id="gpsIcon">📡</div>
+      <div class="gps-accuracy" id="gpsAccuracy">--m</div>
+    </div>
+
   </div>
 
-  <!-- XƏRİTƏ VƏ 3D EKRANI -->
-  <div id="view-container">
-    <div id="map"></div>
-    <div id="pano"></div>
-  </div>
+  <!-- FLOATING -->
+  <div id="floatingControls">
 
-  <!-- ALT PANEL: WHATSAPP PAYLAŞ -->
-  <div id="bottom-bar">
-    <button class="action-btn share-btn" onclick="shareLocationWhatsApp()">
-      📲 Konumu WhatsApp-la Paylaş
+    <button class="float-btn"
+            onclick="centerOnUser()"
+            title="Mənə qayıt">
+      🎯
     </button>
+
+    <button class="float-btn"
+            onclick="toggleFollow()"
+            id="followBtn">
+      👁️
+    </button>
+
+    <button class="float-btn"
+            onclick="toggleView()">
+      🔄
+    </button>
+
   </div>
 
-  <script>
-    let map, panorama, userMarker, targetMarker, directionsService, directionsRenderer, watchId;
-    
-    // Var olan və ya URL-dən gələn Hədəf Koordinatlar
-    let targetCoords = { lat: 40.3772, lng: 49.8541 }; 
-    let currentMode = '2D';
+  <!-- BOTTOM -->
+  <div id="bottomSheet">
 
-    function initApplication() {
-      // 1. URL parametrindən hədəf koordinatı oxuyuruq (?lat=...&lng=...)
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.has('lat') && urlParams.has('lng')) {
-        targetCoords = {
-          lat: parseFloat(urlParams.get('lat')),
-          lng: parseFloat(urlParams.get('lng'))
-        };
-      }
+    <div class="sheet-row">
 
-      // 2. Google Maps və Directions (Marşrut) Xidmətləri
-      directionsService = new google.maps.DirectionsService();
-      directionsRenderer = new google.maps.DirectionsRenderer({
-        polylineOptions: {
-          strokeColor: "#00E5FF", // Mavi/Açıq Yaşıl Zolaq
-          strokeOpacity: 0.9,
-          strokeWeight: 7
+      <div class="info-item">
+        <div class="info-label">Məsafə</div>
+        <div class="info-value" id="totalDistance">--</div>
+      </div>
+
+      <div class="info-item">
+        <div class="info-label">Vaxt</div>
+        <div class="info-value" id="totalTime">--</div>
+      </div>
+
+      <div class="info-item">
+        <div class="info-label">GPS</div>
+        <div class="info-value" id="gpsStatus">Axtarılır</div>
+      </div>
+
+    </div>
+
+    <div class="bottom-actions">
+
+      <button class="bottom-btn share"
+              onclick="shareLocation()">
+        📲 WhatsApp
+      </button>
+
+      <button class="bottom-btn"
+              onclick="openGoogleMaps()">
+        🗺️ Maps
+      </button>
+
+      <button class="bottom-btn"
+              onclick="recalculate()">
+        🔄 Yenilə
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- LOADING -->
+  <div id="loading">
+    <div class="loader-card">
+      <div class="spinner"></div>
+      <div id="loadingText">GPS hazırlanır...</div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast"></div>
+
+  <!-- ERROR -->
+  <div id="errorBox">
+    <h3>⚠️ Naviqasiya xətası</h3>
+    <p id="errorText"></p>
+    <button onclick="location.reload()">Yenidən başlat</button>
+  </div>
+
+</div>
+
+<script>
+
+/* =====================================================
+   CONFIG
+===================================================== */
+
+const CONFIG = {
+
+  // Varsayılan hədəf: Bakı
+  defaultTarget:{
+    lat:40.3772,
+    lng:49.8541
+  },
+
+  // WALKING / DRIVING
+  travelMode:"WALKING",
+
+  // GPS
+  gps:{
+    enableHighAccuracy:true,
+    maximumAge:1500,
+    timeout:10000
+  },
+
+  // Marşrutu hər GPS dəyişməsində çağırmırıq.
+  routeUpdateDistance:20,
+
+  // Kamera avtomatik izləmə
+  followZoom:18
+
+};
+
+
+/* =====================================================
+   STATE
+===================================================== */
+
+let map = null;
+let panorama = null;
+
+let userMarker = null;
+let targetMarker = null;
+let accuracyCircle = null;
+
+let directionsService = null;
+let directionsRenderer = null;
+
+let watchId = null;
+
+let currentMode = "2D";
+let followUser = true;
+
+let currentPosition = null;
+let currentAccuracy = null;
+
+let targetCoords = {...CONFIG.defaultTarget};
+
+let lastRoutePosition = null;
+let lastRouteTime = 0;
+
+let routeData = null;
+
+
+/* =====================================================
+   INIT
+===================================================== */
+
+function initApplication(){
+
+  try{
+
+    readTargetFromURL();
+
+    directionsService =
+      new google.maps.DirectionsService();
+
+    directionsRenderer =
+      new google.maps.DirectionsRenderer({
+
+        suppressMarkers:true,
+
+        polylineOptions:{
+          strokeColor:"#00e5ff",
+          strokeOpacity:.92,
+          strokeWeight:7
         }
+
       });
 
-      // Xəritə Obyekti
-      map = new google.maps.Map(document.getElementById("map"), {
-        center: targetCoords,
-        zoom: 17,
-        heading: 90,
-        tilt: 45, // 3D Meyllənmə bucağı
-        disableDefaultUI: true
-      });
+    map = new google.maps.Map(
+      document.getElementById("map"),
+      {
 
-      directionsRenderer.setMap(map);
+        center:targetCoords,
 
-      // 3D Panorama Obyekti
-      panorama = new google.maps.StreetViewPanorama(
-        document.getElementById("pano"),
-        {
-          position: targetCoords,
-          pov: { heading: 0, pitch: 0 },
-          zoom: 1,
-          visible: false,
-          showRoadLabels: true
-        }
-      );
+        zoom:16,
 
-      // Hədəf Nöqtə Markeri
-      targetMarker = new google.maps.Marker({
-        position: targetCoords,
-        map: map,
-        title: "Gedilməli Məkan",
-        icon: "http://maps.google.com/mapfiles/ms/icons/red-pushpin.png"
-      });
+        tilt:45,
 
-      // 3. Canlı GPS İzləməni Başlat
-      startLiveTracking();
-    }
+        heading:0,
 
-    // Modal düymələrinə tıklandıqda rejimi təyin etmək
-    function setMode(mode) {
-      currentMode = mode;
-      document.getElementById("mode-modal").style.display = "none";
-      
-      if (mode === '3D') {
-        document.getElementById("map").style.display = "none";
-        document.getElementById("pano").style.display = "block";
-        panorama.setVisible(true);
-      } else {
-        document.getElementById("map").style.display = "block";
-        document.getElementById("pano").style.display = "none";
-        panorama.setVisible(false);
+        mapTypeControl:false,
+
+        streetViewControl:false,
+
+        fullscreenControl:false,
+
+        clickableIcons:false,
+
+        gestureHandling:"greedy",
+
+        backgroundColor:"#07111f"
+
       }
-    }
+    );
 
-    function toggleView() {
-      if (currentMode === '2D') {
-        setMode('3D');
-      } else {
-        setMode('2D');
-      }
-    }
+    directionsRenderer.setMap(map);
 
-    // GPS Vasitəsilə Canlı Mövqe və Marşrut İzləmə
-    function startLiveTracking() {
-      if ("geolocation" in navigator) {
-        watchId = navigator.geolocation.watchPosition(
-          (position) => {
-            const userLatLng = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            };
+    createTargetMarker();
 
-            // İstifadəçi Markerini Xəritədə Yenilə
-            if (!userMarker) {
-              userMarker = new google.maps.Marker({
-                position: userLatLng,
-                map: map,
-                title: "Siz",
-                icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-              });
-            } else {
-              userMarker.setPosition(userLatLng);
-            }
+    createPanorama();
 
-            // 3D Ətrafı Canlı Yenilə (Dostunuz gəzdikcə 3D ətraf hərəkət edir)
-            if (currentMode === '3D') {
-              panorama.setPosition(userLatLng);
-            }
+    showLoading("GPS hazırlanır...");
 
-            // Canlı Marşrut (Mavi/Yaşıl Zolaq) və Məsafə Hesablanması
-            calculateRoute(userLatLng, targetCoords);
-          },
-          (error) => {
-            document.getElementById("status-text").innerText = "GPS xətası: Məkan icazəsini aktiv edin.";
-          },
-          {
-            enableHighAccuracy: true,
-            maximumAge: 1000,
-            timeout: 5000
-          }
-        );
-      }
-    }
+    setTimeout(()=>{
+      hideLoading();
+      showToast("Naviqasiya hazırdır");
+    },800);
 
-    // Mavi/Yaşıl Zolaq və Dönüş Təlimatları
-    function calculateRoute(origin, destination) {
-      directionsService.route(
-        {
-          origin: origin,
-          destination: destination,
-          travelMode: google.maps.TravelMode.WALKING // və ya DRIVING
+  }catch(error){
+
+    showError(
+      "Google Maps başladılmadı. API açarını və API aktivliyini yoxlayın."
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   URL TARGET
+===================================================== */
+
+function readTargetFromURL(){
+
+  const params =
+    new URLSearchParams(location.search);
+
+  const lat =
+    parseFloat(params.get("lat"));
+
+  const lng =
+    parseFloat(params.get("lng"));
+
+  if(
+    Number.isFinite(lat) &&
+    Number.isFinite(lng) &&
+    lat >= -90 &&
+    lat <= 90 &&
+    lng >= -180 &&
+    lng <= 180
+  ){
+
+    targetCoords = {lat,lng};
+
+  }
+
+}
+
+
+/* =====================================================
+   TARGET
+===================================================== */
+
+function createTargetMarker(){
+
+  targetMarker =
+    new google.maps.Marker({
+
+      position:targetCoords,
+
+      map:map,
+
+      title:"Hədəf",
+
+      icon:{
+        url:"https://maps.google.com/mapfiles/ms/icons/red-pushpin.png"
+      },
+
+      animation:google.maps.Animation.DROP
+
+    });
+
+}
+
+
+/* =====================================================
+   PANORAMA
+===================================================== */
+
+function createPanorama(){
+
+  panorama =
+    new google.maps.StreetViewPanorama(
+      document.getElementById("pano"),
+      {
+
+        position:targetCoords,
+
+        pov:{
+          heading:0,
+          pitch:0
         },
-        (response, status) => {
-          if (status === "OK") {
-            directionsRenderer.setDirections(response);
-            
-            const route = response.routes[0].legs[0];
-            document.getElementById("distance-text").innerText = route.distance.text;
-            document.getElementById("status-text").innerText = "Dönüş: " + stripHTML(route.steps[0].instructions);
-          }
-        }
-      );
-    }
 
-    function stripHTML(html) {
-      let tmp = document.createElement("DIV");
-      tmp.innerHTML = html;
-      return tmp.textContent || tmp.innerText || "";
-    }
+        zoom:1,
 
-    // WhatsApp üzərindən Mövcud Konumu Linklə Paylaşmaq
-    function shareLocationWhatsApp() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((pos) => {
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-          const currentUrl = window.location.href.split('?')[0];
-          const shareUrl = `${currentUrl}?lat=${lat}&lng=${lng}`;
-          
-          const waText = encodeURIComponent(`📍 Mənim canlı 3D konumum: ${shareUrl}`);
-          window.open(`https://api.whatsapp.com/send?text=${waText}`, '_blank');
-        });
+        visible:false,
+
+        addressControl:false,
+
+        fullscreenControl:false,
+
+        motionTracking:false,
+
+        linksControl:true,
+
+        panControl:false,
+
+        zoomControl:false
+
       }
-    }
-  </script>
+    );
 
-  <!-- Google Maps API (Kendi API Key-inizi yerləşdirin) -->
-  <script 
-    src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places,directions&callback=initApplication" 
-    async 
-    defer>
-  </script>
+}
+
+
+/* =====================================================
+   START APP
+===================================================== */
+
+function startApp(mode){
+
+  currentMode = mode;
+
+  document.getElementById("modeModal")
+    .style.display="none";
+
+  applyView();
+
+  startGPS();
+
+}
+
+
+/* =====================================================
+   VIEW
+===================================================== */
+
+function applyView(){
+
+  const mapEl =
+    document.getElementById("map");
+
+  const panoEl =
+    document.getElementById("pano");
+
+  if(currentMode==="3D"){
+
+    mapEl.style.display="none";
+    panoEl.style.display="block";
+
+    if(currentPosition){
+
+      panorama.setPosition(
+        currentPosition
+      );
+
+    }else{
+
+      panorama.setPosition(
+        targetCoords
+      );
+
+    }
+
+    panorama.setVisible(true);
+
+  }else{
+
+    mapEl.style.display="block";
+    panoEl.style.display="none";
+
+    panorama.setVisible(false);
+
+  }
+
+}
+
+
+function toggleView(){
+
+  currentMode =
+    currentMode==="2D"
+      ?"3D"
+      :"2D";
+
+  applyView();
+
+  showToast(
+    currentMode==="3D"
+      ?"3D görünüş"
+      :"2D xəritə"
+  );
+
+}
+
+
+/* =====================================================
+   GPS
+===================================================== */
+
+function startGPS(){
+
+  if(!navigator.geolocation){
+
+    showError(
+      "Bu cihaz brauzerdə GPS dəstəkləmir."
+    );
+
+    return;
+  }
+
+  updateGPSUI("Axtarılır");
+
+  watchId =
+    navigator.geolocation.watchPosition(
+
+      handlePosition,
+
+      handleGPSError,
+
+      CONFIG.gps
+
+    );
+
+}
+
+
+/* =====================================================
+   GPS POSITION
+===================================================== */
+
+function handlePosition(position){
+
+  const lat =
+    position.coords.latitude;
+
+  const lng =
+    position.coords.longitude;
+
+  const accuracy =
+    position.coords.accuracy || 999;
+
+  const newPosition =
+    new google.maps.LatLng(
+      lat,
+      lng
+    );
+
+  /*
+   GPS sıçramalarını azaltmaq.
+   Çox zəif dəqiqlikdə nöqtəni qəbul etmirik.
+  */
+
+  if(
+    currentPosition &&
+    accuracy > 100 &&
+    distanceBetween(
+      currentPosition.lat(),
+      currentPosition.lng(),
+      lat,
+      lng
+    ) < 30
+  ){
+
+    updateGPSUI("Zəif");
+
+    return;
+
+  }
+
+
+  currentPosition =
+    newPosition;
+
+  currentAccuracy =
+    accuracy;
+
+
+  updateUserMarker(
+    newPosition,
+    accuracy
+  );
+
+
+  updateGPSUI(
+    accuracy <= 10
+      ?"Əla"
+      :accuracy <= 30
+        ?"Yaxşı"
+        :"Zəif"
+  );
+
+
+  /*
+   3D görünüşdə panorama mövqeyini
+   hər piksel dəyişməsində deyil,
+   real GPS dəyişəndə yeniləyirik.
+  */
+
+  if(currentMode==="3D"){
+
+    panorama.setPosition(
+      newPosition
+    );
+
+  }
+
+
+  /*
+   Xəritəni istifadəçi ilə izləmək
+  */
+
+  if(
+    currentMode==="2D" &&
+    followUser
+  ){
+
+    map.panTo(newPosition);
+
+  }
+
+
+  /*
+   Marşrut optimallaşdırılması
+  */
+
+  const now = Date.now();
+
+  let shouldRoute = true;
+
+  if(lastRoutePosition){
+
+    const moved =
+      google.maps.geometry
+        ? google.maps.geometry.spherical.computeDistanceBetween(
+            lastRoutePosition,
+            newPosition
+          )
+        : distanceBetween(
+            lastRoutePosition.lat(),
+            lastRoutePosition.lng(),
+            lat,
+            lng
+          );
+
+    if(
+      moved <
+      CONFIG.routeUpdateDistance &&
+      now-lastRouteTime < 8000
+    ){
+
+      shouldRoute = false;
+
+    }
+
+  }
+
+
+  if(shouldRoute){
+
+    calculateRoute(
+      newPosition,
+      targetCoords
+    );
+
+    lastRoutePosition =
+      newPosition;
+
+    lastRouteTime =
+      now;
+
+  }
+
+}
+
+
+/* =====================================================
+   USER MARKER
+===================================================== */
+
+function updateUserMarker(
+  position,
+  accuracy
+){
+
+  if(!userMarker){
+
+    userMarker =
+      new google.maps.Marker({
+
+        position,
+
+        map,
+
+        title:"Siz",
+
+        zIndex:999,
+
+        icon:{
+          url:"https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+        }
+
+      });
+
+  }else{
+
+    userMarker.setPosition(
+      position
+    );
+
+  }
+
+
+  /*
+   GPS dəqiqlik dairəsi
+  */
+
+  if(!accuracyCircle){
+
+    accuracyCircle =
+      new google.maps.Circle({
+
+        map,
+
+        center:position,
+
+        radius:accuracy,
+
+        fillOpacity:.08,
+
+        strokeOpacity:.25,
+
+        strokeWeight:1,
+
+        clickable:false
+
+      });
+
+  }else{
+
+    accuracyCircle.setCenter(
+      position
+    );
+
+    accuracyCircle.setRadius(
+      Math.min(accuracy,100)
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   ROUTE
+===================================================== */
+
+function calculateRoute(
+  origin,
+  destination
+){
+
+  if(!directionsService)
+    return;
+
+
+  directionsService.route({
+
+    origin,
+
+    destination,
+
+    travelMode:
+      google.maps.TravelMode[
+        CONFIG.travelMode
+      ],
+
+    provideRouteAlternatives:false,
+
+    optimizeWaypoints:false
+
+  },(
+
+    response,
+    status
+
+  )=>{
+
+    if(status!=="OK"){
+
+      document.getElementById("instruction")
+        .textContent =
+        "Marşrut tapılmadı";
+
+      return;
+
+    }
+
+
+    directionsRenderer
+      .setDirections(response);
+
+
+    const route =
+      response.routes[0];
+
+    const leg =
+      route.legs[0];
+
+    routeData = leg;
+
+
+    /*
+     HUD
+    */
+
+    document.getElementById("distance")
+      .textContent =
+      leg.distance.text;
+
+
+    document.getElementById("totalDistance")
+      .textContent =
+      leg.distance.text;
+
+
+    document.getElementById("totalTime")
+      .textContent =
+      leg.duration.text;
+
+
+    document.getElementById("eta")
+      .textContent =
+      "Təxmini " +
+      leg.duration.text;
+
+
+    /*
+     İlk addım
+    */
+
+    if(
+      leg.steps &&
+      leg.steps.length
+    ){
+
+      const instruction =
+        stripHTML(
+          leg.steps[0].instructions
+        );
+
+      document.getElementById(
+        "instruction"
+      ).textContent =
+        instruction;
+
+    }
+
+  });
+
+}
+
+
+/* =====================================================
+   GPS ERROR
+===================================================== */
+
+function handleGPSError(error){
+
+  let message =
+    "GPS xətası.";
+
+  if(error.code===1){
+
+    message =
+      "Məkan icazəsi rədd edildi.";
+
+  }else if(error.code===2){
+
+    message =
+      "GPS mövqeyi müəyyən edilə bilmədi.";
+
+  }else if(error.code===3){
+
+    message =
+      "GPS sorğusunun vaxtı bitdi.";
+
+  }
+
+  updateGPSUI("Xəta");
+
+  showToast(message);
+
+}
+
+
+/* =====================================================
+   GPS UI
+===================================================== */
+
+function updateGPSUI(status){
+
+  const statusEl =
+    document.getElementById(
+      "gpsStatus"
+    );
+
+  const accuracyEl =
+    document.getElementById(
+      "gpsAccuracy"
+    );
+
+  const icon =
+    document.getElementById(
+      "gpsIcon"
+    );
+
+
+  statusEl.textContent =
+    status;
+
+
+  if(currentAccuracy){
+
+    accuracyEl.textContent =
+      Math.round(
+        currentAccuracy
+      )+"m";
+
+  }else{
+
+    accuracyEl.textContent =
+      "--m";
+
+  }
+
+
+  if(status==="Əla"){
+
+    icon.textContent="📡";
+
+  }else if(status==="Yaxşı"){
+
+    icon.textContent="📶";
+
+  }else{
+
+    icon.textContent="⚠️";
+
+  }
+
+}
+
+
+/* =====================================================
+   FOLLOW MODE
+===================================================== */
+
+function toggleFollow(){
+
+  followUser =
+    !followUser;
+
+  document.getElementById(
+    "followBtn"
+  ).textContent =
+    followUser
+      ?"👁️"
+      :"⛔";
+
+  showToast(
+    followUser
+      ?"Avtomatik izləmə aktivdir"
+      :"Avtomatik izləmə dayandırıldı"
+  );
+
+}
+
+
+function centerOnUser(){
+
+  if(!currentPosition){
+
+    showToast(
+      "GPS mövqeyi hələ hazır deyil"
+    );
+
+    return;
+
+  }
+
+  followUser = true;
+
+  document.getElementById(
+    "followBtn"
+  ).textContent="👁️";
+
+
+  if(currentMode==="2D"){
+
+    map.setZoom(
+      CONFIG.followZoom
+    );
+
+    map.panTo(
+      currentPosition
+    );
+
+  }
+
+  showToast(
+    "Mövqeyiniz mərkəzə alındı"
+  );
+
+}
+
+
+/* =====================================================
+   RECALCULATE
+===================================================== */
+
+function recalculate(){
+
+  if(!currentPosition){
+
+    showToast(
+      "GPS mövqeyi gözlənilir"
+    );
+
+    return;
+
+  }
+
+  lastRoutePosition =
+    null;
+
+  lastRouteTime =
+    0;
+
+  calculateRoute(
+    currentPosition,
+    targetCoords
+  );
+
+  showToast(
+    "Marşrut yeniləndi"
+  );
+
+}
+
+
+/* =====================================================
+   WHATSAPP
+===================================================== */
+
+function shareLocation(){
+
+  if(!currentPosition){
+
+    showToast(
+      "GPS mövqeyi hələ hazır deyil"
+    );
+
+    return;
+
+  }
+
+
+  const lat =
+    currentPosition.lat();
+
+  const lng =
+    currentPosition.lng();
+
+
+  const base =
+    location.href.split("?")[0];
+
+
+  /*
+   Paylaşılan linkdə həmin koordinatlar
+   hədəf kimi açılır.
+  */
+
+  const shareURL =
+    base+
+    "?lat="+
+    encodeURIComponent(lat)+
+    "&lng="+
+    encodeURIComponent(lng);
+
+
+  const text =
+    "📍 Mənim canlı konumum:\n"+
+    shareURL;
+
+
+  const whatsapp =
+    "https://wa.me/?text="+
+    encodeURIComponent(text);
+
+
+  window.open(
+    whatsapp,
+    "_blank",
+    "noopener"
+  );
+
+}
+
+
+/* =====================================================
+   GOOGLE MAPS
+===================================================== */
+
+function openGoogleMaps(){
+
+  if(!currentPosition){
+
+    showToast(
+      "GPS mövqeyi hazır deyil"
+    );
+
+    return;
+
+  }
+
+
+  const origin =
+    currentPosition.lat()+
+    ","+
+    currentPosition.lng();
+
+
+  const destination =
+    targetCoords.lat+
+    ","+
+    targetCoords.lng;
+
+
+  const url =
+    "https://www.google.com/maps/dir/?api=1"+
+    "&origin="+
+    encodeURIComponent(origin)+
+    "&destination="+
+    encodeURIComponent(destination);
+
+
+  window.open(
+    url,
+    "_blank",
+    "noopener"
+  );
+
+}
+
+
+/* =====================================================
+   DISTANCE
+===================================================== */
+
+function distanceBetween(
+  lat1,
+  lon1,
+  lat2,
+  lon2
+){
+
+  const R =
+    6371000;
+
+  const p1 =
+    lat1*Math.PI/180;
+
+  const p2 =
+    lat2*Math.PI/180;
+
+  const dLat =
+    (lat2-lat1)*
+    Math.PI/180;
+
+  const dLon =
+    (lon2-lon1)*
+    Math.PI/180;
+
+
+  const a =
+    Math.sin(dLat/2)**2+
+    Math.cos(p1)*
+    Math.cos(p2)*
+    Math.sin(dLon/2)**2;
+
+
+  return R*
+    2*
+    Math.atan2(
+      Math.sqrt(a),
+      Math.sqrt(1-a)
+    );
+
+}
+
+
+/* =====================================================
+   HTML CLEAN
+===================================================== */
+
+function stripHTML(html){
+
+  const div =
+    document.createElement("div");
+
+  div.innerHTML =
+    html;
+
+  return (
+    div.textContent ||
+    div.innerText ||
+    ""
+  );
+
+}
+
+
+/* =====================================================
+   LOADING
+===================================================== */
+
+function showLoading(text){
+
+  document.getElementById(
+    "loading"
+  ).style.display="flex";
+
+  document.getElementById(
+    "loadingText"
+  ).textContent=text;
+
+}
+
+
+function hideLoading(){
+
+  document.getElementById(
+    "loading"
+  ).style.display="none";
+
+}
+
+
+/* =====================================================
+   TOAST
+===================================================== */
+
+let toastTimer=null;
+
+function showToast(message){
+
+  const toast =
+    document.getElementById(
+      "toast"
+    );
+
+  toast.textContent =
+    message;
+
+  toast.classList.add(
+    "show"
+  );
+
+
+  clearTimeout(
+    toastTimer
+  );
+
+
+  toastTimer =
+    setTimeout(()=>{
+
+      toast.classList.remove(
+        "show"
+      );
+
+    },2600);
+
+}
+
+
+/* =====================================================
+   ERROR
+===================================================== */
+
+function showError(message){
+
+  document.getElementById(
+    "errorText"
+  ).textContent =
+    message;
+
+  document.getElementById(
+    "errorBox"
+  ).style.display="block";
+
+}
+
+
+/* =====================================================
+   CLEANUP
+===================================================== */
+
+window.addEventListener(
+  "beforeunload",
+  ()=>{
+
+    if(watchId!==null){
+
+      navigator.geolocation
+        .clearWatch(watchId);
+
+    }
+
+  }
+);
+
+</script>
+
+
+<!-- ===================================================
+     GOOGLE MAPS API
+
+     YOUR_API_KEY yerinə öz API açarınızı yazın.
+=================================================== -->
+
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=geometry&callback=initApplication"
+  async
+  defer>
+</script>
+
 </body>
-</html>
+  </html>
