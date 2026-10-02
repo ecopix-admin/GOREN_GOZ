@@ -1,1089 +1,994 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="az">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#050912">
-
+<meta name="theme-color" content="#05070d">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>ARWORLD — Spatial World</title>
 
 <link rel="stylesheet"
-href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+integrity="sha256-p4NxAoJBhIINfQ3n7Q9vF1b7x0x6v9nQ4x5l5W2JvQ="
+crossorigin=""/>
 
 <style>
-
 :root{
---bg:#050912;
---panel:#0b1422;
---panel2:#101d2e;
---line:#263b56;
---text:#f5f8fc;
---muted:#96a7bb;
---cyan:#49ddff;
---blue:#438fff;
---purple:#765cff;
---green:#45df96;
---red:#ff5d72;
---nav:78px;
---head:78px
+  --bg:#05070d;
+  --panel:rgba(9,13,23,.88);
+  --panel2:rgba(15,21,35,.92);
+  --line:rgba(255,255,255,.10);
+  --text:#f7f9ff;
+  --muted:#8c96aa;
+  --cyan:#00e5ff;
+  --blue:#438cff;
+  --purple:#9b6cff;
+  --green:#20e39b;
+  --red:#ff5577;
+  --yellow:#ffd45c;
+  --header:78px;
+  --nav:78px;
 }
 
 *{
-box-sizing:border-box;
--webkit-tap-highlight-color:transparent
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
 }
 
-html,
-body{
-margin:0;
-width:100%;
-height:100%;
-overflow:hidden;
-background:var(--bg);
-color:var(--text);
-font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Inter,Roboto,Arial,sans-serif;
 }
 
-button,
-input,
-textarea,
-select{
-font:inherit
+button,input,textarea,select{
+  font:inherit;
 }
 
 button{
-color:#fff;
-border:0;
-touch-action:manipulation;
-cursor:pointer
-}
-
-.hidden{
-display:none!important
+  border:0;
+  color:var(--text);
 }
 
 #app{
-position:fixed;
-inset:0;
-overflow:hidden
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+  background:#05070d;
 }
-
-/* HEADER */
-
-.header{
-position:absolute;
-z-index:1200;
-top:0;
-left:0;
-right:0;
-height:var(--head);
-padding:calc(8px + env(safe-area-inset-top)) 14px 8px;
-display:flex;
-align-items:center;
-justify-content:space-between;
-background:rgba(4,9,17,.95);
-border-bottom:1px solid #172638;
-backdrop-filter:blur(18px)
-}
-
-.logo{
-font-size:25px;
-font-weight:950;
-letter-spacing:.4px
-}
-
-.logo b{
-color:var(--cyan)
-}
-
-.headBtns{
-display:flex;
-gap:7px
-}
-
-.iconBtn{
-width:47px;
-height:47px;
-border-radius:15px;
-background:#0d1929;
-border:1px solid #263b57;
-font-size:19px
-}
-
-/* VIEWS */
 
 .view{
-position:absolute;
-inset:0;
-display:none;
-background:var(--bg)
+  position:absolute;
+  inset:0;
+  display:none;
 }
 
 .view.active{
-display:block
+  display:block;
 }
 
-/* CAMERA */
+/* ================= HEADER ================= */
+
+.topbar{
+  position:absolute;
+  z-index:200;
+  top:0;
+  left:0;
+  right:0;
+  height:var(--header);
+  padding:
+    calc(env(safe-area-inset-top) + 10px)
+    14px
+    10px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:linear-gradient(
+    180deg,
+    rgba(3,5,10,.94),
+    rgba(3,5,10,.58),
+    transparent
+  );
+  pointer-events:none;
+}
+
+.brand{
+  pointer-events:auto;
+  min-width:0;
+}
+
+.brand strong{
+  display:block;
+  font-size:18px;
+  letter-spacing:.8px;
+}
+
+.brand span{
+  display:block;
+  color:var(--cyan);
+  font-size:10px;
+  margin-top:2px;
+  letter-spacing:1.5px;
+}
+
+.headerActions{
+  margin-left:auto;
+  display:flex;
+  gap:7px;
+  pointer-events:auto;
+}
+
+.iconBtn{
+  width:42px;
+  height:42px;
+  border-radius:14px;
+  background:rgba(12,18,31,.84);
+  border:1px solid var(--line);
+  display:grid;
+  place-items:center;
+  font-size:18px;
+  backdrop-filter:blur(14px);
+}
+
+/* ================= AR ================= */
 
 #arView{
-display:block;
-position:absolute;
-inset:0;
-background:#000
+  background:#000;
 }
 
 #camera{
-position:absolute;
-inset:0;
-width:100%;
-height:100%;
-object-fit:cover;
-background:#020509
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  background:#000;
 }
 
-.shade{
-position:absolute;
-inset:0;
-pointer-events:none;
-background:
-linear-gradient(
-to bottom,
-rgba(0,0,0,.44),
-transparent 25%,
-transparent 73%,
-rgba(0,0,0,.55)
-)
+.cameraShade{
+  position:absolute;
+  inset:0;
+  z-index:4;
+  pointer-events:none;
+  background:
+    radial-gradient(
+      ellipse at center,
+      transparent 0%,
+      rgba(0,0,0,.03) 42%,
+      rgba(0,0,0,.48) 100%
+    );
 }
 
-/* STATUS */
-
-.status{
-position:absolute;
-z-index:50;
-top:90px;
-left:12px;
-right:12px;
-display:flex;
-justify-content:space-between;
-gap:8px;
-pointer-events:none
+.arTopInfo{
+  position:absolute;
+  z-index:80;
+  top:calc(env(safe-area-inset-top) + 82px);
+  left:12px;
+  right:12px;
+  display:flex;
+  gap:7px;
+  pointer-events:none;
 }
 
-.pill{
-max-width:48%;
-padding:9px 12px;
-border:1px solid #2a4260;
-border-radius:22px;
-background:rgba(7,17,29,.88);
-font-size:11px;
-backdrop-filter:blur(12px);
-white-space:nowrap;
-overflow:hidden;
-text-overflow:ellipsis
+.statusPill{
+  padding:7px 10px;
+  border-radius:999px;
+  background:rgba(5,8,15,.70);
+  border:1px solid rgba(255,255,255,.12);
+  backdrop-filter:blur(12px);
+  font-size:11px;
+  color:#dce5f7;
+}
+
+.statusPill b{
+  color:var(--green);
+}
+
+#arSearch{
+  position:absolute;
+  z-index:90;
+  left:12px;
+  right:12px;
+  top:calc(env(safe-area-inset-top) + 128px);
+  height:45px;
+  border-radius:15px;
+  border:1px solid rgba(255,255,255,.13);
+  background:rgba(5,8,15,.76);
+  backdrop-filter:blur(15px);
+  color:#fff;
+  padding:0 15px;
+  outline:none;
+  display:none;
+}
+
+#arSearch.show{
+  display:block;
 }
 
 .scanInfo{
-position:absolute;
-z-index:45;
-top:137px;
-left:50%;
-transform:translateX(-50%);
-padding:7px 11px;
-border:1px solid #243b56;
-border-radius:20px;
-background:rgba(5,13,23,.72);
-color:#b8c7d8;
-font-size:10px;
-white-space:nowrap;
-pointer-events:none
+  position:absolute;
+  z-index:70;
+  left:50%;
+  transform:translateX(-50%);
+  bottom:calc(var(--nav) + 88px);
+  padding:7px 12px;
+  border-radius:999px;
+  background:rgba(5,8,15,.72);
+  border:1px solid rgba(255,255,255,.10);
+  backdrop-filter:blur(12px);
+  font-size:11px;
+  white-space:nowrap;
+  pointer-events:none;
 }
 
-/* CROSSHAIR */
-
-.cross{
-position:absolute;
-z-index:20;
-left:50%;
-top:50%;
-width:42px;
-height:42px;
-transform:translate(-50%,-50%);
-opacity:.2;
-pointer-events:none
+.crosshair{
+  position:absolute;
+  z-index:20;
+  left:50%;
+  top:48%;
+  width:32px;
+  height:32px;
+  transform:translate(-50%,-50%);
+  border:1px solid rgba(0,229,255,.62);
+  border-radius:50%;
+  pointer-events:none;
 }
 
-.cross:before,
-.cross:after{
-content:"";
-position:absolute;
-background:#fff
+.crosshair:before,
+.crosshair:after{
+  content:"";
+  position:absolute;
+  background:rgba(0,229,255,.65);
 }
 
-.cross:before{
-width:2px;
-height:42px;
-left:20px
+.crosshair:before{
+  width:8px;
+  height:1px;
+  left:11px;
+  top:15px;
 }
 
-.cross:after{
-height:2px;
-width:42px;
-top:20px
+.crosshair:after{
+  width:1px;
+  height:8px;
+  left:15px;
+  top:11px;
 }
 
-/* AR OBJECTS */
+/* ================= AR LAYER ================= */
 
 #arObjects{
-position:absolute;
-z-index:35;
-top:78px;
-bottom:var(--nav);
-left:0;
-right:0;
-pointer-events:none;
-overflow:hidden
+  position:absolute;
+  z-index:30;
+  left:0;
+  right:0;
+  top:0;
+  bottom:var(--nav);
+  pointer-events:none;
+  overflow:hidden;
+}
+
+#arLines{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  overflow:hidden;
+  z-index:5;
+}
+
+.arConnection{
+  position:absolute;
+  height:1px;
+  transform-origin:0 50%;
+  background:linear-gradient(
+    90deg,
+    rgba(0,229,255,.05),
+    rgba(0,229,255,.62),
+    rgba(155,108,255,.30)
+  );
+  opacity:.72;
+}
+
+.arAnchorDot{
+  position:absolute;
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  background:var(--cyan);
+  box-shadow:
+    0 0 0 4px rgba(0,229,255,.10),
+    0 0 18px rgba(0,229,255,.75);
 }
 
 .arCard{
-position:absolute;
-width:min(310px,75vw);
-transform:translate3d(-50%,-50%,0);
-padding:12px;
-border-radius:18px;
-background:rgba(6,14,25,.95);
-border:1px solid rgba(73,221,255,.48);
-box-shadow:0 16px 48px #000b;
-backdrop-filter:blur(15px);
-pointer-events:auto;
-will-change:left,top;
-contain:layout paint;
-transition:none
+  position:absolute;
+  width:min(310px,76vw);
+  min-height:112px;
+  transform:
+    translate3d(-50%,-50%,0)
+    scale(var(--arScale,1));
+  transform-origin:center center;
+  padding:11px;
+  border-radius:18px;
+  border:1px solid rgba(0,229,255,.42);
+  background:
+    linear-gradient(
+      145deg,
+      rgba(7,14,25,.94),
+      rgba(8,10,19,.87)
+    );
+  box-shadow:
+    0 16px 50px rgba(0,0,0,.48),
+    0 0 28px rgba(0,229,255,.07);
+  backdrop-filter:blur(15px);
+  pointer-events:auto;
+  touch-action:manipulation;
+  will-change:left,top,transform;
+  overflow:hidden;
 }
 
 .arCard.big{
-width:min(520px,90vw);
-padding:17px;
-border-width:2px
+  width:min(520px,90vw);
+  padding:15px;
+  border-width:2px;
 }
 
-.arCard .thumb{
-width:100%;
-height:104px;
-object-fit:cover;
-border-radius:12px;
-margin-bottom:8px;
-background:#020509
+.arCard.pinned{
+  border-color:var(--yellow);
+  box-shadow:
+    0 18px 55px rgba(0,0,0,.55),
+    0 0 32px rgba(255,212,92,.17);
 }
 
-.arCard.big .thumb{
-height:185px
+.arCardInner{
+  display:grid;
+  grid-template-columns:86px 1fr;
+  gap:10px;
+}
+
+.arCard.big .arCardInner{
+  grid-template-columns:130px 1fr;
+}
+
+.arMedia{
+  width:100%;
+  height:90px;
+  border-radius:13px;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 30% 20%,#19324d,#090d17 65%);
+  display:grid;
+  place-items:center;
+  color:#6f7b91;
+  font-size:25px;
+}
+
+.arCard.big .arMedia{
+  height:130px;
+}
+
+.arMedia img,
+.arMedia video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+.arContent{
+  min-width:0;
 }
 
 .arTitle{
-font-size:17px;
-font-weight:900
-}
-
-.arCard.big .arTitle{
-font-size:23px
+  font-size:15px;
+  font-weight:800;
+  line-height:1.15;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
 .arType{
-color:var(--cyan);
-font-size:11px;
-margin-top:4px
+  display:inline-block;
+  margin-top:5px;
+  color:var(--cyan);
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.7px;
+  text-transform:uppercase;
 }
 
 .arText{
-font-size:12px;
-color:#d1dbe7;
-line-height:1.4;
-margin-top:6px
+  margin-top:7px;
+  color:#b7c0d1;
+  font-size:11px;
+  line-height:1.35;
+  display:-webkit-box;
+  -webkit-line-clamp:3;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
 }
 
 .arMeta{
-font-size:11px;
-color:#a8b9cc;
-margin-top:7px
+  margin-top:7px;
+  color:#788399;
+  font-size:9px;
 }
 
 .arOpen{
-width:100%;
-height:43px;
-margin-top:9px;
-border-radius:12px;
-background:#15283f;
-border:1px solid #2b4564;
-font-weight:850
+  margin-top:8px;
+  height:28px;
+  padding:0 10px;
+  border-radius:9px;
+  background:rgba(0,229,255,.10);
+  color:var(--cyan);
+  border:1px solid rgba(0,229,255,.18);
+  font-size:10px;
+  font-weight:700;
 }
 
-/* SCAN BUTTONS */
-
-.scanBar{
-position:absolute;
-z-index:70;
-left:12px;
-right:12px;
-bottom:calc(var(--nav) + 9px);
-display:flex;
-gap:7px
+.arEdge{
+  position:absolute;
+  min-width:96px;
+  max-width:155px;
+  padding:7px 9px;
+  border-radius:11px;
+  background:rgba(4,8,15,.82);
+  border:1px solid rgba(255,255,255,.12);
+  backdrop-filter:blur(10px);
+  font-size:9px;
+  color:#dce5f7;
+  pointer-events:auto;
+  transform:translate(-50%,-50%);
+  text-align:center;
 }
 
-.scanBtn{
-height:48px;
-flex:1;
-border-radius:15px;
-background:rgba(8,18,31,.91);
-border:1px solid #2b4563;
-font-weight:800;
-backdrop-filter:blur(12px)
+.arEdge b{
+  color:var(--cyan);
 }
 
-.scanBtn.primary{
-background:linear-gradient(105deg,#17bce9,#765cff)
-}
-
-/* NAV */
+/* ================= BOTTOM ================= */
 
 .bottomNav{
-position:absolute;
-z-index:1600;
-left:0;
-right:0;
-bottom:0;
-height:var(--nav);
-padding-bottom:env(safe-area-inset-bottom);
-background:rgba(4,9,17,.98);
-border-top:1px solid #172538;
-display:flex;
-align-items:center;
-justify-content:space-around
+  position:absolute;
+  z-index:300;
+  left:0;
+  right:0;
+  bottom:0;
+  height:var(--nav);
+  padding:
+    8px
+    8px
+    calc(env(safe-area-inset-bottom) + 8px);
+  background:rgba(4,7,13,.91);
+  border-top:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(20px);
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
 }
 
-.nav{
-width:20%;
-height:70px;
-background:transparent;
-color:#7889a3;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-gap:4px
+.navBtn{
+  background:transparent;
+  color:#657087;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  border-radius:13px;
+  font-size:19px;
 }
 
-.nav.active{
-color:var(--cyan)
+.navBtn span{
+  font-size:9px;
 }
 
-.navIcon{
-width:25px;
-height:25px;
-display:grid;
-place-items:center
+.navBtn.active{
+  color:var(--cyan);
+  background:rgba(0,229,255,.06);
 }
 
-.navIcon svg{
-width:21px;
-height:21px;
-stroke:currentColor;
-fill:none;
-stroke-width:1.8;
-stroke-linecap:round;
-stroke-linejoin:round
+/* ================= FLOAT BUTTONS ================= */
+
+.arActions{
+  position:absolute;
+  z-index:120;
+  right:13px;
+  bottom:calc(var(--nav) + 18px);
+  display:flex;
+  flex-direction:column;
+  gap:9px;
 }
 
-.navText{
-font-size:10px
+.roundAction{
+  width:50px;
+  height:50px;
+  border-radius:17px;
+  background:rgba(7,12,22,.86);
+  border:1px solid rgba(255,255,255,.13);
+  backdrop-filter:blur(14px);
+  font-size:20px;
 }
 
-.add{
-width:62px;
-height:53px;
-margin-top:-12px;
-border-radius:19px;
-background:linear-gradient(110deg,#1dbbea,#765cff);
-font-size:31px;
-box-shadow:0 9px 30px #398cff55
+.roundAction.primary{
+  background:linear-gradient(145deg,#00bcd4,#357cff);
+  border:0;
+  box-shadow:0 10px 30px rgba(0,174,255,.25);
 }
 
-/* PAGES */
+/* ================= OTHER VIEWS ================= */
 
 .page{
-position:absolute;
-inset:var(--head) 0 var(--nav) 0;
-overflow-y:auto;
-padding:16px 14px 34px;
--webkit-overflow-scrolling:touch
+  position:absolute;
+  inset:0;
+  padding:
+    calc(env(safe-area-inset-top) + 90px)
+    14px
+    calc(var(--nav) + 20px);
+  overflow:auto;
+  background:
+    radial-gradient(circle at 80% 0%,rgba(0,229,255,.08),transparent 35%),
+    var(--bg);
 }
 
 .pageTitle{
-font-size:25px;
-font-weight:950;
-margin:3px 0 4px
+  font-size:26px;
+  font-weight:900;
+  margin-bottom:5px;
 }
 
-.sub{
-color:var(--muted);
-font-size:12px;
-margin:0 0 15px
+.pageSub{
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:18px;
 }
 
-/* CARDS */
-
-.card,
-.profileBox{
-background:#0b1625;
-border:1px solid #233953;
-border-radius:20px;
-overflow:hidden;
-margin-bottom:13px
+.card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:14px;
+  margin-bottom:10px;
 }
 
-.body{
-padding:14px
+.worldCard{
+  display:flex;
+  gap:12px;
+  align-items:center;
 }
 
-.cardTitle{
-font-size:19px;
-font-weight:900
+.worldIcon{
+  width:54px;
+  height:54px;
+  border-radius:15px;
+  display:grid;
+  place-items:center;
+  background:rgba(0,229,255,.08);
+  font-size:23px;
 }
 
-.meta{
-color:var(--cyan);
-font-size:12px;
-margin-top:5px
+.worldMain{
+  min-width:0;
+  flex:1;
 }
 
-.text{
-font-size:14px;
-color:#cbd6e4;
-line-height:1.5;
-margin-top:8px
+.worldName{
+  font-size:14px;
+  font-weight:800;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
-.mediaGrid{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:3px;
-background:#000
+.worldDesc{
+  color:#8994a9;
+  font-size:10px;
+  margin-top:4px;
 }
 
-.mediaGrid img,
-.mediaGrid video{
-display:block;
-width:100%;
-height:165px;
-object-fit:cover;
-background:#000
+.worldDistance{
+  color:var(--cyan);
+  font-size:10px;
+  white-space:nowrap;
 }
 
-/* PROFILE */
+/* ================= PROFILE ================= */
 
-.profileBox{
-padding:18px
+.profileHero{
+  text-align:center;
+  padding:15px 0 20px;
 }
 
 .avatar{
-width:82px;
-height:82px;
-border-radius:50%;
-overflow:hidden;
-background:linear-gradient(135deg,#20c6ed,#765cff);
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:30px;
-font-weight:900
+  width:88px;
+  height:88px;
+  margin:auto;
+  border-radius:50%;
+  overflow:hidden;
+  display:grid;
+  place-items:center;
+  background:
+    linear-gradient(145deg,#0b2b45,#15102b);
+  border:2px solid rgba(0,229,255,.45);
+  font-size:30px;
 }
 
 .avatar img{
-width:100%;
-height:100%;
-object-fit:cover
+  width:100%;
+  height:100%;
+  object-fit:cover;
 }
 
-.name{
-font-size:25px;
-font-weight:900;
-margin-top:13px
+.profileName{
+  margin-top:11px;
+  font-size:20px;
+  font-weight:900;
 }
 
-.username{
-color:var(--cyan);
-margin-top:4px
+.profileUser{
+  margin-top:3px;
+  color:var(--cyan);
+  font-size:11px;
 }
 
-.bio{
-color:#cbd6e4;
-line-height:1.5;
-margin-top:11px
+.profileBio{
+  margin:10px auto;
+  max-width:420px;
+  color:#9ca7ba;
+  font-size:12px;
+  line-height:1.5;
 }
 
-.article{
-white-space:pre-wrap;
-line-height:1.65;
-color:#cbd7e5;
-margin-top:14px
-}
-
-.statRow{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:7px;
-margin-top:15px
-}
-
-.stat{
-background:#111f32;
-border:1px solid #273f5c;
-border-radius:14px;
-padding:11px;
-text-align:center
+.stats{
+  display:flex;
+  justify-content:center;
+  gap:35px;
+  margin-top:14px;
 }
 
 .stat b{
-display:block;
-font-size:18px
+  display:block;
+  font-size:18px;
 }
 
-.stat small{
-color:var(--muted)
+.stat span{
+  color:#707b91;
+  font-size:9px;
 }
 
-/* BUTTONS */
+/* ================= MAP ================= */
 
-.btn{
-min-height:48px;
-border-radius:14px;
-background:#14263c;
-border:1px solid #2b4564;
-padding:0 14px;
-font-weight:800
+#mapView{
+  background:#091018;
 }
 
-.btn.full{
-width:100%
+#map{
+  position:absolute;
+  inset:0;
+  bottom:var(--nav);
 }
 
-.btn.primary{
-background:linear-gradient(105deg,#17bce9,#765cff)
+.mapOverlay{
+  position:absolute;
+  z-index:500;
+  left:12px;
+  right:12px;
+  top:calc(env(safe-area-inset-top) + 88px);
+  pointer-events:none;
 }
 
-.btn.danger{
-background:#301521;
-border-color:#653044
+.mapSearch{
+  width:100%;
+  height:44px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.13);
+  background:rgba(4,8,15,.80);
+  color:#fff;
+  padding:0 14px;
+  outline:none;
+  pointer-events:auto;
+  backdrop-filter:blur(14px);
 }
 
-.row{
-display:flex;
-gap:8px
+.leaflet-control-attribution{
+  font-size:7px!important;
 }
 
-.row>*{
-flex:1
-}
-
-.grid2{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:9px
-}
-
-/* FORMS */
-
-.field{
-margin-bottom:12px
-}
-
-.field label{
-display:block;
-color:#a8b7ca;
-font-size:12px;
-margin-bottom:6px
-}
-
-.input,
-.select,
-.area{
-width:100%;
-min-height:52px;
-background:#07111e;
-color:#fff;
-border:1px solid #29415f;
-border-radius:15px;
-padding:0 14px;
-outline:none
-}
-
-.area{
-min-height:110px;
-padding:12px 14px;
-resize:none
-}
-
-.input:focus,
-.select:focus,
-.area:focus{
-border-color:var(--cyan);
-box-shadow:0 0 0 3px #46ddff12
-}
-
-.check{
-display:flex;
-gap:9px;
-align-items:flex-start;
-color:#b7c4d4;
-font-size:12px;
-line-height:1.4
-}
-
-.check input{
-width:19px;
-height:19px;
-accent-color:#46ddff;
-flex:none
-}
-
-.notice{
-padding:11px 12px;
-border-radius:14px;
-background:#101f32;
-border:1px solid #263f5c;
-color:#aebdce;
-font-size:12px;
-line-height:1.5
-}
-
-/* CREATE CHOICES */
-
-.choiceGrid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:8px;
-margin-bottom:13px
-}
-
-.choice{
-min-height:62px;
-text-align:left;
-padding:9px 11px;
-border-radius:15px;
-background:#0e1c2c;
-border:1px solid #29415e
-}
-
-.choice.active{
-border-color:var(--cyan);
-box-shadow:0 0 0 2px #46ddff12;
-background:#10253a
-}
-
-.choice b{
-display:block;
-font-size:13px
-}
-
-.choice small{
-color:var(--muted);
-font-size:10px
-}
-
-/* MEDIA */
-
-.fileBtns{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:7px
-}
-
-.fileBtn{
-min-height:50px;
-border-radius:13px;
-background:#13253a;
-border:1px solid #29435f;
-font-size:12px;
-font-weight:800
-}
-
-.fileInput{
-display:none
-}
-
-.previews{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:5px;
-margin-top:8px
-}
-
-.selectedItem{
-position:relative
-}
-
-.previews>*{
-width:100%;
-height:88px;
-object-fit:cover;
-border-radius:10px;
-background:#000
-}
-
-.selectedItem button{
-position:absolute;
-right:3px;
-top:3px;
-width:25px;
-height:25px;
-border-radius:50%;
-background:#000c;
-border:1px solid #fff5
-}
-
-/* MAP */
-
-.map{
-position:absolute;
-inset:var(--head) 0 var(--nav) 0
-}
-
-.mapHint{
-position:absolute;
-z-index:500;
-left:12px;
-right:12px;
-bottom:10px;
-padding:10px;
-border-radius:14px;
-background:#081321eF;
-border:1px solid #29415f;
-text-align:center;
-font-size:11px;
-pointer-events:none
-}
-
-/* SEARCH */
-
-.search{
-position:absolute;
-z-index:100;
-top:87px;
-left:12px;
-right:12px;
-display:none
-}
-
-.search.show{
-display:block
-}
-
-.search input{
-width:100%;
-height:52px;
-border-radius:16px;
-background:#081321f2;
-color:#fff;
-border:1px solid #2b4563;
-padding:0 15px;
-outline:none
-}
-
-/* MODALS */
+/* ================= MODAL ================= */
 
 .modal{
-position:fixed;
-z-index:3000;
-inset:0;
-display:none;
-align-items:flex-end;
-background:#000a;
-backdrop-filter:blur(5px)
+  position:fixed;
+  z-index:1000;
+  inset:0;
+  display:none;
+  align-items:flex-end;
+  background:rgba(0,0,0,.64);
+  backdrop-filter:blur(5px);
 }
 
 .modal.show{
-display:flex
+  display:flex;
 }
 
 .sheet{
-width:100%;
-max-width:740px;
-margin:auto;
-max-height:min(91dvh,920px);
-background:#0b1625;
-border:1px solid #29425f;
-border-bottom:0;
-border-radius:27px 27px 0 0;
-display:flex;
-flex-direction:column;
-box-shadow:0 -25px 90px #000b;
-overflow:hidden
+  width:100%;
+  max-height:91vh;
+  overflow:auto;
+  border-radius:25px 25px 0 0;
+  background:
+    linear-gradient(180deg,#101624,#080b12);
+  border-top:1px solid rgba(255,255,255,.10);
+  padding:
+    12px
+    14px
+    calc(env(safe-area-inset-bottom) + 20px);
 }
 
 .sheetHead{
-flex:0 0 auto;
-position:relative;
-padding:10px 60px 12px 18px;
-border-bottom:1px solid #ffffff0e
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:14px;
 }
 
-.handle{
-width:42px;
-height:4px;
-border-radius:10px;
-background:#506277;
-margin:0 auto 10px
+.sheetHead h2{
+  margin:0;
+  font-size:19px;
 }
 
-.sheetTitle{
-font-size:19px;
-font-weight:900
+.closeBtn{
+  width:38px;
+  height:38px;
+  border-radius:12px;
+  background:#171d2a;
+  color:#b8c2d5;
+  font-size:18px;
 }
 
-.close{
-position:absolute;
-right:11px;
-top:11px;
-width:44px;
-height:44px;
-border-radius:14px;
-background:#17273b;
-border:1px solid #2b4563;
-font-size:23px
+.field{
+  margin-bottom:11px;
 }
 
-.backBtn{
-position:absolute;
-left:11px;
-top:11px;
-width:44px;
-height:44px;
-border-radius:14px;
-background:#17273b;
-border:1px solid #2b4563;
-font-size:20px
+.field label{
+  display:block;
+  color:#7f8aa0;
+  font-size:10px;
+  margin:0 0 6px 3px;
 }
 
-.sheetBody{
-flex:1;
-min-height:0;
-overflow-y:auto;
-padding:14px 16px 20px;
--webkit-overflow-scrolling:touch
+.field input,
+.field textarea,
+.field select{
+  width:100%;
+  border:1px solid rgba(255,255,255,.09);
+  background:#090d16;
+  color:#fff;
+  border-radius:13px;
+  min-height:44px;
+  padding:11px 12px;
+  outline:none;
 }
 
-.sheetFoot{
-flex:0 0 auto;
-padding:9px 16px calc(11px + env(safe-area-inset-bottom));
-background:#091321;
-border-top:1px solid #ffffff0e
+.field textarea{
+  min-height:85px;
+  resize:vertical;
+}
+
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+}
+
+.checkRow{
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
+  padding:10px 0;
+  color:#8f9aaf;
+  font-size:10px;
+  line-height:1.4;
+}
+
+.checkRow input{
+  margin-top:2px;
+  accent-color:var(--cyan);
+}
+
+.primaryBtn,
+.secondaryBtn,
+.dangerBtn{
+  width:100%;
+  min-height:46px;
+  border-radius:14px;
+  font-weight:800;
+  margin-top:8px;
+}
+
+.primaryBtn{
+  background:linear-gradient(135deg,#00bfd7,#397fff);
+}
+
+.secondaryBtn{
+  background:#151c29;
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.dangerBtn{
+  background:rgba(255,85,119,.10);
+  border:1px solid rgba(255,85,119,.20);
+  color:#ff7994;
+}
+
+.mediaPicker{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-bottom:11px;
+}
+
+.mediaBtn{
+  min-height:55px;
+  border-radius:13px;
+  background:#101725;
+  border:1px solid rgba(255,255,255,.08);
+  font-size:11px;
+}
+
+.selectedMedia{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+  margin-top:8px;
+}
+
+.mediaChip{
+  padding:7px 9px;
+  border-radius:9px;
+  background:#141d2c;
+  color:#aab4c7;
+  font-size:9px;
+}
+
+/* ================= DETAIL ================= */
+
+.detailMedia{
+  display:grid;
+  gap:8px;
+  margin-bottom:14px;
+}
+
+.detailMedia img,
+.detailMedia video{
+  width:100%;
+  max-height:340px;
+  object-fit:cover;
+  border-radius:16px;
+  background:#05070d;
 }
 
 .detailTitle{
-font-size:27px;
-font-weight:900;
-margin-top:14px
+  font-size:24px;
+  font-weight:900;
 }
 
-.detailButtons{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:8px;
-margin-top:17px
+.detailUser{
+  color:var(--cyan);
+  font-size:11px;
+  margin-top:4px;
 }
 
-/* PRIVACY */
-
-.privacy{
-font-size:12px;
-color:#aebdce;
-line-height:1.65
+.detailText{
+  color:#adb6c8;
+  font-size:12px;
+  line-height:1.55;
+  white-space:pre-wrap;
+  margin-top:14px;
 }
 
-.privacy h3{
-color:#fff;
-font-size:15px;
-margin:17px 0 6px
+.detailMeta{
+  margin-top:14px;
+  padding:12px;
+  border-radius:14px;
+  background:#0a0f19;
+  color:#768197;
+  font-size:10px;
+  line-height:1.7;
 }
 
-.privacy h3:first-child{
-margin-top:0
+/* ================= TOAST ================= */
+
+#toast{
+  position:fixed;
+  z-index:2000;
+  left:50%;
+  bottom:calc(var(--nav) + 20px);
+  transform:translate(-50%,20px);
+  opacity:0;
+  max-width:88vw;
+  padding:11px 15px;
+  border-radius:13px;
+  background:#111927;
+  border:1px solid rgba(255,255,255,.11);
+  box-shadow:0 12px 35px rgba(0,0,0,.4);
+  color:#e9effb;
+  font-size:11px;
+  pointer-events:none;
+  transition:.25s ease;
 }
 
-/* VIDEO RECORDER */
-
-.recorder{
-position:fixed;
-z-index:5000;
-inset:0;
-background:#000;
-display:none;
-flex-direction:column
+#toast.show{
+  opacity:1;
+  transform:translate(-50%,0);
 }
 
-.recorder.show{
-display:flex
+/* ================= LOADING ================= */
+
+#loading{
+  position:fixed;
+  z-index:3000;
+  inset:0;
+  display:none;
+  place-items:center;
+  background:rgba(2,4,8,.82);
+  backdrop-filter:blur(8px);
 }
 
-.recTop{
-height:72px;
-padding:calc(8px + env(safe-area-inset-top)) 12px 8px;
-display:flex;
-align-items:center;
-justify-content:space-between;
-background:#050912
-}
-
-.recTitle{
-font-weight:900
-}
-
-.recVideo{
-flex:1;
-min-height:0;
-width:100%;
-object-fit:cover;
-background:#000
-}
-
-.recBottom{
-padding:14px 16px calc(18px + env(safe-area-inset-bottom));
-background:#050912
-}
-
-.recTimer{
-text-align:center;
-font-variant-numeric:tabular-nums;
-font-size:18px;
-margin-bottom:12px
-}
-
-.recordCircle{
-width:70px;
-height:70px;
-border-radius:50%;
-margin:auto;
-background:#ff3b58;
-border:7px solid #fff;
-box-shadow:0 0 0 5px #ff3b5833
-}
-
-.recordCircle.stop{
-background:#fff
-}
-
-.recClose{
-width:45px;
-height:45px;
-border-radius:14px;
-background:#14263c;
-border:1px solid #2b4564
-}
-
-/* TOAST */
-
-.toast{
-position:fixed;
-z-index:7000;
-left:50%;
-bottom:calc(var(--nav) + 12px);
-transform:translate(-50%,20px);
-width:max-content;
-max-width:92%;
-padding:12px 16px;
-border-radius:14px;
-background:#102137;
-border:1px solid #2b4563;
-opacity:0;
-pointer-events:none;
-transition:.22s;
-text-align:center
-}
-
-.toast.show{
-opacity:1;
-transform:translate(-50%,0)
-}
-
-/* LOADING */
-
-.loading{
-position:fixed;
-z-index:6500;
-inset:0;
-display:none;
-align-items:center;
-justify-content:center;
-background:#02060dcc;
-backdrop-filter:blur(7px)
-}
-
-.loading.show{
-display:flex
-}
-
-.loadBox{
-width:min(330px,86vw);
-padding:22px;
-border-radius:22px;
-background:#0e1d30;
-border:1px solid #2c4767;
-text-align:center
+.loaderBox{
+  padding:20px 25px;
+  border-radius:18px;
+  background:#0d1320;
+  border:1px solid rgba(255,255,255,.10);
+  text-align:center;
 }
 
 .spinner{
-width:42px;
-height:42px;
-border:5px solid #29425e;
-border-top-color:var(--cyan);
-border-radius:50%;
-animation:spin .7s linear infinite;
-margin:0 auto 14px
+  width:35px;
+  height:35px;
+  margin:auto auto 10px;
+  border:3px solid rgba(255,255,255,.10);
+  border-top-color:var(--cyan);
+  border-radius:50%;
+  animation:spin .8s linear infinite;
 }
 
 @keyframes spin{
-to{transform:rotate(360deg)}
+  to{transform:rotate(360deg)}
 }
 
-.progress{
-height:7px;
-background:#182a40;
-border-radius:10px;
-margin-top:12px;
-overflow:hidden
+/* ================= PRIVACY ================= */
+
+.legalText{
+  color:#9ba6ba;
+  font-size:11px;
+  line-height:1.65;
 }
 
-.progress i{
-display:block;
-width:0;
-height:100%;
-background:linear-gradient(90deg,#17bce9,#765cff);
-transition:.15s
+.legalText strong{
+  color:#e7edf8;
 }
 
-@media(max-width:500px){
+/* ================= RESPONSIVE ================= */
 
-.detailButtons{
-grid-template-columns:1fr 1fr
+@media(max-width:360px){
+  .arCard{
+    width:82vw;
+  }
+
+  .arCardInner{
+    grid-template-columns:72px 1fr;
+  }
+
+  .arMedia{
+    height:78px;
+  }
 }
-
-.sheet{
-max-height:92dvh
-}
-
-}
-
-@media(max-height:700px){
-
-.sheet{
-max-height:86dvh
-}
-
-.page{
-padding-top:12px
-}
-
-}
-
 </style>
 </head>
 
@@ -1091,1240 +996,556 @@ padding-top:12px
 
 <div id="app">
 
-<header class="header">
+<!-- ================= AR VIEW ================= -->
 
-<div class="logo">
-AR<b>WORLD</b>
-</div>
+<section id="arView" class="view active">
 
-<div class="headBtns">
+  <video id="camera" autoplay playsinline muted></video>
 
-<button
-class="iconBtn"
-id="searchBtn">
-⌕
-</button>
+  <div class="cameraShade"></div>
 
-<button
-class="iconBtn"
-id="refreshBtn">
-↻
-</button>
+  <div class="topbar">
+    <div class="brand">
+      <strong>ARWORLD</strong>
+      <span>SPATIAL WORLD</span>
+    </div>
 
-</div>
+    <div class="headerActions">
+      <button class="iconBtn" id="searchToggle">⌕</button>
+      <button class="iconBtn" id="refreshBtn">↻</button>
+    </div>
+  </div>
 
-</header>
+  <div class="arTopInfo">
+    <div class="statusPill" id="gpsStatus">GPS <b>gözlənilir</b></div>
+    <div class="statusPill" id="compassStatus">Kompas <b>gözlənilir</b></div>
+  </div>
 
+  <input id="arSearch"
+         type="search"
+         placeholder="Yaxınlıqdakı profil, mağaza, maşın, usta...">
 
-<!-- ======================================================
-     AR SCANNER
-====================================================== -->
+  <div id="arObjects">
+    <div id="arLines"></div>
+  </div>
 
-<section id="arView">
+  <div class="crosshair"></div>
 
-<video
-id="camera"
-autoplay
-muted
-playsinline>
-</video>
+  <div class="scanInfo" id="scanInfo">
+    Məkan skanı hazırlanır...
+  </div>
 
-<div class="shade"></div>
-
-<div class="status">
-
-<div
-class="pill"
-id="gpsStatus">
-GPS hazırlanır…
-</div>
-
-<div
-class="pill"
-id="compassStatus">
-Kompas --°
-</div>
-
-</div>
-
-<div
-class="scanInfo"
-id="scanInfo">
-Yaxındakı spatial məlumatlar sabit göstərilir
-</div>
-
-<div class="cross"></div>
-
-<div id="arObjects"></div>
-
-<div
-class="search"
-id="searchBox">
-
-<input
-id="searchInput"
-placeholder="Dünyada axtar…">
-
-</div>
-
-<div class="scanBar">
-
-<button
-class="scanBtn"
-id="scanBtn">
-Skanı yenilə
-</button>
-
-<button
-class="scanBtn primary"
-id="placeQuick">
-+ Dünyaya əlavə et
-</button>
-
-</div>
+  <div class="arActions">
+    <button class="roundAction" id="spreadBtn" title="Məkanları səp">✦</button>
+    <button class="roundAction primary" id="placeBtn" title="Yerləşdir">＋</button>
+  </div>
 
 </section>
 
 
-<!-- ======================================================
-     MAP
-====================================================== -->
+<!-- ================= WORLD VIEW ================= -->
 
-<section
-id="mapView"
-class="view">
+<section id="worldView" class="view">
+  <div class="topbar">
+    <div class="brand">
+      <strong>WORLD</strong>
+      <span>YAXINLIQDA</span>
+    </div>
+  </div>
 
-<div
-id="map"
-class="map">
-</div>
+  <div class="page">
+    <div class="pageTitle">Fiziki dünya</div>
+    <div class="pageSub">
+      Yaxınlıqdakı bütün məkan obyektləri
+    </div>
 
-<div class="mapHint">
-Xəritədə nöqtə seçmək üçün “+” bölməsindən “Xəritədən dəqiq yer” seçin.
-</div>
+    <div id="worldList"></div>
+  </div>
+</section>
+
+
+<!-- ================= MAP VIEW ================= -->
+
+<section id="mapView" class="view">
+
+  <div id="map"></div>
+
+  <div class="mapOverlay">
+    <input id="mapSearch"
+           class="mapSearch"
+           placeholder="Məkan axtar...">
+  </div>
 
 </section>
 
 
-<!-- ======================================================
-     WORLD FEED
-====================================================== -->
+<!-- ================= FEED VIEW ================= -->
 
-<section
-id="feedView"
-class="view">
+<section id="feedView" class="view">
+  <div class="topbar">
+    <div class="brand">
+      <strong>FEED</strong>
+      <span>SPATIAL CONTENT</span>
+    </div>
+  </div>
 
-<div class="page">
+  <div class="page">
+    <div class="pageTitle">Axın</div>
+    <div class="pageSub">
+      Yerləşdirilmiş məkan profilləri
+    </div>
 
-<div class="pageTitle">
-Dünya
-</div>
-
-<div class="sub">
-Fiziki məkana bağlanmış profillər, elanlar, bizneslər və media.
-</div>
-
-<div id="feedList"></div>
-
-</div>
-
+    <div id="feedList"></div>
+  </div>
 </section>
 
 
-<!-- ======================================================
-     PROFILE
-====================================================== -->
+<!-- ================= PROFILE VIEW ================= -->
 
-<section
-id="profileView"
-class="view">
+<section id="profileView" class="view">
 
-<div class="page">
+  <div class="topbar">
+    <div class="brand">
+      <strong>PROFILE</strong>
+      <span>SƏNİN MƏKANIN</span>
+    </div>
 
-<div class="pageTitle">
-Profil
-</div>
+    <div class="headerActions">
+      <button class="iconBtn" id="editProfileBtn">✎</button>
+    </div>
+  </div>
 
-<div id="profileCard"></div>
+  <div class="page">
 
-<div
-class="pageTitle"
-style="font-size:19px;margin-top:20px">
-Mənim spatial obyektlərim
-</div>
+    <div class="profileHero">
 
-<div id="myObjects"></div>
+      <div class="avatar" id="profileAvatar">
+        ◉
+      </div>
 
-</div>
+      <div class="profileName" id="profileName">
+        ARWORLD istifadəçisi
+      </div>
 
+      <div class="profileUser" id="profileUsername">
+        @arworld
+      </div>
+
+      <div class="profileBio" id="profileBio">
+        Fiziki dünyaya rəqəmsal iz burax.
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <b id="profileObjectCount">0</b>
+          <span>OBYEKT</span>
+        </div>
+
+        <div class="stat">
+          <b>AR</b>
+          <span>FORMAT</span>
+        </div>
+
+        <div class="stat">
+          <b>∞</b>
+          <span>WORLD</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card">
+      <button class="secondaryBtn" id="privacyBtn">
+        🔐 Məxfilik və hüquqi məlumat
+      </button>
+    </div>
+
+    <div id="profileObjects"></div>
+
+  </div>
 </section>
 
 
-<!-- ======================================================
-     CREATE
-====================================================== -->
-
-<div
-class="modal"
-id="createModal">
-
-<div class="sheet">
-
-<div class="sheetHead">
-
-<div class="handle"></div>
-
-<div class="sheetTitle">
-Dünyaya yerləşdir
-</div>
-
-<button
-class="close"
-id="closeCreate">
-×
-</button>
-
-</div>
-
-
-<div class="sheetBody">
-
-
-<!-- TWO MAIN MODES -->
-
-<div class="choiceGrid">
-
-<button
-class="choice active"
-data-mode="listing">
-
-<b>
-▣ Məkan / elan
-</b>
-
-<small>
-Biznes, xidmət, avtomobil, bina, turizm, xəbər və s.
-</small>
-
-</button>
-
-
-<button
-class="choice"
-data-mode="social">
-
-<b>
-◎ Spatial sosial profil
-</b>
-
-<small>
-Bio, məqalə, şəkil, video, əlaqələr və sosial şəbəkələr.
-</small>
-
-</button>
-
-</div>
-
-
-<!-- CATEGORY -->
-
-<div class="field">
-
-<label>
-Kateqoriya
-</label>
-
-<select
-id="objectType"
-class="select">
-
-<option value="business">
-Biznes / mağaza
-</option>
-
-<option value="service">
-Usta / xidmət
-</option>
-
-<option value="car">
-Avtomobil
-</option>
-
-<option value="building">
-Bina / nəhəng elan
-</option>
-
-<option value="person">
-Şəxsi profil
-</option>
-
-<option value="place">
-Məkan
-</option>
-
-<option value="tourism">
-Turizm
-</option>
-
-<option value="event">
-Tədbir
-</option>
-
-<option value="warning">
-Xəbərdarlıq
-</option>
-
-<option value="information">
-Məlumat
-</option>
-
-</select>
-
-</div>
-
-
-<!-- NAME -->
-
-<div class="field">
-
-<label>
-Ad / başlıq
-</label>
-
-<input
-id="objectName"
-class="input"
-placeholder="Məsələn: ARWORLD Coffee">
-
-</div>
-
-
-<!-- USERNAME -->
-
-<div class="field">
-
-<label>
-İstifadəçi adı
-</label>
-
-<input
-id="objectUsername"
-class="input"
-placeholder="@istifadeci">
-
-</div>
-
-
-<!-- BIO -->
-
-<div class="field">
-
-<label>
-Qısa bio
-</label>
-
-<textarea
-id="objectBio"
-class="area"
-placeholder="Özünüzü, biznesi və ya məkanı qısa təqdim edin…">
-</textarea>
-
-</div>
-
-
-<!-- ARTICLE -->
-
-<div class="field">
-
-<label>
-Haqqında / məqalə
-</label>
-
-<textarea
-id="objectArticle"
-class="area"
-style="min-height:150px"
-placeholder="Burada uzun məqalə, xidmət təsviri, tarixçə, satış məlumatı və s. yaza bilərsiniz. Bu mətn spatial profil açıldıqda görünür.">
-</textarea>
-
-</div>
-
-
-<!-- CONTACT -->
-
-<div class="grid2">
-
-<div class="field">
-
-<label>
-Telefon
-</label>
-
-<input
-id="objectPhone"
-class="input"
-type="tel"
-placeholder="+994…">
-
-</div>
-
-
-<div class="field">
-
-<label>
-WhatsApp
-</label>
-
-<input
-id="objectWhatsapp"
-class="input"
-type="tel"
-placeholder="+994…">
-
-</div>
-
-</div>
-
-
-<!-- SOCIAL -->
-
-<div class="field">
-
-<label>
-Sosial şəbəkə / sayt
-</label>
-
-<input
-id="objectSocial"
-class="input"
-placeholder="instagram.com/... və ya sayt">
-
-</div>
-
-
-<!-- COORDINATES -->
-
-<div class="field">
-
-<label>
-📍 Koordinat
-</label>
-
-<div class="grid2">
-
-<input
-id="objectLat"
-class="input"
-type="number"
-step="any"
-placeholder="Latitude">
-
-<input
-id="objectLng"
-class="input"
-type="number"
-step="any"
-placeholder="Longitude">
-
-</div>
-
-</div>
-
-
-<!-- LOCATION -->
-
-<div class="row">
-
-<button
-class="btn"
-id="currentGPS">
-📍 Avtomatik GPS
-</button>
-
-<button
-class="btn"
-id="pickMap">
-⌖ Xəritədən dəqiq yer
-</button>
-
-</div>
-
-
-<!-- RADIUS / SIZE -->
-
-<div
-class="grid2"
-style="margin-top:12px">
-
-<div class="field">
-
-<label>
-Görünmə radiusu
-</label>
-
-<select
-id="objectRadius"
-class="select">
-
-<option value="50">
-50 m
-</option>
-
-<option value="100">
-100 m
-</option>
-
-<option value="300"
-selected>
-300 m
-</option>
-
-<option value="500">
-500 m
-</option>
-
-<option value="1000">
-1 km
-</option>
-
-<option value="5000">
-5 km
-</option>
-
-</select>
-
-</div>
-
-
-<div class="field">
-
-<label>
-AR ölçüsü
-</label>
-
-<select
-id="objectSize"
-class="select">
-
-<option value="normal">
-Normal
-</option>
-
-<option value="large">
-Böyük
-</option>
-
-<option value="building">
-Nəhəng / bina
-</option>
-
-</select>
-
-</div>
-
-</div>
-
-
-<!-- MEDIA -->
-
-<div class="field">
-
-<label>
-📸 Profil şəkli / şəkil / video
-</label>
-
-<div class="fileBtns">
-
-<button
-class="fileBtn"
-id="galleryBtn">
-Qalereya
-</button>
-
-<button
-class="fileBtn"
-id="photoBtn">
-Kamera
-</button>
-
-<button
-class="fileBtn"
-id="videoBtn">
-Video çək
-</button>
-
-</div>
-
-
-<input
-id="galleryInput"
-class="fileInput"
-type="file"
-accept="image/*,video/*"
-multiple>
-
-
-<input
-id="photoInput"
-class="fileInput"
-type="file"
-accept="image/*"
-capture="environment">
-
-
-<input
-id="videoInput"
-class="fileInput"
-type="file"
-accept="video/*"
-capture="environment">
-
-
-<div
-id="selectedMedia"
-class="previews">
-</div>
-
-</div>
-
-
-<!-- PRIVACY -->
-
-<div class="check">
-
-<input
-id="publicCheck"
-type="checkbox"
-checked>
-
-<span>
-Spatial məzmun ictimai görünsün.
-</span>
-
-</div>
-
-
-<div
-class="check"
-style="margin-top:8px">
-
-<input
-id="showContactCheck"
-type="checkbox"
-checked>
-
-<span>
-Telefon və WhatsApp düymələrini profilimdə göstər.
-</span>
-
-</div>
-
-
-<div
-class="check"
-style="margin-top:8px">
-
-<input
-id="consentCheck"
-type="checkbox"
-checked>
-
-<span>
-Paylaşdığım məzmun və məlumatlara sahib olduğumu və qanunlara uyğun paylaşdığımı təsdiq edirəm.
-</span>
-
-</div>
-
-
-<div
-class="notice"
-style="margin-top:12px">
-
-Yerləşdirmə koordinatı əvvəlcə dərhal yadda saxlanılır.
-Böyük video sonradan lokal yaddaşa əlavə olunur.
-Buna görə “yerləşdir” düyməsi media çevrilməsini gözləyib
-dəqiqələrlə fırlanmayacaq.
-
-</div>
-
-</div>
-
-
-<div class="sheetFoot">
-
-<button
-class="btn primary full"
-id="placeObject">
-
-📍 DƏRHAL YERLƏŞDİR
-
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- ======================================================
-     DETAIL
-====================================================== -->
-
-<div
-class="modal"
-id="detailModal">
-
-<div class="sheet">
-
-<div class="sheetHead">
-
-<button
-class="backBtn"
-id="detailBack">
-‹
-</button>
-
-<div class="handle"></div>
-
-<div class="sheetTitle">
-Spatial profil
-</div>
-
-<button
-class="close"
-id="closeDetail">
-×
-</button>
-
-</div>
-
-<div
-class="sheetBody"
-id="detailBody">
-</div>
-
-</div>
-
-</div>
-
-
-<!-- ======================================================
-     PROFILE EDIT
-====================================================== -->
-
-<div
-class="modal"
-id="profileModal">
-
-<div class="sheet">
-
-<div class="sheetHead">
-
-<button
-class="backBtn"
-id="profileBack">
-‹
-</button>
-
-<div class="handle"></div>
-
-<div class="sheetTitle">
-Profilimi redaktə et
-</div>
-
-<button
-class="close"
-id="closeProfile">
-×
-</button>
-
-</div>
-
-
-<div class="sheetBody">
-
-
-<div class="field">
-
-<label>
-Profil şəkli
-</label>
-
-<div class="fileBtns">
-
-<button
-class="fileBtn"
-id="avatarGallery">
-Qalereya
-</button>
-
-<button
-class="fileBtn"
-id="avatarCamera">
-Kamera
-</button>
-
-<button
-class="fileBtn"
-id="avatarRemove">
-Sil
-</button>
-
-</div>
-
-
-<input
-id="avatarGalleryInput"
-class="fileInput"
-type="file"
-accept="image/*">
-
-
-<input
-id="avatarCameraInput"
-class="fileInput"
-type="file"
-accept="image/*"
-capture="environment">
-
-
-<div
-id="avatarPreview"
-style="margin-top:9px">
-</div>
-
-</div>
-
-
-<div class="field">
-
-<label>
-Ad
-</label>
-
-<input
-id="myNameInput"
-class="input">
-
-</div>
-
-
-<div class="field">
-
-<label>
-İstifadəçi adı
-</label>
-
-<input
-id="myUsernameInput"
-class="input">
-
-</div>
-
-
-<div class="field">
-
-<label>
-Bio
-</label>
-
-<textarea
-id="myBioInput"
-class="area">
-</textarea>
-
-</div>
-
-
-<div class="field">
-
-<label>
-Haqqımda / məqalə
-</label>
-
-<textarea
-id="myArticleInput"
-class="area"
-style="min-height:150px">
-</textarea>
-
-</div>
-
-
-<div class="grid2">
-
-<div class="field">
-
-<label>
-Telefon
-</label>
-
-<input
-id="myPhoneInput"
-class="input"
-type="tel">
-
-</div>
-
-
-<div class="field">
-
-<label>
-WhatsApp
-</label>
-
-<input
-id="myWhatsappInput"
-class="input"
-type="tel">
-
-</div>
-
-</div>
-
-
-<div class="field">
-
-<label>
-Sosial / sayt
-</label>
-
-<input
-id="mySocialInput"
-class="input">
-
-</div>
-
-
-<div class="notice">
-
-Bu tək fayllı demo versiyasında profil və spatial məlumatlar
-yalnız bu cihazın IndexedDB yaddaşında saxlanılır.
-Başqa istifadəçilər hələ bu məlumatları görmür.
-
-Kütləvi versiya üçün autentifikasiya +
-server verilənlər bazası +
-media storage lazımdır.
-
-</div>
-
-</div>
-
-
-<div class="sheetFoot">
-
-<button
-class="btn primary full"
-id="saveProfile">
-
-PROFİLİ SAXLA
-
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- ======================================================
-     PRIVACY
-====================================================== -->
-
-<div
-class="modal"
-id="privacyModal">
-
-<div class="sheet">
-
-<div class="sheetHead">
-
-<button
-class="backBtn"
-id="privacyBack">
-‹
-</button>
-
-<div class="handle"></div>
-
-<div class="sheetTitle">
-Məxfilik və qaydalar
-</div>
-
-<button
-class="close"
-id="closePrivacy">
-×
-</button>
-
-</div>
-
-
-<div class="sheetBody privacy">
-
-
-<h3>
-1. Məxfilik
-</h3>
-
-<p>
-Bu prototipdə yaradılan profil, koordinat, spatial obyekt və
-seçilmiş media cihazın brauzer yaddaşında saxlanılır.
-Bu fayl öz-özünə ARWORLD serverinə məlumat göndərmir.
-</p>
-
-
-<h3>
-2. GPS
-</h3>
-
-<p>
-GPS yalnız məkan funksiyası üçün brauzer icazəsi ilə istifadə edilir.
-İstifadəçi özü “Dünyaya yerləşdir” funksiyası ilə koordinat
-paylaşdıqda həmin koordinat spatial obyektin hissəsi olur.
-</p>
-
-
-<h3>
-3. Media
-</h3>
-
-<p>
-Şəkil və video bu demo versiyada lokal IndexedDB-də saxlanılır.
-Gələcək server versiyasında media ayrıca storage sisteminə
-yüklənməzdən əvvəl istifadəçiyə məlumat və razılıq göstərilməlidir.
-</p>
-
-
-<h3>
-4. İstifadəçi məsuliyyəti
-</h3>
-
-<p>
-Başqasının şəxsi məlumatını, müəllif hüququ ilə qorunan materialı,
-təhdid, saxtakarlıq və qanunsuz məzmunu icazəsiz paylaşmayın.
-Report, silinmə, bloklama, moderasiya və hüquqi sorğu mexanizmləri
-real xidmətə əlavə edilməlidir.
-</p>
-
-
-<h3>
-5. Hüquqi qeyd
-</h3>
-
-<p>
-Bu mətn hüquqi məsləhət və ya “qanuni sığorta” deyil.
-Heç bir tək HTML faylı platforma sahibini avtomatik olaraq
-hüquqi məsuliyyətdən azad etmir.
-
-İctimai istifadədən əvvəl Azərbaycan və hədəf ölkələrin
-hüquqşünası ilə Privacy Policy, Terms of Service,
-Content Policy, Copyright/DMCA prosesi, Data Processing,
-yaş qaydaları və məsuliyyət məhdudiyyəti hazırlanmalıdır.
-</p>
-
-
-<h3>
-6. Dəqiq AR məhdudiyyəti
-</h3>
-
-<p>
-Brauzer GPS + kompasla hazırlanmış bu prototip fiziki dünyada
-təxmini istiqamət və məsafə overlayidir.
-
-Sensorların fiziki dəqiqliyi səbəbindən “millimetr dəqiqliyi”
-və tam sıfır titrəmə zəmanəti vermək olmaz.
-
-Kod kartları low-pass, hysteresis və anchor smoothing ilə
-mümkün qədər sabit saxlayır.
-
-Həqiqi bina-səviyyəli persistent AR üçün
-ARCore Geospatial / VPS kimi sistem tələb olunur.
-</p>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- ======================================================
-     LONG VIDEO RECORDER
-====================================================== -->
-
-<div
-class="recorder"
-id="recorder">
-
-<div class="recTop">
-
-<button
-class="recClose"
-id="recClose">
-×
-</button>
-
-<div class="recTitle">
-Uzun video çək
-</div>
-
-<div style="width:45px"></div>
-
-</div>
-
-
-<video
-class="recVideo"
-id="recVideo"
-autoplay
-muted
-playsinline>
-</video>
-
-
-<div class="recBottom">
-
-<div
-class="recTimer"
-id="recTimer">
-00:00
-</div>
-
-<button
-class="recordCircle"
-id="recordBtn">
-</button>
-
-<div
-style="
-text-align:center;
-color:#8fa1b7;
-font-size:11px;
-margin-top:10px">
-
-Başlat → istədiyin qədər çək → dayandır.
-Fayl sonra yerləşdirməyə əlavə olunur.
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- LOADING -->
-
-<div
-class="loading"
-id="loading">
-
-<div class="loadBox">
-
-<div class="spinner"></div>
-
-<div id="loadingText">
-Hazırlanır…
-</div>
-
-<div class="progress">
-
-<i id="loadProgress"></i>
-
-</div>
-
-</div>
-
-</div>
-
-
-<div
-class="toast"
-id="toast">
-</div>
-
-
-<!-- NAV -->
+<!-- ================= BOTTOM NAV ================= -->
 
 <nav class="bottomNav">
 
-<button
-class="nav active"
-data-view="ar">
+  <button class="navBtn active" data-view="ar">
+    ◉
+    <span>AR</span>
+  </button>
 
-<div
-class="navIcon"
-id="iScan">
-</div>
+  <button class="navBtn" data-view="world">
+    ◎
+    <span>WORLD</span>
+  </button>
 
-<div class="navText">
-Scan
-</div>
+  <button class="navBtn" data-view="map">
+    ◇
+    <span>XƏRİTƏ</span>
+  </button>
 
-</button>
+  <button class="navBtn" data-view="feed">
+    ≋
+    <span>FEED</span>
+  </button>
 
-
-<button
-class="nav"
-data-view="map">
-
-<div
-class="navIcon"
-id="iMap">
-</div>
-
-<div class="navText">
-Xəritə
-</div>
-
-</button>
-
-
-<button
-class="nav"
-id="addBtn">
-
-<div class="add">
-＋
-</div>
-
-</button>
-
-
-<button
-class="nav"
-data-view="feed">
-
-<div
-class="navIcon"
-id="iWorld">
-</div>
-
-<div class="navText">
-Dünya
-</div>
-
-</button>
-
-
-<button
-class="nav"
-data-view="profile">
-
-<div
-class="navIcon"
-id="iProfile">
-</div>
-
-<div class="navText">
-Profil
-</div>
-
-</button>
+  <button class="navBtn" data-view="profile">
+    ○
+    <span>PROFİL</span>
+  </button>
 
 </nav>
+
+
+<!-- ================= CREATE MODAL ================= -->
+
+<div class="modal" id="createModal">
+
+  <div class="sheet">
+
+    <div class="sheetHead">
+      <h2>🌐 Məkana yerləşdir</h2>
+      <button class="closeBtn" data-close="createModal">×</button>
+    </div>
+
+    <div class="field">
+      <label>FORMAT</label>
+      <select id="createMode">
+        <option value="listing">Məkan obyekti</option>
+        <option value="social">Sosial profil</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>KATEQORİYA</label>
+      <select id="createType">
+        <option value="business">🏪 Mağaza</option>
+        <option value="service">🛠 Xidmət</option>
+        <option value="car">🚗 Avtomobil</option>
+        <option value="building">🏢 Bina</option>
+        <option value="person">👤 Şəxs</option>
+        <option value="place">📍 Məkan</option>
+        <option value="tourism">🏔 Turizm</option>
+        <option value="event">🎫 Tədbir</option>
+        <option value="warning">⚠️ Xəbərdarlıq</option>
+        <option value="information">ℹ️ Məlumat</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>BAŞLIQ</label>
+      <input id="createName"
+             placeholder="Məsələn: Şamxal — BMW 320">
+    </div>
+
+    <div class="field">
+      <label>İSTİFADƏÇİ ADI</label>
+      <input id="createUsername"
+             placeholder="@username">
+    </div>
+
+    <div class="field">
+      <label>QISA MƏLUMAT</label>
+      <textarea id="createBio"
+                placeholder="Bu məkanda nə var?"></textarea>
+    </div>
+
+    <div class="field">
+      <label>MƏQALƏ / ƏTRAFLI MƏLUMAT</label>
+      <textarea id="createArticle"
+                placeholder="Ətraflı məlumat..."></textarea>
+    </div>
+
+    <div class="row">
+
+      <div class="field">
+        <label>TELEFON</label>
+        <input id="createPhone"
+               inputmode="tel"
+               placeholder="+994">
+      </div>
+
+      <div class="field">
+        <label>WHATSAPP</label>
+        <input id="createWhatsapp"
+               inputmode="tel"
+               placeholder="+994">
+      </div>
+
+    </div>
+
+    <div class="field">
+      <label>SAYT / SOSİAL LİNK</label>
+      <input id="createSocial"
+             placeholder="https://...">
+    </div>
+
+    <div class="row">
+
+      <div class="field">
+        <label>GÖRÜNMƏ MƏSAFƏSİ</label>
+        <select id="createRadius">
+          <option value="50">50 m</option>
+          <option value="100">100 m</option>
+          <option value="300" selected>300 m</option>
+          <option value="500">500 m</option>
+          <option value="1000">1 km</option>
+          <option value="5000">5 km</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>OBYEKT ÖLÇÜSÜ</label>
+        <select id="createSize">
+          <option value="normal">Normal</option>
+          <option value="large">Böyük</option>
+          <option value="building">Bina</option>
+        </select>
+      </div>
+
+    </div>
+
+    <div class="field">
+
+      <label>KOORDİNAT</label>
+
+      <div class="row">
+
+        <input id="createLat"
+               inputmode="decimal"
+               placeholder="Latitude">
+
+        <input id="createLng"
+               inputmode="decimal"
+               placeholder="Longitude">
+
+      </div>
+
+      <button class="secondaryBtn" id="useCurrentLocation">
+        ◎ Hazırkı GPS koordinatımı istifadə et
+      </button>
+
+      <button class="secondaryBtn" id="pickOnMap">
+        ◇ Xəritədən seç
+      </button>
+
+    </div>
+
+
+    <div class="field">
+      <label>ŞƏKİL / VİDEO</label>
+
+      <div class="mediaPicker">
+
+        <button class="mediaBtn" id="galleryBtn">
+          🖼 Qalereya
+        </button>
+
+        <button class="mediaBtn" id="photoBtn">
+          📷 Kamera
+        </button>
+
+        <button class="mediaBtn" id="videoBtn">
+          🎥 Video
+        </button>
+
+      </div>
+
+      <input id="galleryInput"
+             type="file"
+             accept="image/*,video/*"
+             multiple
+             hidden>
+
+      <input id="photoInput"
+             type="file"
+             accept="image/*"
+             capture="environment"
+             hidden>
+
+      <input id="videoInput"
+             type="file"
+             accept="video/*"
+             capture="environment"
+             hidden>
+
+      <div class="selectedMedia" id="selectedMedia"></div>
+
+    </div>
+
+
+    <div class="checkRow">
+      <input type="checkbox" id="createPublic" checked>
+      <label for="createPublic">
+        Bu obyekt digər istifadəçilərə açıq olsun.
+      </label>
+    </div>
+
+    <div class="checkRow">
+      <input type="checkbox" id="createContact">
+      <label for="createContact">
+        Telefon və WhatsApp məlumatlarımı göstər.
+      </label>
+    </div>
+
+    <div class="checkRow">
+      <input type="checkbox" id="createConsent">
+      <label for="createConsent">
+        Bu məzmunu paylaşmaq hüququm olduğunu təsdiq edirəm və
+        məkan məlumatının istifadə olunmasına razıyam.
+      </label>
+    </div>
+
+    <button class="primaryBtn" id="saveObjectBtn">
+      ✦ MƏKANA YERLƏŞDİR
+    </button>
+
+  </div>
+</div>
+
+
+<!-- ================= DETAIL MODAL ================= -->
+
+<div class="modal" id="detailModal">
+
+  <div class="sheet">
+
+    <div class="sheetHead">
+      <h2>Spatial Profile</h2>
+      <button class="closeBtn" data-close="detailModal">×</button>
+    </div>
+
+    <div id="detailContent"></div>
+
+  </div>
+</div>
+
+
+<!-- ================= PROFILE EDIT ================= -->
+
+<div class="modal" id="profileModal">
+
+  <div class="sheet">
+
+    <div class="sheetHead">
+      <h2>Profili redaktə et</h2>
+      <button class="closeBtn" data-close="profileModal">×</button>
+    </div>
+
+    <div class="field">
+      <label>AD</label>
+      <input id="profileEditName">
+    </div>
+
+    <div class="field">
+      <label>USERNAME</label>
+      <input id="profileEditUsername">
+    </div>
+
+    <div class="field">
+      <label>BİO</label>
+      <textarea id="profileEditBio"></textarea>
+    </div>
+
+    <div class="field">
+      <label>MƏQALƏ</label>
+      <textarea id="profileEditArticle"></textarea>
+    </div>
+
+    <div class="field">
+      <label>TELEFON</label>
+      <input id="profileEditPhone">
+    </div>
+
+    <div class="field">
+      <label>WHATSAPP</label>
+      <input id="profileEditWhatsapp">
+    </div>
+
+    <div class="field">
+      <label>SOSİAL / SAYT</label>
+      <input id="profileEditSocial">
+    </div>
+
+    <button class="primaryBtn" id="saveProfileBtn">
+      Profili yadda saxla
+    </button>
+
+  </div>
+</div>
+
+
+<!-- ================= PRIVACY ================= -->
+
+<div class="modal" id="privacyModal">
+
+  <div class="sheet">
+
+    <div class="sheetHead">
+      <h2>🔐 Məxfilik</h2>
+      <button class="closeBtn" data-close="privacyModal">×</button>
+    </div>
+
+    <div class="legalText">
+
+      <p>
+        <strong>ARWORLD demo versiyası</strong> hazırda
+        istifadəçi profillərini, koordinatları və media məlumatlarını
+        bu brauzerin lokal IndexedDB yaddaşında saxlayır.
+      </p>
+
+      <p>
+        GPS məlumatı yalnız brauzerin verdiyi icazə əsasında
+        cihazdan alınır.
+      </p>
+
+      <p>
+        Bu demo məlumatları ARWORLD serverinə göndərmir.
+        Başqa telefonlardakı istifadəçilərlə real paylaşım üçün
+        gələcəkdə autentifikasiya, server bazası və media storage
+        sistemi qoşulmalıdır.
+      </p>
+
+      <p>
+        Başqa şəxslərin şəxsi məlumatlarını, müəllif hüququ ilə
+        qorunan materialları, təhdid, saxtakarlıq və qanunsuz
+        məzmunu icazəsiz yerləşdirməyin.
+      </p>
+
+      <p>
+        Real ictimai xidmət istifadəyə veriləndə
+        <strong>Privacy Policy, Terms of Service, Content Policy,
+        report/block sistemi, copyright proseduru və data-processing
+        qaydaları</strong> ayrıca hazırlanmalıdır.
+      </p>
+
+      <p>
+        Bu bölmə hüquqi məsləhət deyil.
+      </p>
+
+      <p>
+        ARWORLD-in bu brauzer versiyasında GPS + kompas vasitəsilə
+        məkan istiqaməti hesablanır. Kartların bir-birindən ayrılması
+        ekran-məkanı collision/layer sistemi ilə həyata keçirilir.
+        Bu, ARCore/ARKit səviyyəsində santimetr dəqiqliyində
+        fiziki anchor sistemi deyil.
+      </p>
+
+    </div>
+
+  </div>
+</div>
+
+
+<div id="toast"></div>
+
+<div id="loading">
+  <div class="loaderBox">
+    <div class="spinner"></div>
+    <div>ARWORLD hazırlanır...</div>
+  </div>
+</div>
 
 </div>
 
@@ -2332,4593 +1553,3321 @@ Profil
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
+/* =========================================================
+   ARWORLD SPATIAL WORLD
+   Single-file GitHub Pages version
+   ========================================================= */
 
-'use strict';
-
-
-/* ======================================================
-   GLOBALS
-====================================================== */
-
-const $ =
-id => document.getElementById(id);
-
+const $ = id => document.getElementById(id);
 
 let db = null;
-
 let objects = [];
-
 let map = null;
-
 let mapMarkers = [];
 
 let gpsWatch = null;
-
 let cameraStream = null;
 
 let userLat = null;
-
 let userLng = null;
-
 let gpsAccuracy = null;
 
-let sLat = null;
-
-let sLng = null;
-
 let heading = 0;
-
 let headingSamples = [];
 
-let lastAR = 0;
-
-let lastGpsRender = 0;
-
+let activeView = "ar";
 let selectedFiles = [];
 
-let avatarFile = null;
-
-let activeView = "ar";
-
-let picker = false;
-
-let createMode = "listing";
-
-let historyDepth = 0;
-
-
-/* PROFILE */
-
 let profile = {
-
-name:"ARWORLD istifadəçisi",
-
-username:"@arworld",
-
-bio:"Fiziki dünyaya rəqəmsal iz burax.",
-
-article:"",
-
-phone:"",
-
-whatsapp:"",
-
-social:"",
-
-avatar:null
-
+  name:"ARWORLD istifadəçisi",
+  username:"@arworld",
+  bio:"Fiziki dünyaya rəqəmsal iz burax.",
+  article:"",
+  phone:"",
+  whatsapp:"",
+  social:"",
+  avatar:null
 };
 
 
-/* STABLE AR */
+/* =========================================================
+   AR ENGINE STATE
+   ========================================================= */
 
-const anchorState =
-new Map();
+const anchorState = new Map();
+const layoutState = new Map();
+const mediaURLCache = new Map();
 
-
-/* RECORDER */
-
-let recStream = null;
-
-let recorder = null;
-
-let recChunks = [];
-
-let recStart = 0;
-
-let recTimer = null;
+let layoutGeneration = 0;
+let forceSpread = 0;
 
 
-/* ======================================================
-   HELPERS
-====================================================== */
+/* =========================================================
+   BASIC HELPERS
+   ========================================================= */
 
-function toast(text){
+function toast(message){
+  const el = $("toast");
+  el.textContent = message;
+  el.classList.add("show");
 
-const el =
-$("toast");
+  clearTimeout(toast.timer);
 
-el.textContent =
-text;
-
-el.classList.add("show");
-
-clearTimeout(
-window._toast
-);
-
-window._toast =
-setTimeout(
-()=>{
-el.classList.remove("show");
-},
-2800
-);
-
+  toast.timer = setTimeout(()=>{
+    el.classList.remove("show");
+  },2600);
 }
 
 
-function esc(v){
+function esc(value){
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
 
-return String(v ?? "")
-.replaceAll("&","&amp;")
-.replaceAll("<","&lt;")
-.replaceAll(">","&gt;")
-.replaceAll('"',"&quot;")
-.replaceAll("'","&#039;");
 
+function fmtTime(ts){
+  try{
+    return new Date(ts).toLocaleString("az-AZ");
+  }catch{
+    return "";
+  }
 }
 
 
 function typeName(type){
+  const names={
+    business:"Mağaza",
+    service:"Xidmət",
+    car:"Avtomobil",
+    building:"Bina",
+    person:"Şəxs",
+    place:"Məkan",
+    tourism:"Turizm",
+    event:"Tədbir",
+    warning:"Xəbərdarlıq",
+    information:"Məlumat"
+  };
 
-return {
-
-person:"Şəxsi profil",
-
-business:"Biznes / mağaza",
-
-service:"Usta / xidmət",
-
-car:"Avtomobil",
-
-building:"Bina / nəhəng elan",
-
-place:"Məkan",
-
-tourism:"Turizm",
-
-event:"Tədbir",
-
-warning:"Xəbərdarlıq",
-
-information:"Məlumat"
-
-}[type] ||
-"Spatial obyekt";
-
+  return names[type] || type;
 }
 
 
-function openModal(
-id,
-push=true
-){
+function typeIcon(type){
+  const icons={
+    business:"🏪",
+    service:"🛠",
+    car:"🚗",
+    building:"🏢",
+    person:"👤",
+    place:"📍",
+    tourism:"🏔",
+    event:"🎫",
+    warning:"⚠️",
+    information:"ℹ️"
+  };
 
-$(id)
-.classList.add("show");
-
-if(push){
-
-history.pushState(
-{modal:id},
-"",
-"#"+id
-);
-
-historyDepth++;
-
-}
-
+  return icons[type] || "◎";
 }
 
 
-function closeModal(
-id,
-pop=true
-){
-
-$(id)
-.classList.remove("show");
-
-if(
-pop &&
-historyDepth>0
-){
-
-history.back();
-
-historyDepth--;
-
-}
-
+function openModal(id){
+  $(id).classList.add("show");
 }
 
 
-function fmtTime(sec){
-
-sec =
-Math.max(
-0,
-Math.floor(sec)
-);
-
-return (
-String(
-Math.floor(sec/60)
-).padStart(2,"0")
-+
-":"
-+
-String(
-sec%60
-).padStart(2,"0")
-);
-
+function closeModal(id){
+  $(id).classList.remove("show");
 }
 
 
-/* ======================================================
-   MODERN ICONS
-====================================================== */
-
-function svg(name){
-
-const icons = {
-
-scan:
-`
-<path d="M7 3H3v4
-M17 3h4v4
-M21 17v4h-4
-M3 17v4h4"/>
-<circle
-cx="12"
-cy="12"
-r="3"/>
-`,
-
-map:
-`
-<path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3z"/>
-<path d="M9 3v15M15 6v15"/>
-`,
-
-world:
-`
-<circle
-cx="12"
-cy="12"
-r="9"/>
-<path d="M3 12h18"/>
-<path d="M12 3c3 3 3 15 0 18"/>
-<path d="M12 3c-3 3-3 15 0 18"/>
-`,
-
-profile:
-`
-<circle
-cx="12"
-cy="8"
-r="3.5"/>
-<path
-d="M4 21c1.7-4.4 5-6 8-6s6.3 1.6 8 6"/>
-`
-
-};
-
-return `
-<svg
-viewBox="0 0 24 24">
-${icons[name] || ""}
-</svg>
-`;
-
-}
-
-
-$("iScan").innerHTML =
-svg("scan");
-
-$("iMap").innerHTML =
-svg("map");
-
-$("iWorld").innerHTML =
-svg("world");
-
-$("iProfile").innerHTML =
-svg("profile");
-
-
-/* ======================================================
+/* =========================================================
    INDEXED DB
-====================================================== */
+   ========================================================= */
 
 function openDB(){
 
-return new Promise(
-(resolve,reject)=>{
+  return new Promise((resolve,reject)=>{
 
-const request =
-indexedDB.open(
-"ARWORLD_PRO_6",
-1
-);
+    const request =
+      indexedDB.open("ARWORLD_SPATIAL_10",1);
 
-request.onupgradeneeded =
-e=>{
+    request.onupgradeneeded = event => {
 
-const d =
-e.target.result;
+      const d = event.target.result;
 
-if(
-!d.objectStoreNames.contains(
-"objects"
-)
-){
+      if(!d.objectStoreNames.contains("objects")){
+        d.createObjectStore("objects",{keyPath:"id"});
+      }
 
-d.createObjectStore(
-"objects",
-{
-keyPath:"id"
-}
-);
+      if(!d.objectStoreNames.contains("profile")){
+        d.createObjectStore("profile",{keyPath:"id"});
+      }
+    };
 
-}
+    request.onsuccess = event=>{
+      db = event.target.result;
+      resolve(db);
+    };
 
+    request.onerror = ()=>{
+      reject(request.error);
+    };
 
-if(
-!d.objectStoreNames.contains(
-"profile"
-)
-){
-
-d.createObjectStore(
-"profile",
-{
-keyPath:"id"
-}
-);
-
-}
-
-};
-
-
-request.onsuccess =
-e=>{
-
-db =
-e.target.result;
-
-resolve();
-
-};
-
-
-request.onerror =
-()=>{
-reject(
-request.error
-);
-};
-
-});
-
+  });
 }
 
 
-function put(
-store,
-value
-){
+function dbPut(storeName,data){
 
-return new Promise(
-(resolve,reject)=>{
+  return new Promise((resolve,reject)=>{
 
-const tx =
-db.transaction(
-store,
-"readwrite"
-);
+    const tx = db.transaction(storeName,"readwrite");
 
-tx.objectStore(
-store
-).put(value);
+    tx.objectStore(storeName).put(data);
 
-tx.oncomplete =
-resolve;
+    tx.oncomplete = ()=>resolve();
+    tx.onerror = ()=>reject(tx.error);
 
-tx.onerror =
-()=>{
-reject(
-tx.error
-);
-};
-
-});
-
+  });
 }
 
 
-function getAll(
-store
-){
+function dbGetAll(storeName){
 
-return new Promise(
-(resolve,reject)=>{
+  return new Promise((resolve,reject)=>{
 
-const request =
-db.transaction(
-store
-)
-.objectStore(store)
-.getAll();
+    const tx = db.transaction(storeName,"readonly");
 
-request.onsuccess =
-()=>{
-resolve(
-request.result || []
-);
-};
+    const request =
+      tx.objectStore(storeName).getAll();
 
-request.onerror =
-()=>{
-reject(
-request.error
-);
-};
+    request.onsuccess = ()=>{
+      resolve(request.result || []);
+    };
 
-});
+    request.onerror = ()=>{
+      reject(request.error);
+    };
 
-}
-
-
-function getOne(
-store,
-id
-){
-
-return new Promise(
-(resolve,reject)=>{
-
-const request =
-db.transaction(
-store
-)
-.objectStore(store)
-.get(id);
-
-request.onsuccess =
-()=>{
-resolve(
-request.result
-);
-};
-
-request.onerror =
-()=>{
-reject(
-request.error
-);
-};
-
-});
-
+  });
 }
 
 
 async function saveObject(obj){
 
-await put(
-"objects",
-obj
-);
+  await dbPut("objects",obj);
 
+  const index =
+    objects.findIndex(x=>x.id===obj.id);
+
+  if(index>=0){
+    objects[index]=obj;
+  }else{
+    objects.push(obj);
+  }
 }
 
 
 async function saveProfile(){
 
-await put(
-"profile",
-{
-id:"me",
-...profile
-}
-);
-
+  await dbPut("profile",{
+    id:"me",
+    ...profile
+  });
 }
 
 
-/* ======================================================
+/* =========================================================
    GEO
-====================================================== */
+   ========================================================= */
 
-function dist(
-a,
-b,
-c,
-d
-){
+function dist(lat1,lon1,lat2,lon2){
 
-const R =
-6371000;
+  const R=6371000;
 
-const p1 =
-a*Math.PI/180;
+  const p1=lat1*Math.PI/180;
+  const p2=lat2*Math.PI/180;
 
-const p2 =
-c*Math.PI/180;
+  const dp=(lat2-lat1)*Math.PI/180;
+  const dl=(lon2-lon1)*Math.PI/180;
 
-const dp =
-(c-a)*Math.PI/180;
+  const a=
+    Math.sin(dp/2)**2+
+    Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
 
-const dl =
-(d-b)*Math.PI/180;
-
-const x =
-Math.sin(dp/2)**2 +
-Math.cos(p1)*
-Math.cos(p2)*
-Math.sin(dl/2)**2;
-
-return (
-2*R*
-Math.atan2(
-Math.sqrt(x),
-Math.sqrt(1-x)
-)
-);
-
+  return R*2*Math.atan2(
+    Math.sqrt(a),
+    Math.sqrt(1-a)
+  );
 }
 
 
-function bearing(
-a,
-b,
-c,
-d
-){
+function bearing(lat1,lon1,lat2,lon2){
 
-const p1 =
-a*Math.PI/180;
+  const p1=lat1*Math.PI/180;
+  const p2=lat2*Math.PI/180;
 
-const p2 =
-c*Math.PI/180;
+  const dl=(lon2-lon1)*Math.PI/180;
 
-const dl =
-(d-b)*Math.PI/180;
+  const y=Math.sin(dl)*Math.cos(p2);
 
-const y =
-Math.sin(dl)*
-Math.cos(p2);
+  const x=
+    Math.cos(p1)*Math.sin(p2)-
+    Math.sin(p1)*Math.cos(p2)*Math.cos(dl);
 
-const x =
-Math.cos(p1)*
-Math.sin(p2) -
-Math.sin(p1)*
-Math.cos(p2)*
-Math.cos(dl);
-
-return (
-Math.atan2(y,x)*
-180/Math.PI+
-360
-)%360;
-
+  return (Math.atan2(y,x)*180/Math.PI+360)%360;
 }
 
 
-function adiff(
-a,
-b
-){
+function adiff(a,b){
 
-return (
-(a-b+540)%360
-)-180;
-
+  return ((a-b+540)%360)-180;
 }
 
 
-/* ======================================================
-   GPS STABILIZATION
-====================================================== */
+function clamp(v,min,max){
+
+  return Math.max(min,Math.min(max,v));
+}
+
+
+/* =========================================================
+   DETERMINISTIC HASH
+   ========================================================= */
+
+function hashString(str){
+
+  let h=2166136261;
+
+  for(let i=0;i<str.length;i++){
+
+    h^=str.charCodeAt(i);
+
+    h+=
+      (h<<1)+
+      (h<<4)+
+      (h<<7)+
+      (h<<8)+
+      (h<<24);
+
+  }
+
+  return Math.abs(h>>>0);
+}
+
+
+function seeded(obj){
+
+  const h=hashString(obj.id || obj.name || "object");
+
+  return {
+    a:(h%360),
+    b:((h>>>8)%360),
+    c:((h>>>16)%360)
+  };
+}
+
+
+/* =========================================================
+   GPS
+   ========================================================= */
 
 function startGPS(){
 
-if(
-!navigator.geolocation
-){
+  if(!navigator.geolocation){
 
-$("gpsStatus").textContent =
-"GPS yoxdur";
+    $("gpsStatus").innerHTML =
+      'GPS <b>dəstəklənmir</b>';
 
-return;
+    return;
+  }
 
+  gpsWatch =
+    navigator.geolocation.watchPosition(
+
+      pos=>{
+
+        const lat=pos.coords.latitude;
+        const lng=pos.coords.longitude;
+
+        gpsAccuracy=pos.coords.accuracy || 30;
+
+        if(userLat===null){
+
+          userLat=lat;
+          userLng=lng;
+
+        }else{
+
+          const movement =
+            dist(userLat,userLng,lat,lng);
+
+          const maxJump =
+            Math.max(100,gpsAccuracy*5);
+
+          if(movement>maxJump){
+            return;
+          }
+
+          let alpha=.045;
+
+          if(gpsAccuracy<=8){
+            alpha=.18;
+          }else if(gpsAccuracy<=20){
+            alpha=.10;
+          }
+
+          userLat += (lat-userLat)*alpha;
+          userLng += (lng-userLng)*alpha;
+        }
+
+        $("gpsStatus").innerHTML =
+          `GPS <b>±${Math.round(gpsAccuracy)}m</b>`;
+
+        updateAR();
+        updateMapMe();
+
+      },
+
+      err=>{
+
+        $("gpsStatus").innerHTML =
+          'GPS <b>icazə lazımdır</b>';
+
+      },
+
+      {
+        enableHighAccuracy:true,
+        maximumAge:1000,
+        timeout:12000
+      }
+
+    );
 }
 
 
-gpsWatch =
-navigator.geolocation.watchPosition(
+/* =========================================================
+   COMPASS
+   ========================================================= */
 
-position=>{
+function pushHeading(value){
 
-const lat =
-position.coords.latitude;
+  if(!Number.isFinite(value)) return;
 
-const lng =
-position.coords.longitude;
+  value=(value+360)%360;
 
-const accuracy =
-Math.max(
-1,
-position.coords.accuracy || 50
-);
+  if(headingSamples.length===0){
 
+    heading=value;
 
-/* Reject impossible GPS jump */
+  }else{
 
-if(
-sLat !== null
-){
+    const difference=adiff(value,heading);
 
-const jump =
-dist(
-sLat,
-sLng,
-lat,
-lng
-);
+    const alpha=
+      Math.abs(difference)>35
+      ? .18
+      : .075;
 
-if(
-jump >
-Math.max(
-100,
-accuracy*5
-)
-){
+    heading =
+      (heading+difference*alpha+360)%360;
+  }
 
-return;
+  headingSamples.push(value);
 
-}
+  if(headingSamples.length>7){
+    headingSamples.shift();
+  }
 
-}
+  $("compassStatus").innerHTML =
+    `Kompas <b>${Math.round(heading)}°</b>`;
 
-
-/* Strong low-pass filter */
-
-const alpha =
-sLat === null
-? 1
-:
-accuracy <= 8
-? .18
-:
-accuracy <= 20
-? .10
-:
-.045;
-
-
-sLat =
-sLat === null
-? lat
-:
-sLat +
-(lat-sLat)*alpha;
-
-
-sLng =
-sLng === null
-? lng
-:
-sLng +
-(lng-sLng)*alpha;
-
-
-userLat =
-sLat;
-
-userLng =
-sLng;
-
-gpsAccuracy =
-accuracy;
-
-
-$("gpsStatus").textContent =
-"GPS ±"+
-Math.round(
-accuracy
-)+"m";
-
-
-const now =
-performance.now();
-
-
-if(
-now-lastGpsRender >
-120
-){
-
-lastGpsRender =
-now;
-
-updateAR();
-
-updateMapMe();
-
-}
-
-},
-
-error=>{
-
-$("gpsStatus").textContent =
-error.code===1
-?
-"GPS icazəsi lazımdır"
-:
-"GPS gözlənilir…";
-
-},
-
-{
-
-enableHighAccuracy:true,
-
-maximumAge:1000,
-
-timeout:12000
-
-}
-
-);
-
-}
-
-
-/* ======================================================
-   COMPASS FILTER
-====================================================== */
-
-function pushHeading(h){
-
-headingSamples.push(h);
-
-if(
-headingSamples.length>7
-){
-
-headingSamples.shift();
-
-}
-
-
-let base =
-headingSamples[0];
-
-let sum = 0;
-
-
-for(
-const value
-of headingSamples
-){
-
-sum +=
-adiff(
-value,
-base
-);
-
-}
-
-
-return (
-base +
-sum/
-headingSamples.length+
-360
-)%360;
-
+  updateAR();
 }
 
 
 function startCompass(){
 
-const handler =
-event=>{
+  function handler(e){
 
-let h = null;
+    let value=null;
 
+    if(typeof e.webkitCompassHeading==="number"){
 
-if(
-typeof
-event.webkitCompassHeading
-===
-"number"
-){
+      value=e.webkitCompassHeading;
 
-h =
-event.webkitCompassHeading;
+    }else if(
+      typeof e.alpha==="number"
+    ){
 
-}
-else if(
-typeof event.alpha ===
-"number"
-){
+      value=360-e.alpha;
+    }
 
-h =
-(360-event.alpha)%360;
+    if(Number.isFinite(value)){
+      pushHeading(value);
+    }
+  }
 
-}
+  window.addEventListener(
+    "deviceorientationabsolute",
+    handler,
+    true
+  );
 
-
-if(
-h === null
-)
-return;
-
-
-h =
-(h+360)%360;
-
-
-const target =
-pushHeading(h);
-
-
-const difference =
-adiff(
-target,
-heading
-);
-
-
-if(
-Math.abs(difference)<.7
-)
-return;
-
-
-const alpha =
-Math.abs(difference)>35
-?
-.18
-:
-.075;
-
-
-heading =
-(
-heading+
-difference*alpha+
-360
-)%360;
-
-
-$("compassStatus").textContent =
-"Kompas "+
-Math.round(
-heading
-)+"°";
-
-
-const now =
-performance.now();
-
-
-if(
-now-lastAR>80
-){
-
-lastAR =
-now;
-
-updateAR();
-
-}
-
-};
-
-
-window.addEventListener(
-"deviceorientationabsolute",
-handler,
-true
-);
-
-window.addEventListener(
-"deviceorientation",
-handler,
-true
-);
-
+  window.addEventListener(
+    "deviceorientation",
+    handler,
+    true
+  );
 }
 
 
-/* ======================================================
+/* =========================================================
    CAMERA
-====================================================== */
+   ========================================================= */
 
 async function startCamera(){
 
-try{
+  if(!navigator.mediaDevices?.getUserMedia){
 
-if(
-!navigator.mediaDevices ||
-!navigator.mediaDevices.getUserMedia
+    toast("Bu brauzerdə kamera dəstəyi yoxdur.");
+    return;
+  }
+
+  try{
+
+    cameraStream =
+      await navigator.mediaDevices.getUserMedia({
+
+        video:{
+          facingMode:{
+            ideal:"environment"
+          },
+          width:{
+            ideal:1280
+          },
+          height:{
+            ideal:720
+          }
+        },
+
+        audio:false
+
+      });
+
+    $("camera").srcObject=cameraStream;
+
+  }catch(err){
+
+    toast("Kameraya icazə verilmədi.");
+
+  }
+}
+
+
+/* =========================================================
+   OBJECT MATCHING
+   ========================================================= */
+
+function objectMatches(obj,query){
+
+  if(!query) return true;
+
+  query=query.toLowerCase();
+
+  return [
+
+    obj.name,
+    obj.username,
+    obj.bio,
+    obj.article,
+    obj.type,
+    typeName(obj.type)
+
+  ].join(" ")
+   .toLowerCase()
+   .includes(query);
+}
+
+
+/* =========================================================
+   AR TARGET PROJECTION
+   ========================================================= */
+
+function projectTarget(obj,distance,bearingValue){
+
+  const layer=$("arObjects");
+
+  const w=layer.clientWidth || window.innerWidth;
+  const h=layer.clientHeight || window.innerHeight;
+
+  const diff=adiff(bearingValue,heading);
+
+  /*
+    Horizontal field:
+    -82° ... +82°
+  */
+
+  let x =
+    w*.50+
+    (diff/82)*(w*.42);
+
+  /*
+    Near = lower/front
+    Far = upper/back
+  */
+
+  const radius =
+    Math.max(obj.radius || 300,50);
+
+  const depth =
+    clamp(distance/radius,0,1);
+
+  let y =
+    h*.40+
+    depth*h*.20;
+
+  return {
+    x,
+    y,
+    diff,
+    w,
+    h
+  };
+}
+
+
+/* =========================================================
+   RECTANGLE COLLISION
+   ========================================================= */
+
+function rectFor(card,x,y){
+
+  const width=card.offsetWidth || 280;
+  const height=card.offsetHeight || 120;
+
+  return {
+    left:x-width/2,
+    right:x+width/2,
+    top:y-height/2,
+    bottom:y+height/2,
+    width,
+    height
+  };
+}
+
+
+function overlapAmount(a,b){
+
+  const x =
+    Math.max(
+      0,
+      Math.min(a.right,b.right)-
+      Math.max(a.left,b.left)
+    );
+
+  const y =
+    Math.max(
+      0,
+      Math.min(a.bottom,b.bottom)-
+      Math.max(a.top,b.top)
+    );
+
+  return x*y;
+}
+
+
+function overlapRatio(a,b){
+
+  const area=overlapAmount(a,b);
+
+  if(!area) return 0;
+
+  const minArea =
+    Math.min(
+      a.width*a.height,
+      b.width*b.height
+    );
+
+  return minArea
+    ? area/minArea
+    : 0;
+}
+
+
+/* =========================================================
+   SAFE POSITION
+   ========================================================= */
+
+function clampPosition(card,x,y){
+
+  const layer=$("arObjects");
+
+  const w=layer.clientWidth || innerWidth;
+  const h=layer.clientHeight || innerHeight;
+
+  const cw=card.offsetWidth || 280;
+  const ch=card.offsetHeight || 120;
+
+  const marginX=8;
+  const topSafe=70;
+  const bottomSafe=75;
+
+  return {
+    x:clamp(
+      x,
+      cw/2+marginX,
+      w-cw/2-marginX
+    ),
+
+    y:clamp(
+      y,
+      ch/2+topSafe,
+      h-ch/2-bottomSafe
+    )
+  };
+}
+
+
+/* =========================================================
+   CANDIDATE POSITIONS
+   ========================================================= */
+
+function getCandidates(obj,target,card,index,total){
+
+  const s=seeded(obj);
+
+  const candidates=[];
+
+  /*
+    First position is always the true spatial target.
+  */
+
+  candidates.push({
+    x:target.x,
+    y:target.y,
+    penalty:0,
+    slot:0
+  });
+
+  /*
+    Deterministic fan.
+    Same object keeps approximately the same
+    preferred side, which reduces jitter.
+  */
+
+  const direction =
+    s.a%2===0
+    ? 1
+    : -1;
+
+  const base =
+    52+
+    (s.b%45);
+
+  const vertical =
+    ((s.c%5)-2)*16;
+
+  const offsets=[
+
+    [direction*base,vertical],
+
+    [-direction*base,vertical],
+
+    [direction*(base+65),vertical-38],
+
+    [-direction*(base+65),vertical-38],
+
+    [direction*(base+92),vertical+42],
+
+    [-direction*(base+92),vertical+42],
+
+    [0,-72],
+
+    [0,72],
+
+    [direction*125,0],
+
+    [-direction*125,0],
+
+    [direction*155,-65],
+
+    [-direction*155,-65],
+
+    [direction*155,65],
+
+    [-direction*155,65],
+
+    [direction*205,0],
+
+    [-direction*205,0]
+
+  ];
+
+  offsets.forEach((o,i)=>{
+
+    candidates.push({
+
+      x:target.x+o[0],
+      y:target.y+o[1],
+
+      /*
+        Slight penalty for moving away from
+        the actual spatial point.
+      */
+
+      penalty:
+        Math.hypot(o[0],o[1])*.55,
+
+      slot:i+1
+
+    });
+
+  });
+
+  /*
+    If many objects share similar bearing,
+    create extra fan positions.
+  */
+
+  const fan=[
+    [-190,-105],
+    [-140,-75],
+    [-90,-45],
+    [90,-45],
+    [140,-75],
+    [190,-105],
+    [-190,105],
+    [-140,75],
+    [-90,45],
+    [90,45],
+    [140,75],
+    [190,105]
+  ];
+
+  fan.forEach((o,i)=>{
+
+    candidates.push({
+
+      x:target.x+o[0],
+      y:target.y+o[1],
+
+      penalty:
+        Math.hypot(o[0],o[1])*.68,
+
+      slot:30+i
+
+    });
+
+  });
+
+  return candidates;
+}
+
+
+/* =========================================================
+   GLOBAL SPATIAL LAYOUT
+   ========================================================= */
+
+function calculateLayout(items){
+
+  const layer=$("arObjects");
+
+  if(!layer) return;
+
+  /*
+    Important:
+    nearest objects are placed first.
+    This gives them visual priority.
+  */
+
+  items.sort((a,b)=>a.distance-b.distance);
+
+  const placed=[];
+
+  for(let index=0;index<items.length;index++){
+
+    const item=items[index];
+
+    const card=item.card;
+
+    const target=item.target;
+
+    const candidates=
+      getCandidates(
+        item.obj,
+        target,
+        card,
+        index,
+        items.length
+      );
+
+    const previous=
+      layoutState.get(item.obj.id);
+
+    let best=null;
+
+    for(const candidate of candidates){
+
+      const safe=
+        clampPosition(
+          card,
+          candidate.x,
+          candidate.y
+        );
+
+      const rect=
+        rectFor(
+          card,
+          safe.x,
+          safe.y
+        );
+
+      let score=
+        candidate.penalty;
+
+      /*
+        Strong collision penalty.
+      */
+
+      for(const other of placed){
+
+        const ratio=
+          overlapRatio(
+            rect,
+            other.rect
+          );
+
+        if(ratio>0){
+
+          score +=
+            7000+
+            ratio*18000;
+        }
+
+      }
+
+      /*
+        Edge penalty.
+      */
+
+      const layerW=
+        layer.clientWidth || innerWidth;
+
+      const layerH=
+        layer.clientHeight || innerHeight;
+
+      const edgeX=
+        Math.min(
+          safe.x,
+          layerW-safe.x
+        );
+
+      const edgeY=
+        Math.min(
+          safe.y,
+          layerH-safe.y
+        );
+
+      if(edgeX<45){
+        score+=400;
+      }
+
+      if(edgeY<80){
+        score+=300;
+      }
+
+      /*
+        Keep the existing slot stable.
+      */
+
+      if(
+        previous &&
+        previous.slot===candidate.slot
+      ){
+        score-=450;
+      }
+
+      /*
+        Small deterministic preference.
+      */
+
+      const seedValue=
+        hashString(
+          item.obj.id+
+          ":"+
+          candidate.slot
+        )%100;
+
+      score+=seedValue*.04;
+
+      if(!best || score<best.score){
+
+        best={
+          ...candidate,
+          x:safe.x,
+          y:safe.y,
+          rect,
+          score
+        };
+      }
+    }
+
+    /*
+      If previous layout is still good,
+      preserve it unless the new one is
+      significantly better.
+    */
+
+    if(previous){
+
+      const previousSafe=
+        clampPosition(
+          card,
+          previous.x,
+          previous.y
+        );
+
+      const previousRect=
+        rectFor(
+          card,
+          previousSafe.x,
+          previousSafe.y
+        );
+
+      let oldScore=0;
+
+      for(const other of placed){
+
+        const ratio=
+          overlapRatio(
+            previousRect,
+            other.rect
+          );
+
+        oldScore+=ratio*18000;
+
+      }
+
+      const newScore=best.score;
+
+      if(
+        previous.slot!==undefined &&
+        oldScore<newScore+850
+      ){
+
+        best={
+          x:previousSafe.x,
+          y:previousSafe.y,
+          slot:previous.slot,
+          rect:previousRect
+        };
+      }
+    }
+
+    layoutState.set(
+      item.obj.id,
+      {
+        x:best.x,
+        y:best.y,
+        slot:best.slot,
+        last:performance.now()
+      }
+    );
+
+    placed.push({
+      id:item.obj.id,
+      rect:best.rect
+    });
+
+    item.layout=best;
+  }
+}
+
+
+/* =========================================================
+   AR CARD
+   ========================================================= */
+
+function makeARCard(obj){
+
+  const card=document.createElement("div");
+
+  card.className="arCard";
+
+  card.dataset.id=obj.id;
+
+  card.innerHTML=`
+
+    <div class="arCardInner">
+
+      <div class="arMedia">
+        ${typeIcon(obj.type)}
+      </div>
+
+      <div class="arContent">
+
+        <div class="arTitle"></div>
+
+        <div class="arType"></div>
+
+        <div class="arText"></div>
+
+        <div class="arMeta"></div>
+
+        <button class="arOpen">
+          PROFİLƏ BAX →
+        </button>
+
+      </div>
+
+    </div>
+  `;
+
+  card.addEventListener(
+    "click",
+    e=>{
+
+      e.stopPropagation();
+
+      const found=
+        objects.find(x=>x.id===obj.id);
+
+      if(found){
+        openDetail(found);
+      }
+    }
+  );
+
+
+  /*
+    Long press = temporarily pin card.
+    This gives the user the feeling of
+    physically "holding" one floating profile.
+  */
+
+  let pressTimer=null;
+
+  card.addEventListener(
+    "pointerdown",
+    ()=>{
+
+      pressTimer=
+        setTimeout(()=>{
+
+          card.classList.toggle("pinned");
+
+          const state=
+            layoutState.get(obj.id);
+
+          if(state){
+            state.pinned=
+              card.classList.contains("pinned");
+
+            layoutState.set(
+              obj.id,
+              state
+            );
+          }
+
+          toast(
+            card.classList.contains("pinned")
+            ? "Profil sabitlənib"
+            : "Profil sərbəst buraxıldı"
+          );
+
+        },520);
+    }
+  );
+
+  card.addEventListener(
+    "pointerup",
+    ()=>{
+      clearTimeout(pressTimer);
+    }
+  );
+
+  card.addEventListener(
+    "pointercancel",
+    ()=>{
+      clearTimeout(pressTimer);
+    }
+  );
+
+  return card;
+}
+
+
+/* =========================================================
+   MEDIA URL
+   ========================================================= */
+
+function getMediaURL(media){
+
+  if(!media?.blob){
+    return null;
+  }
+
+  if(mediaURLCache.has(media.id)){
+    return mediaURLCache.get(media.id);
+  }
+
+  const url=
+    URL.createObjectURL(media.blob);
+
+  mediaURLCache.set(
+    media.id,
+    url
+  );
+
+  return url;
+}
+
+
+/* =========================================================
+   UPDATE CARD CONTENT
+   ========================================================= */
+
+function updateCardContent(card,obj,distance){
+
+  card.querySelector(".arTitle")
+    .textContent=obj.name || "Adsız obyekt";
+
+  card.querySelector(".arType")
+    .textContent=typeName(obj.type);
+
+  card.querySelector(".arText")
+    .textContent=
+      obj.bio ||
+      obj.article ||
+      "Məkan profili";
+
+  const b=
+    bearing(
+      userLat,
+      userLng,
+      obj.lat,
+      obj.lng
+    );
+
+  card.querySelector(".arMeta")
+    .textContent=
+      `${Math.round(distance)} m · ${Math.round(b)}°`;
+
+  const mediaEl=
+    card.querySelector(".arMedia");
+
+  const first=
+    obj.media?.[0];
+
+  if(first?.blob){
+
+    const url=
+      getMediaURL(first);
+
+    if(
+      first.type?.startsWith("video/")
+    ){
+
+      if(
+        mediaEl.dataset.mediaId!==first.id
+      ){
+
+        mediaEl.innerHTML=
+          `<video muted playsinline></video>`;
+
+        const v=
+          mediaEl.querySelector("video");
+
+        v.src=url;
+        v.muted=true;
+        v.playsInline=true;
+        v.loop=true;
+        v.autoplay=true;
+
+        mediaEl.dataset.mediaId=
+          first.id;
+      }
+
+    }else{
+
+      if(
+        mediaEl.dataset.mediaId!==first.id
+      ){
+
+        mediaEl.innerHTML=
+          `<img alt="">`;
+
+        mediaEl.querySelector("img").src=url;
+
+        mediaEl.dataset.mediaId=
+          first.id;
+      }
+
+    }
+
+  }else{
+
+    if(!mediaEl.dataset.mediaId){
+
+      mediaEl.innerHTML=
+        typeIcon(obj.type);
+    }
+
+  }
+}
+
+
+/* =========================================================
+   CONNECTION LINE
+   ========================================================= */
+
+function updateConnection(
+  obj,
+  target,
+  position
 ){
 
-throw new Error(
-"camera"
-);
+  const lines=$("arLines");
+
+  let line=
+    lines.querySelector(
+      `[data-line="${obj.id}"]`
+    );
+
+  if(!line){
+
+    line=document.createElement("div");
+
+    line.className="arConnection";
+
+    line.dataset.line=obj.id;
+
+    lines.appendChild(line);
+  }
+
+  const dx=
+    position.x-target.x;
+
+  const dy=
+    position.y-target.y;
+
+  const length=
+    Math.sqrt(dx*dx+dy*dy);
+
+  if(length<8){
+
+    line.style.display="none";
+    return;
+  }
+
+  line.style.display="block";
+
+  line.style.left=
+    target.x+"px";
+
+  line.style.top=
+    target.y+"px";
+
+  line.style.width=
+    length+"px";
+
+  line.style.transform=
+    `rotate(${Math.atan2(dy,dx)*180/Math.PI}deg)`;
+
+  /*
+    Very far offsets get softer.
+  */
+
+  line.style.opacity=
+    String(
+      clamp(
+        .78-length/700,
+        .18,
+        .72
+      )
+    );
 
 }
 
 
-cameraStream =
-await navigator.mediaDevices
-.getUserMedia({
+/* =========================================================
+   ANCHOR DOT
+   ========================================================= */
 
-video:{
-
-facingMode:{
-ideal:"environment"
-},
-
-width:{
-ideal:1280
-},
-
-height:{
-ideal:720
-}
-
-},
-
-audio:false
-
-});
-
-
-$("camera")
-.srcObject =
-cameraStream;
-
-
-}
-catch(error){
-
-toast(
-"Kamera icazəsi verilmədi. Xəritə və GPS rejimi yenə işləyə bilər."
-);
-
-}
-
-}
-
-
-/* ======================================================
-   STABLE AR
-====================================================== */
-
-function objectMatches(
-obj,
-query
+function updateAnchorDot(
+  obj,
+  target
 ){
 
-if(!query)
-return true;
+  const lines=$("arLines");
 
+  let dot=
+    lines.querySelector(
+      `[data-dot="${obj.id}"]`
+    );
 
-return (
-obj.name+
-" "+
-obj.username+
-" "+
-obj.bio+
-" "+
-obj.article+
-" "+
-obj.type
-)
-.toLowerCase()
-.includes(query);
+  if(!dot){
+
+    dot=document.createElement("div");
+
+    dot.className="arAnchorDot";
+
+    dot.dataset.dot=obj.id;
+
+    lines.appendChild(dot);
+  }
+
+  dot.style.left=
+    target.x+"px";
+
+  dot.style.top=
+    target.y+"px";
 
 }
 
 
-function makeARCard(
-obj
+/* =========================================================
+   EDGE INDICATOR
+   ========================================================= */
+
+function makeEdge(obj){
+
+  const el=document.createElement("div");
+
+  el.className="arEdge";
+
+  el.dataset.edge=obj.id;
+
+  el.innerHTML=`
+    <b>↗</b>
+    <div></div>
+  `;
+
+  el.addEventListener(
+    "click",
+    e=>{
+
+      e.stopPropagation();
+
+      openDetail(obj);
+    }
+  );
+
+  return el;
+}
+
+
+function updateEdge(
+  edge,
+  obj,
+  distance,
+  diff
 ){
 
-const card =
-document.createElement(
-"div"
-);
+  const layer=$("arObjects");
 
-card.className =
-"arCard";
+  const w=
+    layer.clientWidth || innerWidth;
 
-card.dataset.id =
-obj.id;
+  const h=
+    layer.clientHeight || innerHeight;
 
+  let x=
+    diff<0
+    ? 45
+    : w-45;
 
-card.innerHTML = `
+  let y=
+    h*.40+
+    clamp(
+      distance/Math.max(obj.radius,1),
+      0,
+      1
+    )*h*.20;
 
-<div class="arMedia"></div>
+  y=clamp(y,100,h-130);
 
-<div class="arTitle"></div>
+  edge.style.left=x+"px";
+  edge.style.top=y+"px";
 
-<div class="arType"></div>
+  const arrow=
+    diff<0
+    ? "←"
+    : "→";
 
-<div class="arText"></div>
+  edge.querySelector("b")
+    .textContent=arrow;
 
-<div class="arMeta"></div>
-
-<button class="arOpen">
-SPATIAL PROFİLİ AÇ
-</button>
-
-`;
-
-
-card.querySelector(
-".arOpen"
-).onclick =
-()=>{
-openDetail(obj);
-};
-
-
-return card;
-
+  edge.querySelector("div")
+    .textContent=
+      `${obj.name} · ${Math.round(distance)}m`;
 }
 
 
-/*
-  Hər obyekt üçün öz virtual anchor-u var.
-  GPS/kompas dəyişsə də kart bir anda
-  yeni koordinata sıçramır.
-*/
-
-function ensureAnchor(
-obj,
-distance,
-bearingValue
-){
-
-let anchor =
-anchorState.get(
-obj.id
-);
-
-
-if(!anchor){
-
-const difference =
-adiff(
-bearingValue,
-heading
-);
-
-
-anchor = {
-
-x:
-50+
-difference/82*42,
-
-y:
-43+
-Math.min(
-1,
-distance/
-Math.max(
-obj.radius,
-1
-)
-)*19,
-
-bearing:
-bearingValue,
-
-distance:
-
-distance,
-
-last:
-performance.now()
-
-};
-
-
-anchorState.set(
-obj.id,
-anchor
-);
-
-return anchor;
-
-}
-
-
-/* Bearing smoothing */
-
-const bearingDifference =
-adiff(
-bearingValue,
-anchor.bearing
-);
-
-anchor.bearing =
-(
-anchor.bearing+
-bearingDifference*.12+
-360
-)%360;
-
-
-/* Distance smoothing */
-
-anchor.distance =
-anchor.distance+
-(
-distance-
-anchor.distance
-)*.08;
-
-
-/* New screen target */
-
-const screenDifference =
-adiff(
-anchor.bearing,
-heading
-);
-
-const targetX =
-50+
-screenDifference/
-82*
-42;
-
-const targetY =
-43+
-Math.min(
-1,
-anchor.distance/
-Math.max(
-obj.radius,
-1
-)
-)*19;
-
-
-/* Screen smoothing */
-
-anchor.x +=
-(
-targetX-
-anchor.x
-)*.18;
-
-anchor.y +=
-(
-targetY-
-anchor.y
-)*.18;
-
-
-anchor.last =
-performance.now();
-
-
-return anchor;
-
-}
-
+/* =========================================================
+   MAIN AR UPDATE
+   ========================================================= */
 
 function updateAR(){
 
-const container =
-$("arObjects");
+  if(
+    userLat===null ||
+    userLng===null
+  ){
+
+    $("scanInfo").textContent=
+      "GPS gözlənilir...";
+
+    return;
+  }
+
+  const layer=$("arObjects");
+  const lines=$("arLines");
+
+  const query=
+    $("arSearch").value.trim();
+
+  const candidates=[];
+  const visibleIds=new Set();
+
+  const edgeObjects=[];
+
+  for(const obj of objects){
+
+    if(obj.public===false){
+      continue;
+    }
+
+    if(!objectMatches(obj,query)){
+      continue;
+    }
+
+    if(
+      !Number.isFinite(obj.lat) ||
+      !Number.isFinite(obj.lng)
+    ){
+      continue;
+    }
+
+    const distance=
+      dist(
+        userLat,
+        userLng,
+        obj.lat,
+        obj.lng
+      );
+
+    const radius=
+      Math.max(
+        Number(obj.radius)||300,
+        30
+      );
+
+    if(distance>radius){
+      continue;
+    }
+
+    const targetBearing=
+      bearing(
+        userLat,
+        userLng,
+        obj.lat,
+        obj.lng
+      );
+
+    const diff=
+      adiff(
+        targetBearing,
+        heading
+      );
+
+    /*
+      Main camera field.
+      Objects outside are shown as
+      edge indicators rather than simply
+      disappearing.
+    */
+
+    if(Math.abs(diff)>88){
+
+      edgeObjects.push({
+        obj,
+        distance,
+        diff
+      });
+
+      continue;
+    }
+
+    let card=
+      layer.querySelector(
+        `.arCard[data-id="${obj.id}"]`
+      );
+
+    if(!card){
+
+      card=makeARCard(obj);
+
+      layer.appendChild(card);
+    }
+
+    card.classList.toggle(
+      "big",
+      obj.size==="building"
+    );
+
+    updateCardContent(
+      card,
+      obj,
+      distance
+    );
+
+    const target=
+      projectTarget(
+        obj,
+        distance,
+        targetBearing
+      );
+
+    candidates.push({
+      obj,
+      card,
+      distance,
+      bearing:targetBearing,
+      target
+    });
+
+    visibleIds.add(obj.id);
+  }
 
 
-if(
-userLat === null ||
-userLng === null
-){
+  /*
+    Remove old edge indicators.
+  */
 
-$("scanInfo").textContent =
-"GPS gözlənilir…";
+  layer
+    .querySelectorAll(".arEdge")
+    .forEach(el=>{
 
-return;
+      if(
+        !edgeObjects.some(
+          x=>x.obj.id===el.dataset.edge
+        )
+      ){
 
+        el.remove();
+      }
+    });
+
+
+  /*
+    Show nearest off-screen objects.
+  */
+
+  edgeObjects
+    .sort((a,b)=>a.distance-b.distance)
+    .slice(0,7)
+    .forEach(item=>{
+
+      let edge=
+        layer.querySelector(
+          `.arEdge[data-edge="${item.obj.id}"]`
+        );
+
+      if(!edge){
+
+        edge=makeEdge(item.obj);
+
+        layer.appendChild(edge);
+      }
+
+      updateEdge(
+        edge,
+        item.obj,
+        item.distance,
+        item.diff
+      );
+    });
+
+
+  /*
+    Collision layout.
+  */
+
+  calculateLayout(candidates);
+
+
+  /*
+    Render cards.
+  */
+
+  candidates.forEach(item=>{
+
+    const state=
+      layoutState.get(item.obj.id);
+
+    if(!state) return;
+
+    const card=item.card;
+
+    /*
+      Smooth movement.
+      Pinned cards don't move with collision layout.
+    */
+
+    const isPinned=
+      state.pinned ||
+      card.classList.contains("pinned");
+
+    if(!state.renderX){
+
+      state.renderX=state.x;
+      state.renderY=state.y;
+
+    }else{
+
+      const smooth=
+        isPinned
+        ? .02
+        : .16;
+
+      state.renderX +=
+        (state.x-state.renderX)*smooth;
+
+      state.renderY +=
+        (state.y-state.renderY)*smooth;
+    }
+
+
+    /*
+      Perspective.
+      Near = slightly bigger.
+      Far = slightly smaller.
+    */
+
+    const radius=
+      Math.max(
+        Number(item.obj.radius)||300,
+        50
+      );
+
+    const depth=
+      clamp(
+        item.distance/radius,
+        0,
+        1
+      );
+
+    const scale=
+      clamp(
+        1.05-depth*.18,
+        .86,
+        1.06
+      );
+
+    card.style.setProperty(
+      "--arScale",
+      scale
+    );
+
+    card.style.left=
+      state.renderX+"px";
+
+    card.style.top=
+      state.renderY+"px";
+
+
+    /*
+      Nearer objects are visually in front.
+    */
+
+    card.style.zIndex=
+      String(
+        Math.round(
+          10000-
+          item.distance*4
+        )
+      );
+
+
+    /*
+      Slight opacity difference only.
+    */
+
+    card.style.opacity=
+      String(
+        clamp(
+          1-depth*.22,
+          .72,
+          1
+        )
+      );
+
+
+    updateConnection(
+      item.obj,
+      item.target,
+      {
+        x:state.renderX,
+        y:state.renderY
+      }
+    );
+
+    updateAnchorDot(
+      item.obj,
+      item.target
+    );
+
+  });
+
+
+  /*
+    Remove stale cards.
+  */
+
+  layer
+    .querySelectorAll(".arCard")
+    .forEach(card=>{
+
+      if(!visibleIds.has(card.dataset.id)){
+
+        card.remove();
+
+        layoutState.delete(
+          card.dataset.id
+        );
+      }
+    });
+
+
+  /*
+    Remove stale lines/dots.
+  */
+
+  lines
+    .querySelectorAll(".arConnection,.arAnchorDot")
+    .forEach(el=>{
+
+      const id=
+        el.dataset.line ||
+        el.dataset.dot;
+
+      if(!visibleIds.has(id)){
+        el.remove();
+      }
+    });
+
+
+  $("scanInfo").textContent=
+    `${candidates.length} profil · `+
+    `${edgeObjects.length} istiqamət · `+
+    `məkan səpilməsi aktiv`;
 }
 
 
-const query =
-(
-$("searchInput")
-.value ||
-""
-)
-.trim()
-.toLowerCase();
+/* =========================================================
+   REFRESH AR
+   ========================================================= */
 
+function refreshAR(){
 
-const keep =
-new Set();
+  /*
+    Force a fresh spread while keeping
+    deterministic object positions.
+  */
 
+  layoutGeneration++;
 
-const visible =
-objects.filter(
-obj=>
-obj.public !== false &&
-objectMatches(
-obj,
-query
-)
-);
+  for(const state of layoutState.values()){
 
+    state.slot=undefined;
+    state.renderX=undefined;
+    state.renderY=undefined;
+  }
 
-for(
-const obj
-of visible
-){
+  updateAR();
 
-const distance =
-dist(
-userLat,
-userLng,
-obj.lat,
-obj.lng
-);
-
-
-if(
-distance >
-Number(
-obj.radius || 300
-)
-){
-
-continue;
-
+  toast("Məkan profilləri yenidən səpildi.");
 }
 
 
-const targetBearing =
-bearing(
-userLat,
-userLng,
-obj.lat,
-obj.lng
-);
-
-
-const difference =
-adiff(
-targetBearing,
-heading
-);
-
-
-let card =
-container.querySelector(
-'[data-id="'+
-CSS.escape(obj.id)+
-'"]'
-);
-
-
-/*
-  Object is behind user.
-  We don't destroy it immediately.
-*/
-
-if(
-Math.abs(difference)>86
-){
-
-if(card)
-card.style.opacity =
-"0";
-
-continue;
-
-}
-
-
-if(!card){
-
-card =
-makeARCard(
-obj
-);
-
-container.appendChild(
-card
-);
-
-}
-
-
-card.style.opacity =
-"1";
-
-
-const anchor =
-ensureAnchor(
-obj,
-distance,
-targetBearing
-);
-
-
-card.classList.toggle(
-"big",
-obj.size === "building"
-);
-
-
-card.style.left =
-anchor.x+"%";
-
-card.style.top =
-anchor.y+"%";
-
-
-card.querySelector(
-".arTitle"
-).textContent =
-obj.name;
-
-
-card.querySelector(
-".arType"
-).textContent =
-typeName(
-obj.type
-);
-
-
-card.querySelector(
-".arText"
-).textContent =
-(
-obj.bio ||
-obj.article ||
-""
-)
-.slice(
-0,
-125
-);
-
-
-card.querySelector(
-".arMeta"
-).textContent =
-Math.round(
-anchor.distance
-)+
-" m · "+
-Math.round(
-anchor.bearing
-)+
-"°";
-
-
-/* First media */
-
-const media =
-obj.media &&
-obj.media[0];
-
-const mediaBox =
-card.querySelector(
-".arMedia"
-);
-
-
-if(
-media &&
-!mediaBox.dataset.loaded
-){
-
-mediaBox.dataset.loaded =
-"1";
-
-
-if(
-media.type &&
-media.type.startsWith(
-"video/"
-)
-){
-
-const video =
-document.createElement(
-"video"
-);
-
-video.className =
-"thumb";
-
-video.muted =
-true;
-
-video.playsInline =
-true;
-
-video.preload =
-"metadata";
-
-video.src =
-URL.createObjectURL(
-media.blob
-);
-
-mediaBox.appendChild(
-video
-);
-
-}
-else{
-
-const image =
-document.createElement(
-"img"
-);
-
-image.className =
-"thumb";
-
-image.src =
-URL.createObjectURL(
-media.blob
-);
-
-mediaBox.appendChild(
-image
-);
-
-}
-
-}
-
-
-keep.add(
-obj.id
-);
-
-}
-
-
-/* Remove objects no longer needed */
-
-[
-...container.children
-]
-.forEach(
-card=>{
-
-if(
-!keep.has(
-card.dataset.id
-)
-){
-
-card.remove();
-
-}
-
-}
-);
-
-
-$("scanInfo").textContent =
-visible.length+
-" spatial obyekt · sabit skan";
-
-}
-
-
-/* ======================================================
-   CREATE FORM
-====================================================== */
-
-function resetCreate(){
-
-$("objectName").value =
-"";
-
-$("objectUsername").value =
-"";
-
-$("objectPhone").value =
-"";
-
-$("objectBio").value =
-"";
-
-$("objectArticle").value =
-"";
-
-$("objectWhatsapp").value =
-"";
-
-$("objectSocial").value =
-"";
-
-
-$("objectType").value =
-createMode === "social"
-?
-"person"
-:
-"business";
-
-
-$("objectRadius").value =
-"300";
-
-
-$("objectSize").value =
-"normal";
-
-
-$("publicCheck").checked =
-true;
-
-
-$("showContactCheck").checked =
-true;
-
-
-$("consentCheck").checked =
-true;
-
-
-selectedFiles =
-[];
-
-renderSelected();
-
-
-$("objectLat").value =
-userLat !== null
-?
-userLat.toFixed(7)
-:
-"";
-
-
-$("objectLng").value =
-userLng !== null
-?
-userLng.toFixed(7)
-:
-"";
-
-}
-
-
-function openCreate(){
-
-resetCreate();
-
-openModal(
-"createModal"
-);
-
-}
-
-
-/* ======================================================
-   MEDIA PREVIEW
-====================================================== */
-
-function renderSelected(){
-
-const box =
-$("selectedMedia");
-
-box.innerHTML =
-"";
-
-
-selectedFiles.forEach(
-(file,index)=>{
-
-const wrapper =
-document.createElement(
-"div"
-);
-
-wrapper.className =
-"selectedItem";
-
-
-const element =
-document.createElement(
-file.type.startsWith(
-"video/"
-)
-?
-"video"
-:
-"img"
-);
-
-
-element.src =
-URL.createObjectURL(
-file
-);
-
-
-if(
-element.tagName ===
-"VIDEO"
-){
-
-element.controls =
-true;
-
-element.playsInline =
-true;
-
-}
-
-
-wrapper.appendChild(
-element
-);
-
-
-const remove =
-document.createElement(
-"button"
-);
-
-remove.textContent =
-"×";
-
-
-remove.onclick =
-()=>{
-
-selectedFiles.splice(
-index,
-1
-);
-
-renderSelected();
-
-};
-
-
-wrapper.appendChild(
-remove
-);
-
-box.appendChild(
-wrapper
-);
-
-});
-
-}
-
-
-function addFiles(
-files
-){
-
-for(
-const file
-of files
-){
-
-if(
-!/^image\/|^video\//.test(
-file.type
-)
-){
-
-continue;
-
-}
-
-
-if(
-selectedFiles.length>=10
-){
-
-toast(
-"Maksimum 10 media."
-);
-
-break;
-
-}
-
-
-if(
-file.size >
-250*1024*1024
-){
-
-toast(
-file.name+
-" 250 MB-dan böyükdür."
-);
-
-continue;
-
-}
-
-
-selectedFiles.push(
-file
-);
-
-}
-
-
-renderSelected();
-
-}
-
-
-$("galleryBtn").onclick =
-()=>
-$("galleryInput").click();
-
-
-$("photoBtn").onclick =
-()=>
-$("photoInput").click();
-
-
-$("videoBtn").onclick =
-()=>
-openRecorder();
-
-
-$("galleryInput").onchange =
-event=>{
-
-addFiles(
-[
-...event.target.files
-]
-);
-
-event.target.value =
-"";
-
-};
-
-
-$("photoInput").onchange =
-event=>{
-
-addFiles(
-[
-...event.target.files
-]
-);
-
-event.target.value =
-"";
-
-};
-
-
-$("videoInput").onchange =
-event=>{
-
-addFiles(
-[
-...event.target.files
-]
-);
-
-event.target.value =
-"";
-
-};
-
-
-/* ======================================================
-   GPS BUTTON
-====================================================== */
-
-$("currentGPS").onclick =
-()=>{
-
-if(
-userLat === null
-){
-
-toast(
-"GPS hələ hazır deyil."
-);
-
-return;
-
-}
-
-
-$("objectLat").value =
-userLat.toFixed(7);
-
-$("objectLng").value =
-userLng.toFixed(7);
-
-
-toast(
-"Koordinat avtomatik götürüldü. GPS ±"+
-Math.round(
-gpsAccuracy || 0
-)+"m"
-);
-
-};
-
-
-/* ======================================================
-   MAP PICKER
-====================================================== */
-
-$("pickMap").onclick =
-()=>{
-
-closeModal(
-"createModal"
-);
-
-switchView(
-"map"
-);
-
-setTimeout(
-()=>{
-
-initMap();
-
-picker =
-true;
-
-toast(
-"Xəritədə dəqiq nöqtəyə toxunun."
-);
-
-},
-250
-);
-
-};
-
-
-/* ======================================================
-   LONG VIDEO RECORDER
-====================================================== */
-
-async function openRecorder(){
-
-try{
-
-if(
-!navigator.mediaDevices ||
-!navigator.mediaDevices.getUserMedia
-){
-
-throw new Error(
-"camera"
-);
-
-}
-
-
-recStream =
-await navigator.mediaDevices
-.getUserMedia({
-
-video:{
-facingMode:{
-ideal:"environment"
-},
-
-width:{
-ideal:1280
-},
-
-height:{
-ideal:720
-}
-},
-
-audio:true
-
-});
-
-
-$("recVideo")
-.srcObject =
-recStream;
-
-
-$("recorder")
-.classList.add(
-"show"
-);
-
-
-history.pushState(
-{rec:true},
-"",
-"#recorder"
-);
-
-
-recorder =
-null;
-
-recChunks =
-[];
-
-$("recordBtn")
-.classList.remove(
-"stop"
-);
-
-$("recTimer").textContent =
-"00:00";
-
-
-}
-catch(error){
-
-toast(
-"Video kamerasına giriş mümkün olmadı."
-);
-
-}
-
-}
-
-
-function closeRecorder(
-pop=true
-){
-
-if(
-recorder &&
-recorder.state ===
-"recording"
-){
-
-stopRecording();
-
-}
-
-
-if(recStream){
-
-recStream
-.getTracks()
-.forEach(
-track=>
-track.stop()
-);
-
-recStream =
-null;
-
-}
-
-
-$("recorder")
-.classList.remove(
-"show"
-);
-
-
-if(
-pop &&
-historyDepth>0
-){
-
-history.back();
-
-historyDepth--;
-
-}
-
-}
-
-
-function startRecording(){
-
-if(!recStream)
-return;
-
-
-recChunks =
-[];
-
-
-let mime = "";
-
-
-const types = [
-
-"video/webm;codecs=vp9,opus",
-
-"video/webm;codecs=vp8,opus",
-
-"video/webm"
-
-];
-
-
-for(
-const type
-of types
-){
-
-if(
-MediaRecorder
-.isTypeSupported(
-type
-)
-){
-
-mime =
-type;
-
-break;
-
-}
-
-}
-
-
-try{
-
-recorder =
-new MediaRecorder(
-
-recStream,
-
-mime
-?
-{
-mimeType:mime,
-videoBitsPerSecond:3000000
-}
-:
-undefined
-
-);
-
-}
-catch(error){
-
-toast(
-"Bu brauzer video yazmanı dəstəkləmir."
-);
-
-return;
-
-}
-
-
-recorder.ondataavailable =
-event=>{
-
-if(
-event.data &&
-event.data.size
-){
-
-recChunks.push(
-event.data
-);
-
-}
-
-};
-
-
-recorder.onstop =
-()=>{
-
-const blob =
-new Blob(
-recChunks,
-{
-type:
-recorder.mimeType ||
-"video/webm"
-}
-);
-
-
-const file =
-new File(
-[
-blob
-],
-"ARWORLD-"+
-Date.now()+
-".webm",
-{
-type:
-blob.type
-}
-);
-
-
-addFiles(
-[
-file
-]
-);
-
-
-toast(
-"Uzun video əlavə olundu."
-);
-
-
-closeRecorder(
-false
-);
-
-};
-
-
-recorder.start(
-1000
-);
-
-
-recStart =
-Date.now();
-
-
-$("recordBtn")
-.classList.add(
-"stop"
-);
-
-
-clearInterval(
-recTimer
-);
-
-
-recTimer =
-setInterval(
-()=>{
-
-$("recTimer").textContent =
-fmtTime(
-(
-Date.now()-
-recStart
-)/
-1000
-);
-
-},
-500
-);
-
-}
-
-
-function stopRecording(){
-
-if(
-recorder &&
-recorder.state ===
-"recording"
-){
-
-recorder.stop();
-
-clearInterval(
-recTimer
-);
-
-recTimer =
-null;
-
-}
-
-}
-
-
-$("recordBtn").onclick =
-()=>{
-
-if(
-recorder &&
-recorder.state ===
-"recording"
-){
-
-stopRecording();
-
-}
-else{
-
-startRecording();
-
-}
-
-};
-
-
-$("recClose").onclick =
-()=>
-closeRecorder();
-
-
-/* ======================================================
-   PLACE OBJECT
-   IMPORTANT:
-   OBJECT IS SAVED BEFORE MEDIA PROCESSING
-====================================================== */
+/* =========================================================
+   CREATE OBJECT
+   ========================================================= */
 
 async function placeObject(){
 
-const name =
-$("objectName")
-.value
-.trim();
+  const name=
+    $("createName").value.trim();
+
+  if(!name){
+
+    toast("Başlıq yaz.");
+    return;
+  }
+
+  let lat=
+    parseFloat(
+      $("createLat").value
+    );
+
+  let lng=
+    parseFloat(
+      $("createLng").value
+    );
+
+  if(
+    !Number.isFinite(lat) ||
+    !Number.isFinite(lng)
+  ){
+
+    if(
+      userLat!==null &&
+      userLng!==null
+    ){
+
+      lat=userLat;
+      lng=userLng;
+
+    }else{
+
+      toast("GPS koordinatı lazımdır.");
+      return;
+    }
+  }
+
+  if(!$("createConsent").checked){
+
+    toast("Yerləşdirmə üçün təsdiqi işarələ.");
+    return;
+  }
+
+  const obj={
+
+    id:
+      "obj_"+Date.now()+"_"+Math.random()
+      .toString(36)
+      .slice(2,9),
+
+    type:$("createType").value,
+
+    mode:$("createMode").value,
+
+    name,
+
+    username:
+      $("createUsername").value.trim() ||
+      profile.username,
+
+    bio:
+      $("createBio").value.trim(),
+
+    article:
+      $("createArticle").value.trim(),
+
+    phone:
+      $("createContact").checked
+      ? $("createPhone").value.trim()
+      : "",
+
+    whatsapp:
+      $("createContact").checked
+      ? $("createWhatsapp").value.trim()
+      : "",
+
+    social:
+      $("createSocial").value.trim(),
+
+    lat,
+    lng,
+
+    radius:
+      Number(
+        $("createRadius").value
+      ),
+
+    size:
+      $("createSize").value,
+
+    public:
+      $("createPublic").checked,
+
+    showContact:
+      $("createContact").checked,
+
+    authorId:"me",
+
+    author:
+      profile.name,
+
+    media:[],
+
+    createdAt:Date.now()
+
+  };
 
 
-let lat =
-parseFloat(
-$("objectLat").value
-);
+  $("loading").style.display="grid";
 
+  try{
 
-let lng =
-parseFloat(
-$("objectLng").value
-);
+    await saveObject(obj);
 
+    /*
+      Reset spatial state so the newly created
+      object receives a deterministic slot.
+    */
 
-if(!name){
+    layoutState.delete(obj.id);
 
-toast(
-"Ad / başlıq yazın."
-);
+    closeModal("createModal");
 
-return;
+    renderAll();
 
+    toast(
+      "Profil məkana yerləşdirildi ✦"
+    );
+
+    /*
+      Save media after the object itself exists.
+    */
+
+    if(selectedFiles.length){
+
+      const media=[];
+
+      for(const file of selectedFiles){
+
+        media.push({
+
+          id:
+            "media_"+Date.now()+"_"+
+            Math.random()
+            .toString(36)
+            .slice(2,8),
+
+          name:file.name,
+
+          type:file.type,
+
+          size:file.size,
+
+          blob:file
+
+        });
+      }
+
+      obj.media=media;
+
+      await saveObject(obj);
+
+      renderAll();
+    }
+
+  }catch(err){
+
+    console.error(err);
+
+    toast(
+      "Yerləşdirmə zamanı xəta baş verdi."
+    );
+
+  }finally{
+
+    $("loading").style.display="none";
+
+  }
+
+  selectedFiles=[];
+
+  updateSelectedMedia();
 }
 
 
-/*
-  If coordinates are empty,
-  automatically use current GPS.
-*/
+/* =========================================================
+   CREATE FORM RESET
+   ========================================================= */
 
-if(
-!Number.isFinite(lat) ||
-!Number.isFinite(lng)
-){
+function resetCreateForm(){
 
-if(
-userLat !== null
-){
+  $("createName").value="";
+  $("createUsername").value=
+    profile.username;
 
-lat =
-userLat;
+  $("createBio").value="";
+  $("createArticle").value="";
+  $("createPhone").value="";
+  $("createWhatsapp").value="";
+  $("createSocial").value="";
 
-lng =
-userLng;
+  $("createLat").value=
+    userLat!==null
+    ? userLat.toFixed(7)
+    : "";
 
-$("objectLat").value =
-userLat.toFixed(7);
+  $("createLng").value=
+    userLng!==null
+    ? userLng.toFixed(7)
+    : "";
 
-$("objectLng").value =
-userLng.toFixed(7);
+  $("createRadius").value="300";
+  $("createSize").value="normal";
 
-}
-else{
+  $("createPublic").checked=true;
+  $("createContact").checked=false;
+  $("createConsent").checked=false;
 
-toast(
-"GPS hazır deyil. Xəritədən nöqtə seçin."
-);
+  selectedFiles=[];
 
-return;
-
-}
-
-}
-
-
-if(
-!$("consentCheck").checked
-){
-
-toast(
-"Paylaşım razılığını təsdiqləyin."
-);
-
-return;
-
+  updateSelectedMedia();
 }
 
 
-/*
-  CRITICAL:
-  No media conversion before this save.
-*/
+function updateSelectedMedia(){
 
-const object = {
+  const box=
+    $("selectedMedia");
 
-id:
-"o_"+
-Date.now()+
-"_"+
+  box.innerHTML="";
 
-Math.random()
-.toString(36)
-.slice(2,8),
+  selectedFiles.forEach(
+    (file,index)=>{
 
-type:
-$("objectType").value,
+      const chip=
+        document.createElement("div");
 
-name:
+      chip.className="mediaChip";
 
-name,
+      chip.textContent=
+        `${index+1}. ${file.name}`;
 
-username:
-
-$("objectUsername")
-.value
-.trim(),
-
-bio:
-
-$("objectBio")
-.value
-.trim(),
-
-article:
-
-$("objectArticle")
-.value
-.trim(),
-
-phone:
-
-$("showContactCheck")
-.checked
-?
-$("objectPhone")
-.value
-.trim()
-:
-"",
-
-whatsapp:
-
-$("showContactCheck")
-.checked
-?
-$("objectWhatsapp")
-.value
-.trim()
-:
-"",
-
-social:
-
-$("objectSocial")
-.value
-.trim(),
-
-lat:
-
-lat,
-
-lng:
-
-lng,
-
-radius:
-
-parseInt(
-$("objectRadius").value
-)
-||
-300,
-
-size:
-
-$("objectSize").value,
-
-public:
-
-$("publicCheck").checked,
-
-authorId:
-
-"me",
-
-author:
-
-profile.name,
-
-media:[],
-
-createdAt:
-
-Date.now()
-
-};
-
-
-try{
-
-/*
-  FIRST: Save spatial object.
-  This makes placement immediate.
-*/
-
-await saveObject(
-object
-);
-
-
-objects.push(
-object
-);
-
-
-/*
-  Copy selected files before reset.
-*/
-
-const files =
-selectedFiles.slice();
-
-
-/*
-  Close immediately.
-*/
-
-closeModal(
-"createModal"
-);
-
-
-/*
-  Refresh immediately.
-*/
-
-renderFeed();
-
-renderProfile();
-
-renderMapMarkers();
-
-updateAR();
-
-
-toast(
-"🌍 Dərhal yerləşdirildi."
-);
-
-
-/*
-  Media is added afterwards.
-*/
-
-if(
-files.length
-){
-
-processMedia(
-object,
-files
-);
-
+      box.appendChild(chip);
+    }
+  );
 }
 
 
-}
-catch(error){
+/* =========================================================
+   DETAIL
+   ========================================================= */
+
+function openDetail(obj){
+
+  const modal=
+    $("detailModal");
 
-console.error(
-error
-);
+  const content=
+    $("detailContent");
 
-toast(
-"Yerləşdirmə alınmadı: "+
-(
-error.message ||
-"xəta"
-)
-);
+  const distance=
+    userLat!==null
+    ? dist(
+        userLat,
+        userLng,
+        obj.lat,
+        obj.lng
+      )
+    : null;
 
-}
+  let mediaHTML="";
 
-}
+  if(obj.media?.length){
 
+    mediaHTML=
+      `<div class="detailMedia">`+
+      obj.media.map(media=>{
 
-/* ======================================================
-   MEDIA PROCESSING AFTER PLACEMENT
-====================================================== */
+        const url=
+          getMediaURL(media);
 
-async function processMedia(
-object,
-files
-){
+        if(media.type?.startsWith("video/")){
 
-for(
-let i=0;
-i<files.length;
-i++
-){
+          return `
+            <video
+              src="${url}"
+              controls
+              playsinline>
+            </video>
+          `;
 
-try{
+        }
 
-toast(
-"Media "+
-(i+1)+
-"/"+
-files.length+
-" saxlanılır…"
-);
+        return `
+          <img
+            src="${url}"
+            alt="">
+        `;
 
+      }).join("")+
+      `</div>`;
+  }
 
-object.media =
-object.media ||
-[];
 
+  let contactHTML="";
 
-object.media.push({
+  if(obj.showContact){
 
-id:
-"m_"+
-Date.now()+
-"_"+
-i,
+    if(obj.phone){
 
-name:
-files[i].name,
+      contactHTML+=`
+        <button
+          class="secondaryBtn"
+          onclick="window.location.href='tel:${esc(obj.phone)}'">
+          ☎ Zəng et
+        </button>
+      `;
+    }
 
-type:
-files[i].type,
+    if(obj.whatsapp){
 
-size:
-files[i].size,
+      const clean=
+        obj.whatsapp.replace(/\D/g,"");
 
-blob:
-files[i]
-
-});
-
-
-await saveObject(
-object
-);
-
-
-const local =
-objects.find(
-x=>
-x.id ===
-object.id
-);
-
-
-if(local){
-
-local.media =
-object.media;
-
-}
-
-
-renderFeed();
-
-renderProfile();
-
-updateAR();
-
-
-}
-catch(error){
-
-console.error(
-error
-);
-
-toast(
-"Media saxlanmadı: "+
-files[i].name
-);
-
-}
-
-}
-
-
-toast(
-"Media hazırdır."
-);
-
-}
-
-
-$("placeObject").onclick =
-placeObject;
-
-
-$("addBtn").onclick =
-openCreate;
-
-
-$("placeQuick").onclick =
-openCreate;
-
-
-$("closeCreate").onclick =
-()=>
-closeModal(
-"createModal"
-);
-
-
-/* MODE SELECT */
-
-document
-.querySelectorAll(
-".choice"
-)
-.forEach(
-choice=>{
-
-choice.onclick =
-()=>{
-
-document
-.querySelectorAll(
-".choice"
-)
-.forEach(
-item=>
-item.classList.remove(
-"active"
-)
-);
-
-choice.classList.add(
-"active"
-);
-
-
-createMode =
-choice.dataset.mode;
-
-
-$("objectType").value =
-createMode ===
-"social"
-?
-"person"
-:
-"business";
-
-};
-
-}
-);
-
-
-/* ======================================================
-   DETAIL PROFILE
-====================================================== */
-
-function mediaHTML(
-object
-){
-
-if(
-!object.media ||
-!object.media.length
-){
-
-return "";
-
+      contactHTML+=`
+        <button
+          class="secondaryBtn"
+          onclick="window.open(
+            'https://wa.me/${clean}',
+            '_blank'
+          )">
+          WhatsApp
+        </button>
+      `;
+    }
+  }
+
+
+  if(obj.social){
+
+    contactHTML+=`
+      <button
+        class="secondaryBtn"
+        onclick="openExternal(
+          '${esc(obj.social)}'
+        )">
+        🔗 Linki aç
+      </button>
+    `;
+  }
+
+
+  const canDelete=
+    obj.authorId==="me";
+
+
+  content.innerHTML=`
+
+    ${mediaHTML}
+
+    <div class="detailTitle">
+      ${esc(obj.name)}
+    </div>
+
+    <div class="detailUser">
+      ${esc(obj.username || "")}
+      ·
+      ${esc(typeName(obj.type))}
+    </div>
+
+    ${
+      obj.bio
+      ? `<div class="detailText">${esc(obj.bio)}</div>`
+      : ""
+    }
+
+    ${
+      obj.article
+      ? `<div class="detailText">${esc(obj.article)}</div>`
+      : ""
+    }
+
+    <div class="detailMeta">
+
+      📍
+      ${obj.lat.toFixed(6)},
+      ${obj.lng.toFixed(6)}
+
+      <br>
+
+      ${distance!==null
+        ? `◎ Sənə məsafə:
+           ${Math.round(distance)} m<br>`
+        : ""
+      }
+
+      👁 Görünmə radiusu:
+      ${obj.radius} m
+
+      <br>
+
+      🕒 ${fmtTime(obj.createdAt)}
+
+    </div>
+
+    <button
+      class="primaryBtn"
+      onclick="routeTo(
+        ${obj.lat},
+        ${obj.lng}
+      )">
+      🧭 BURAYA GET
+    </button>
+
+    ${contactHTML}
+
+    <button
+      class="dangerBtn"
+      onclick="reportObject(
+        '${esc(obj.id)}'
+      )">
+      ⚑ Şikayət et
+    </button>
+
+    ${
+      canDelete
+      ? `
+        <button
+          class="dangerBtn"
+          onclick="deleteObject(
+            '${esc(obj.id)}'
+          )">
+          🗑 Öz obyektimi sil
+        </button>
+      `
+      : ""
+    }
+
+  `;
+
+  openModal("detailModal");
 }
 
 
-return (
+/* =========================================================
+   EXTERNAL
+   ========================================================= */
 
-'<div class="mediaGrid">'+
+function openExternal(url){
 
-object.media
-.map(
-media=>{
+  if(!url) return;
 
-const url =
-URL.createObjectURL(
-media.blob
-);
+  let target=url.trim();
 
+  if(
+    !/^https?:\/\//i.test(target)
+  ){
 
-if(
-media.type &&
-media.type.startsWith(
-"video/"
-)
-){
+    target=
+      "https://"+target;
+  }
 
-return `
-<video
-controls
-playsinline
-preload="metadata"
-src="${url}">
-</video>
-`;
-
+  window.open(
+    target,
+    "_blank",
+    "noopener"
+  );
 }
 
 
-return `
-<img
-src="${url}"
-loading="lazy">
-`;
+function routeTo(lat,lng){
 
-}
-)
-.join("")
-
-+
-"</div>"
-
-);
-
+  window.open(
+    `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`,
+    "_blank",
+    "noopener"
+  );
 }
 
 
-function safeURL(
-url
-){
+function reportObject(id){
 
-let value =
-String(
-url ||
-""
-)
-.trim();
-
-
-if(
-!/^https?:\/\//i
-.test(value)
-){
-
-value =
-"https://"+
-value;
-
+  toast(
+    "Şikayət demo rejimində qeyd edildi."
+  );
 }
 
 
-return value;
+async function deleteObject(id){
 
+  const obj=
+    objects.find(x=>x.id===id);
+
+  if(!obj) return;
+
+  if(obj.authorId!=="me"){
+
+    toast("Bu obyekt sənə aid deyil.");
+    return;
+  }
+
+  try{
+
+    const tx=
+      db.transaction(
+        "objects",
+        "readwrite"
+      );
+
+    tx.objectStore("objects")
+      .delete(id);
+
+    tx.oncomplete=()=>{
+
+      objects=
+        objects.filter(x=>x.id!==id);
+
+      layoutState.delete(id);
+      anchorState.delete(id);
+
+      closeModal("detailModal");
+
+      renderAll();
+
+      toast("Obyekt silindi.");
+    };
+
+  }catch{
+
+    toast("Silinmədi.");
+  }
 }
 
 
-function openDetail(
-object
-){
+/* =========================================================
+   FEED
+   ========================================================= */
 
-$("detailBody")
-.innerHTML =
+function renderFeed(){
 
-mediaHTML(
-object
-)
+  const box=
+    $("feedList");
 
-+
+  box.innerHTML="";
 
-`
-<div class="detailTitle">
-${esc(object.name)}
-</div>
+  if(!objects.length){
 
-<div class="username">
-${esc(object.username || "")}
-</div>
+    box.innerHTML=`
+      <div class="card">
+        Hələ heç bir spatial obyekt yoxdur.
+      </div>
+    `;
 
-<div class="meta">
-${esc(typeName(object.type))}
-${
-object.size === "building"
-?
-" · Nəhəng görünüş"
-:
-""
-}
-</div>
+    return;
+  }
 
-<div class="bio">
-${esc(object.bio || "")}
-</div>
+  const sorted=
+    [...objects]
+      .sort(
+        (a,b)=>
+          (b.createdAt||0)-
+          (a.createdAt||0)
+      );
 
-${
-object.article
-?
-`
-<div class="article">
-${esc(object.article)}
-</div>
-`
-:
-""
-}
+  sorted.forEach(obj=>{
 
-<div
-class="meta"
-style="margin-top:15px">
+    const el=
+      document.createElement("div");
 
-📍
-${Number(object.lat).toFixed(7)},
-${Number(object.lng).toFixed(7)}
+    el.className=
+      "card worldCard";
 
-·
+    el.innerHTML=`
 
-${
-userLat !== null
-?
-Math.round(
-dist(
-userLat,
-userLng,
-object.lat,
-object.lng
-)
-)
-:
-"—"
-}
-m
+      <div class="worldIcon">
+        ${typeIcon(obj.type)}
+      </div>
 
-</div>
+      <div class="worldMain">
 
+        <div class="worldName">
+          ${esc(obj.name)}
+        </div>
 
-<div class="detailButtons">
+        <div class="worldDesc">
+          ${esc(
+            obj.bio ||
+            typeName(obj.type)
+          )}
+        </div>
 
-<button
-class="btn primary"
-id="dRoute">
+      </div>
 
-Marşrut
+      <div class="worldDistance">
+        ${distanceText(obj)}
+      </div>
 
-</button>
+    `;
 
+    el.addEventListener(
+      "click",
+      ()=>{
+        openDetail(obj);
+      }
+    );
 
-${
-object.phone
-?
-`
-<button
-class="btn"
-id="dCall">
-
-Zəng
-
-</button>
-`
-:
-""
+    box.appendChild(el);
+  });
 }
 
 
-${
-object.whatsapp
-?
-`
-<button
-class="btn"
-id="dWA">
+/* =========================================================
+   WORLD
+   ========================================================= */
 
-WhatsApp
+function distanceText(obj){
 
-</button>
-`
-:
-""
+  if(
+    userLat===null ||
+    userLng===null
+  ){
+    return "—";
+  }
+
+  return (
+    Math.round(
+      dist(
+        userLat,
+        userLng,
+        obj.lat,
+        obj.lng
+      )
+    )+
+    "m"
+  );
 }
 
 
-${
-object.social
-?
-`
-<button
-class="btn"
-id="dSocial">
+function renderWorld(){
 
-Sosial şəbəkə
+  const box=
+    $("worldList");
 
-</button>
-`
-:
-""
+  box.innerHTML="";
+
+  const visible=
+    objects
+      .filter(x=>x.public!==false)
+      .sort(
+        (a,b)=>
+          distanceNumber(a)-
+          distanceNumber(b)
+      );
+
+  if(!visible.length){
+
+    box.innerHTML=`
+      <div class="card">
+        Yaxınlıqda obyekt yoxdur.
+      </div>
+    `;
+
+    return;
+  }
+
+  visible.forEach(obj=>{
+
+    const el=
+      document.createElement("div");
+
+    el.className=
+      "card worldCard";
+
+    el.innerHTML=`
+
+      <div class="worldIcon">
+        ${typeIcon(obj.type)}
+      </div>
+
+      <div class="worldMain">
+
+        <div class="worldName">
+          ${esc(obj.name)}
+        </div>
+
+        <div class="worldDesc">
+          ${esc(obj.bio || typeName(obj.type))}
+        </div>
+
+      </div>
+
+      <div class="worldDistance">
+        ${distanceText(obj)}
+      </div>
+
+    `;
+
+    el.onclick=
+      ()=>openDetail(obj);
+
+    box.appendChild(el);
+  });
 }
 
 
-<button
-class="btn"
-id="dReport">
+function distanceNumber(obj){
 
-Report
+  if(
+    userLat===null ||
+    userLng===null
+  ){
+    return Infinity;
+  }
 
-</button>
-
-
-${
-object.authorId === "me"
-?
-`
-<button
-class="btn danger"
-id="dDelete">
-
-Sil
-
-</button>
-`
-:
-""
-}
-
-</div>
-`;
-
-
-openModal(
-"detailModal"
-);
-
-
-/* ACTIONS */
-
-$("dRoute").onclick =
-()=>{
-
-window.open(
-"https://www.google.com/maps/dir/?api=1&destination="+
-encodeURIComponent(
-object.lat+
-","+
-object.lng
-),
-"_blank"
-);
-
-};
-
-
-if(
-$("dCall")
-){
-
-$("dCall").onclick =
-()=>{
-
-location.href =
-"tel:"+
-object.phone;
-
-};
-
+  return dist(
+    userLat,
+    userLng,
+    obj.lat,
+    obj.lng
+  );
 }
 
 
-if(
-$("dWA")
-){
+/* =========================================================
+   PROFILE
+   ========================================================= */
 
-$("dWA").onclick =
-()=>{
+function renderProfile(){
 
-window.open(
-"https://wa.me/"+
-object.whatsapp.replace(
-/\D/g,
-""
-),
-"_blank"
-);
+  $("profileName")
+    .textContent=profile.name;
 
-};
+  $("profileUsername")
+    .textContent=profile.username;
 
+  $("profileBio")
+    .textContent=
+      profile.bio ||
+      "Fiziki dünyaya rəqəmsal iz burax.";
+
+  $("profileObjectCount")
+    .textContent=
+      objects.filter(
+        x=>x.authorId==="me"
+      ).length;
+
+
+  if(profile.avatar){
+
+    $("profileAvatar").innerHTML=
+      `<img src="${profile.avatar}" alt="">`;
+
+  }else{
+
+    $("profileAvatar").textContent="◉";
+  }
+
+
+  const box=
+    $("profileObjects");
+
+  box.innerHTML="";
+
+  const mine=
+    objects.filter(
+      x=>x.authorId==="me"
+    );
+
+  mine.forEach(obj=>{
+
+    const el=
+      document.createElement("div");
+
+    el.className=
+      "card worldCard";
+
+    el.innerHTML=`
+
+      <div class="worldIcon">
+        ${typeIcon(obj.type)}
+      </div>
+
+      <div class="worldMain">
+
+        <div class="worldName">
+          ${esc(obj.name)}
+        </div>
+
+        <div class="worldDesc">
+          ${esc(typeName(obj.type))}
+          · ${obj.radius}m radius
+        </div>
+
+      </div>
+
+    `;
+
+    el.onclick=
+      ()=>openDetail(obj);
+
+    box.appendChild(el);
+  });
 }
 
 
-if(
-$("dSocial")
-){
-
-$("dSocial").onclick =
-()=>{
-
-window.open(
-safeURL(
-object.social
-),
-"_blank"
-);
-
-};
-
-}
-
-
-$("dReport").onclick =
-()=>{
-
-toast(
-"Report qeydi yaradıldı. Real server versiyasında moderasiya növbəsinə göndəriləcək."
-);
-
-};
-
-
-if(
-$("dDelete")
-){
-
-$("dDelete").onclick =
-()=>{
-
-deleteObject(
-object
-);
-
-};
-
-}
-
-}
-
-
-async function deleteObject(
-object
-){
-
-if(
-!confirm(
-"Bu spatial obyekti silmək istəyirsiniz?"
-)
-){
-
-return;
-
-}
-
-
-await new Promise(
-(resolve,reject)=>{
-
-const tx =
-db.transaction(
-"objects",
-"readwrite"
-);
-
-tx.objectStore(
-"objects"
-)
-.delete(
-object.id
-);
-
-tx.oncomplete =
-resolve;
-
-tx.onerror =
-()=>reject(
-tx.error
-);
-
-}
-);
-
-
-objects =
-objects.filter(
-x=>
-x.id !==
-object.id
-);
-
-
-anchorState.delete(
-object.id
-);
-
-
-closeModal(
-"detailModal"
-);
-
-
-renderFeed();
-
-renderProfile();
-
-renderMapMarkers();
-
-updateAR();
-
-
-toast(
-"Obyekt silindi."
-);
-
-}
-
-
-$("closeDetail").onclick =
-()=>
-closeModal(
-"detailModal"
-);
-
-
-$("detailBack").onclick =
-()=>
-closeModal(
-"detailModal"
-);
-
-
-/* ======================================================
+/* =========================================================
    MAP
-====================================================== */
+   ========================================================= */
 
 function initMap(){
 
-if(map)
-return;
+  if(map) return;
 
+  map=
+    L.map("map",{
+      zoomControl:false
+    }).setView(
+      [40.4093,49.8671],
+      13
+    );
 
-map =
-L.map(
-"map"
-)
-.setView(
-[
-userLat ||
-40.4093,
+  L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+      maxZoom:19,
+      attribution:"© OpenStreetMap"
+    }
+  ).addTo(map);
 
-userLng ||
-49.8671
-],
-15
-);
-
-
-L.tileLayer(
-"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-{
-
-maxZoom:19,
-
-attribution:
-"© OpenStreetMap"
-
-}
-)
-.addTo(
-map
-);
-
-
-map.on(
-"click",
-event=>{
-
-if(!picker)
-return;
-
-
-$("objectLat").value =
-event.latlng.lat
-.toFixed(7);
-
-
-$("objectLng").value =
-event.latlng.lng
-.toFixed(7);
-
-
-picker =
-false;
-
-
-switchView(
-"ar"
-);
-
-
-openCreate();
-
-
-/*
-  Restore exact selected coordinates
-  after create form reset.
-*/
-
-$("objectLat").value =
-event.latlng.lat
-.toFixed(7);
-
-
-$("objectLng").value =
-event.latlng.lng
-.toFixed(7);
-
-
-toast(
-"Koordinat seçildi və yerləşdirmə pəncərəsi açıldı."
-);
-
-}
-);
-
-
-renderMapMarkers();
-
+  updateMapMarkers();
 }
 
 
-function renderMapMarkers(){
+function updateMapMarkers(){
 
-if(!map)
-return;
+  if(!map) return;
 
+  mapMarkers.forEach(
+    marker=>marker.remove()
+  );
 
-mapMarkers.forEach(
-marker=>
-marker.remove()
-);
+  mapMarkers=[];
 
+  objects
+    .filter(x=>x.public!==false)
+    .forEach(obj=>{
 
-mapMarkers =
-[];
+      const marker=
+        L.marker(
+          [obj.lat,obj.lng]
+        ).addTo(map);
 
+      marker.bindPopup(`
+        <strong>${esc(obj.name)}</strong><br>
+        ${esc(typeName(obj.type))}<br>
+        ${esc(obj.bio || "")}
+      `);
 
-objects
-.filter(
-object=>
-object.public !== false
-)
-.forEach(
-object=>{
+      marker.on(
+        "click",
+        ()=>{
+          openDetail(obj);
+        }
+      );
 
-const marker =
-L.marker(
-[
-object.lat,
-object.lng
-]
-)
-.addTo(
-map
-);
-
-
-marker.bindPopup(
-
-`
-<b>
-${esc(object.name)}
-</b>
-
-<br>
-
-${esc(
-typeName(
-object.type
-)
-)}
-
-<br><br>
-
-<button
-onclick="
-window.showObject(
-'${object.id}'
-)
-">
-
-Profilə bax
-
-</button>
-
-`
-
-);
+      mapMarkers.push(marker);
+    });
 
 
-mapMarkers.push(
-marker
-);
+  if(
+    userLat!==null &&
+    userLng!==null
+  ){
 
-}
-);
+    const me=
+      L.circleMarker(
+        [userLat,userLng],
+        {
+          radius:8,
+          color:"#00e5ff",
+          fillColor:"#00e5ff",
+          fillOpacity:.8
+        }
+      ).addTo(map);
 
+    me.bindTooltip(
+      "Sən buradasan"
+    );
 
-updateMapMe();
-
+    mapMarkers.push(me);
+  }
 }
 
 
 function updateMapMe(){
 
-if(
-!map ||
-userLat === null
-){
+  if(!map) return;
 
-return;
-
+  updateMapMarkers();
 }
 
 
-if(
-window.meMarker
-){
+function showMap(){
 
-window.meMarker.setLatLng(
-[
-userLat,
-userLng
-]
-);
+  initMap();
 
-}
-else{
+  setTimeout(
+    ()=>{
+      map.invalidateSize();
 
-window.meMarker =
-L.circleMarker(
+      if(
+        userLat!==null &&
+        userLng!==null
+      ){
 
-[
-userLat,
-userLng
-],
+        map.setView(
+          [userLat,userLng],
+          Math.max(
+            map.getZoom(),
+            15
+          )
+        );
+      }
 
-{
-
-radius:8,
-
-color:
-"#49ddff",
-
-fillColor:
-"#49ddff",
-
-fillOpacity:.9
-
-}
-
-)
-.addTo(
-map
-)
-.bindPopup(
-"Sizin mövqeyiniz"
-);
-
-}
-
+    },
+    150
+  );
 }
 
 
-window.showObject =
-id=>{
+/* =========================================================
+   MAP PICKER
+   ========================================================= */
 
-const object =
-objects.find(
-x=>
-x.id === id
-);
+let mapPickerMode=false;
 
+function enableMapPicker(){
 
-if(object){
+  initMap();
 
-openDetail(
-object
-);
+  mapPickerMode=true;
 
-}
+  switchView("map");
 
-};
-
-
-/* ======================================================
-   WORLD FEED
-====================================================== */
-
-function renderFeed(){
-
-const list =
-$("feedList");
-
-
-list.innerHTML =
-"";
-
-
-if(
-!objects.length
-){
-
-list.innerHTML = `
-
-<div class="profileBox">
-
-<div
-style="font-size:40px">
-◎
-</div>
-
-<h3>
-Dünya hələ boşdur
-</h3>
-
-<div class="bio">
-＋ düyməsi ilə ilk spatial profilini yerləşdir.
-</div>
-
-</div>
-
-`;
-
-return;
-
+  toast(
+    "Xəritədə istədiyin nöqtəyə toxun."
+  );
 }
 
 
-objects
-.slice()
-.sort(
-(a,b)=>
-b.createdAt-
-a.createdAt
-)
-.forEach(
-object=>{
+function handleMapClick(e){
 
-const card =
-document.createElement(
-"div"
-);
+  if(!mapPickerMode){
+    return;
+  }
 
-card.className =
-"card";
+  const lat=e.latlng.lat;
+  const lng=e.latlng.lng;
 
+  $("createLat").value=
+    lat.toFixed(7);
 
-let media = "";
+  $("createLng").value=
+    lng.toFixed(7);
 
+  mapPickerMode=false;
 
-if(
-object.media &&
-object.media.length
-){
+  switchView("ar");
 
-media =
+  openModal("createModal");
 
-'<div class="mediaGrid">'+
-
-object.media
-.slice(
-0,
-4
-)
-.map(
-m=>{
-
-const url =
-URL.createObjectURL(
-m.blob
-);
-
-
-if(
-m.type &&
-m.type.startsWith(
-"video/"
-)
-){
-
-return `
-<video
-muted
-playsinline
-preload="metadata"
-src="${url}">
-</video>
-`;
-
+  toast("Koordinat seçildi.");
 }
 
 
-return `
-<img
-src="${url}"
-loading="lazy">
-`;
+function useCurrentLocation(){
 
-}
-)
-.join("")
+  if(
+    userLat===null ||
+    userLng===null
+  ){
 
-+
+    toast("GPS hələ hazır deyil.");
+    return;
+  }
 
-"</div>";
+  $("createLat").value=
+    userLat.toFixed(7);
 
-}
+  $("createLng").value=
+    userLng.toFixed(7);
 
-
-card.innerHTML =
-
-media+
-
-`
-
-<div class="body">
-
-<div class="cardTitle">
-${esc(object.name)}
-</div>
-
-<div class="meta">
-
-${esc(
-typeName(
-object.type
-)
-)}
-
-·
-
-${
-userLat !== null
-?
-Math.round(
-dist(
-userLat,
-userLng,
-object.lat,
-object.lng
-)
-)
-:
-"—"
-}
-
-m
-
-</div>
-
-<div class="text">
-
-${esc(
-(
-object.bio ||
-object.article ||
-""
-)
-.slice(
-0,
-260
-)
-)}
-
-</div>
-
-
-<button
-class="btn full"
-style="margin-top:12px">
-
-Spatial profilə bax
-
-</button>
-
-</div>
-
-`;
-
-
-card.querySelector(
-"button"
-)
-.onclick =
-()=>
-openDetail(
-object
-);
-
-
-list.appendChild(
-card
-);
-
-}
-);
-
+  toast("Hazırkı koordinat əlavə edildi.");
 }
 
 
-/* ======================================================
-   PROFILE
-====================================================== */
+/* =========================================================
+   VIEW SWITCH
+   ========================================================= */
 
-function renderProfile(){
+function switchView(view){
 
-const profileCard =
-$("profileCard");
+  activeView=view;
 
-
-const avatar =
-profile.avatar
-?
-
-`
-<img
-src="${URL.createObjectURL(
-profile.avatar
-)}">
-`
-
-:
-
-esc(
-(
-profile.name ||
-"A"
-)[0]
-.toUpperCase()
-);
+  document
+    .querySelectorAll(".view")
+    .forEach(v=>{
+      v.classList.remove("active");
+    });
 
 
-profileCard.innerHTML =
+  const map={
+    ar:"arView",
+    world:"worldView",
+    map:"mapView",
+    feed:"feedView",
+    profile:"profileView"
+  };
 
-`
-
-<div class="profileBox">
-
-<div class="avatar">
-
-${avatar}
-
-</div>
-
-
-<div class="name">
-
-${esc(
-profile.name
-)}
-
-</div>
+  $(map[view])
+    .classList.add("active");
 
 
-<div class="username">
+  document
+    .querySelectorAll(".navBtn")
+    .forEach(btn=>{
 
-${esc(
-profile.username
-)}
+      btn.classList.toggle(
+        "active",
+        btn.dataset.view===view
+      );
 
-</div>
-
-
-<div class="bio">
-
-${esc(
-profile.bio
-)}
-
-</div>
+    });
 
 
-${
-profile.article
-?
-`
-<div class="article">
+  if(view==="map"){
+    showMap();
+  }
 
-${esc(
-profile.article
-)}
+  if(view==="ar"){
+    updateAR();
+  }
 
-</div>
-`
-:
-""
+  if(view==="world"){
+    renderWorld();
+  }
+
+  if(view==="feed"){
+    renderFeed();
+  }
+
+  if(view==="profile"){
+    renderProfile();
+  }
 }
 
 
-<div class="statRow">
+/* =========================================================
+   RENDER ALL
+   ========================================================= */
 
-<div class="stat">
+function renderAll(){
 
-<b>
-${
-objects.filter(
-x=>
-x.authorId ===
-"me"
-).length
-}
-</b>
-
-<small>
-Obyekt
-</small>
-
-</div>
-
-
-<div class="stat">
-
-<b>
-
-${
-objects.reduce(
-(
-total,
-object
-)=>
-total+
-(
-object.media?.length ||
-0
-),
-0
-)
-}
-
-</b>
-
-<small>
-Media
-</small>
-
-</div>
-
-
-<div class="stat">
-
-<b>
-AR
-</b>
-
-<small>
-Spatial
-</small>
-
-</div>
-
-</div>
-
-
-<div
-class="row"
-style="margin-top:14px">
-
-<button
-class="btn"
-id="editProfile">
-
-Profil
-
-</button>
-
-
-<button
-class="btn"
-id="privacyBtn">
-
-Məxfilik
-
-</button>
-
-</div>
-
-</div>
-
-`;
-
-
-$("editProfile").onclick =
-openProfileEdit;
-
-
-$("privacyBtn").onclick =
-()=>
-openModal(
-"privacyModal"
-);
-
-
-/* MY OBJECTS */
-
-const myObjects =
-$("myObjects");
-
-
-myObjects.innerHTML =
-"";
-
-
-const mine =
-objects.filter(
-object=>
-object.authorId ===
-"me"
-);
-
-
-if(
-!mine.length
-){
-
-myObjects.innerHTML = `
-
-<div class="notice">
-
-Hələ öz spatial obyektiniz yoxdur.
-
-</div>
-
-`;
-
+  renderFeed();
+  renderWorld();
+  renderProfile();
+  updateMapMarkers();
+  updateAR();
 }
 
 
-mine.forEach(
-object=>{
+/* =========================================================
+   MEDIA INPUTS
+   ========================================================= */
 
-const button =
-document.createElement(
-"button"
-);
+$("galleryBtn").onclick=
+  ()=>$("galleryInput").click();
 
-button.className =
-"btn full";
+$("photoBtn").onclick=
+  ()=>$("photoInput").click();
 
-button.style.marginBottom =
-"7px";
+$("videoBtn").onclick=
+  ()=>$("videoInput").click();
 
-button.textContent =
-typeName(
-object.type
-)+
-" · "+
-object.name;
 
+["galleryInput","photoInput","videoInput"]
+.forEach(id=>{
 
-button.onclick =
-()=>
-openDetail(
-object
-);
+  $(id).addEventListener(
+    "change",
+    e=>{
 
+      const files=
+        Array.from(
+          e.target.files || []
+        );
 
-myObjects.appendChild(
-button
-);
+      selectedFiles.push(...files);
 
-});
+      updateSelectedMedia();
 
-}
-
-
-/* ======================================================
-   PROFILE EDIT
-====================================================== */
-
-function openProfileEdit(){
-
-$("myNameInput").value =
-profile.name;
-
-$("myUsernameInput").value =
-profile.username;
-
-$("myBioInput").value =
-profile.bio;
-
-$("myArticleInput").value =
-profile.article;
-
-$("myPhoneInput").value =
-profile.phone;
-
-$("myWhatsappInput").value =
-profile.whatsapp;
-
-$("mySocialInput").value =
-profile.social;
-
-
-avatarFile =
-null;
-
-
-$("avatarPreview").innerHTML =
-profile.avatar
-?
-
-`
-<img
-class="avatar"
-src="${URL.createObjectURL(
-profile.avatar
-)}">
-`
-
-:
-
-"";
-
-
-openModal(
-"profileModal"
-);
-
-}
-
-
-async function saveMyProfile(){
-
-profile.name =
-$("myNameInput")
-.value
-.trim()
-||
-"ARWORLD istifadəçisi";
-
-
-profile.username =
-$("myUsernameInput")
-.value
-.trim()
-||
-"@arworld";
-
-
-profile.bio =
-$("myBioInput")
-.value
-.trim();
-
-
-profile.article =
-$("myArticleInput")
-.value
-.trim();
-
-
-profile.phone =
-$("myPhoneInput")
-.value
-.trim();
-
-
-profile.whatsapp =
-$("myWhatsappInput")
-.value
-.trim();
-
-
-profile.social =
-$("mySocialInput")
-.value
-.trim();
-
-
-if(
-avatarFile
-){
-
-profile.avatar =
-avatarFile;
-
-}
-
-
-await saveProfile();
-
-
-closeModal(
-"profileModal"
-);
-
-
-renderProfile();
-
-
-toast(
-"Profil saxlanıldı."
-);
-
-}
-
-
-/* PROFILE MEDIA */
-
-$("avatarGallery").onclick =
-()=>
-$("avatarGalleryInput").click();
-
-
-$("avatarCamera").onclick =
-()=>
-$("avatarCameraInput").click();
-
-
-$("avatarRemove").onclick =
-()=>{
-
-avatarFile =
-null;
-
-profile.avatar =
-null;
-
-$("avatarPreview")
-.innerHTML =
-"";
-
-};
-
-
-$("avatarGalleryInput").onchange =
-event=>{
-
-avatarFile =
-event.target.files[0] ||
-null;
-
-
-if(
-avatarFile
-){
-
-$("avatarPreview")
-.innerHTML =
-
-`
-<img
-class="avatar"
-src="${URL.createObjectURL(
-avatarFile
-)}">
-`;
-
-}
-
-};
-
-
-$("avatarCameraInput").onchange =
-event=>{
-
-avatarFile =
-event.target.files[0] ||
-null;
-
-
-if(
-avatarFile
-){
-
-$("avatarPreview")
-.innerHTML =
-
-`
-<img
-class="avatar"
-src="${URL.createObjectURL(
-avatarFile
-)}">
-`;
-
-}
-
-};
-
-
-$("saveProfile").onclick =
-saveMyProfile;
-
-
-$("closeProfile").onclick =
-()=>
-closeModal(
-"profileModal"
-);
-
-
-$("profileBack").onclick =
-()=>
-closeModal(
-"profileModal"
-);
-
-
-$("closePrivacy").onclick =
-()=>
-closeModal(
-"privacyModal"
-);
-
-
-$("privacyBack").onclick =
-()=>
-closeModal(
-"privacyModal"
-);
-
-
-/* ======================================================
-   NAVIGATION
-====================================================== */
-
-function switchView(
-view
-){
-
-activeView =
-view;
-
-
-$("arView").style.display =
-view === "ar"
-?
-"block"
-:
-"none";
-
-
-document
-.querySelectorAll(
-".view"
-)
-.forEach(
-element=>
-element.classList.remove(
-"active"
-)
-);
-
-
-if(
-view === "map"
-){
-
-$("mapView")
-.classList.add(
-"active"
-);
-
-
-setTimeout(
-()=>{
-
-initMap();
-
-map.invalidateSize();
-
-
-if(
-userLat !== null
-){
-
-map.setView(
-[
-userLat,
-userLng
-],
-16
-);
-
-}
-
-},
-80
-);
-
-}
-
-
-if(
-view === "feed"
-){
-
-$("feedView")
-.classList.add(
-"active"
-);
-
-renderFeed();
-
-}
-
-
-if(
-view === "profile"
-){
-
-$("profileView")
-.classList.add(
-"active"
-);
-
-renderProfile();
-
-}
-
-
-document
-.querySelectorAll(
-".nav[data-view]"
-)
-.forEach(
-nav=>{
-
-nav.classList.toggle(
-"active",
-nav.dataset.view ===
-view
-);
+      e.target.value="";
+    }
+  );
 
 });
 
 
-if(
-view === "ar"
-){
+/* =========================================================
+   EVENTS
+   ========================================================= */
 
-updateAR();
+$("placeBtn").onclick=()=>{
 
-}
+  resetCreateForm();
 
-}
+  openModal("createModal");
+};
+
+
+$("saveObjectBtn").onclick=
+  placeObject;
+
+
+$("useCurrentLocation").onclick=
+  useCurrentLocation;
+
+
+$("pickOnMap").onclick=
+  enableMapPicker;
+
+
+$("refreshBtn").onclick=
+  refreshAR;
+
+
+$("spreadBtn").onclick=
+  refreshAR;
+
+
+$("searchToggle").onclick=()=>{
+
+  $("arSearch")
+    .classList.toggle("show");
+
+  if(
+    $("arSearch").classList.contains("show")
+  ){
+
+    $("arSearch").focus();
+
+  }else{
+
+    $("arSearch").value="";
+
+    updateAR();
+  }
+};
+
+
+$("arSearch").addEventListener(
+  "input",
+  updateAR
+);
+
+
+$("editProfileBtn").onclick=()=>{
+
+  $("profileEditName").value=
+    profile.name;
+
+  $("profileEditUsername").value=
+    profile.username;
+
+  $("profileEditBio").value=
+    profile.bio;
+
+  $("profileEditArticle").value=
+    profile.article;
+
+  $("profileEditPhone").value=
+    profile.phone;
+
+  $("profileEditWhatsapp").value=
+    profile.whatsapp;
+
+  $("profileEditSocial").value=
+    profile.social;
+
+  openModal("profileModal");
+};
+
+
+$("saveProfileBtn").onclick=
+async()=>{
+
+  profile.name=
+    $("profileEditName").value.trim() ||
+    "ARWORLD istifadəçisi";
+
+  profile.username=
+    $("profileEditUsername").value.trim() ||
+    "@arworld";
+
+  profile.bio=
+    $("profileEditBio").value.trim();
+
+  profile.article=
+    $("profileEditArticle").value.trim();
+
+  profile.phone=
+    $("profileEditPhone").value.trim();
+
+  profile.whatsapp=
+    $("profileEditWhatsapp").value.trim();
+
+  profile.social=
+    $("profileEditSocial").value.trim();
+
+  await saveProfile();
+
+  closeModal("profileModal");
+
+  renderProfile();
+
+  toast("Profil yadda saxlanıldı.");
+};
+
+
+$("privacyBtn").onclick=
+  ()=>openModal("privacyModal");
 
 
 document
-.querySelectorAll(
-".nav[data-view]"
-)
-.forEach(
-button=>{
+  .querySelectorAll(".navBtn")
+  .forEach(btn=>{
 
-button.onclick =
-()=>{
+    btn.addEventListener(
+      "click",
+      ()=>{
+        switchView(
+          btn.dataset.view
+        );
+      }
+    );
 
-switchView(
-button.dataset.view
+  });
+
+
+document
+  .querySelectorAll("[data-close]")
+  .forEach(btn=>{
+
+    btn.addEventListener(
+      "click",
+      ()=>{
+        closeModal(
+          btn.dataset.close
+        );
+      }
+    );
+
+  });
+
+
+document
+  .querySelectorAll(".modal")
+  .forEach(modal=>{
+
+    modal.addEventListener(
+      "click",
+      e=>{
+
+        if(e.target===modal){
+
+          modal.classList.remove("show");
+        }
+
+      }
+    );
+
+  });
+
+
+/* =========================================================
+   MAP EVENTS
+   ========================================================= */
+
+$("mapSearch").addEventListener(
+  "input",
+  e=>{
+
+    const q=
+      e.target.value
+       .trim()
+       .toLowerCase();
+
+    if(!q){
+
+      updateMapMarkers();
+      return;
+    }
+
+    mapMarkers.forEach(
+      marker=>marker.remove()
+    );
+
+    mapMarkers=[];
+
+    objects
+      .filter(obj=>
+        obj.public!==false &&
+        objectMatches(obj,q)
+      )
+      .forEach(obj=>{
+
+        const marker=
+          L.marker(
+            [obj.lat,obj.lng]
+          ).addTo(map);
+
+        marker.bindPopup(
+          `<strong>${esc(obj.name)}</strong>`
+        );
+
+        marker.on(
+          "click",
+          ()=>{
+            openDetail(obj);
+          }
+        );
+
+        mapMarkers.push(marker);
+      });
+
+  }
 );
 
-};
 
-});
+document.addEventListener(
+  "click",
+  e=>{
 
+    if(
+      mapPickerMode &&
+      e.target.closest("#map")
+    ){
+      /*
+        Leaflet click itself handles selection.
+      */
+    }
 
-/* ======================================================
-   SEARCH
-====================================================== */
-
-$("searchBtn").onclick =
-()=>{
-
-$("searchBox")
-.classList.toggle(
-"show"
+  }
 );
 
 
-if(
-$("searchBox")
-.classList.contains(
-"show"
-)
-){
+/* Leaflet map click must be attached
+   after map initialization. */
+function attachMapClick(){
 
-$("searchInput")
-.focus();
+  initMap();
 
+  map.on(
+    "click",
+    handleMapClick
+  );
 }
-else{
-
-$("searchInput")
-.value =
-"";
-
-updateAR();
-
-}
-
-};
 
 
-$("searchInput").oninput =
-()=>{
-updateAR();
-};
-
-
-/* ======================================================
-   REFRESH
-====================================================== */
-
-$("scanBtn").onclick =
-()=>{
-
-updateAR();
-
-toast(
-"Skan yeniləndi."
-);
-
-};
-
-
-$("refreshBtn").onclick =
-()=>{
-
-updateAR();
-
-renderFeed();
-
-renderProfile();
-
-renderMapMarkers();
-
-
-toast(
-"Dünya yeniləndi."
-);
-
-};
-
-
-/* ======================================================
-   ESC / BACK
-====================================================== */
+/* =========================================================
+   RESIZE
+   ========================================================= */
 
 window.addEventListener(
-"keydown",
-event=>{
+  "resize",
+  ()=>{
+    updateAR();
 
-if(
-event.key ===
-"Escape"
-){
-
-document
-.querySelectorAll(
-".modal.show"
-)
-.forEach(
-modal=>
-modal.classList.remove(
-"show"
-)
+    if(map){
+      map.invalidateSize();
+    }
+  }
 );
 
 
-if(
-$("recorder")
-.classList.contains(
-"show"
-)
-){
+/* =========================================================
+   VISIBILITY
+   ========================================================= */
 
-closeRecorder(
-false
-);
-
-}
-
-}
-
-});
-
-
-window.addEventListener(
-"popstate",
-()=>{
-
-document
-.querySelectorAll(
-".modal.show"
-)
-.forEach(
-modal=>
-modal.classList.remove(
-"show"
-)
+document.addEventListener(
+  "visibilitychange",
+  ()=>{
+    if(!document.hidden){
+      updateAR();
+    }
+  }
 );
 
 
-if(
-$("recorder")
-.classList.contains(
-"show"
-)
-){
-
-closeRecorder(
-false
-);
-
-}
-
-
-historyDepth =
-Math.max(
-0,
-historyDepth-1
-);
-
-});
-
-
-document
-.querySelectorAll(
-".modal"
-)
-.forEach(
-modal=>{
-
-modal.addEventListener(
-"click",
-event=>{
-
-if(
-event.target ===
-modal
-){
-
-closeModal(
-modal.id
-);
-
-}
-
-});
-
-});
-
-
-/* ======================================================
+/* =========================================================
    INIT
-====================================================== */
+   ========================================================= */
 
 async function init(){
 
-try{
+  $("loading").style.display="grid";
 
-await openDB();
+  try{
 
+    await openDB();
 
-const savedProfile =
-await getOne(
-"profile",
-"me"
-);
+    const savedObjects=
+      await dbGetAll("objects");
 
+    objects=savedObjects || [];
 
-if(
-savedProfile
-){
+    const savedProfiles=
+      await dbGetAll("profile");
 
-profile =
-savedProfile;
+    if(savedProfiles.length){
 
+      const p=savedProfiles[0];
+
+      profile={
+        ...profile,
+        ...p
+      };
+    }
+
+    renderAll();
+
+    startGPS();
+    startCompass();
+    startCamera();
+
+    /*
+      Initialize map lazily,
+      but attach click listener now.
+    */
+
+    attachMapClick();
+
+  }catch(err){
+
+    console.error(err);
+
+    toast(
+      "ARWORLD məlumat bazası açıla bilmədi."
+    );
+
+  }finally{
+
+    $("loading").style.display="none";
+  }
 }
 
 
-objects =
-await getAll(
-"objects"
-);
-
-
-renderFeed();
-
-renderProfile();
-
-startGPS();
-
-startCompass();
-
-startCamera();
-
-
-}
-catch(error){
-
-console.error(
-error
-);
-
-toast(
-"Başlanğıc xətası: "+
-(
-error.message ||
-error
-)
-);
-
-}
-
-}
-
-
-if(
-document.readyState ===
-"loading"
-){
-
-document.addEventListener(
-"DOMContentLoaded",
-init
-);
-
-}
-else{
+/* =========================================================
+   START
+   ========================================================= */
 
 init();
-
-}
 
 </script>
 
 </body>
- </html>
+                        </html>
