@@ -3,31 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#05070d">
+<meta name="theme-color" content="#05070c">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>ARWORLD — Spatial World</title>
 
-<link rel="stylesheet"
-href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-integrity="sha256-p4NxAoJBhIINfQ3n7Q9vF1b7x0x6v9nQ4x5l5W2JvQ="
-crossorigin=""/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 <style>
 :root{
-  --bg:#05070d;
-  --panel:rgba(9,13,23,.88);
-  --panel2:rgba(15,21,35,.92);
-  --line:rgba(255,255,255,.10);
-  --text:#f7f9ff;
-  --muted:#8c96aa;
-  --cyan:#00e5ff;
-  --blue:#438cff;
-  --purple:#9b6cff;
-  --green:#20e39b;
+  --bg:#05070c;
+  --panel:#0c111b;
+  --panel2:#101722;
+  --panel3:#151d2b;
+  --line:rgba(255,255,255,.09);
+  --line2:rgba(255,255,255,.15);
+  --text:#f4f7fb;
+  --muted:#7f8a9e;
+  --cyan:#00d9ff;
+  --blue:#477dff;
+  --green:#22d99b;
   --red:#ff5577;
   --yellow:#ffd45c;
-  --header:78px;
-  --nav:78px;
+  --header:72px;
+  --nav:76px;
 }
 
 *{
@@ -42,24 +41,38 @@ html,body{
   overflow:hidden;
   background:var(--bg);
   color:var(--text);
-  font-family:Inter,Roboto,Arial,sans-serif;
+  font-family:
+    Inter,
+    Roboto,
+    Arial,
+    sans-serif;
 }
 
-button,input,textarea,select{
+body{
+  overscroll-behavior:none;
+}
+
+button,
+input,
+textarea,
+select{
   font:inherit;
 }
 
 button{
-  border:0;
-  color:var(--text);
+  color:inherit;
 }
 
 #app{
   position:fixed;
   inset:0;
   overflow:hidden;
-  background:#05070d;
+  background:var(--bg);
 }
+
+/* =====================================================
+   VIEWS
+===================================================== */
 
 .view{
   position:absolute;
@@ -71,74 +84,100 @@ button{
   display:block;
 }
 
-/* ================= HEADER ================= */
+/* =====================================================
+   HEADER
+===================================================== */
 
 .topbar{
   position:absolute;
-  z-index:200;
+  z-index:500;
   top:0;
   left:0;
   right:0;
   height:var(--header);
   padding:
-    calc(env(safe-area-inset-top) + 10px)
-    14px
-    10px;
+    calc(env(safe-area-inset-top) + 9px)
+    12px
+    8px;
   display:flex;
   align-items:center;
   gap:10px;
-  background:linear-gradient(
-    180deg,
-    rgba(3,5,10,.94),
-    rgba(3,5,10,.58),
-    transparent
-  );
   pointer-events:none;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(3,5,10,.96),
+      rgba(3,5,10,.72),
+      transparent
+    );
 }
 
 .brand{
+  display:flex;
+  align-items:center;
+  gap:9px;
   pointer-events:auto;
-  min-width:0;
 }
 
-.brand strong{
+.brandMark{
+  width:36px;
+  height:36px;
+  border-radius:11px;
+  border:1px solid rgba(0,217,255,.42);
+  background:
+    linear-gradient(
+      145deg,
+      rgba(0,217,255,.12),
+      rgba(71,125,255,.07)
+    );
+  display:grid;
+  place-items:center;
+  color:var(--cyan);
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:-1px;
+}
+
+.brandText strong{
   display:block;
-  font-size:18px;
+  font-size:17px;
   letter-spacing:.8px;
 }
 
-.brand span{
+.brandText small{
   display:block;
-  color:var(--cyan);
-  font-size:10px;
   margin-top:2px;
-  letter-spacing:1.5px;
+  font-size:8px;
+  color:var(--cyan);
+  letter-spacing:1.7px;
 }
 
-.headerActions{
+.headerRight{
   margin-left:auto;
   display:flex;
   gap:7px;
   pointer-events:auto;
 }
 
-.iconBtn{
-  width:42px;
-  height:42px;
-  border-radius:14px;
-  background:rgba(12,18,31,.84);
+.iconButton{
+  width:40px;
+  height:40px;
+  border-radius:13px;
   border:1px solid var(--line);
+  background:rgba(12,17,27,.86);
   display:grid;
   place-items:center;
   font-size:18px;
-  backdrop-filter:blur(14px);
+  backdrop-filter:blur(15px);
 }
 
-/* ================= AR ================= */
-
-#arView{
-  background:#000;
+.iconButton:active{
+  transform:scale(.94);
 }
+
+/* =====================================================
+   AR CAMERA
+===================================================== */
 
 #camera{
   position:absolute;
@@ -152,121 +191,168 @@ button{
 .cameraShade{
   position:absolute;
   inset:0;
-  z-index:4;
+  z-index:2;
   pointer-events:none;
   background:
     radial-gradient(
       ellipse at center,
       transparent 0%,
-      rgba(0,0,0,.03) 42%,
-      rgba(0,0,0,.48) 100%
+      rgba(0,0,0,.05) 45%,
+      rgba(0,0,0,.45) 100%
     );
 }
 
-.arTopInfo{
+.arStatus{
   position:absolute;
-  z-index:80;
-  top:calc(env(safe-area-inset-top) + 82px);
+  z-index:100;
   left:12px;
   right:12px;
+  top:
+    calc(
+      env(safe-area-inset-top) +
+      78px
+    );
   display:flex;
-  gap:7px;
+  gap:6px;
   pointer-events:none;
 }
 
-.statusPill{
+.status{
   padding:7px 10px;
   border-radius:999px;
-  background:rgba(5,8,15,.70);
-  border:1px solid rgba(255,255,255,.12);
-  backdrop-filter:blur(12px);
-  font-size:11px;
-  color:#dce5f7;
+  background:rgba(4,8,14,.72);
+  border:1px solid rgba(255,255,255,.11);
+  backdrop-filter:blur(14px);
+  color:#cbd4e3;
+  font-size:9px;
 }
 
-.statusPill b{
+.status b{
   color:var(--green);
 }
 
-#arSearch{
+/* =====================================================
+   SEARCH
+===================================================== */
+
+.searchWrap{
   position:absolute;
-  z-index:90;
+  z-index:150;
   left:12px;
   right:12px;
-  top:calc(env(safe-area-inset-top) + 128px);
+  top:
+    calc(
+      env(safe-area-inset-top) +
+      120px
+    );
+  display:none;
+  gap:7px;
+}
+
+.searchWrap.show{
+  display:flex;
+}
+
+.searchInput{
+  min-width:0;
+  flex:1;
   height:45px;
-  border-radius:15px;
-  border:1px solid rgba(255,255,255,.13);
-  background:rgba(5,8,15,.76);
-  backdrop-filter:blur(15px);
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(4,8,15,.82);
   color:#fff;
-  padding:0 15px;
+  padding:0 13px;
   outline:none;
+  backdrop-filter:blur(16px);
+}
+
+.searchButton{
+  width:75px;
+  height:45px;
+  border-radius:14px;
+  border:1px solid rgba(0,217,255,.22);
+  background:rgba(0,217,255,.10);
+  color:var(--cyan);
+  font-size:10px;
+  font-weight:800;
+}
+
+.searchResults{
+  position:absolute;
+  z-index:160;
+  left:12px;
+  right:12px;
+  top:
+    calc(
+      env(safe-area-inset-top) +
+      172px
+    );
+  max-height:46vh;
+  overflow:auto;
   display:none;
 }
 
-#arSearch.show{
+.searchResults.show{
   display:block;
 }
 
-.scanInfo{
-  position:absolute;
-  z-index:70;
-  left:50%;
-  transform:translateX(-50%);
-  bottom:calc(var(--nav) + 88px);
-  padding:7px 12px;
-  border-radius:999px;
-  background:rgba(5,8,15,.72);
-  border:1px solid rgba(255,255,255,.10);
-  backdrop-filter:blur(12px);
+.searchResult{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:11px;
+  margin-bottom:6px;
+  border-radius:14px;
+  background:rgba(7,11,19,.94);
+  border:1px solid var(--line);
+  backdrop-filter:blur(15px);
+}
+
+.resultMark{
+  width:34px;
+  height:34px;
+  border-radius:10px;
+  display:grid;
+  place-items:center;
+  background:rgba(0,217,255,.08);
+  color:var(--cyan);
+  font-weight:800;
+}
+
+.resultMain{
+  min-width:0;
+  flex:1;
+}
+
+.resultTitle{
   font-size:11px;
+  font-weight:800;
+}
+
+.resultSub{
+  margin-top:3px;
+  color:var(--muted);
+  font-size:8px;
+  line-height:1.3;
+}
+
+.resultAction{
+  padding:7px 8px;
+  border-radius:9px;
+  background:#151e2d;
+  color:#d7dfed;
+  font-size:8px;
   white-space:nowrap;
-  pointer-events:none;
 }
 
-.crosshair{
-  position:absolute;
-  z-index:20;
-  left:50%;
-  top:48%;
-  width:32px;
-  height:32px;
-  transform:translate(-50%,-50%);
-  border:1px solid rgba(0,229,255,.62);
-  border-radius:50%;
-  pointer-events:none;
-}
-
-.crosshair:before,
-.crosshair:after{
-  content:"";
-  position:absolute;
-  background:rgba(0,229,255,.65);
-}
-
-.crosshair:before{
-  width:8px;
-  height:1px;
-  left:11px;
-  top:15px;
-}
-
-.crosshair:after{
-  width:1px;
-  height:8px;
-  left:15px;
-  top:11px;
-}
-
-/* ================= AR LAYER ================= */
+/* =====================================================
+   AR LAYER
+===================================================== */
 
 #arObjects{
   position:absolute;
-  z-index:30;
-  left:0;
-  right:0;
-  top:0;
+  z-index:40;
+  inset:0;
   bottom:var(--nav);
   pointer-events:none;
   overflow:hidden;
@@ -277,23 +363,23 @@ button{
   inset:0;
   pointer-events:none;
   overflow:hidden;
-  z-index:5;
+  z-index:1;
 }
 
 .arConnection{
   position:absolute;
   height:1px;
   transform-origin:0 50%;
-  background:linear-gradient(
-    90deg,
-    rgba(0,229,255,.05),
-    rgba(0,229,255,.62),
-    rgba(155,108,255,.30)
-  );
-  opacity:.72;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0,217,255,.04),
+      rgba(0,217,255,.60),
+      rgba(71,125,255,.15)
+    );
 }
 
-.arAnchorDot{
+.arDot{
   position:absolute;
   width:7px;
   height:7px;
@@ -301,75 +387,80 @@ button{
   transform:translate(-50%,-50%);
   background:var(--cyan);
   box-shadow:
-    0 0 0 4px rgba(0,229,255,.10),
-    0 0 18px rgba(0,229,255,.75);
+    0 0 0 4px rgba(0,217,255,.09),
+    0 0 16px rgba(0,217,255,.8);
 }
+
+/* =====================================================
+   AR CARD
+===================================================== */
 
 .arCard{
   position:absolute;
-  width:min(310px,76vw);
-  min-height:112px;
+  z-index:10;
+  width:min(315px,77vw);
+  min-height:108px;
   transform:
     translate3d(-50%,-50%,0)
-    scale(var(--arScale,1));
-  transform-origin:center center;
-  padding:11px;
-  border-radius:18px;
-  border:1px solid rgba(0,229,255,.42);
+    scale(var(--scale,1));
+  padding:10px;
+  border-radius:17px;
+  border:1px solid rgba(0,217,255,.40);
   background:
     linear-gradient(
       145deg,
-      rgba(7,14,25,.94),
-      rgba(8,10,19,.87)
+      rgba(8,14,24,.95),
+      rgba(8,10,17,.91)
     );
   box-shadow:
-    0 16px 50px rgba(0,0,0,.48),
-    0 0 28px rgba(0,229,255,.07);
-  backdrop-filter:blur(15px);
+    0 18px 48px rgba(0,0,0,.52),
+    0 0 25px rgba(0,217,255,.06);
+  backdrop-filter:blur(16px);
   pointer-events:auto;
   touch-action:manipulation;
-  will-change:left,top,transform;
   overflow:hidden;
+  will-change:left,top,transform;
 }
 
-.arCard.big{
-  width:min(520px,90vw);
-  padding:15px;
-  border-width:2px;
+.arCard.large{
+  width:min(430px,88vw);
 }
 
 .arCard.pinned{
   border-color:var(--yellow);
   box-shadow:
-    0 18px 55px rgba(0,0,0,.55),
-    0 0 32px rgba(255,212,92,.17);
+    0 20px 55px rgba(0,0,0,.6),
+    0 0 30px rgba(255,212,92,.15);
 }
 
-.arCardInner{
+.arCardGrid{
   display:grid;
-  grid-template-columns:86px 1fr;
-  gap:10px;
+  grid-template-columns:82px minmax(0,1fr);
+  gap:9px;
 }
 
-.arCard.big .arCardInner{
-  grid-template-columns:130px 1fr;
+.arCard.large .arCardGrid{
+  grid-template-columns:120px minmax(0,1fr);
 }
 
 .arMedia{
-  width:100%;
-  height:90px;
-  border-radius:13px;
+  height:86px;
   overflow:hidden;
+  border-radius:12px;
   background:
-    radial-gradient(circle at 30% 20%,#19324d,#090d17 65%);
+    linear-gradient(
+      145deg,
+      #101c2c,
+      #080c14
+    );
   display:grid;
   place-items:center;
-  color:#6f7b91;
-  font-size:25px;
+  color:#738096;
+  font-size:20px;
 }
 
-.arCard.big .arMedia{
-  height:130px;
+.arCard.large .arMedia{
+  height:118px;
 }
 
 .arMedia img,
@@ -380,33 +471,31 @@ button{
   display:block;
 }
 
-.arContent{
+.arInfo{
   min-width:0;
 }
 
-.arTitle{
-  font-size:15px;
-  font-weight:800;
-  line-height:1.15;
+.arName{
+  font-size:14px;
+  font-weight:900;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
 }
 
-.arType{
-  display:inline-block;
-  margin-top:5px;
+.arUser{
+  margin-top:3px;
   color:var(--cyan);
-  font-size:9px;
-  font-weight:800;
-  letter-spacing:.7px;
-  text-transform:uppercase;
+  font-size:8px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
-.arText{
-  margin-top:7px;
-  color:#b7c0d1;
-  font-size:11px;
+.arDescription{
+  margin-top:6px;
+  color:#aab4c5;
+  font-size:10px;
   line-height:1.35;
   display:-webkit-box;
   -webkit-line-clamp:3;
@@ -414,257 +503,407 @@ button{
   overflow:hidden;
 }
 
-.arMeta{
+.arBottom{
   margin-top:7px;
-  color:#788399;
-  font-size:9px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.arDistance{
+  color:#758198;
+  font-size:8px;
+  flex:1;
 }
 
 .arOpen{
-  margin-top:8px;
-  height:28px;
-  padding:0 10px;
-  border-radius:9px;
-  background:rgba(0,229,255,.10);
+  min-height:27px;
+  padding:0 9px;
+  border-radius:8px;
+  border:1px solid rgba(0,217,255,.18);
+  background:rgba(0,217,255,.08);
   color:var(--cyan);
-  border:1px solid rgba(0,229,255,.18);
-  font-size:10px;
-  font-weight:700;
+  font-size:8px;
+  font-weight:800;
 }
+
+/* =====================================================
+   EDGE POINTER
+===================================================== */
 
 .arEdge{
   position:absolute;
-  min-width:96px;
-  max-width:155px;
-  padding:7px 9px;
+  z-index:5;
+  width:125px;
+  padding:7px 8px;
   border-radius:11px;
-  background:rgba(4,8,15,.82);
-  border:1px solid rgba(255,255,255,.12);
-  backdrop-filter:blur(10px);
-  font-size:9px;
-  color:#dce5f7;
-  pointer-events:auto;
-  transform:translate(-50%,-50%);
+  background:rgba(5,9,16,.87);
+  border:1px solid rgba(255,255,255,.10);
+  backdrop-filter:blur(12px);
   text-align:center;
+  font-size:8px;
+  pointer-events:auto;
 }
 
-.arEdge b{
+.arEdge strong{
   color:var(--cyan);
+  font-size:14px;
 }
 
-/* ================= BOTTOM ================= */
+.arEdge div{
+  margin-top:2px;
+  color:#b9c3d4;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* =====================================================
+   AR CONTROLS
+===================================================== */
+
+.scanInfo{
+  position:absolute;
+  z-index:120;
+  left:50%;
+  transform:translateX(-50%);
+  bottom:
+    calc(
+      var(--nav) +
+      82px
+    );
+  padding:7px 11px;
+  border-radius:999px;
+  background:rgba(4,8,14,.72);
+  border:1px solid rgba(255,255,255,.10);
+  backdrop-filter:blur(12px);
+  color:#aeb8ca;
+  font-size:8px;
+  white-space:nowrap;
+  pointer-events:none;
+}
+
+.crosshair{
+  position:absolute;
+  z-index:15;
+  left:50%;
+  top:47%;
+  width:31px;
+  height:31px;
+  transform:translate(-50%,-50%);
+  border:1px solid rgba(0,217,255,.60);
+  border-radius:50%;
+  pointer-events:none;
+}
+
+.crosshair:before,
+.crosshair:after{
+  content:"";
+  position:absolute;
+  background:rgba(0,217,255,.65);
+}
+
+.crosshair:before{
+  left:10px;
+  top:14px;
+  width:9px;
+  height:1px;
+}
+
+.crosshair:after{
+  left:14px;
+  top:10px;
+  width:1px;
+  height:9px;
+}
+
+.arActions{
+  position:absolute;
+  z-index:180;
+  right:12px;
+  bottom:
+    calc(
+      var(--nav) +
+      18px
+    );
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.roundButton{
+  width:49px;
+  height:49px;
+  border-radius:15px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(7,12,21,.86);
+  backdrop-filter:blur(15px);
+  display:grid;
+  place-items:center;
+  font-size:19px;
+}
+
+.roundButton.primary{
+  background:
+    linear-gradient(
+      145deg,
+      #00c6e3,
+      #3b78ff
+    );
+  border:0;
+  box-shadow:
+    0 10px 32px rgba(0,160,255,.25);
+}
+
+/* =====================================================
+   BOTTOM NAV
+===================================================== */
 
 .bottomNav{
   position:absolute;
-  z-index:300;
+  z-index:600;
   left:0;
   right:0;
   bottom:0;
   height:var(--nav);
   padding:
-    8px
-    8px
-    calc(env(safe-area-inset-bottom) + 8px);
-  background:rgba(4,7,13,.91);
-  border-top:1px solid rgba(255,255,255,.08);
-  backdrop-filter:blur(20px);
+    7px
+    7px
+    calc(env(safe-area-inset-bottom) + 7px);
   display:grid;
   grid-template-columns:repeat(5,1fr);
+  background:rgba(4,7,12,.94);
+  border-top:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(20px);
 }
 
-.navBtn{
+.navButton{
+  border:0;
+  border-radius:13px;
   background:transparent;
-  color:#657087;
+  color:#68748a;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
   gap:4px;
-  border-radius:13px;
-  font-size:19px;
 }
 
-.navBtn span{
-  font-size:9px;
+.navIcon{
+  width:25px;
+  height:25px;
+  border:1px solid currentColor;
+  border-radius:8px;
+  display:grid;
+  place-items:center;
+  font-size:10px;
+  font-weight:900;
 }
 
-.navBtn.active{
+.navLabel{
+  font-size:8px;
+}
+
+.navButton.active{
   color:var(--cyan);
-  background:rgba(0,229,255,.06);
+  background:rgba(0,217,255,.055);
 }
 
-/* ================= FLOAT BUTTONS ================= */
-
-.arActions{
-  position:absolute;
-  z-index:120;
-  right:13px;
-  bottom:calc(var(--nav) + 18px);
-  display:flex;
-  flex-direction:column;
-  gap:9px;
-}
-
-.roundAction{
-  width:50px;
-  height:50px;
-  border-radius:17px;
-  background:rgba(7,12,22,.86);
-  border:1px solid rgba(255,255,255,.13);
-  backdrop-filter:blur(14px);
-  font-size:20px;
-}
-
-.roundAction.primary{
-  background:linear-gradient(145deg,#00bcd4,#357cff);
-  border:0;
-  box-shadow:0 10px 30px rgba(0,174,255,.25);
-}
-
-/* ================= OTHER VIEWS ================= */
+/* =====================================================
+   NORMAL PAGES
+===================================================== */
 
 .page{
   position:absolute;
   inset:0;
-  padding:
-    calc(env(safe-area-inset-top) + 90px)
-    14px
-    calc(var(--nav) + 20px);
   overflow:auto;
+  padding:
+    calc(env(safe-area-inset-top) + 88px)
+    13px
+    calc(var(--nav) + 18px);
   background:
-    radial-gradient(circle at 80% 0%,rgba(0,229,255,.08),transparent 35%),
+    radial-gradient(
+      circle at 90% 0%,
+      rgba(0,217,255,.07),
+      transparent 34%
+    ),
     var(--bg);
 }
 
-.pageTitle{
-  font-size:26px;
-  font-weight:900;
-  margin-bottom:5px;
+.pageHeader{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  margin-bottom:17px;
 }
 
-.pageSub{
-  color:var(--muted);
-  font-size:12px;
-  margin-bottom:18px;
-}
-
-.card{
-  background:var(--panel);
+.backButton{
+  width:39px;
+  height:39px;
+  border-radius:12px;
   border:1px solid var(--line);
-  border-radius:18px;
-  padding:14px;
-  margin-bottom:10px;
+  background:var(--panel2);
+  font-size:18px;
 }
+
+.pageTitle{
+  font-size:23px;
+  font-weight:900;
+}
+
+.pageSubtitle{
+  color:var(--muted);
+  font-size:10px;
+  margin-top:3px;
+}
+
+/* =====================================================
+   WORLD / FEED CARDS
+===================================================== */
 
 .worldCard{
   display:flex;
-  gap:12px;
   align-items:center;
+  gap:10px;
+  padding:12px;
+  margin-bottom:8px;
+  border-radius:16px;
+  border:1px solid var(--line);
+  background:rgba(12,17,27,.88);
 }
 
-.worldIcon{
-  width:54px;
-  height:54px;
-  border-radius:15px;
+.objectMark{
+  width:47px;
+  height:47px;
+  border-radius:13px;
+  border:1px solid rgba(0,217,255,.15);
+  background:rgba(0,217,255,.06);
   display:grid;
   place-items:center;
-  background:rgba(0,229,255,.08);
-  font-size:23px;
+  color:var(--cyan);
+  font-size:11px;
+  font-weight:900;
 }
 
-.worldMain{
+.objectMain{
   min-width:0;
   flex:1;
 }
 
-.worldName{
-  font-size:14px;
+.objectName{
+  font-size:12px;
   font-weight:800;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
 }
 
-.worldDesc{
-  color:#8994a9;
-  font-size:10px;
+.objectSub{
   margin-top:4px;
+  color:#7f8a9e;
+  font-size:9px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
-.worldDistance{
+.objectDistance{
   color:var(--cyan);
-  font-size:10px;
+  font-size:8px;
   white-space:nowrap;
 }
 
-/* ================= PROFILE ================= */
+/* =====================================================
+   PROFILE
+===================================================== */
 
 .profileHero{
   text-align:center;
-  padding:15px 0 20px;
+  padding-bottom:16px;
 }
 
-.avatar{
-  width:88px;
-  height:88px;
+.profileAvatar{
+  position:relative;
+  width:91px;
+  height:91px;
   margin:auto;
   border-radius:50%;
   overflow:hidden;
+  border:2px solid rgba(0,217,255,.40);
+  background:
+    linear-gradient(
+      145deg,
+      #102b3b,
+      #15142a
+    );
   display:grid;
   place-items:center;
-  background:
-    linear-gradient(145deg,#0b2b45,#15102b);
-  border:2px solid rgba(0,229,255,.45);
-  font-size:30px;
+  color:var(--cyan);
+  font-weight:900;
+  font-size:20px;
 }
 
-.avatar img{
+.profileAvatar img{
   width:100%;
   height:100%;
   object-fit:cover;
 }
 
+.avatarEdit{
+  position:absolute;
+  right:-2px;
+  bottom:2px;
+  width:28px;
+  height:28px;
+  border-radius:9px;
+  border:1px solid rgba(255,255,255,.15);
+  background:#111927;
+  color:var(--cyan);
+}
+
 .profileName{
   margin-top:11px;
-  font-size:20px;
+  font-size:19px;
   font-weight:900;
 }
 
-.profileUser{
+.profileUsername{
   margin-top:3px;
   color:var(--cyan);
-  font-size:11px;
+  font-size:9px;
 }
 
 .profileBio{
-  margin:10px auto;
-  max-width:420px;
-  color:#9ca7ba;
-  font-size:12px;
-  line-height:1.5;
+  max-width:430px;
+  margin:9px auto;
+  color:#9ba6b8;
+  font-size:10px;
+  line-height:1.45;
 }
 
-.stats{
+.profileStats{
   display:flex;
   justify-content:center;
-  gap:35px;
-  margin-top:14px;
+  gap:30px;
+  margin-top:13px;
 }
 
 .stat b{
   display:block;
-  font-size:18px;
+  font-size:17px;
 }
 
 .stat span{
-  color:#707b91;
-  font-size:9px;
+  color:#6e7a8e;
+  font-size:7px;
 }
 
-/* ================= MAP ================= */
+/* =====================================================
+   MAP
+===================================================== */
 
 #mapView{
-  background:#091018;
+  background:#071019;
 }
 
 #map{
@@ -673,41 +912,69 @@ button{
   bottom:var(--nav);
 }
 
-.mapOverlay{
+.mapTop{
   position:absolute;
   z-index:500;
   left:12px;
   right:12px;
-  top:calc(env(safe-area-inset-top) + 88px);
-  pointer-events:none;
+  top:
+    calc(env(safe-area-inset-top) + 84px);
+  display:flex;
+  gap:7px;
 }
 
 .mapSearch{
-  width:100%;
+  min-width:0;
+  flex:1;
   height:44px;
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,.13);
-  background:rgba(4,8,15,.80);
+  border-radius:13px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(5,9,15,.84);
   color:#fff;
-  padding:0 14px;
+  padding:0 12px;
   outline:none;
-  pointer-events:auto;
-  backdrop-filter:blur(14px);
+  backdrop-filter:blur(15px);
 }
 
-.leaflet-control-attribution{
-  font-size:7px!important;
+.mapSearchBtn{
+  width:72px;
+  height:44px;
+  border-radius:13px;
+  border:1px solid rgba(0,217,255,.18);
+  background:rgba(0,217,255,.08);
+  color:var(--cyan);
+  font-size:9px;
+  font-weight:800;
 }
 
-/* ================= MODAL ================= */
+.mapHint{
+  position:absolute;
+  z-index:510;
+  left:12px;
+  right:12px;
+  bottom:
+    calc(var(--nav) + 12px);
+  padding:8px 10px;
+  border-radius:12px;
+  background:rgba(5,9,15,.82);
+  border:1px solid var(--line);
+  color:#98a4b7;
+  font-size:8px;
+  text-align:center;
+  pointer-events:none;
+}
+
+/* =====================================================
+   MODALS / SHEETS
+===================================================== */
 
 .modal{
   position:fixed;
-  z-index:1000;
+  z-index:2000;
   inset:0;
   display:none;
   align-items:flex-end;
-  background:rgba(0,0,0,.64);
+  background:rgba(0,0,0,.68);
   backdrop-filter:blur(5px);
 }
 
@@ -717,210 +984,277 @@ button{
 
 .sheet{
   width:100%;
-  max-height:91vh;
+  max-height:92vh;
   overflow:auto;
-  border-radius:25px 25px 0 0;
-  background:
-    linear-gradient(180deg,#101624,#080b12);
-  border-top:1px solid rgba(255,255,255,.10);
   padding:
-    12px
-    14px
+    10px
+    13px
     calc(env(safe-area-inset-bottom) + 20px);
+  border-radius:24px 24px 0 0;
+  background:
+    linear-gradient(
+      180deg,
+      #111824,
+      #080b11
+    );
+  border-top:1px solid rgba(255,255,255,.10);
 }
 
-.sheetHead{
+.sheetHeader{
   display:flex;
   align-items:center;
-  justify-content:space-between;
-  gap:10px;
+  gap:8px;
   margin-bottom:14px;
+  position:sticky;
+  top:0;
+  z-index:5;
+  padding-bottom:6px;
+  background:#111824;
 }
 
-.sheetHead h2{
+.sheetHeader h2{
   margin:0;
-  font-size:19px;
+  flex:1;
+  font-size:17px;
 }
 
-.closeBtn{
-  width:38px;
-  height:38px;
-  border-radius:12px;
-  background:#171d2a;
-  color:#b8c2d5;
-  font-size:18px;
+.sheetClose,
+.sheetBack{
+  width:37px;
+  height:37px;
+  border-radius:11px;
+  border:1px solid var(--line);
+  background:#171f2d;
 }
 
 .field{
-  margin-bottom:11px;
+  margin-bottom:10px;
 }
 
 .field label{
   display:block;
-  color:#7f8aa0;
-  font-size:10px;
-  margin:0 0 6px 3px;
+  margin:0 0 5px 2px;
+  color:#778398;
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:.3px;
 }
 
 .field input,
 .field textarea,
 .field select{
   width:100%;
+  min-height:43px;
+  border-radius:12px;
   border:1px solid rgba(255,255,255,.09);
-  background:#090d16;
+  background:#090e16;
   color:#fff;
-  border-radius:13px;
-  min-height:44px;
-  padding:11px 12px;
+  padding:10px 11px;
   outline:none;
 }
 
 .field textarea{
-  min-height:85px;
+  min-height:75px;
   resize:vertical;
 }
 
 .row{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:9px;
+  gap:8px;
 }
 
-.checkRow{
+.actionButton{
+  width:100%;
+  min-height:44px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:#151d2a;
+  font-size:10px;
+  font-weight:800;
+  margin-top:6px;
+}
+
+.actionButton.primary{
+  border:0;
+  background:
+    linear-gradient(
+      135deg,
+      #00bad6,
+      #3b78ff
+    );
+}
+
+.actionButton.danger{
+  color:#ff7891;
+  background:rgba(255,85,119,.08);
+  border-color:rgba(255,85,119,.17);
+}
+
+.check{
   display:flex;
   align-items:flex-start;
   gap:8px;
-  padding:10px 0;
-  color:#8f9aaf;
-  font-size:10px;
+  padding:7px 0;
+  color:#8995a8;
+  font-size:9px;
   line-height:1.4;
 }
 
-.checkRow input{
-  margin-top:2px;
+.check input{
+  margin-top:1px;
   accent-color:var(--cyan);
 }
 
-.primaryBtn,
-.secondaryBtn,
-.dangerBtn{
-  width:100%;
-  min-height:46px;
-  border-radius:14px;
-  font-weight:800;
-  margin-top:8px;
-}
-
-.primaryBtn{
-  background:linear-gradient(135deg,#00bfd7,#397fff);
-}
-
-.secondaryBtn{
-  background:#151c29;
-  border:1px solid rgba(255,255,255,.08);
-}
-
-.dangerBtn{
-  background:rgba(255,85,119,.10);
-  border:1px solid rgba(255,85,119,.20);
-  color:#ff7994;
-}
-
-.mediaPicker{
+.mediaButtons{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:8px;
-  margin-bottom:11px;
-}
-
-.mediaBtn{
-  min-height:55px;
-  border-radius:13px;
-  background:#101725;
-  border:1px solid rgba(255,255,255,.08);
-  font-size:11px;
-}
-
-.selectedMedia{
-  display:flex;
   gap:7px;
-  flex-wrap:wrap;
-  margin-top:8px;
 }
 
-.mediaChip{
-  padding:7px 9px;
-  border-radius:9px;
-  background:#141d2c;
-  color:#aab4c7;
+.mediaButton{
+  min-height:52px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:#101722;
+  color:#aab5c8;
   font-size:9px;
 }
 
-/* ================= DETAIL ================= */
+.mediaList{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:7px;
+}
+
+.mediaChip{
+  padding:6px 8px;
+  border-radius:8px;
+  background:#151d2a;
+  color:#8f9bad;
+  font-size:8px;
+}
+
+/* =====================================================
+   DETAIL
+===================================================== */
 
 .detailMedia{
   display:grid;
-  gap:8px;
-  margin-bottom:14px;
+  gap:7px;
+  margin-bottom:13px;
 }
 
 .detailMedia img,
 .detailMedia video{
   width:100%;
-  max-height:340px;
+  max-height:350px;
   object-fit:cover;
-  border-radius:16px;
-  background:#05070d;
+  border-radius:15px;
+  background:#05070b;
 }
 
-.detailTitle{
-  font-size:24px;
+.detailName{
+  font-size:23px;
   font-weight:900;
 }
 
 .detailUser{
+  margin-top:3px;
   color:var(--cyan);
-  font-size:11px;
-  margin-top:4px;
+  font-size:9px;
 }
 
 .detailText{
-  color:#adb6c8;
-  font-size:12px;
-  line-height:1.55;
+  margin-top:12px;
+  color:#aab4c6;
+  font-size:10px;
+  line-height:1.6;
   white-space:pre-wrap;
-  margin-top:14px;
 }
 
-.detailMeta{
-  margin-top:14px;
-  padding:12px;
-  border-radius:14px;
-  background:#0a0f19;
-  color:#768197;
-  font-size:10px;
+.detailInfo{
+  margin-top:12px;
+  padding:10px;
+  border-radius:13px;
+  background:#090e16;
+  border:1px solid var(--line);
+  color:#788499;
+  font-size:8px;
   line-height:1.7;
 }
 
-/* ================= TOAST ================= */
+/* =====================================================
+   SEARCH PAGE RESULT
+===================================================== */
+
+.placeResult{
+  margin-top:10px;
+  padding:12px;
+  border-radius:15px;
+  border:1px solid rgba(0,217,255,.15);
+  background:rgba(0,217,255,.035);
+}
+
+.placeResultTitle{
+  font-size:12px;
+  font-weight:900;
+}
+
+.placeResultAddress{
+  margin-top:5px;
+  color:#9aa5b8;
+  font-size:9px;
+  line-height:1.4;
+}
+
+.coordinate{
+  margin-top:7px;
+  color:var(--cyan);
+  font-size:8px;
+}
+
+/* =====================================================
+   LEGAL
+===================================================== */
+
+.legal{
+  color:#98a3b6;
+  font-size:9px;
+  line-height:1.7;
+}
+
+.legal h3{
+  color:#e5eaf3;
+  font-size:11px;
+  margin:15px 0 5px;
+}
+
+/* =====================================================
+   TOAST
+===================================================== */
 
 #toast{
   position:fixed;
-  z-index:2000;
+  z-index:5000;
   left:50%;
-  bottom:calc(var(--nav) + 20px);
-  transform:translate(-50%,20px);
+  bottom:
+    calc(var(--nav) + 17px);
+  transform:
+    translate(-50%,20px);
   opacity:0;
   max-width:88vw;
-  padding:11px 15px;
-  border-radius:13px;
-  background:#111927;
+  padding:10px 13px;
+  border-radius:12px;
+  background:#121a27;
   border:1px solid rgba(255,255,255,.11);
-  box-shadow:0 12px 35px rgba(0,0,0,.4);
-  color:#e9effb;
-  font-size:11px;
+  color:#e7edf8;
+  font-size:9px;
+  text-align:center;
+  box-shadow:0 15px 40px rgba(0,0,0,.45);
   pointer-events:none;
-  transition:.25s ease;
+  transition:.22s ease;
 }
 
 #toast.show{
@@ -928,66 +1262,71 @@ button{
   transform:translate(-50%,0);
 }
 
-/* ================= LOADING ================= */
+/* =====================================================
+   STARTUP
+===================================================== */
 
-#loading{
+#startup{
   position:fixed;
-  z-index:3000;
+  z-index:6000;
   inset:0;
-  display:none;
-  place-items:center;
-  background:rgba(2,4,8,.82);
-  backdrop-filter:blur(8px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#05070c;
+  transition:.25s ease;
 }
 
-.loaderBox{
-  padding:20px 25px;
-  border-radius:18px;
-  background:#0d1320;
-  border:1px solid rgba(255,255,255,.10);
+.startupBox{
   text-align:center;
 }
 
-.spinner{
-  width:35px;
-  height:35px;
-  margin:auto auto 10px;
-  border:3px solid rgba(255,255,255,.10);
-  border-top-color:var(--cyan);
-  border-radius:50%;
-  animation:spin .8s linear infinite;
+.startupLogo{
+  width:60px;
+  height:60px;
+  margin:auto;
+  border-radius:18px;
+  border:1px solid rgba(0,217,255,.35);
+  display:grid;
+  place-items:center;
+  color:var(--cyan);
+  font-size:18px;
+  font-weight:900;
+  box-shadow:0 0 35px rgba(0,217,255,.08);
 }
 
-@keyframes spin{
-  to{transform:rotate(360deg)}
+.startupBox strong{
+  display:block;
+  margin-top:13px;
+  font-size:16px;
+  letter-spacing:1px;
 }
 
-/* ================= PRIVACY ================= */
-
-.legalText{
-  color:#9ba6ba;
-  font-size:11px;
-  line-height:1.65;
+.startupBox small{
+  display:block;
+  margin-top:4px;
+  color:#6d788b;
+  font-size:8px;
 }
 
-.legalText strong{
-  color:#e7edf8;
-}
-
-/* ================= RESPONSIVE ================= */
+/* =====================================================
+   RESPONSIVE
+===================================================== */
 
 @media(max-width:360px){
+
   .arCard{
     width:82vw;
   }
 
-  .arCardInner{
-    grid-template-columns:72px 1fr;
+  .arCardGrid{
+    grid-template-columns:72px minmax(0,1fr);
   }
 
   .arMedia{
-    height:78px;
+    height:76px;
   }
+
 }
 </style>
 </head>
@@ -996,555 +1335,1181 @@ button{
 
 <div id="app">
 
-<!-- ================= AR VIEW ================= -->
+<!-- =====================================================
+     AR VIEW
+===================================================== -->
 
 <section id="arView" class="view active">
 
-  <video id="camera" autoplay playsinline muted></video>
+  <video
+    id="camera"
+    autoplay
+    muted
+    playsinline>
+  </video>
 
   <div class="cameraShade"></div>
 
-  <div class="topbar">
+  <header class="topbar">
+
     <div class="brand">
-      <strong>ARWORLD</strong>
-      <span>SPATIAL WORLD</span>
+
+      <div class="brandMark">AW</div>
+
+      <div class="brandText">
+        <strong>ARWORLD</strong>
+        <small>SPATIAL WORLD</small>
+      </div>
+
     </div>
 
-    <div class="headerActions">
-      <button class="iconBtn" id="searchToggle">⌕</button>
-      <button class="iconBtn" id="refreshBtn">↻</button>
+    <div class="headerRight">
+
+      <button
+        class="iconButton"
+        id="searchToggle"
+        aria-label="Search">
+        ⌕
+      </button>
+
+      <button
+        class="iconButton"
+        id="languageButton">
+        EN
+      </button>
+
+      <button
+        class="iconButton"
+        id="refreshButton">
+        ↻
+      </button>
+
     </div>
+
+  </header>
+
+
+  <div class="arStatus">
+
+    <div class="status" id="gpsStatus">
+      GPS <b>...</b>
+    </div>
+
+    <div class="status" id="compassStatus">
+      <span data-i18n="compass">Kompas</span>
+      <b>...</b>
+    </div>
+
   </div>
 
-  <div class="arTopInfo">
-    <div class="statusPill" id="gpsStatus">GPS <b>gözlənilir</b></div>
-    <div class="statusPill" id="compassStatus">Kompas <b>gözlənilir</b></div>
+
+  <div
+    class="searchWrap"
+    id="searchWrap">
+
+    <input
+      class="searchInput"
+      id="globalSearch"
+      autocomplete="off"
+      placeholder="Məkan, şəhər, küçə və ya koordinat...">
+
+    <button
+      class="searchButton"
+      id="searchButton">
+      <span data-i18n="search">Axtar</span>
+    </button>
+
   </div>
 
-  <input id="arSearch"
-         type="search"
-         placeholder="Yaxınlıqdakı profil, mağaza, maşın, usta...">
+
+  <div
+    class="searchResults"
+    id="searchResults">
+  </div>
+
 
   <div id="arObjects">
+
     <div id="arLines"></div>
+
   </div>
+
 
   <div class="crosshair"></div>
 
-  <div class="scanInfo" id="scanInfo">
-    Məkan skanı hazırlanır...
+
+  <div
+    class="scanInfo"
+    id="scanInfo">
+    Spatial scan
   </div>
 
+
   <div class="arActions">
-    <button class="roundAction" id="spreadBtn" title="Məkanları səp">✦</button>
-    <button class="roundAction primary" id="placeBtn" title="Yerləşdir">＋</button>
+
+    <button
+      class="roundButton"
+      id="spreadButton">
+      ◇
+    </button>
+
+    <button
+      class="roundButton primary"
+      id="placeButton">
+      +
+    </button>
+
   </div>
 
 </section>
 
 
-<!-- ================= WORLD VIEW ================= -->
+<!-- =====================================================
+     WORLD
+===================================================== -->
 
 <section id="worldView" class="view">
-  <div class="topbar">
+
+  <header class="topbar">
+
     <div class="brand">
-      <strong>WORLD</strong>
-      <span>YAXINLIQDA</span>
+      <div class="brandMark">AW</div>
+      <div class="brandText">
+        <strong>WORLD</strong>
+        <small>NEARBY WORLD</small>
+      </div>
     </div>
-  </div>
+
+  </header>
 
   <div class="page">
-    <div class="pageTitle">Fiziki dünya</div>
-    <div class="pageSub">
-      Yaxınlıqdakı bütün məkan obyektləri
+
+    <div class="pageHeader">
+
+      <button
+        class="backButton"
+        data-back="ar">
+        ←
+      </button>
+
+      <div>
+        <div class="pageTitle" data-i18n="world">
+          Dünya
+        </div>
+
+        <div
+          class="pageSubtitle"
+          data-i18n="nearbyObjects">
+          Yaxınlıqdakı obyektlər
+        </div>
+      </div>
+
     </div>
 
     <div id="worldList"></div>
+
   </div>
+
 </section>
 
 
-<!-- ================= MAP VIEW ================= -->
+<!-- =====================================================
+     MAP
+===================================================== -->
 
 <section id="mapView" class="view">
 
   <div id="map"></div>
 
-  <div class="mapOverlay">
-    <input id="mapSearch"
-           class="mapSearch"
-           placeholder="Məkan axtar...">
+  <div class="mapTop">
+
+    <button
+      class="backButton"
+      id="mapBack">
+      ←
+    </button>
+
+    <input
+      class="mapSearch"
+      id="mapSearch"
+      placeholder="Dünya üzrə yer axtar...">
+
+    <button
+      class="mapSearchBtn"
+      id="mapSearchButton">
+      AXTAR
+    </button>
+
+  </div>
+
+  <div class="mapHint">
+    Xəritədə nöqtəyə toxunaraq həmin koordinata məlumat yerləşdirə bilərsən.
   </div>
 
 </section>
 
 
-<!-- ================= FEED VIEW ================= -->
+<!-- =====================================================
+     FEED
+===================================================== -->
 
 <section id="feedView" class="view">
-  <div class="topbar">
+
+  <header class="topbar">
+
     <div class="brand">
-      <strong>FEED</strong>
-      <span>SPATIAL CONTENT</span>
+      <div class="brandMark">AW</div>
+      <div class="brandText">
+        <strong>FEED</strong>
+        <small>SPATIAL CONTENT</small>
+      </div>
     </div>
-  </div>
+
+  </header>
 
   <div class="page">
-    <div class="pageTitle">Axın</div>
-    <div class="pageSub">
-      Yerləşdirilmiş məkan profilləri
+
+    <div class="pageHeader">
+
+      <button
+        class="backButton"
+        data-back="ar">
+        ←
+      </button>
+
+      <div>
+
+        <div
+          class="pageTitle"
+          data-i18n="feed">
+          Axın
+        </div>
+
+        <div
+          class="pageSubtitle">
+          Spatial content
+        </div>
+
+      </div>
+
     </div>
 
     <div id="feedList"></div>
+
   </div>
+
 </section>
 
 
-<!-- ================= PROFILE VIEW ================= -->
+<!-- =====================================================
+     PROFILE
+===================================================== -->
 
 <section id="profileView" class="view">
 
-  <div class="topbar">
+  <header class="topbar">
+
     <div class="brand">
-      <strong>PROFILE</strong>
-      <span>SƏNİN MƏKANIN</span>
+      <div class="brandMark">AW</div>
+      <div class="brandText">
+        <strong>PROFILE</strong>
+        <small>MY SPATIAL ID</small>
+      </div>
     </div>
 
-    <div class="headerActions">
-      <button class="iconBtn" id="editProfileBtn">✎</button>
+    <div class="headerRight">
+
+      <button
+        class="iconButton"
+        id="profileLanguageButton">
+        EN
+      </button>
+
     </div>
-  </div>
+
+  </header>
+
 
   <div class="page">
 
+    <div class="pageHeader">
+
+      <button
+        class="backButton"
+        data-back="ar">
+        ←
+      </button>
+
+      <div>
+        <div
+          class="pageTitle"
+          data-i18n="profile">
+          Profil
+        </div>
+      </div>
+
+    </div>
+
+
     <div class="profileHero">
 
-      <div class="avatar" id="profileAvatar">
-        ◉
+      <div class="profileAvatar">
+
+        <span id="avatarPlaceholder">
+          AW
+        </span>
+
+        <img
+          id="profileAvatarImage"
+          style="display:none"
+          alt="">
+
+        <button
+          class="avatarEdit"
+          id="avatarButton">
+          +
+        </button>
+
       </div>
 
-      <div class="profileName" id="profileName">
-        ARWORLD istifadəçisi
+
+      <input
+        id="avatarInput"
+        type="file"
+        accept="image/*"
+        hidden>
+
+
+      <div
+        class="profileName"
+        id="profileName">
+        ARWORLD
       </div>
 
-      <div class="profileUser" id="profileUsername">
+      <div
+        class="profileUsername"
+        id="profileUsername">
         @arworld
       </div>
 
-      <div class="profileBio" id="profileBio">
+      <div
+        class="profileBio"
+        id="profileBio">
         Fiziki dünyaya rəqəmsal iz burax.
       </div>
 
-      <div class="stats">
+
+      <div class="profileStats">
+
         <div class="stat">
           <b id="profileObjectCount">0</b>
-          <span>OBYEKT</span>
+          <span>OBJECTS</span>
         </div>
 
         <div class="stat">
           <b>AR</b>
-          <span>FORMAT</span>
+          <span>WORLD</span>
         </div>
 
         <div class="stat">
           <b>∞</b>
-          <span>WORLD</span>
+          <span>SPACE</span>
         </div>
+
       </div>
 
     </div>
 
-    <div class="card">
-      <button class="secondaryBtn" id="privacyBtn">
-        🔐 Məxfilik və hüquqi məlumat
-      </button>
-    </div>
+
+    <button
+      class="actionButton primary"
+      id="editProfileButton">
+      <span data-i18n="editProfile">
+        Profili redaktə et
+      </span>
+    </button>
+
+
+    <button
+      class="actionButton"
+      id="privacyButton">
+      <span data-i18n="privacy">
+        Məxfilik və hüquqi məlumat
+      </span>
+    </button>
+
 
     <div id="profileObjects"></div>
 
   </div>
+
 </section>
 
 
-<!-- ================= BOTTOM NAV ================= -->
+<!-- =====================================================
+     CREATE MODAL
+===================================================== -->
 
-<nav class="bottomNav">
-
-  <button class="navBtn active" data-view="ar">
-    ◉
-    <span>AR</span>
-  </button>
-
-  <button class="navBtn" data-view="world">
-    ◎
-    <span>WORLD</span>
-  </button>
-
-  <button class="navBtn" data-view="map">
-    ◇
-    <span>XƏRİTƏ</span>
-  </button>
-
-  <button class="navBtn" data-view="feed">
-    ≋
-    <span>FEED</span>
-  </button>
-
-  <button class="navBtn" data-view="profile">
-    ○
-    <span>PROFİL</span>
-  </button>
-
-</nav>
-
-
-<!-- ================= CREATE MODAL ================= -->
-
-<div class="modal" id="createModal">
+<div
+  class="modal"
+  id="createModal">
 
   <div class="sheet">
 
-    <div class="sheetHead">
-      <h2>🌐 Məkana yerləşdir</h2>
-      <button class="closeBtn" data-close="createModal">×</button>
+    <div class="sheetHeader">
+
+      <button
+        class="sheetBack"
+        data-close="createModal">
+        ←
+      </button>
+
+      <h2 data-i18n="placeTitle">
+        Məkana yerləşdir
+      </h2>
+
+      <button
+        class="sheetClose"
+        data-close="createModal">
+        ×
+      </button>
+
     </div>
 
+
     <div class="field">
-      <label>FORMAT</label>
+
+      <label data-i18n="format">
+        FORMAT
+      </label>
+
       <select id="createMode">
-        <option value="listing">Məkan obyekti</option>
-        <option value="social">Sosial profil</option>
+
+        <option value="listing">
+          Spatial object
+        </option>
+
+        <option value="social">
+          Spatial profile
+        </option>
+
       </select>
+
     </div>
 
+
     <div class="field">
-      <label>KATEQORİYA</label>
+
+      <label data-i18n="category">
+        KATEQORİYA
+      </label>
+
       <select id="createType">
-        <option value="business">🏪 Mağaza</option>
-        <option value="service">🛠 Xidmət</option>
-        <option value="car">🚗 Avtomobil</option>
-        <option value="building">🏢 Bina</option>
-        <option value="person">👤 Şəxs</option>
-        <option value="place">📍 Məkan</option>
-        <option value="tourism">🏔 Turizm</option>
-        <option value="event">🎫 Tədbir</option>
-        <option value="warning">⚠️ Xəbərdarlıq</option>
-        <option value="information">ℹ️ Məlumat</option>
+
+        <option value="business">Business</option>
+        <option value="service">Service</option>
+        <option value="car">Vehicle</option>
+        <option value="building">Building</option>
+        <option value="person">Person</option>
+        <option value="place">Place</option>
+        <option value="tourism">Tourism</option>
+        <option value="event">Event</option>
+        <option value="warning">Warning</option>
+        <option value="information">Information</option>
+
       </select>
+
     </div>
 
-    <div class="field">
-      <label>BAŞLIQ</label>
-      <input id="createName"
-             placeholder="Məsələn: Şamxal — BMW 320">
-    </div>
 
     <div class="field">
-      <label>İSTİFADƏÇİ ADI</label>
-      <input id="createUsername"
-             placeholder="@username">
+
+      <label data-i18n="title">
+        BAŞLIQ
+      </label>
+
+      <input
+        id="createName"
+        placeholder="Məsələn: Colorado Street Notice">
+
     </div>
 
-    <div class="field">
-      <label>QISA MƏLUMAT</label>
-      <textarea id="createBio"
-                placeholder="Bu məkanda nə var?"></textarea>
-    </div>
 
     <div class="field">
-      <label>MƏQALƏ / ƏTRAFLI MƏLUMAT</label>
-      <textarea id="createArticle"
-                placeholder="Ətraflı məlumat..."></textarea>
+
+      <label>
+        USERNAME
+      </label>
+
+      <input
+        id="createUsername"
+        placeholder="@username">
+
     </div>
+
+
+    <div class="field">
+
+      <label data-i18n="shortInfo">
+        QISA MƏLUMAT
+      </label>
+
+      <textarea
+        id="createBio"
+        placeholder="Məkan haqqında məlumat..."></textarea>
+
+    </div>
+
+
+    <div class="field">
+
+      <label data-i18n="article">
+        ƏTRAFLI MƏLUMAT
+      </label>
+
+      <textarea
+        id="createArticle"
+        placeholder="Daha geniş məlumat..."></textarea>
+
+    </div>
+
 
     <div class="row">
 
       <div class="field">
-        <label>TELEFON</label>
-        <input id="createPhone"
-               inputmode="tel"
-               placeholder="+994">
+
+        <label>PHONE</label>
+
+        <input
+          id="createPhone"
+          inputmode="tel"
+          placeholder="+994">
+
       </div>
 
       <div class="field">
+
         <label>WHATSAPP</label>
-        <input id="createWhatsapp"
-               inputmode="tel"
-               placeholder="+994">
+
+        <input
+          id="createWhatsapp"
+          inputmode="tel"
+          placeholder="+994">
+
       </div>
 
     </div>
 
+
     <div class="field">
-      <label>SAYT / SOSİAL LİNK</label>
-      <input id="createSocial"
-             placeholder="https://...">
+
+      <label>SOCIAL / WEBSITE</label>
+
+      <input
+        id="createSocial"
+        placeholder="https://...">
+
     </div>
+
 
     <div class="row">
 
       <div class="field">
-        <label>GÖRÜNMƏ MƏSAFƏSİ</label>
+
+        <label data-i18n="radius">
+          RADIUS
+        </label>
+
         <select id="createRadius">
+
           <option value="50">50 m</option>
           <option value="100">100 m</option>
           <option value="300" selected>300 m</option>
           <option value="500">500 m</option>
           <option value="1000">1 km</option>
           <option value="5000">5 km</option>
+
         </select>
+
       </div>
 
+
       <div class="field">
-        <label>OBYEKT ÖLÇÜSÜ</label>
+
+        <label data-i18n="size">
+          SIZE
+        </label>
+
         <select id="createSize">
-          <option value="normal">Normal</option>
-          <option value="large">Böyük</option>
-          <option value="building">Bina</option>
+
+          <option value="normal">
+            Normal
+          </option>
+
+          <option value="large">
+            Large
+          </option>
+
+          <option value="building">
+            Building
+          </option>
+
         </select>
+
       </div>
 
     </div>
 
+
     <div class="field">
 
-      <label>KOORDİNAT</label>
+      <label data-i18n="coordinates">
+        KOORDİNAT
+      </label>
 
       <div class="row">
 
-        <input id="createLat"
-               inputmode="decimal"
-               placeholder="Latitude">
+        <input
+          id="createLat"
+          inputmode="decimal"
+          placeholder="Latitude">
 
-        <input id="createLng"
-               inputmode="decimal"
-               placeholder="Longitude">
+        <input
+          id="createLng"
+          inputmode="decimal"
+          placeholder="Longitude">
 
       </div>
 
-      <button class="secondaryBtn" id="useCurrentLocation">
-        ◎ Hazırkı GPS koordinatımı istifadə et
+
+      <button
+        class="actionButton"
+        id="currentLocationButton">
+        ◎ Hazırkı GPS nöqtəm
       </button>
 
-      <button class="secondaryBtn" id="pickOnMap">
-        ◇ Xəritədən seç
+
+      <button
+        class="actionButton"
+        id="pickMapButton">
+        ◇ Xəritədən nöqtə seç
       </button>
+
+    </div>
+
+
+    <div
+      class="placeResult"
+      id="selectedPlaceBox"
+      style="display:none">
+
+      <div
+        class="placeResultTitle"
+        id="selectedPlaceTitle">
+      </div>
+
+      <div
+        class="placeResultAddress"
+        id="selectedPlaceAddress">
+      </div>
+
+      <div
+        class="coordinate"
+        id="selectedPlaceCoordinates">
+      </div>
 
     </div>
 
 
     <div class="field">
-      <label>ŞƏKİL / VİDEO</label>
 
-      <div class="mediaPicker">
+      <label data-i18n="media">
+        FOTO / VİDEO
+      </label>
 
-        <button class="mediaBtn" id="galleryBtn">
-          🖼 Qalereya
+      <div class="mediaButtons">
+
+        <button
+          class="mediaButton"
+          id="galleryButton">
+          GALLERY
         </button>
 
-        <button class="mediaBtn" id="photoBtn">
-          📷 Kamera
+        <button
+          class="mediaButton"
+          id="photoButton">
+          CAMERA
         </button>
 
-        <button class="mediaBtn" id="videoBtn">
-          🎥 Video
+        <button
+          class="mediaButton"
+          id="videoButton">
+          VIDEO
         </button>
 
       </div>
 
-      <input id="galleryInput"
-             type="file"
-             accept="image/*,video/*"
-             multiple
-             hidden>
 
-      <input id="photoInput"
-             type="file"
-             accept="image/*"
-             capture="environment"
-             hidden>
+      <input
+        id="galleryInput"
+        type="file"
+        accept="image/*,video/*"
+        multiple
+        hidden>
 
-      <input id="videoInput"
-             type="file"
-             accept="video/*"
-             capture="environment"
-             hidden>
 
-      <div class="selectedMedia" id="selectedMedia"></div>
+      <input
+        id="photoInput"
+        type="file"
+        accept="image/*"
+        capture="environment"
+        hidden>
+
+
+      <input
+        id="videoInput"
+        type="file"
+        accept="video/*"
+        capture="environment"
+        hidden>
+
+
+      <div
+        class="mediaList"
+        id="selectedMedia">
+      </div>
 
     </div>
 
 
-    <div class="checkRow">
-      <input type="checkbox" id="createPublic" checked>
+    <div class="check">
+
+      <input
+        type="checkbox"
+        id="createPublic"
+        checked>
+
       <label for="createPublic">
-        Bu obyekt digər istifadəçilərə açıq olsun.
+        Obyekt digər istifadəçilər üçün açıq olsun.
       </label>
+
     </div>
 
-    <div class="checkRow">
-      <input type="checkbox" id="createContact">
+
+    <div class="check">
+
+      <input
+        type="checkbox"
+        id="createContact">
+
       <label for="createContact">
-        Telefon və WhatsApp məlumatlarımı göstər.
+        Telefon və WhatsApp məlumatını göstər.
       </label>
+
     </div>
 
-    <div class="checkRow">
-      <input type="checkbox" id="createConsent">
+
+    <div class="check">
+
+      <input
+        type="checkbox"
+        id="createConsent">
+
       <label for="createConsent">
-        Bu məzmunu paylaşmaq hüququm olduğunu təsdiq edirəm və
-        məkan məlumatının istifadə olunmasına razıyam.
+        Bu məzmunu paylaşmaq hüququm olduğunu təsdiq edirəm.
       </label>
+
     </div>
 
-    <button class="primaryBtn" id="saveObjectBtn">
-      ✦ MƏKANA YERLƏŞDİR
+
+    <button
+      class="actionButton primary"
+      id="saveObjectButton">
+      <span data-i18n="place">
+        MƏKANA YERLƏŞDİR
+      </span>
     </button>
 
   </div>
+
 </div>
 
 
-<!-- ================= DETAIL MODAL ================= -->
+<!-- =====================================================
+     DETAIL MODAL
+===================================================== -->
 
-<div class="modal" id="detailModal">
+<div
+  class="modal"
+  id="detailModal">
 
   <div class="sheet">
 
-    <div class="sheetHead">
-      <h2>Spatial Profile</h2>
-      <button class="closeBtn" data-close="detailModal">×</button>
+    <div class="sheetHeader">
+
+      <button
+        class="sheetBack"
+        data-close="detailModal">
+        ←
+      </button>
+
+      <h2>
+        Spatial Profile
+      </h2>
+
+      <button
+        class="sheetClose"
+        data-close="detailModal">
+        ×
+      </button>
+
     </div>
 
     <div id="detailContent"></div>
 
   </div>
+
 </div>
 
 
-<!-- ================= PROFILE EDIT ================= -->
+<!-- =====================================================
+     PROFILE EDIT
+===================================================== -->
 
-<div class="modal" id="profileModal">
+<div
+  class="modal"
+  id="profileModal">
 
   <div class="sheet">
 
-    <div class="sheetHead">
-      <h2>Profili redaktə et</h2>
-      <button class="closeBtn" data-close="profileModal">×</button>
+    <div class="sheetHeader">
+
+      <button
+        class="sheetBack"
+        data-close="profileModal">
+        ←
+      </button>
+
+      <h2 data-i18n="editProfile">
+        Profili redaktə et
+      </h2>
+
+      <button
+        class="sheetClose"
+        data-close="profileModal">
+        ×
+      </button>
+
     </div>
 
-    <div class="field">
-      <label>AD</label>
-      <input id="profileEditName">
-    </div>
 
     <div class="field">
+
+      <label>NAME</label>
+
+      <input
+        id="profileEditName">
+
+    </div>
+
+
+    <div class="field">
+
       <label>USERNAME</label>
-      <input id="profileEditUsername">
+
+      <input
+        id="profileEditUsername">
+
     </div>
 
-    <div class="field">
-      <label>BİO</label>
-      <textarea id="profileEditBio"></textarea>
-    </div>
 
     <div class="field">
-      <label>MƏQALƏ</label>
-      <textarea id="profileEditArticle"></textarea>
+
+      <label>BIO</label>
+
+      <textarea
+        id="profileEditBio"></textarea>
+
     </div>
 
-    <div class="field">
-      <label>TELEFON</label>
-      <input id="profileEditPhone">
-    </div>
 
     <div class="field">
+
+      <label>ARTICLE</label>
+
+      <textarea
+        id="profileEditArticle"></textarea>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>PHONE</label>
+
+      <input
+        id="profileEditPhone">
+
+    </div>
+
+
+    <div class="field">
+
       <label>WHATSAPP</label>
-      <input id="profileEditWhatsapp">
+
+      <input
+        id="profileEditWhatsapp">
+
     </div>
+
 
     <div class="field">
-      <label>SOSİAL / SAYT</label>
-      <input id="profileEditSocial">
+
+      <label>SOCIAL</label>
+
+      <input
+        id="profileEditSocial">
+
     </div>
 
-    <button class="primaryBtn" id="saveProfileBtn">
-      Profili yadda saxla
+
+    <button
+      class="actionButton primary"
+      id="saveProfileButton">
+      SAVE
     </button>
 
   </div>
+
 </div>
 
 
-<!-- ================= PRIVACY ================= -->
+<!-- =====================================================
+     LANGUAGE MODAL
+===================================================== -->
 
-<div class="modal" id="privacyModal">
+<div
+  class="modal"
+  id="languageModal">
 
   <div class="sheet">
 
-    <div class="sheetHead">
-      <h2>🔐 Məxfilik</h2>
-      <button class="closeBtn" data-close="privacyModal">×</button>
+    <div class="sheetHeader">
+
+      <button
+        class="sheetBack"
+        data-close="languageModal">
+        ←
+      </button>
+
+      <h2>
+        Language
+      </h2>
+
+      <button
+        class="sheetClose"
+        data-close="languageModal">
+        ×
+      </button>
+
     </div>
 
-    <div class="legalText">
+
+    <button
+      class="actionButton"
+      data-language="az">
+      Azərbaycan dili
+    </button>
+
+    <button
+      class="actionButton"
+      data-language="en">
+      English
+    </button>
+
+    <button
+      class="actionButton"
+      data-language="ru">
+      Русский
+    </button>
+
+    <button
+      class="actionButton"
+      data-language="de">
+      Deutsch
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- =====================================================
+     PRIVACY
+===================================================== -->
+
+<div
+  class="modal"
+  id="privacyModal">
+
+  <div class="sheet">
+
+    <div class="sheetHeader">
+
+      <button
+        class="sheetBack"
+        data-close="privacyModal">
+        ←
+      </button>
+
+      <h2 data-i18n="privacy">
+        Məxfilik
+      </h2>
+
+      <button
+        class="sheetClose"
+        data-close="privacyModal">
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="legal">
+
+      <h3>ARWORLD demo</h3>
 
       <p>
-        <strong>ARWORLD demo versiyası</strong> hazırda
-        istifadəçi profillərini, koordinatları və media məlumatlarını
-        bu brauzerin lokal IndexedDB yaddaşında saxlayır.
+        Bu GitHub Pages versiyası məkan obyektlərini
+        əsasən cihazın lokal yaddaşında saxlayır.
       </p>
 
-      <p>
-        GPS məlumatı yalnız brauzerin verdiyi icazə əsasında
-        cihazdan alınır.
-      </p>
+      <h3>GPS</h3>
 
       <p>
-        Bu demo məlumatları ARWORLD serverinə göndərmir.
-        Başqa telefonlardakı istifadəçilərlə real paylaşım üçün
-        gələcəkdə autentifikasiya, server bazası və media storage
-        sistemi qoşulmalıdır.
+        GPS yalnız brauzer icazəsi verildikdə istifadə olunur.
+        Demo GPS koordinatını real serverə avtomatik göndərmir.
       </p>
 
-      <p>
-        Başqa şəxslərin şəxsi məlumatlarını, müəllif hüququ ilə
-        qorunan materialları, təhdid, saxtakarlıq və qanunsuz
-        məzmunu icazəsiz yerləşdirməyin.
-      </p>
+      <h3>Media</h3>
 
       <p>
-        Real ictimai xidmət istifadəyə veriləndə
-        <strong>Privacy Policy, Terms of Service, Content Policy,
-        report/block sistemi, copyright proseduru və data-processing
-        qaydaları</strong> ayrıca hazırlanmalıdır.
+        Yüklənən foto və videolar demo rejimində cihazın
+        IndexedDB yaddaşında saxlanılır.
       </p>
 
-      <p>
-        Bu bölmə hüquqi məsləhət deyil.
-      </p>
+      <h3>Məkan yerləşdirmə</h3>
 
       <p>
-        ARWORLD-in bu brauzer versiyasında GPS + kompas vasitəsilə
-        məkan istiqaməti hesablanır. Kartların bir-birindən ayrılması
-        ekran-məkanı collision/layer sistemi ilə həyata keçirilir.
-        Bu, ARCore/ARKit səviyyəsində santimetr dəqiqliyində
-        fiziki anchor sistemi deyil.
+        İstifadəçi dünyanın istənilən koordinatına mətn,
+        profil, şəkil və video məlumatı yerləşdirə bilər.
+        Real ictimai xidmətə keçiddə Terms, Privacy,
+        Content Policy, copyright, report/block və
+        moderasiya mexanizmləri əlavə edilməlidir.
+      </p>
+
+      <h3>AR dəqiqliyi</h3>
+
+      <p>
+        Bu brauzer prototipində GPS + kompas +
+        ekran-məkanı collision sistemi istifadə olunur.
+        Bu, xüsusi ARCore/ARKit Geospatial sistemindəki
+        santimetr səviyyəli fiziki anchor demək deyil.
+      </p>
+
+      <h3>Hüquqi qeyd</h3>
+
+      <p>
+        Bu bölmə hüquqi məsləhət deyil. Real beynəlxalq
+        xidmət istifadəyə verilməzdən əvvəl fəaliyyət göstərilən
+        ölkələr üzrə hüquqi sənədlər hazırlanmalıdır.
       </p>
 
     </div>
 
   </div>
+
 </div>
+
+
+<!-- =====================================================
+     BOTTOM NAV
+===================================================== -->
+
+<nav class="bottomNav">
+
+  <button
+    class="navButton active"
+    data-view="ar">
+
+    <span class="navIcon">AR</span>
+    <span class="navLabel">AR</span>
+
+  </button>
+
+
+  <button
+    class="navButton"
+    data-view="world">
+
+    <span class="navIcon">W</span>
+    <span class="navLabel">WORLD</span>
+
+  </button>
+
+
+  <button
+    class="navButton"
+    data-view="map">
+
+    <span class="navIcon">M</span>
+    <span class="navLabel">MAP</span>
+
+  </button>
+
+
+  <button
+    class="navButton"
+    data-view="feed">
+
+    <span class="navIcon">F</span>
+    <span class="navLabel">FEED</span>
+
+  </button>
+
+
+  <button
+    class="navButton"
+    data-view="profile">
+
+    <span class="navIcon">P</span>
+    <span class="navLabel">PROFILE</span>
+
+  </button>
+
+</nav>
 
 
 <div id="toast"></div>
 
-<div id="loading">
-  <div class="loaderBox">
-    <div class="spinner"></div>
-    <div>ARWORLD hazırlanır...</div>
+
+<!-- STARTUP -->
+<div id="startup">
+
+  <div class="startupBox">
+
+    <div class="startupLogo">
+      AW
+    </div>
+
+    <strong>ARWORLD</strong>
+
+    <small>
+      SPATIAL WORLD
+    </small>
+
   </div>
+
 </div>
 
 </div>
@@ -1553,73 +2518,23 @@ button{
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
+
 /* =========================================================
-   ARWORLD SPATIAL WORLD
-   Single-file GitHub Pages version
-   ========================================================= */
+   ARWORLD CORE
+========================================================= */
+
+"use strict";
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
 
 const $ = id => document.getElementById(id);
 
-let db = null;
-let objects = [];
-let map = null;
-let mapMarkers = [];
-
-let gpsWatch = null;
-let cameraStream = null;
-
-let userLat = null;
-let userLng = null;
-let gpsAccuracy = null;
-
-let heading = 0;
-let headingSamples = [];
-
-let activeView = "ar";
-let selectedFiles = [];
-
-let profile = {
-  name:"ARWORLD istifadəçisi",
-  username:"@arworld",
-  bio:"Fiziki dünyaya rəqəmsal iz burax.",
-  article:"",
-  phone:"",
-  whatsapp:"",
-  social:"",
-  avatar:null
-};
-
-
-/* =========================================================
-   AR ENGINE STATE
-   ========================================================= */
-
-const anchorState = new Map();
-const layoutState = new Map();
-const mediaURLCache = new Map();
-
-let layoutGeneration = 0;
-let forceSpread = 0;
-
-
-/* =========================================================
-   BASIC HELPERS
-   ========================================================= */
-
-function toast(message){
-  const el = $("toast");
-  el.textContent = message;
-  el.classList.add("show");
-
-  clearTimeout(toast.timer);
-
-  toast.timer = setTimeout(()=>{
-    el.classList.remove("show");
-  },2600);
-}
-
 
 function esc(value){
+
   return String(value ?? "")
     .replaceAll("&","&amp;")
     .replaceAll("<","&lt;")
@@ -1629,225 +2544,924 @@ function esc(value){
 }
 
 
-function fmtTime(ts){
-  try{
-    return new Date(ts).toLocaleString("az-AZ");
-  }catch{
-    return "";
-  }
+function clamp(v,min,max){
+
+  return Math.max(min,Math.min(max,v));
+
 }
 
 
-function typeName(type){
-  const names={
-    business:"Mağaza",
-    service:"Xidmət",
-    car:"Avtomobil",
-    building:"Bina",
-    person:"Şəxs",
-    place:"Məkan",
-    tourism:"Turizm",
-    event:"Tədbir",
-    warning:"Xəbərdarlıq",
-    information:"Məlumat"
-  };
+function toast(message){
 
-  return names[type] || type;
-}
+  const el=$("toast");
 
+  el.textContent=message;
 
-function typeIcon(type){
-  const icons={
-    business:"🏪",
-    service:"🛠",
-    car:"🚗",
-    building:"🏢",
-    person:"👤",
-    place:"📍",
-    tourism:"🏔",
-    event:"🎫",
-    warning:"⚠️",
-    information:"ℹ️"
-  };
+  el.classList.add("show");
 
-  return icons[type] || "◎";
+  clearTimeout(
+    toast.timer
+  );
+
+  toast.timer=
+    setTimeout(
+      ()=>{
+        el.classList.remove("show");
+      },
+      2600
+    );
+
 }
 
 
 function openModal(id){
+
   $(id).classList.add("show");
+
 }
 
 
 function closeModal(id){
+
   $(id).classList.remove("show");
+
 }
 
 
 /* =========================================================
-   INDEXED DB
-   ========================================================= */
+   DATABASE
+========================================================= */
+
+let db=null;
+
+let objects=[];
+
+let profile={
+
+  id:"me",
+
+  name:"ARWORLD",
+
+  username:"@arworld",
+
+  bio:"Fiziki dünyaya rəqəmsal iz burax.",
+
+  article:"",
+
+  phone:"",
+
+  whatsapp:"",
+
+  social:"",
+
+  avatar:null
+
+};
+
 
 function openDB(){
 
-  return new Promise((resolve,reject)=>{
+  return new Promise(
+    (resolve,reject)=>{
 
-    const request =
-      indexedDB.open("ARWORLD_SPATIAL_10",1);
+      const req=
+        indexedDB.open(
+          "ARWORLD_WORLD_20",
+          1
+        );
 
-    request.onupgradeneeded = event => {
 
-      const d = event.target.result;
+      req.onupgradeneeded=
+        event=>{
 
-      if(!d.objectStoreNames.contains("objects")){
-        d.createObjectStore("objects",{keyPath:"id"});
+          const database=
+            event.target.result;
+
+
+          if(
+            !database.objectStoreNames
+              .contains("objects")
+          ){
+
+            database.createObjectStore(
+              "objects",
+              {
+                keyPath:"id"
+              }
+            );
+
+          }
+
+
+          if(
+            !database.objectStoreNames
+              .contains("profile")
+          ){
+
+            database.createObjectStore(
+              "profile",
+              {
+                keyPath:"id"
+              }
+            );
+
+          }
+
+        };
+
+
+      req.onsuccess=
+        event=>{
+
+          db=
+            event.target.result;
+
+          resolve(db);
+
+        };
+
+
+      req.onerror=
+        ()=>{
+          reject(req.error);
+        };
+
+    }
+  );
+
+}
+
+
+function dbGetAll(store){
+
+  return new Promise(
+    (resolve,reject)=>{
+
+      if(!db){
+
+        resolve([]);
+
+        return;
       }
 
-      if(!d.objectStoreNames.contains("profile")){
-        d.createObjectStore("profile",{keyPath:"id"});
+
+      const tx=
+        db.transaction(
+          store,
+          "readonly"
+        );
+
+
+      const req=
+        tx.objectStore(store)
+          .getAll();
+
+
+      req.onsuccess=
+        ()=>{
+          resolve(req.result || []);
+        };
+
+
+      req.onerror=
+        ()=>{
+          reject(req.error);
+        };
+
+    }
+  );
+
+}
+
+
+function dbPut(store,data){
+
+  return new Promise(
+    (resolve,reject)=>{
+
+      if(!db){
+
+        reject(
+          new Error("DB unavailable")
+        );
+
+        return;
       }
-    };
 
-    request.onsuccess = event=>{
-      db = event.target.result;
-      resolve(db);
-    };
 
-    request.onerror = ()=>{
-      reject(request.error);
-    };
+      const tx=
+        db.transaction(
+          store,
+          "readwrite"
+        );
 
-  });
+
+      tx.objectStore(store)
+        .put(data);
+
+
+      tx.oncomplete=
+        ()=>resolve();
+
+
+      tx.onerror=
+        ()=>reject(tx.error);
+
+    }
+  );
+
 }
 
 
-function dbPut(storeName,data){
+/* =========================================================
+   LANGUAGE
+========================================================= */
 
-  return new Promise((resolve,reject)=>{
+const translations={
 
-    const tx = db.transaction(storeName,"readwrite");
+  az:{
+    search:"Axtar",
+    compass:"Kompas",
+    world:"Dünya",
+    nearbyObjects:"Yaxınlıqdakı obyektlər",
+    feed:"Axın",
+    profile:"Profil",
+    editProfile:"Profili redaktə et",
+    privacy:"Məxfilik və hüquqi məlumat",
+    placeTitle:"Məkana yerləşdir",
+    format:"FORMAT",
+    category:"KATEQORİYA",
+    title:"BAŞLIQ",
+    shortInfo:"QISA MƏLUMAT",
+    article:"ƏTRAFLI MƏLUMAT",
+    radius:"GÖRÜNMƏ MƏSAFƏSİ",
+    size:"ÖLÇÜ",
+    coordinates:"KOORDİNAT",
+    media:"FOTO / VİDEO",
+    place:"MƏKANA YERLƏŞDİR"
+  },
 
-    tx.objectStore(storeName).put(data);
+  en:{
+    search:"Search",
+    compass:"Compass",
+    world:"World",
+    nearbyObjects:"Nearby objects",
+    feed:"Feed",
+    profile:"Profile",
+    editProfile:"Edit profile",
+    privacy:"Privacy & legal",
+    placeTitle:"Place in world",
+    format:"FORMAT",
+    category:"CATEGORY",
+    title:"TITLE",
+    shortInfo:"SHORT INFO",
+    article:"FULL INFORMATION",
+    radius:"VISIBLE RADIUS",
+    size:"SIZE",
+    coordinates:"COORDINATES",
+    media:"PHOTO / VIDEO",
+    place:"PLACE IN WORLD"
+  },
 
-    tx.oncomplete = ()=>resolve();
-    tx.onerror = ()=>reject(tx.error);
+  ru:{
+    search:"Поиск",
+    compass:"Компас",
+    world:"Мир",
+    nearbyObjects:"Объекты рядом",
+    feed:"Лента",
+    profile:"Профиль",
+    editProfile:"Изменить профиль",
+    privacy:"Конфиденциальность и право",
+    placeTitle:"Разместить в мире",
+    format:"ФОРМАТ",
+    category:"КАТЕГОРИЯ",
+    title:"ЗАГОЛОВОК",
+    shortInfo:"КРАТКАЯ ИНФОРМАЦИЯ",
+    article:"ПОДРОБНАЯ ИНФОРМАЦИЯ",
+    radius:"РАДИУС ВИДИМОСТИ",
+    size:"РАЗМЕР",
+    coordinates:"КООРДИНАТЫ",
+    media:"ФОТО / ВИДЕО",
+    place:"РАЗМЕСТИТЬ"
+  },
 
-  });
-}
-
-
-function dbGetAll(storeName){
-
-  return new Promise((resolve,reject)=>{
-
-    const tx = db.transaction(storeName,"readonly");
-
-    const request =
-      tx.objectStore(storeName).getAll();
-
-    request.onsuccess = ()=>{
-      resolve(request.result || []);
-    };
-
-    request.onerror = ()=>{
-      reject(request.error);
-    };
-
-  });
-}
-
-
-async function saveObject(obj){
-
-  await dbPut("objects",obj);
-
-  const index =
-    objects.findIndex(x=>x.id===obj.id);
-
-  if(index>=0){
-    objects[index]=obj;
-  }else{
-    objects.push(obj);
+  de:{
+    search:"Suchen",
+    compass:"Kompass",
+    world:"Welt",
+    nearbyObjects:"Objekte in der Nähe",
+    feed:"Feed",
+    profile:"Profil",
+    editProfile:"Profil bearbeiten",
+    privacy:"Datenschutz & Recht",
+    placeTitle:"In der Welt platzieren",
+    format:"FORMAT",
+    category:"KATEGORIE",
+    title:"TITEL",
+    shortInfo:"KURZE INFO",
+    article:"DETAILINFORMATION",
+    radius:"SICHTBARKEIT",
+    size:"GRÖSSE",
+    coordinates:"KOORDINATEN",
+    media:"FOTO / VIDEO",
+    place:"PLATZIEREN"
   }
+
+};
+
+
+let currentLanguage="az";
+
+
+function detectLanguage(){
+
+  const lang=
+    (
+      navigator.language ||
+      navigator.userLanguage ||
+      "az"
+    )
+    .toLowerCase();
+
+
+  if(lang.startsWith("ru")){
+    return "ru";
+  }
+
+  if(lang.startsWith("de")){
+    return "de";
+  }
+
+  if(lang.startsWith("en")){
+    return "en";
+  }
+
+  return "az";
 }
 
 
-async function saveProfile(){
+function setLanguage(lang){
 
-  await dbPut("profile",{
-    id:"me",
-    ...profile
-  });
+  if(!translations[lang]){
+    lang="az";
+  }
+
+  currentLanguage=lang;
+
+  localStorage.setItem(
+    "arworld_language",
+    lang
+  );
+
+
+  document.documentElement.lang=
+    lang;
+
+
+  document
+    .querySelectorAll("[data-i18n]")
+    .forEach(el=>{
+
+      const key=
+        el.dataset.i18n;
+
+      if(
+        translations[lang][key]
+      ){
+
+        el.textContent=
+          translations[lang][key];
+      }
+
+    });
+
+
+  $("languageButton")
+    .textContent=
+      lang.toUpperCase();
+
+  $("profileLanguageButton")
+    .textContent=
+      lang.toUpperCase();
+
+
+  const placeholders={
+
+    az:"Məkan, şəhər, küçə və ya koordinat...",
+    en:"Place, city, street or coordinates...",
+    ru:"Место, город, улица или координаты...",
+    de:"Ort, Stadt, Straße oder Koordinaten..."
+
+  };
+
+
+  $("globalSearch").placeholder=
+    placeholders[lang];
+
+
+  $("mapSearch").placeholder=
+    lang==="az"
+    ? "Dünya üzrə yer axtar..."
+    : lang==="ru"
+    ? "Искать место в мире..."
+    : lang==="de"
+    ? "Ort weltweit suchen..."
+    : "Search a place worldwide...";
+
+}
+
+
+function initLanguage(){
+
+  const saved=
+    localStorage.getItem(
+      "arworld_language"
+    );
+
+  setLanguage(
+    saved ||
+    detectLanguage()
+  );
+
 }
 
 
 /* =========================================================
    GEO
-   ========================================================= */
+========================================================= */
 
-function dist(lat1,lon1,lat2,lon2){
+let userLat=null;
+let userLng=null;
+let gpsAccuracy=null;
+let heading=0;
+
+
+function distance(
+  lat1,
+  lng1,
+  lat2,
+  lng2
+){
 
   const R=6371000;
 
-  const p1=lat1*Math.PI/180;
-  const p2=lat2*Math.PI/180;
+  const p1=
+    lat1*Math.PI/180;
 
-  const dp=(lat2-lat1)*Math.PI/180;
-  const dl=(lon2-lon1)*Math.PI/180;
+  const p2=
+    lat2*Math.PI/180;
+
+  const dp=
+    (lat2-lat1)*Math.PI/180;
+
+  const dl=
+    (lng2-lng1)*Math.PI/180;
 
   const a=
     Math.sin(dp/2)**2+
-    Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
+    Math.cos(p1)*
+    Math.cos(p2)*
+    Math.sin(dl/2)**2;
 
-  return R*2*Math.atan2(
-    Math.sqrt(a),
-    Math.sqrt(1-a)
-  );
+  return R*
+    2*
+    Math.atan2(
+      Math.sqrt(a),
+      Math.sqrt(1-a)
+    );
+
 }
 
 
-function bearing(lat1,lon1,lat2,lon2){
+function getBearing(
+  lat1,
+  lng1,
+  lat2,
+  lng2
+){
 
-  const p1=lat1*Math.PI/180;
-  const p2=lat2*Math.PI/180;
+  const p1=
+    lat1*Math.PI/180;
 
-  const dl=(lon2-lon1)*Math.PI/180;
+  const p2=
+    lat2*Math.PI/180;
 
-  const y=Math.sin(dl)*Math.cos(p2);
+  const dl=
+    (lng2-lng1)*Math.PI/180;
+
+  const y=
+    Math.sin(dl)*
+    Math.cos(p2);
 
   const x=
-    Math.cos(p1)*Math.sin(p2)-
-    Math.sin(p1)*Math.cos(p2)*Math.cos(dl);
+    Math.cos(p1)*
+    Math.sin(p2)-
+    Math.sin(p1)*
+    Math.cos(p2)*
+    Math.cos(dl);
 
-  return (Math.atan2(y,x)*180/Math.PI+360)%360;
+  return (
+    Math.atan2(y,x)*
+    180/
+    Math.PI+
+    360
+  )%360;
+
 }
 
 
-function adiff(a,b){
+function angleDiff(a,b){
 
-  return ((a-b+540)%360)-180;
-}
+  return (
+    (a-b+540)%360
+  )-180;
 
-
-function clamp(v,min,max){
-
-  return Math.max(min,Math.min(max,v));
 }
 
 
 /* =========================================================
-   DETERMINISTIC HASH
-   ========================================================= */
+   GPS
+========================================================= */
 
-function hashString(str){
+function startGPS(){
+
+  if(!navigator.geolocation){
+
+    $("gpsStatus").innerHTML=
+      "GPS <b>n/a</b>";
+
+    return;
+  }
+
+
+  navigator.geolocation.watchPosition(
+
+    position=>{
+
+      const lat=
+        position.coords.latitude;
+
+      const lng=
+        position.coords.longitude;
+
+      const accuracy=
+        position.coords.accuracy ||
+        30;
+
+
+      if(userLat===null){
+
+        userLat=lat;
+        userLng=lng;
+
+      }else{
+
+        const move=
+          distance(
+            userLat,
+            userLng,
+            lat,
+            lng
+          );
+
+
+        if(
+          move>
+          Math.max(
+            100,
+            accuracy*5
+          )
+        ){
+
+          return;
+        }
+
+
+        let alpha=.05;
+
+        if(accuracy<=8){
+          alpha=.18;
+        }else if(accuracy<=20){
+          alpha=.10;
+        }
+
+
+        userLat +=
+          (lat-userLat)*alpha;
+
+        userLng +=
+          (lng-userLng)*alpha;
+
+      }
+
+
+      gpsAccuracy=accuracy;
+
+
+      $("gpsStatus").innerHTML=
+        `GPS <b>±${Math.round(accuracy)}m</b>`;
+
+
+      $("createLat").value=
+        userLat.toFixed(7);
+
+      $("createLng").value=
+        userLng.toFixed(7);
+
+
+      updateAR();
+
+      updateLists();
+
+    },
+
+    ()=>{
+      $("gpsStatus").innerHTML=
+        "GPS <b>icazə</b>";
+    },
+
+    {
+      enableHighAccuracy:true,
+      maximumAge:1000,
+      timeout:10000
+    }
+
+  );
+
+}
+
+
+/* =========================================================
+   COMPASS
+========================================================= */
+
+function startCompass(){
+
+  const handler=e=>{
+
+    let value=null;
+
+
+    if(
+      typeof e.webkitCompassHeading===
+      "number"
+    ){
+
+      value=
+        e.webkitCompassHeading;
+
+    }else if(
+      typeof e.alpha===
+      "number"
+    ){
+
+      value=
+        360-e.alpha;
+    }
+
+
+    if(
+      Number.isFinite(value)
+    ){
+
+      value=
+        (value+360)%360;
+
+
+      const diff=
+        angleDiff(
+          value,
+          heading
+        );
+
+
+      const alpha=
+        Math.abs(diff)>35
+        ? .18
+        : .08;
+
+
+      heading=
+        (heading+
+        diff*alpha+
+        360)%360;
+
+
+      $("compassStatus").innerHTML=
+        `${translations[currentLanguage].compass} <b>${Math.round(heading)}°</b>`;
+
+
+      updateAR();
+
+    }
+
+  };
+
+
+  window.addEventListener(
+    "deviceorientationabsolute",
+    handler,
+    true
+  );
+
+
+  window.addEventListener(
+    "deviceorientation",
+    handler,
+    true
+  );
+
+}
+
+
+/* =========================================================
+   CAMERA
+========================================================= */
+
+async function startCamera(){
+
+  if(
+    !navigator.mediaDevices ||
+    !navigator.mediaDevices.getUserMedia
+  ){
+
+    toast("Camera API unavailable.");
+    return;
+  }
+
+
+  try{
+
+    const stream=
+      await navigator.mediaDevices
+        .getUserMedia({
+
+          video:{
+            facingMode:{
+              ideal:"environment"
+            },
+            width:{
+              ideal:1280
+            },
+            height:{
+              ideal:720
+            }
+          },
+
+          audio:false
+
+        });
+
+
+    $("camera").srcObject=
+      stream;
+
+
+  }catch{
+
+    toast(
+      currentLanguage==="az"
+      ? "Kamera icazəsi verilmədi."
+      : "Camera permission was not granted."
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   MEDIA URL CACHE
+========================================================= */
+
+const mediaURLs=
+  new Map();
+
+
+function mediaURL(media){
+
+  if(!media || !media.blob){
+    return null;
+  }
+
+
+  if(
+    mediaURLs.has(media.id)
+  ){
+
+    return mediaURLs.get(
+      media.id
+    );
+
+  }
+
+
+  const url=
+    URL.createObjectURL(
+      media.blob
+    );
+
+
+  mediaURLs.set(
+    media.id,
+    url
+  );
+
+
+  return url;
+
+}
+
+
+/* =========================================================
+   OBJECT TYPE
+========================================================= */
+
+function typeLabel(type){
+
+  const labels={
+
+    business:"Business",
+    service:"Service",
+    car:"Vehicle",
+    building:"Building",
+    person:"Person",
+    place:"Place",
+    tourism:"Tourism",
+    event:"Event",
+    warning:"Warning",
+    information:"Information"
+
+  };
+
+  return labels[type] ||
+    "Spatial Object";
+
+}
+
+
+/* =========================================================
+   OBJECT MATCH
+========================================================= */
+
+function objectMatches(
+  obj,
+  query
+){
+
+  if(!query){
+    return true;
+  }
+
+
+  const text=[
+
+    obj.name,
+    obj.username,
+    obj.bio,
+    obj.article,
+    obj.type,
+    typeLabel(obj.type)
+
+  ]
+  .join(" ")
+  .toLowerCase();
+
+
+  return text.includes(
+    query.toLowerCase()
+  );
+
+}
+
+
+/* =========================================================
+   AR STATE
+========================================================= */
+
+const layoutState=
+  new Map();
+
+
+const pinnedState=
+  new Set();
+
+
+function objectHash(id){
 
   let h=2166136261;
 
-  for(let i=0;i<str.length;i++){
 
-    h^=str.charCodeAt(i);
+  for(
+    let i=0;
+    i<id.length;
+    i++
+  ){
 
-    h+=
+    h^=
+      id.charCodeAt(i);
+
+    h +=
       (h<<1)+
       (h<<4)+
       (h<<7)+
@@ -1856,1016 +3470,929 @@ function hashString(str){
 
   }
 
-  return Math.abs(h>>>0);
-}
 
+  return Math.abs(
+    h>>>0
+  );
 
-function seeded(obj){
-
-  const h=hashString(obj.id || obj.name || "object");
-
-  return {
-    a:(h%360),
-    b:((h>>>8)%360),
-    c:((h>>>16)%360)
-  };
 }
 
 
 /* =========================================================
-   GPS
-   ========================================================= */
+   TARGET POSITION
+========================================================= */
 
-function startGPS(){
+function projectTarget(
+  obj,
+  meters,
+  bearingValue
+){
 
-  if(!navigator.geolocation){
+  const layer=
+    $("arObjects");
 
-    $("gpsStatus").innerHTML =
-      'GPS <b>dəstəklənmir</b>';
 
-    return;
-  }
+  const w=
+    layer.clientWidth ||
+    window.innerWidth;
 
-  gpsWatch =
-    navigator.geolocation.watchPosition(
+  const h=
+    layer.clientHeight ||
+    window.innerHeight;
 
-      pos=>{
 
-        const lat=pos.coords.latitude;
-        const lng=pos.coords.longitude;
-
-        gpsAccuracy=pos.coords.accuracy || 30;
-
-        if(userLat===null){
-
-          userLat=lat;
-          userLng=lng;
-
-        }else{
-
-          const movement =
-            dist(userLat,userLng,lat,lng);
-
-          const maxJump =
-            Math.max(100,gpsAccuracy*5);
-
-          if(movement>maxJump){
-            return;
-          }
-
-          let alpha=.045;
-
-          if(gpsAccuracy<=8){
-            alpha=.18;
-          }else if(gpsAccuracy<=20){
-            alpha=.10;
-          }
-
-          userLat += (lat-userLat)*alpha;
-          userLng += (lng-userLng)*alpha;
-        }
-
-        $("gpsStatus").innerHTML =
-          `GPS <b>±${Math.round(gpsAccuracy)}m</b>`;
-
-        updateAR();
-        updateMapMe();
-
-      },
-
-      err=>{
-
-        $("gpsStatus").innerHTML =
-          'GPS <b>icazə lazımdır</b>';
-
-      },
-
-      {
-        enableHighAccuracy:true,
-        maximumAge:1000,
-        timeout:12000
-      }
-
+  const diff=
+    angleDiff(
+      bearingValue,
+      heading
     );
-}
 
-
-/* =========================================================
-   COMPASS
-   ========================================================= */
-
-function pushHeading(value){
-
-  if(!Number.isFinite(value)) return;
-
-  value=(value+360)%360;
-
-  if(headingSamples.length===0){
-
-    heading=value;
-
-  }else{
-
-    const difference=adiff(value,heading);
-
-    const alpha=
-      Math.abs(difference)>35
-      ? .18
-      : .075;
-
-    heading =
-      (heading+difference*alpha+360)%360;
-  }
-
-  headingSamples.push(value);
-
-  if(headingSamples.length>7){
-    headingSamples.shift();
-  }
-
-  $("compassStatus").innerHTML =
-    `Kompas <b>${Math.round(heading)}°</b>`;
-
-  updateAR();
-}
-
-
-function startCompass(){
-
-  function handler(e){
-
-    let value=null;
-
-    if(typeof e.webkitCompassHeading==="number"){
-
-      value=e.webkitCompassHeading;
-
-    }else if(
-      typeof e.alpha==="number"
-    ){
-
-      value=360-e.alpha;
-    }
-
-    if(Number.isFinite(value)){
-      pushHeading(value);
-    }
-  }
-
-  window.addEventListener(
-    "deviceorientationabsolute",
-    handler,
-    true
-  );
-
-  window.addEventListener(
-    "deviceorientation",
-    handler,
-    true
-  );
-}
-
-
-/* =========================================================
-   CAMERA
-   ========================================================= */
-
-async function startCamera(){
-
-  if(!navigator.mediaDevices?.getUserMedia){
-
-    toast("Bu brauzerdə kamera dəstəyi yoxdur.");
-    return;
-  }
-
-  try{
-
-    cameraStream =
-      await navigator.mediaDevices.getUserMedia({
-
-        video:{
-          facingMode:{
-            ideal:"environment"
-          },
-          width:{
-            ideal:1280
-          },
-          height:{
-            ideal:720
-          }
-        },
-
-        audio:false
-
-      });
-
-    $("camera").srcObject=cameraStream;
-
-  }catch(err){
-
-    toast("Kameraya icazə verilmədi.");
-
-  }
-}
-
-
-/* =========================================================
-   OBJECT MATCHING
-   ========================================================= */
-
-function objectMatches(obj,query){
-
-  if(!query) return true;
-
-  query=query.toLowerCase();
-
-  return [
-
-    obj.name,
-    obj.username,
-    obj.bio,
-    obj.article,
-    obj.type,
-    typeName(obj.type)
-
-  ].join(" ")
-   .toLowerCase()
-   .includes(query);
-}
-
-
-/* =========================================================
-   AR TARGET PROJECTION
-   ========================================================= */
-
-function projectTarget(obj,distance,bearingValue){
-
-  const layer=$("arObjects");
-
-  const w=layer.clientWidth || window.innerWidth;
-  const h=layer.clientHeight || window.innerHeight;
-
-  const diff=adiff(bearingValue,heading);
 
   /*
-    Horizontal field:
-    -82° ... +82°
+    Real direction -> horizontal.
   */
 
-  let x =
-    w*.50+
-    (diff/82)*(w*.42);
+  const x=
+    w*.5+
+    (diff/86)*
+    (w*.42);
+
 
   /*
-    Near = lower/front
-    Far = upper/back
+    Distance -> depth illusion.
   */
 
-  const radius =
-    Math.max(obj.radius || 300,50);
+  const radius=
+    Math.max(
+      Number(obj.radius)||300,
+      50
+    );
 
-  const depth =
-    clamp(distance/radius,0,1);
 
-  let y =
+  const depth=
+    clamp(
+      meters/radius,
+      0,
+      1
+    );
+
+
+  const y=
     h*.40+
-    depth*h*.20;
+    depth*h*.22;
+
 
   return {
     x,
     y,
-    diff,
-    w,
-    h
+    diff
   };
+
 }
 
 
 /* =========================================================
-   RECTANGLE COLLISION
-   ========================================================= */
+   CARD RECT
+========================================================= */
 
-function rectFor(card,x,y){
+function rect(
+  card,
+  x,
+  y
+){
 
-  const width=card.offsetWidth || 280;
-  const height=card.offsetHeight || 120;
+  const w=
+    card.offsetWidth ||
+    290;
+
+  const h=
+    card.offsetHeight ||
+    120;
+
 
   return {
-    left:x-width/2,
-    right:x+width/2,
-    top:y-height/2,
-    bottom:y+height/2,
-    width,
-    height
+
+    left:x-w/2,
+    right:x+w/2,
+    top:y-h/2,
+    bottom:y+h/2,
+
+    width:w,
+    height:h
+
   };
+
 }
 
 
-function overlapAmount(a,b){
+function overlap(
+  a,
+  b
+){
 
-  const x =
+  const x=
     Math.max(
       0,
-      Math.min(a.right,b.right)-
-      Math.max(a.left,b.left)
+      Math.min(
+        a.right,
+        b.right
+      )-
+      Math.max(
+        a.left,
+        b.left
+      )
     );
 
-  const y =
+
+  const y=
     Math.max(
       0,
-      Math.min(a.bottom,b.bottom)-
-      Math.max(a.top,b.top)
+      Math.min(
+        a.bottom,
+        b.bottom
+      )-
+      Math.max(
+        a.top,
+        b.top
+      )
     );
+
 
   return x*y;
-}
 
-
-function overlapRatio(a,b){
-
-  const area=overlapAmount(a,b);
-
-  if(!area) return 0;
-
-  const minArea =
-    Math.min(
-      a.width*a.height,
-      b.width*b.height
-    );
-
-  return minArea
-    ? area/minArea
-    : 0;
 }
 
 
 /* =========================================================
    SAFE POSITION
-   ========================================================= */
+========================================================= */
 
-function clampPosition(card,x,y){
+function safePosition(
+  card,
+  x,
+  y
+){
 
-  const layer=$("arObjects");
+  const layer=
+    $("arObjects");
 
-  const w=layer.clientWidth || innerWidth;
-  const h=layer.clientHeight || innerHeight;
 
-  const cw=card.offsetWidth || 280;
-  const ch=card.offsetHeight || 120;
+  const W=
+    layer.clientWidth ||
+    innerWidth;
 
-  const marginX=8;
-  const topSafe=70;
-  const bottomSafe=75;
+  const H=
+    layer.clientHeight ||
+    innerHeight;
+
+
+  const cw=
+    card.offsetWidth ||
+    290;
+
+  const ch=
+    card.offsetHeight ||
+    120;
+
 
   return {
+
     x:clamp(
       x,
-      cw/2+marginX,
-      w-cw/2-marginX
+      cw/2+7,
+      W-cw/2-7
     ),
 
     y:clamp(
       y,
-      ch/2+topSafe,
-      h-ch/2-bottomSafe
+      ch/2+72,
+      H-ch/2-78
     )
+
   };
+
 }
 
 
 /* =========================================================
-   CANDIDATE POSITIONS
-   ========================================================= */
+   CANDIDATES
+========================================================= */
 
-function getCandidates(obj,target,card,index,total){
+function candidates(
+  obj,
+  target
+){
 
-  const s=seeded(obj);
+  const h=
+    objectHash(
+      obj.id
+    );
 
-  const candidates=[];
 
-  /*
-    First position is always the true spatial target.
-  */
-
-  candidates.push({
-    x:target.x,
-    y:target.y,
-    penalty:0,
-    slot:0
-  });
-
-  /*
-    Deterministic fan.
-    Same object keeps approximately the same
-    preferred side, which reduces jitter.
-  */
-
-  const direction =
-    s.a%2===0
+  const side=
+    h%2
     ? 1
     : -1;
 
-  const base =
-    52+
-    (s.b%45);
 
-  const vertical =
-    ((s.c%5)-2)*16;
+  const seed=
+    (h>>>8)%5;
+
+
+  const vertical=
+    (seed-2)*15;
+
 
   const offsets=[
 
-    [direction*base,vertical],
+    [0,0],
 
-    [-direction*base,vertical],
+    [side*52,vertical],
 
-    [direction*(base+65),vertical-38],
+    [-side*52,vertical],
 
-    [-direction*(base+65),vertical-38],
+    [side*92,vertical-36],
 
-    [direction*(base+92),vertical+42],
+    [-side*92,vertical-36],
 
-    [-direction*(base+92),vertical+42],
+    [side*125,vertical+40],
 
-    [0,-72],
+    [-side*125,vertical+40],
 
-    [0,72],
+    [0,-74],
 
-    [direction*125,0],
+    [0,74],
 
-    [-direction*125,0],
+    [side*155,-68],
 
-    [direction*155,-65],
+    [-side*155,-68],
 
-    [-direction*155,-65],
+    [side*155,68],
 
-    [direction*155,65],
+    [-side*155,68],
 
-    [-direction*155,65],
+    [side*205,0],
 
-    [direction*205,0],
+    [-side*205,0],
 
-    [-direction*205,0]
+    [side*230,-95],
+
+    [-side*230,-95],
+
+    [side*230,95],
+
+    [-side*230,95]
 
   ];
 
-  offsets.forEach((o,i)=>{
 
-    candidates.push({
+  return offsets.map(
+    (offset,index)=>({
 
-      x:target.x+o[0],
-      y:target.y+o[1],
+      x:
+        target.x+
+        offset[0],
 
-      /*
-        Slight penalty for moving away from
-        the actual spatial point.
-      */
+      y:
+        target.y+
+        offset[1],
 
-      penalty:
-        Math.hypot(o[0],o[1])*.55,
+      slot:index,
 
-      slot:i+1
+      move:
+        Math.hypot(
+          offset[0],
+          offset[1]
+        )
 
-    });
+    })
+  );
 
-  });
-
-  /*
-    If many objects share similar bearing,
-    create extra fan positions.
-  */
-
-  const fan=[
-    [-190,-105],
-    [-140,-75],
-    [-90,-45],
-    [90,-45],
-    [140,-75],
-    [190,-105],
-    [-190,105],
-    [-140,75],
-    [-90,45],
-    [90,45],
-    [140,75],
-    [190,105]
-  ];
-
-  fan.forEach((o,i)=>{
-
-    candidates.push({
-
-      x:target.x+o[0],
-      y:target.y+o[1],
-
-      penalty:
-        Math.hypot(o[0],o[1])*.68,
-
-      slot:30+i
-
-    });
-
-  });
-
-  return candidates;
 }
 
 
 /* =========================================================
-   GLOBAL SPATIAL LAYOUT
-   ========================================================= */
+   LAYOUT ENGINE
+========================================================= */
 
-function calculateLayout(items){
-
-  const layer=$("arObjects");
-
-  if(!layer) return;
+function calculateLayout(
+  items
+){
 
   /*
-    Important:
-    nearest objects are placed first.
-    This gives them visual priority.
+    Closest objects first.
   */
 
-  items.sort((a,b)=>a.distance-b.distance);
+  items.sort(
+    (a,b)=>
+      a.distance-
+      b.distance
+  );
+
 
   const placed=[];
 
-  for(let index=0;index<items.length;index++){
 
-    const item=items[index];
+  for(
+    const item of items
+  ){
 
-    const card=item.card;
+    const card=
+      item.card;
 
-    const target=item.target;
 
-    const candidates=
-      getCandidates(
-        item.obj,
-        target,
-        card,
-        index,
-        items.length
+    const old=
+      layoutState.get(
+        item.obj.id
       );
 
-    const previous=
-      layoutState.get(item.obj.id);
+
+    const list=
+      candidates(
+        item.obj,
+        item.target
+      );
+
 
     let best=null;
 
-    for(const candidate of candidates){
+
+    for(
+      const candidate of list
+    ){
 
       const safe=
-        clampPosition(
+        safePosition(
           card,
           candidate.x,
           candidate.y
         );
 
-      const rect=
-        rectFor(
+
+      const r=
+        rect(
           card,
           safe.x,
           safe.y
         );
 
+
       let score=
-        candidate.penalty;
+        candidate.move*.55;
+
 
       /*
-        Strong collision penalty.
+        Collision penalty.
       */
 
-      for(const other of placed){
+      for(
+        const p of placed
+      ){
 
-        const ratio=
-          overlapRatio(
-            rect,
-            other.rect
+        const amount=
+          overlap(
+            r,
+            p.rect
           );
 
-        if(ratio>0){
 
-          score +=
+        if(amount>0){
+
+          score+=
             7000+
-            ratio*18000;
+            amount*2.8;
+
         }
 
       }
 
-      /*
-        Edge penalty.
-      */
-
-      const layerW=
-        layer.clientWidth || innerWidth;
-
-      const layerH=
-        layer.clientHeight || innerHeight;
-
-      const edgeX=
-        Math.min(
-          safe.x,
-          layerW-safe.x
-        );
-
-      const edgeY=
-        Math.min(
-          safe.y,
-          layerH-safe.y
-        );
-
-      if(edgeX<45){
-        score+=400;
-      }
-
-      if(edgeY<80){
-        score+=300;
-      }
 
       /*
-        Keep the existing slot stable.
+        Keep existing slot stable.
       */
 
       if(
-        previous &&
-        previous.slot===candidate.slot
+        old &&
+        old.slot===
+        candidate.slot
       ){
-        score-=450;
+
+        score-=550;
+
       }
 
-      /*
-        Small deterministic preference.
-      */
 
-      const seedValue=
-        hashString(
-          item.obj.id+
-          ":"+
-          candidate.slot
-        )%100;
+      if(
+        old &&
+        old.pinned
+      ){
 
-      score+=seedValue*.04;
-
-      if(!best || score<best.score){
-
-        best={
-          ...candidate,
-          x:safe.x,
-          y:safe.y,
-          rect,
-          score
-        };
-      }
-    }
-
-    /*
-      If previous layout is still good,
-      preserve it unless the new one is
-      significantly better.
-    */
-
-    if(previous){
-
-      const previousSafe=
-        clampPosition(
-          card,
-          previous.x,
-          previous.y
-        );
-
-      const previousRect=
-        rectFor(
-          card,
-          previousSafe.x,
-          previousSafe.y
-        );
-
-      let oldScore=0;
-
-      for(const other of placed){
-
-        const ratio=
-          overlapRatio(
-            previousRect,
-            other.rect
+        const oldSafe=
+          safePosition(
+            card,
+            old.x,
+            old.y
           );
 
-        oldScore+=ratio*18000;
+
+        const oldRect=
+          rect(
+            card,
+            oldSafe.x,
+            oldSafe.y
+          );
+
+
+        let oldCollision=0;
+
+
+        for(
+          const p of placed
+        ){
+
+          oldCollision+=
+            overlap(
+              oldRect,
+              p.rect
+            );
+
+        }
+
+
+        if(
+          oldCollision<100
+        ){
+
+          best={
+            x:oldSafe.x,
+            y:oldSafe.y,
+            slot:old.slot,
+            rect:oldRect
+          };
+
+          break;
+        }
 
       }
 
-      const newScore=best.score;
 
       if(
-        previous.slot!==undefined &&
-        oldScore<newScore+850
+        !best ||
+        score<best.score
       ){
 
         best={
-          x:previousSafe.x,
-          y:previousSafe.y,
-          slot:previous.slot,
-          rect:previousRect
+          x:safe.x,
+          y:safe.y,
+          slot:candidate.slot,
+          rect:r,
+          score
         };
+
       }
+
     }
+
+
+    if(!best) continue;
+
+
+    const state={
+      x:best.x,
+      y:best.y,
+      slot:best.slot,
+      pinned:
+        pinnedState.has(
+          item.obj.id
+        )
+    };
+
+
+    if(old){
+
+      state.renderX=
+        old.renderX ??
+        old.x;
+
+      state.renderY=
+        old.renderY ??
+        old.y;
+
+    }else{
+
+      state.renderX=
+        best.x;
+
+      state.renderY=
+        best.y;
+
+    }
+
 
     layoutState.set(
       item.obj.id,
-      {
-        x:best.x,
-        y:best.y,
-        slot:best.slot,
-        last:performance.now()
-      }
+      state
     );
 
+
     placed.push({
+
       id:item.obj.id,
       rect:best.rect
+
     });
 
-    item.layout=best;
+
+    item.layout=
+      best;
+
   }
+
 }
 
 
 /* =========================================================
-   AR CARD
-   ========================================================= */
+   AR CARD CREATOR
+========================================================= */
 
-function makeARCard(obj){
+function createARCard(
+  obj
+){
 
-  const card=document.createElement("div");
+  const card=
+    document.createElement(
+      "div"
+    );
 
-  card.className="arCard";
 
-  card.dataset.id=obj.id;
+  card.className=
+    "arCard";
+
+
+  card.dataset.id=
+    obj.id;
+
 
   card.innerHTML=`
 
-    <div class="arCardInner">
+    <div class="arCardGrid">
 
       <div class="arMedia">
-        ${typeIcon(obj.type)}
+        AW
       </div>
 
-      <div class="arContent">
+      <div class="arInfo">
 
-        <div class="arTitle"></div>
+        <div class="arName"></div>
 
-        <div class="arType"></div>
+        <div class="arUser"></div>
 
-        <div class="arText"></div>
+        <div class="arDescription"></div>
 
-        <div class="arMeta"></div>
+        <div class="arBottom">
 
-        <button class="arOpen">
-          PROFİLƏ BAX →
-        </button>
+          <div class="arDistance"></div>
+
+          <button
+            class="arOpen">
+            OPEN
+          </button>
+
+        </div>
 
       </div>
 
     </div>
+
   `;
+
 
   card.addEventListener(
     "click",
     e=>{
 
-      e.stopPropagation();
+      if(
+        e.target.closest(
+          ".arOpen"
+        ) ||
+        e.target===card
+      ){
 
-      const found=
-        objects.find(x=>x.id===obj.id);
+        const found=
+          objects.find(
+            x=>x.id===obj.id
+          );
 
-      if(found){
-        openDetail(found);
+        if(found){
+          openDetail(found);
+        }
+
       }
+
     }
   );
 
 
   /*
-    Long press = temporarily pin card.
-    This gives the user the feeling of
-    physically "holding" one floating profile.
+    Long press = hold / pin.
   */
 
-  let pressTimer=null;
+  let timer=null;
+
 
   card.addEventListener(
     "pointerdown",
     ()=>{
 
-      pressTimer=
-        setTimeout(()=>{
+      timer=
+        setTimeout(
+          ()=>{
 
-          card.classList.toggle("pinned");
+            if(
+              pinnedState.has(
+                obj.id
+              )
+            ){
 
-          const state=
-            layoutState.get(obj.id);
+              pinnedState.delete(
+                obj.id
+              );
 
-          if(state){
-            state.pinned=
-              card.classList.contains("pinned");
+              card.classList.remove(
+                "pinned"
+              );
 
-            layoutState.set(
-              obj.id,
-              state
-            );
-          }
+              toast(
+                currentLanguage==="az"
+                ? "Profil sərbəst buraxıldı."
+                : "Profile released."
+              );
 
-          toast(
-            card.classList.contains("pinned")
-            ? "Profil sabitlənib"
-            : "Profil sərbəst buraxıldı"
-          );
+            }else{
 
-        },520);
+              pinnedState.add(
+                obj.id
+              );
+
+              card.classList.add(
+                "pinned"
+              );
+
+              toast(
+                currentLanguage==="az"
+                ? "Profil havada sabitləndi."
+                : "Profile pinned in space."
+              );
+
+            }
+
+
+            const s=
+              layoutState.get(
+                obj.id
+              );
+
+            if(s){
+
+              s.pinned=
+                pinnedState.has(
+                  obj.id
+                );
+
+            }
+
+          },
+          520
+        );
+
     }
   );
 
-  card.addEventListener(
+
+  [
     "pointerup",
-    ()=>{
-      clearTimeout(pressTimer);
+    "pointercancel",
+    "pointerleave"
+  ]
+  .forEach(
+    event=>{
+      card.addEventListener(
+        event,
+        ()=>{
+          clearTimeout(timer);
+        }
+      );
     }
   );
 
-  card.addEventListener(
-    "pointercancel",
-    ()=>{
-      clearTimeout(pressTimer);
-    }
-  );
 
   return card;
+
 }
 
 
 /* =========================================================
-   MEDIA URL
-   ========================================================= */
+   UPDATE CARD
+========================================================= */
 
-function getMediaURL(media){
+function updateCard(
+  card,
+  obj,
+  meters
+){
 
-  if(!media?.blob){
-    return null;
-  }
-
-  if(mediaURLCache.has(media.id)){
-    return mediaURLCache.get(media.id);
-  }
-
-  const url=
-    URL.createObjectURL(media.blob);
-
-  mediaURLCache.set(
-    media.id,
-    url
+  card.classList.toggle(
+    "large",
+    obj.size==="large" ||
+    obj.size==="building"
   );
 
-  return url;
-}
+
+  card.querySelector(
+    ".arName"
+  ).textContent=
+    obj.name ||
+    "Spatial Object";
 
 
-/* =========================================================
-   UPDATE CARD CONTENT
-   ========================================================= */
+  card.querySelector(
+    ".arUser"
+  ).textContent=
+    obj.username ||
+    "@arworld";
 
-function updateCardContent(card,obj,distance){
 
-  card.querySelector(".arTitle")
-    .textContent=obj.name || "Adsız obyekt";
+  card.querySelector(
+    ".arDescription"
+  ).textContent=
+    obj.bio ||
+    obj.article ||
+    "Spatial information";
 
-  card.querySelector(".arType")
-    .textContent=typeName(obj.type);
-
-  card.querySelector(".arText")
-    .textContent=
-      obj.bio ||
-      obj.article ||
-      "Məkan profili";
 
   const b=
-    bearing(
+    getBearing(
       userLat,
       userLng,
       obj.lat,
       obj.lng
     );
 
-  card.querySelector(".arMeta")
-    .textContent=
-      `${Math.round(distance)} m · ${Math.round(b)}°`;
 
-  const mediaEl=
-    card.querySelector(".arMedia");
+  card.querySelector(
+    ".arDistance"
+  ).textContent=
+    `${Math.round(meters)} m · ${Math.round(b)}°`;
 
-  const first=
+
+  const media=
     obj.media?.[0];
 
-  if(first?.blob){
+
+  const mediaBox=
+    card.querySelector(
+      ".arMedia"
+    );
+
+
+  if(media?.blob){
 
     const url=
-      getMediaURL(first);
+      mediaURL(media);
+
 
     if(
-      first.type?.startsWith("video/")
+      media.type?.startsWith(
+        "video/"
+      )
     ){
 
       if(
-        mediaEl.dataset.mediaId!==first.id
+        mediaBox.dataset.id!==media.id
       ){
 
-        mediaEl.innerHTML=
-          `<video muted playsinline></video>`;
+        mediaBox.innerHTML=
+          `<video
+             muted
+             autoplay
+             loop
+             playsinline>
+           </video>`;
 
-        const v=
-          mediaEl.querySelector("video");
 
-        v.src=url;
-        v.muted=true;
-        v.playsInline=true;
-        v.loop=true;
-        v.autoplay=true;
+        const video=
+          mediaBox.querySelector(
+            "video"
+          );
 
-        mediaEl.dataset.mediaId=
-          first.id;
+
+        video.src=url;
+
+
+        mediaBox.dataset.id=
+          media.id;
+
       }
 
     }else{
 
       if(
-        mediaEl.dataset.mediaId!==first.id
+        mediaBox.dataset.id!==media.id
       ){
 
-        mediaEl.innerHTML=
+        mediaBox.innerHTML=
           `<img alt="">`;
 
-        mediaEl.querySelector("img").src=url;
 
-        mediaEl.dataset.mediaId=
-          first.id;
+        mediaBox.querySelector(
+          "img"
+        ).src=url;
+
+
+        mediaBox.dataset.id=
+          media.id;
+
       }
 
     }
 
   }else{
 
-    if(!mediaEl.dataset.mediaId){
+    mediaBox.innerHTML="AW";
 
-      mediaEl.innerHTML=
-        typeIcon(obj.type);
-    }
+    delete mediaBox.dataset.id;
 
   }
+
 }
 
 
 /* =========================================================
-   CONNECTION LINE
-   ========================================================= */
+   LINE
+========================================================= */
 
-function updateConnection(
-  obj,
+function updateLine(
+  id,
   target,
   position
 ){
 
-  const lines=$("arLines");
+  const lines=
+    $("arLines");
+
 
   let line=
     lines.querySelector(
-      `[data-line="${obj.id}"]`
+      `.arConnection[data-id="${CSS.escape(id)}"]`
     );
+
 
   if(!line){
 
-    line=document.createElement("div");
+    line=
+      document.createElement(
+        "div"
+      );
 
-    line.className="arConnection";
+    line.className=
+      "arConnection";
 
-    line.dataset.line=obj.id;
+    line.dataset.id=
+      id;
 
     lines.appendChild(line);
+
   }
+
 
   const dx=
-    position.x-target.x;
+    position.x-
+    target.x;
 
   const dy=
-    position.y-target.y;
+    position.y-
+    target.y;
 
-  const length=
-    Math.sqrt(dx*dx+dy*dy);
 
-  if(length<8){
+  const len=
+    Math.hypot(
+      dx,
+      dy
+    );
 
-    line.style.display="none";
+
+  if(len<7){
+
+    line.style.display=
+      "none";
+
     return;
+
   }
 
-  line.style.display="block";
+
+  line.style.display=
+    "block";
 
   line.style.left=
     target.x+"px";
@@ -2874,53 +4401,50 @@ function updateConnection(
     target.y+"px";
 
   line.style.width=
-    length+"px";
+    len+"px";
 
   line.style.transform=
     `rotate(${Math.atan2(dy,dx)*180/Math.PI}deg)`;
-
-  /*
-    Very far offsets get softer.
-  */
-
-  line.style.opacity=
-    String(
-      clamp(
-        .78-length/700,
-        .18,
-        .72
-      )
-    );
 
 }
 
 
 /* =========================================================
-   ANCHOR DOT
-   ========================================================= */
+   DOT
+========================================================= */
 
-function updateAnchorDot(
-  obj,
+function updateDot(
+  id,
   target
 ){
 
-  const lines=$("arLines");
+  const lines=
+    $("arLines");
+
 
   let dot=
     lines.querySelector(
-      `[data-dot="${obj.id}"]`
+      `.arDot[data-id="${CSS.escape(id)}"]`
     );
+
 
   if(!dot){
 
-    dot=document.createElement("div");
+    dot=
+      document.createElement(
+        "div"
+      );
 
-    dot.className="arAnchorDot";
+    dot.className=
+      "arDot";
 
-    dot.dataset.dot=obj.id;
+    dot.dataset.id=
+      id;
 
     lines.appendChild(dot);
+
   }
+
 
   dot.style.left=
     target.x+"px";
@@ -2932,86 +4456,114 @@ function updateAnchorDot(
 
 
 /* =========================================================
-   EDGE INDICATOR
-   ========================================================= */
+   EDGE
+========================================================= */
 
-function makeEdge(obj){
+function createEdge(
+  obj
+){
 
-  const el=document.createElement("div");
+  const el=
+    document.createElement(
+      "div"
+    );
 
-  el.className="arEdge";
 
-  el.dataset.edge=obj.id;
+  el.className=
+    "arEdge";
+
+
+  el.dataset.id=
+    obj.id;
+
 
   el.innerHTML=`
-    <b>↗</b>
+    <strong>→</strong>
     <div></div>
   `;
 
+
   el.addEventListener(
     "click",
-    e=>{
-
-      e.stopPropagation();
-
+    ()=>{
       openDetail(obj);
     }
   );
 
+
   return el;
+
 }
 
 
 function updateEdge(
   edge,
   obj,
-  distance,
+  meters,
   diff
 ){
 
-  const layer=$("arObjects");
+  const layer=
+    $("arObjects");
+
 
   const w=
-    layer.clientWidth || innerWidth;
+    layer.clientWidth ||
+    innerWidth;
 
   const h=
-    layer.clientHeight || innerHeight;
+    layer.clientHeight ||
+    innerHeight;
 
-  let x=
-    diff<0
-    ? 45
-    : w-45;
 
-  let y=
-    h*.40+
+  const left=
+    diff<0;
+
+
+  edge.style.left=
+    (
+      left
+      ? 67
+      : w-67
+    )+"px";
+
+
+  edge.style.top=
     clamp(
-      distance/Math.max(obj.radius,1),
-      0,
-      1
-    )*h*.20;
+      h*.40+
+      Math.min(
+        1,
+        meters/
+        Math.max(
+          obj.radius||300,
+          50
+        )
+      )*
+      h*.20,
+      120,
+      h-150
+    )+"px";
 
-  y=clamp(y,100,h-130);
 
-  edge.style.left=x+"px";
-  edge.style.top=y+"px";
-
-  const arrow=
-    diff<0
+  edge.querySelector(
+    "strong"
+  ).textContent=
+    left
     ? "←"
     : "→";
 
-  edge.querySelector("b")
-    .textContent=arrow;
 
-  edge.querySelector("div")
-    .textContent=
-      `${obj.name} · ${Math.round(distance)}m`;
+  edge.querySelector(
+    "div"
+  ).textContent=
+    `${obj.name} · ${Math.round(meters)}m`;
+
 }
 
 
 /* =========================================================
-   MAIN AR UPDATE
-   ========================================================= */
+   MAIN AR
+========================================================= */
 
 function updateAR(){
 
@@ -3021,46 +4573,72 @@ function updateAR(){
   ){
 
     $("scanInfo").textContent=
-      "GPS gözlənilir...";
+      "GPS...";
 
     return;
+
   }
 
-  const layer=$("arObjects");
-  const lines=$("arLines");
+
+  const layer=
+    $("arObjects");
+
 
   const query=
-    $("arSearch").value.trim();
+    $("globalSearch")
+      .value
+      .trim();
 
-  const candidates=[];
-  const visibleIds=new Set();
 
-  const edgeObjects=[];
+  const items=[];
 
-  for(const obj of objects){
+  const visible=
+    new Set();
 
-    if(obj.public===false){
-      continue;
-    }
+  const edges=[];
 
-    if(!objectMatches(obj,query)){
-      continue;
-    }
+
+  for(
+    const obj of objects
+  ){
 
     if(
-      !Number.isFinite(obj.lat) ||
-      !Number.isFinite(obj.lng)
+      obj.public===false
     ){
       continue;
     }
 
-    const distance=
-      dist(
+
+    if(
+      !objectMatches(
+        obj,
+        query
+      )
+    ){
+      continue;
+    }
+
+
+    if(
+      !Number.isFinite(
+        Number(obj.lat)
+      ) ||
+      !Number.isFinite(
+        Number(obj.lng)
+      )
+    ){
+      continue;
+    }
+
+
+    const meters=
+      distance(
         userLat,
         userLng,
-        obj.lat,
-        obj.lng
+        Number(obj.lat),
+        Number(obj.lng)
       );
+
 
     const radius=
       Math.max(
@@ -3068,532 +4646,1094 @@ function updateAR(){
         30
       );
 
-    if(distance>radius){
+
+    if(
+      meters>radius
+    ){
       continue;
     }
 
-    const targetBearing=
-      bearing(
+
+    const b=
+      getBearing(
         userLat,
         userLng,
-        obj.lat,
-        obj.lng
+        Number(obj.lat),
+        Number(obj.lng)
       );
 
-    const diff=
-      adiff(
-        targetBearing,
-        heading
-      );
-
-    /*
-      Main camera field.
-      Objects outside are shown as
-      edge indicators rather than simply
-      disappearing.
-    */
-
-    if(Math.abs(diff)>88){
-
-      edgeObjects.push({
-        obj,
-        distance,
-        diff
-      });
-
-      continue;
-    }
-
-    let card=
-      layer.querySelector(
-        `.arCard[data-id="${obj.id}"]`
-      );
-
-    if(!card){
-
-      card=makeARCard(obj);
-
-      layer.appendChild(card);
-    }
-
-    card.classList.toggle(
-      "big",
-      obj.size==="building"
-    );
-
-    updateCardContent(
-      card,
-      obj,
-      distance
-    );
 
     const target=
       projectTarget(
         obj,
-        distance,
-        targetBearing
+        meters,
+        b
       );
 
-    candidates.push({
+
+    /*
+      Keep nearby objects in main view.
+    */
+
+    if(
+      Math.abs(
+        target.diff
+      )>88
+    ){
+
+      edges.push({
+        obj,
+        meters,
+        diff:target.diff
+      });
+
+      continue;
+
+    }
+
+
+    let card=
+      layer.querySelector(
+        `.arCard[data-id="${CSS.escape(obj.id)}"]`
+      );
+
+
+    if(!card){
+
+      card=
+        createARCard(obj);
+
+      layer.appendChild(card);
+
+    }
+
+
+    updateCard(
+      card,
+      obj,
+      meters
+    );
+
+
+    items.push({
+
       obj,
       card,
-      distance,
-      bearing:targetBearing,
+      distance:meters,
       target
+
     });
 
-    visibleIds.add(obj.id);
+
+    visible.add(
+      obj.id
+    );
+
   }
 
 
   /*
-    Remove old edge indicators.
+    Edge indicators.
   */
 
   layer
-    .querySelectorAll(".arEdge")
-    .forEach(el=>{
+    .querySelectorAll(
+      ".arEdge"
+    )
+    .forEach(
+      edge=>{
+
+        if(
+          !edges.some(
+            e=>
+              e.obj.id===
+              edge.dataset.id
+          )
+        ){
+
+          edge.remove();
+
+        }
+
+      }
+    );
+
+
+  edges
+    .sort(
+      (a,b)=>
+        a.meters-
+        b.meters
+    )
+    .slice(0,7)
+    .forEach(
+      item=>{
+
+        let edge=
+          layer.querySelector(
+            `.arEdge[data-id="${CSS.escape(item.obj.id)}"]`
+          );
+
+
+        if(!edge){
+
+          edge=
+            createEdge(
+              item.obj
+            );
+
+          layer.appendChild(
+            edge
+          );
+
+        }
+
+
+        updateEdge(
+          edge,
+          item.obj,
+          item.meters,
+          item.diff
+        );
+
+      }
+    );
+
+
+  /*
+    Spatial collision engine.
+  */
+
+  calculateLayout(
+    items
+  );
+
+
+  /*
+    Render positions.
+  */
+
+  items.forEach(
+    item=>{
+
+      const state=
+        layoutState.get(
+          item.obj.id
+        );
+
+
+      if(!state) return;
+
+
+      const pinned=
+        pinnedState.has(
+          item.obj.id
+        );
+
 
       if(
-        !edgeObjects.some(
-          x=>x.obj.id===el.dataset.edge
-        )
+        state.renderX===
+        undefined
       ){
 
-        el.remove();
-      }
-    });
+        state.renderX=
+          state.x;
 
+        state.renderY=
+          state.y;
 
-  /*
-    Show nearest off-screen objects.
-  */
-
-  edgeObjects
-    .sort((a,b)=>a.distance-b.distance)
-    .slice(0,7)
-    .forEach(item=>{
-
-      let edge=
-        layer.querySelector(
-          `.arEdge[data-edge="${item.obj.id}"]`
-        );
-
-      if(!edge){
-
-        edge=makeEdge(item.obj);
-
-        layer.appendChild(edge);
       }
 
-      updateEdge(
-        edge,
-        item.obj,
-        item.distance,
-        item.diff
-      );
-    });
-
-
-  /*
-    Collision layout.
-  */
-
-  calculateLayout(candidates);
-
-
-  /*
-    Render cards.
-  */
-
-  candidates.forEach(item=>{
-
-    const state=
-      layoutState.get(item.obj.id);
-
-    if(!state) return;
-
-    const card=item.card;
-
-    /*
-      Smooth movement.
-      Pinned cards don't move with collision layout.
-    */
-
-    const isPinned=
-      state.pinned ||
-      card.classList.contains("pinned");
-
-    if(!state.renderX){
-
-      state.renderX=state.x;
-      state.renderY=state.y;
-
-    }else{
 
       const smooth=
-        isPinned
-        ? .02
+        pinned
+        ? .035
         : .16;
 
+
       state.renderX +=
-        (state.x-state.renderX)*smooth;
+        (
+          state.x-
+          state.renderX
+        )*
+        smooth;
+
 
       state.renderY +=
-        (state.y-state.renderY)*smooth;
-    }
+        (
+          state.y-
+          state.renderY
+        )*
+        smooth;
 
 
-    /*
-      Perspective.
-      Near = slightly bigger.
-      Far = slightly smaller.
-    */
-
-    const radius=
-      Math.max(
-        Number(item.obj.radius)||300,
-        50
-      );
-
-    const depth=
-      clamp(
-        item.distance/radius,
-        0,
-        1
-      );
-
-    const scale=
-      clamp(
-        1.05-depth*.18,
-        .86,
-        1.06
-      );
-
-    card.style.setProperty(
-      "--arScale",
-      scale
-    );
-
-    card.style.left=
-      state.renderX+"px";
-
-    card.style.top=
-      state.renderY+"px";
+      const radius=
+        Math.max(
+          Number(item.obj.radius)||300,
+          50
+        );
 
 
-    /*
-      Nearer objects are visually in front.
-    */
-
-    card.style.zIndex=
-      String(
-        Math.round(
-          10000-
-          item.distance*4
-        )
-      );
-
-
-    /*
-      Slight opacity difference only.
-    */
-
-    card.style.opacity=
-      String(
+      const depth=
         clamp(
-          1-depth*.22,
-          .72,
+          item.distance/radius,
+          0,
           1
-        )
+        );
+
+
+      const scale=
+        clamp(
+          1.06-
+          depth*.19,
+          .86,
+          1.06
+        );
+
+
+      item.card.style.setProperty(
+        "--scale",
+        scale
       );
 
 
-    updateConnection(
-      item.obj,
-      item.target,
-      {
-        x:state.renderX,
-        y:state.renderY
-      }
-    );
+      item.card.style.left=
+        state.renderX+
+        "px";
 
-    updateAnchorDot(
-      item.obj,
-      item.target
-    );
 
-  });
+      item.card.style.top=
+        state.renderY+
+        "px";
+
+
+      item.card.style.zIndex=
+        String(
+          Math.round(
+            10000-
+            item.distance*5
+          )
+        );
+
+
+      item.card.style.opacity=
+        String(
+          clamp(
+            1-
+            depth*.22,
+            .74,
+            1
+          )
+        );
+
+
+      updateLine(
+        item.obj.id,
+        item.target,
+        {
+          x:state.renderX,
+          y:state.renderY
+        }
+      );
+
+
+      updateDot(
+        item.obj.id,
+        item.target
+      );
+
+    }
+  );
 
 
   /*
-    Remove stale cards.
+    Delete cards that disappeared.
   */
 
   layer
-    .querySelectorAll(".arCard")
-    .forEach(card=>{
+    .querySelectorAll(
+      ".arCard"
+    )
+    .forEach(
+      card=>{
 
-      if(!visibleIds.has(card.dataset.id)){
+        if(
+          !visible.has(
+            card.dataset.id
+          )
+        ){
 
-        card.remove();
+          card.remove();
 
-        layoutState.delete(
-          card.dataset.id
-        );
+          layoutState.delete(
+            card.dataset.id
+          );
+
+        }
+
       }
-    });
+    );
 
 
   /*
-    Remove stale lines/dots.
+    Delete old lines/dots.
   */
 
-  lines
-    .querySelectorAll(".arConnection,.arAnchorDot")
-    .forEach(el=>{
+  $("arLines")
+    .querySelectorAll(
+      ".arConnection,.arDot"
+    )
+    .forEach(
+      el=>{
 
-      const id=
-        el.dataset.line ||
-        el.dataset.dot;
+        if(
+          !visible.has(
+            el.dataset.id
+          )
+        ){
 
-      if(!visibleIds.has(id)){
-        el.remove();
+          el.remove();
+
+        }
+
       }
-    });
+    );
 
 
   $("scanInfo").textContent=
-    `${candidates.length} profil · `+
-    `${edgeObjects.length} istiqamət · `+
-    `məkan səpilməsi aktiv`;
+    `${items.length} spatial · ${edges.length} →`;
+
 }
 
 
 /* =========================================================
-   REFRESH AR
-   ========================================================= */
+   SPREAD
+========================================================= */
 
-function refreshAR(){
+function forceSpread(){
 
-  /*
-    Force a fresh spread while keeping
-    deterministic object positions.
-  */
+  layoutState.forEach(
+    state=>{
 
-  layoutGeneration++;
+      state.slot=
+        undefined;
 
-  for(const state of layoutState.values()){
+      state.renderX=
+        undefined;
 
-    state.slot=undefined;
-    state.renderX=undefined;
-    state.renderY=undefined;
-  }
+      state.renderY=
+        undefined;
+
+    }
+  );
+
 
   updateAR();
 
-  toast("Məkan profilləri yenidən səpildi.");
+
+  toast(
+    currentLanguage==="az"
+    ? "Məkan obyektləri yenidən ayrıldı."
+    : "Spatial objects rearranged."
+  );
+
 }
 
 
 /* =========================================================
-   CREATE OBJECT
-   ========================================================= */
+   SEARCH / NOMINATIM
+========================================================= */
 
-async function placeObject(){
+let lastSearchResults=[];
 
-  const name=
-    $("createName").value.trim();
 
-  if(!name){
+function parseCoordinates(
+  text
+){
 
-    toast("Başlıq yaz.");
-    return;
+  const match=
+    text.trim().match(
+      /^\s*(-?\d+(?:\.\d+)?)\s*[,;\s]\s*(-?\d+(?:\.\d+)?)\s*$/
+    );
+
+
+  if(!match){
+    return null;
   }
 
-  let lat=
-    parseFloat(
-      $("createLat").value
-    );
 
-  let lng=
-    parseFloat(
-      $("createLng").value
-    );
+  const lat=
+    Number(match[1]);
+
+  const lng=
+    Number(match[2]);
+
 
   if(
-    !Number.isFinite(lat) ||
-    !Number.isFinite(lng)
+    lat>=-90 &&
+    lat<=90 &&
+    lng>=-180 &&
+    lng<=180
   ){
 
+    return {
+      lat,
+      lng
+    };
+
+  }
+
+
+  return null;
+
+}
+
+
+async function reverseGeocode(
+  lat,
+  lng
+){
+
+  try{
+
+    const url=
+      "https://nominatim.openstreetmap.org/reverse"+
+      `?format=jsonv2&lat=${encodeURIComponent(lat)}`+
+      `&lon=${encodeURIComponent(lng)}`+
+      "&zoom=18&addressdetails=1";
+
+
+    const response=
+      await fetch(
+        url,
+        {
+          headers:{
+            "Accept":
+              "application/json"
+          }
+        }
+      );
+
+
+    if(!response.ok){
+      return null;
+    }
+
+
+    return await response.json();
+
+  }catch{
+
+    return null;
+
+  }
+
+}
+
+
+async function searchWorld(
+  query
+){
+
+  query=query.trim();
+
+
+  if(!query){
+
+    toast(
+      currentLanguage==="az"
+      ? "Nə axtardığını yaz."
+      : "Enter a place to search."
+    );
+
+    return;
+
+  }
+
+
+  const resultsBox=
+    $("searchResults");
+
+
+  resultsBox.innerHTML=
+    `<div class="searchResult">
+       <div class="resultMain">
+         Searching...
+       </div>
+     </div>`;
+
+
+  resultsBox.classList.add(
+    "show"
+  );
+
+
+  /*
+    First: exact coordinates.
+  */
+
+  const coords=
+    parseCoordinates(
+      query
+    );
+
+
+  if(coords){
+
+    const reverse=
+      await reverseGeocode(
+        coords.lat,
+        coords.lng
+      );
+
+
+    const result={
+      lat:coords.lat,
+      lng:coords.lng,
+      name:
+        reverse?.display_name ||
+        "Selected coordinates",
+      display_name:
+        reverse?.display_name ||
+        `${coords.lat}, ${coords.lng}`
+    };
+
+
+    showSearchResults(
+      [result]
+    );
+
+
+    focusSearchResult(
+      result
+    );
+
+
+    return;
+
+  }
+
+
+  /*
+    Worldwide OpenStreetMap/Nominatim search.
+  */
+
+  try{
+
+    const url=
+      "https://nominatim.openstreetmap.org/search"+
+      `?format=jsonv2&limit=8&addressdetails=1&q=${encodeURIComponent(query)}`;
+
+
+    const response=
+      await fetch(
+        url,
+        {
+          headers:{
+            "Accept":
+              "application/json"
+          }
+        }
+      );
+
+
+    if(!response.ok){
+      throw new Error();
+    }
+
+
+    const data=
+      await response.json();
+
+
+    lastSearchResults=
+      data;
+
+
+    showSearchResults(
+      data
+    );
+
+
+  }catch{
+
+    resultsBox.innerHTML=
+      `<div class="searchResult">
+        <div class="resultMain">
+          Search unavailable
+        </div>
+      </div>`;
+
+  }
+
+}
+
+
+function showSearchResults(
+  results
+){
+
+  const box=
+    $("searchResults");
+
+
+  box.innerHTML="";
+
+
+  if(!results.length){
+
+    box.innerHTML=
+      `<div class="searchResult">
+        <div class="resultMain">
+          No location found.
+        </div>
+      </div>`;
+
+    return;
+
+  }
+
+
+  results.forEach(
+    (result,index)=>{
+
+      const lat=
+        Number(
+          result.lat
+        );
+
+      const lng=
+        Number(
+          result.lon ??
+          result.lng
+        );
+
+
+      const el=
+        document.createElement(
+          "div"
+        );
+
+
+      el.className=
+        "searchResult";
+
+
+      el.innerHTML=`
+
+        <div class="resultMark">
+          ${String(index+1)}
+        </div>
+
+        <div class="resultMain">
+
+          <div class="resultTitle">
+            ${esc(
+              result.name ||
+              result.display_name ||
+              "Location"
+            )}
+          </div>
+
+          <div class="resultSub">
+            ${esc(
+              result.display_name ||
+              ""
+            )}
+          </div>
+
+        </div>
+
+        <button
+          class="resultAction">
+          OPEN
+        </button>
+
+      `;
+
+
+      el.addEventListener(
+        "click",
+        ()=>{
+
+          focusSearchResult({
+            ...result,
+            lat,
+            lng
+          });
+
+        }
+      );
+
+
+      box.appendChild(
+        el
+      );
+
+    }
+  );
+
+}
+
+
+function focusSearchResult(
+  result
+){
+
+  const lat=
+    Number(result.lat);
+
+  const lng=
+    Number(
+      result.lng ??
+      result.lon
+    );
+
+
+  $("createLat").value=
+    lat.toFixed(7);
+
+  $("createLng").value=
+    lng.toFixed(7);
+
+
+  $("selectedPlaceBox")
+    .style.display=
+    "block";
+
+
+  $("selectedPlaceTitle")
+    .textContent=
+    result.name ||
+    "Selected location";
+
+
+  $("selectedPlaceAddress")
+    .textContent=
+    result.display_name ||
+    "";
+
+
+  $("selectedPlaceCoordinates")
+    .textContent=
+    `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+
+  /*
+    Put marker on map.
+  */
+
+  initMap();
+
+
+  map.setView(
+    [lat,lng],
+    17
+  );
+
+
+  if(
+    selectedSearchMarker
+  ){
+
+    selectedSearchMarker.remove();
+
+  }
+
+
+  selectedSearchMarker=
+    L.marker(
+      [lat,lng]
+    )
+    .addTo(map);
+
+
+  selectedSearchMarker.bindPopup(
+    esc(
+      result.display_name ||
+      result.name ||
+      "Selected location"
+    )
+  );
+
+
+  selectedSearchMarker.openPopup();
+
+
+  $("searchResults")
+    .classList.remove(
+      "show"
+    );
+
+
+  toast(
+    currentLanguage==="az"
+    ? "Məkan tapıldı. İndi həmin nöqtəyə məlumat yerləşdirə bilərsən."
+    : "Location found. You can now place content there."
+  );
+
+}
+
+
+/* =========================================================
+   SEARCH EVENTS
+========================================================= */
+
+$("searchButton").onclick=
+  ()=>{
+    searchWorld(
+      $("globalSearch").value
+    );
+  };
+
+
+$("globalSearch").addEventListener(
+  "keydown",
+  e=>{
+
+    if(e.key==="Enter"){
+
+      searchWorld(
+        e.target.value
+      );
+
+    }
+
+  }
+);
+
+
+$("searchToggle").onclick=
+  ()=>{
+
+    $("searchWrap")
+      .classList.toggle(
+        "show"
+      );
+
+
     if(
-      userLat!==null &&
-      userLng!==null
+      $("searchWrap")
+        .classList.contains(
+          "show"
+        )
     ){
 
-      lat=userLat;
-      lng=userLng;
+      $("globalSearch")
+        .focus();
 
     }else{
 
-      toast("GPS koordinatı lazımdır.");
-      return;
+      $("globalSearch")
+        .value="";
+
+      $("searchResults")
+        .classList.remove(
+          "show"
+        );
+
+      updateAR();
+
     }
-  }
-
-  if(!$("createConsent").checked){
-
-    toast("Yerləşdirmə üçün təsdiqi işarələ.");
-    return;
-  }
-
-  const obj={
-
-    id:
-      "obj_"+Date.now()+"_"+Math.random()
-      .toString(36)
-      .slice(2,9),
-
-    type:$("createType").value,
-
-    mode:$("createMode").value,
-
-    name,
-
-    username:
-      $("createUsername").value.trim() ||
-      profile.username,
-
-    bio:
-      $("createBio").value.trim(),
-
-    article:
-      $("createArticle").value.trim(),
-
-    phone:
-      $("createContact").checked
-      ? $("createPhone").value.trim()
-      : "",
-
-    whatsapp:
-      $("createContact").checked
-      ? $("createWhatsapp").value.trim()
-      : "",
-
-    social:
-      $("createSocial").value.trim(),
-
-    lat,
-    lng,
-
-    radius:
-      Number(
-        $("createRadius").value
-      ),
-
-    size:
-      $("createSize").value,
-
-    public:
-      $("createPublic").checked,
-
-    showContact:
-      $("createContact").checked,
-
-    authorId:"me",
-
-    author:
-      profile.name,
-
-    media:[],
-
-    createdAt:Date.now()
 
   };
 
 
-  $("loading").style.display="grid";
+/* =========================================================
+   MAP
+========================================================= */
 
-  try{
+let map=null;
+let selectedSearchMarker=null;
+let pickerMarker=null;
 
-    await saveObject(obj);
 
-    /*
-      Reset spatial state so the newly created
-      object receives a deterministic slot.
-    */
+function initMap(){
 
-    layoutState.delete(obj.id);
+  if(map) return;
 
-    closeModal("createModal");
 
-    renderAll();
-
-    toast(
-      "Profil məkana yerləşdirildi ✦"
+  map=
+    L.map(
+      "map",
+      {
+        zoomControl:false
+      }
+    )
+    .setView(
+      [40.4093,49.8671],
+      13
     );
 
-    /*
-      Save media after the object itself exists.
-    */
 
-    if(selectedFiles.length){
+  L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+      maxZoom:19,
+      attribution:"© OpenStreetMap"
+    }
+  )
+  .addTo(map);
 
-      const media=[];
 
-      for(const file of selectedFiles){
+  map.on(
+    "click",
+    e=>{
 
-        media.push({
-
-          id:
-            "media_"+Date.now()+"_"+
-            Math.random()
-            .toString(36)
-            .slice(2,8),
-
-          name:file.name,
-
-          type:file.type,
-
-          size:file.size,
-
-          blob:file
-
-        });
+      if(!mapPickerMode){
+        return;
       }
 
-      obj.media=media;
 
-      await saveObject(obj);
+      const lat=
+        e.latlng.lat;
 
-      renderAll();
+      const lng=
+        e.latlng.lng;
+
+
+      $("createLat").value=
+        lat.toFixed(7);
+
+      $("createLng").value=
+        lng.toFixed(7);
+
+
+      if(pickerMarker){
+        pickerMarker.remove();
+      }
+
+
+      pickerMarker=
+        L.marker(
+          [lat,lng]
+        )
+        .addTo(map);
+
+
+      pickerMarker.bindPopup(
+        `${lat.toFixed(6)}, ${lng.toFixed(6)}`
+      )
+      .openPopup();
+
+
+      mapPickerMode=false;
+
+
+      switchView("ar");
+
+      openModal(
+        "createModal"
+      );
+
+
+      reverseGeocode(
+        lat,
+        lng
+      )
+      .then(
+        data=>{
+
+          if(data){
+
+            $("selectedPlaceBox")
+              .style.display=
+              "block";
+
+            $("selectedPlaceTitle")
+              .textContent=
+              data.name ||
+              "Selected place";
+
+            $("selectedPlaceAddress")
+              .textContent=
+              data.display_name ||
+              "";
+
+            $("selectedPlaceCoordinates")
+              .textContent=
+              `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+          }
+
+        }
+      );
+
+
     }
+  );
 
-  }catch(err){
-
-    console.error(err);
-
-    toast(
-      "Yerləşdirmə zamanı xəta baş verdi."
-    );
-
-  }finally{
-
-    $("loading").style.display="none";
-
-  }
-
-  selectedFiles=[];
-
-  updateSelectedMedia();
 }
 
 
-/* =========================================================
-   CREATE FORM RESET
-   ========================================================= */
+let mapPickerMode=false;
 
-function resetCreateForm(){
+
+$("pickMapButton").onclick=
+  ()=>{
+
+    initMap();
+
+    mapPickerMode=true;
+
+    switchView("map");
+
+    setTimeout(
+      ()=>{
+        map.invalidateSize();
+      },
+      100
+    );
+
+
+    toast(
+      currentLanguage==="az"
+      ? "Xəritədə istədiyin nöqtəyə toxun."
+      : "Tap the desired point on the map."
+    );
+
+  };
+
+
+$("mapBack").onclick=
+  ()=>{
+    mapPickerMode=false;
+    switchView("ar");
+  };
+
+
+$("mapSearchButton").onclick=
+  ()=>{
+    searchWorld(
+      $("mapSearch").value
+    );
+  };
+
+
+$("mapSearch").addEventListener(
+  "keydown",
+  e=>{
+
+    if(e.key==="Enter"){
+
+      searchWorld(
+        e.target.value
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   CREATE FORM
+========================================================= */
+
+let selectedFiles=[];
+
+
+function resetCreate(){
 
   $("createName").value="";
   $("createUsername").value=
@@ -3605,16 +5745,6 @@ function resetCreateForm(){
   $("createWhatsapp").value="";
   $("createSocial").value="";
 
-  $("createLat").value=
-    userLat!==null
-    ? userLat.toFixed(7)
-    : "";
-
-  $("createLng").value=
-    userLng!==null
-    ? userLng.toFixed(7)
-    : "";
-
   $("createRadius").value="300";
   $("createSize").value="normal";
 
@@ -3622,415 +5752,769 @@ function resetCreateForm(){
   $("createContact").checked=false;
   $("createConsent").checked=false;
 
+
+  if(
+    userLat!==null &&
+    userLng!==null
+  ){
+
+    $("createLat").value=
+      userLat.toFixed(7);
+
+    $("createLng").value=
+      userLng.toFixed(7);
+
+  }else{
+
+    $("createLat").value="";
+    $("createLng").value="";
+
+  }
+
+
+  $("selectedPlaceBox")
+    .style.display="none";
+
+
   selectedFiles=[];
 
-  updateSelectedMedia();
+  renderSelectedFiles();
+
 }
 
 
-function updateSelectedMedia(){
+function renderSelectedFiles(){
 
   const box=
     $("selectedMedia");
 
+
   box.innerHTML="";
+
 
   selectedFiles.forEach(
     (file,index)=>{
 
       const chip=
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
 
-      chip.className="mediaChip";
+
+      chip.className=
+        "mediaChip";
+
 
       chip.textContent=
         `${index+1}. ${file.name}`;
 
-      box.appendChild(chip);
-    }
-  );
-}
 
-
-/* =========================================================
-   DETAIL
-   ========================================================= */
-
-function openDetail(obj){
-
-  const modal=
-    $("detailModal");
-
-  const content=
-    $("detailContent");
-
-  const distance=
-    userLat!==null
-    ? dist(
-        userLat,
-        userLng,
-        obj.lat,
-        obj.lng
-      )
-    : null;
-
-  let mediaHTML="";
-
-  if(obj.media?.length){
-
-    mediaHTML=
-      `<div class="detailMedia">`+
-      obj.media.map(media=>{
-
-        const url=
-          getMediaURL(media);
-
-        if(media.type?.startsWith("video/")){
-
-          return `
-            <video
-              src="${url}"
-              controls
-              playsinline>
-            </video>
-          `;
-
-        }
-
-        return `
-          <img
-            src="${url}"
-            alt="">
-        `;
-
-      }).join("")+
-      `</div>`;
-  }
-
-
-  let contactHTML="";
-
-  if(obj.showContact){
-
-    if(obj.phone){
-
-      contactHTML+=`
-        <button
-          class="secondaryBtn"
-          onclick="window.location.href='tel:${esc(obj.phone)}'">
-          ☎ Zəng et
-        </button>
-      `;
-    }
-
-    if(obj.whatsapp){
-
-      const clean=
-        obj.whatsapp.replace(/\D/g,"");
-
-      contactHTML+=`
-        <button
-          class="secondaryBtn"
-          onclick="window.open(
-            'https://wa.me/${clean}',
-            '_blank'
-          )">
-          WhatsApp
-        </button>
-      `;
-    }
-  }
-
-
-  if(obj.social){
-
-    contactHTML+=`
-      <button
-        class="secondaryBtn"
-        onclick="openExternal(
-          '${esc(obj.social)}'
-        )">
-        🔗 Linki aç
-      </button>
-    `;
-  }
-
-
-  const canDelete=
-    obj.authorId==="me";
-
-
-  content.innerHTML=`
-
-    ${mediaHTML}
-
-    <div class="detailTitle">
-      ${esc(obj.name)}
-    </div>
-
-    <div class="detailUser">
-      ${esc(obj.username || "")}
-      ·
-      ${esc(typeName(obj.type))}
-    </div>
-
-    ${
-      obj.bio
-      ? `<div class="detailText">${esc(obj.bio)}</div>`
-      : ""
-    }
-
-    ${
-      obj.article
-      ? `<div class="detailText">${esc(obj.article)}</div>`
-      : ""
-    }
-
-    <div class="detailMeta">
-
-      📍
-      ${obj.lat.toFixed(6)},
-      ${obj.lng.toFixed(6)}
-
-      <br>
-
-      ${distance!==null
-        ? `◎ Sənə məsafə:
-           ${Math.round(distance)} m<br>`
-        : ""
-      }
-
-      👁 Görünmə radiusu:
-      ${obj.radius} m
-
-      <br>
-
-      🕒 ${fmtTime(obj.createdAt)}
-
-    </div>
-
-    <button
-      class="primaryBtn"
-      onclick="routeTo(
-        ${obj.lat},
-        ${obj.lng}
-      )">
-      🧭 BURAYA GET
-    </button>
-
-    ${contactHTML}
-
-    <button
-      class="dangerBtn"
-      onclick="reportObject(
-        '${esc(obj.id)}'
-      )">
-      ⚑ Şikayət et
-    </button>
-
-    ${
-      canDelete
-      ? `
-        <button
-          class="dangerBtn"
-          onclick="deleteObject(
-            '${esc(obj.id)}'
-          )">
-          🗑 Öz obyektimi sil
-        </button>
-      `
-      : ""
-    }
-
-  `;
-
-  openModal("detailModal");
-}
-
-
-/* =========================================================
-   EXTERNAL
-   ========================================================= */
-
-function openExternal(url){
-
-  if(!url) return;
-
-  let target=url.trim();
-
-  if(
-    !/^https?:\/\//i.test(target)
-  ){
-
-    target=
-      "https://"+target;
-  }
-
-  window.open(
-    target,
-    "_blank",
-    "noopener"
-  );
-}
-
-
-function routeTo(lat,lng){
-
-  window.open(
-    `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`,
-    "_blank",
-    "noopener"
-  );
-}
-
-
-function reportObject(id){
-
-  toast(
-    "Şikayət demo rejimində qeyd edildi."
-  );
-}
-
-
-async function deleteObject(id){
-
-  const obj=
-    objects.find(x=>x.id===id);
-
-  if(!obj) return;
-
-  if(obj.authorId!=="me"){
-
-    toast("Bu obyekt sənə aid deyil.");
-    return;
-  }
-
-  try{
-
-    const tx=
-      db.transaction(
-        "objects",
-        "readwrite"
+      box.appendChild(
+        chip
       );
 
-    tx.objectStore("objects")
-      .delete(id);
+    }
+  );
 
-    tx.oncomplete=()=>{
-
-      objects=
-        objects.filter(x=>x.id!==id);
-
-      layoutState.delete(id);
-      anchorState.delete(id);
-
-      closeModal("detailModal");
-
-      renderAll();
-
-      toast("Obyekt silindi.");
-    };
-
-  }catch{
-
-    toast("Silinmədi.");
-  }
 }
 
 
-/* =========================================================
-   FEED
-   ========================================================= */
+[
+  ["galleryButton","galleryInput"],
+  ["photoButton","photoInput"],
+  ["videoButton","videoInput"]
+]
+.forEach(
+  ([button,input])=>{
 
-function renderFeed(){
-
-  const box=
-    $("feedList");
-
-  box.innerHTML="";
-
-  if(!objects.length){
-
-    box.innerHTML=`
-      <div class="card">
-        Hələ heç bir spatial obyekt yoxdur.
-      </div>
-    `;
-
-    return;
-  }
-
-  const sorted=
-    [...objects]
-      .sort(
-        (a,b)=>
-          (b.createdAt||0)-
-          (a.createdAt||0)
-      );
-
-  sorted.forEach(obj=>{
-
-    const el=
-      document.createElement("div");
-
-    el.className=
-      "card worldCard";
-
-    el.innerHTML=`
-
-      <div class="worldIcon">
-        ${typeIcon(obj.type)}
-      </div>
-
-      <div class="worldMain">
-
-        <div class="worldName">
-          ${esc(obj.name)}
-        </div>
-
-        <div class="worldDesc">
-          ${esc(
-            obj.bio ||
-            typeName(obj.type)
-          )}
-        </div>
-
-      </div>
-
-      <div class="worldDistance">
-        ${distanceText(obj)}
-      </div>
-
-    `;
-
-    el.addEventListener(
-      "click",
+    $(button).onclick=
       ()=>{
-        openDetail(obj);
+        $(input).click();
+      };
+
+  }
+);
+
+
+[
+  "galleryInput",
+  "photoInput",
+  "videoInput"
+]
+.forEach(
+  id=>{
+
+    $(id).addEventListener(
+      "change",
+      e=>{
+
+        const files=
+          Array.from(
+            e.target.files || []
+          );
+
+
+        selectedFiles.push(
+          ...files
+        );
+
+
+        renderSelectedFiles();
+
+
+        e.target.value="";
+
       }
     );
 
-    box.appendChild(el);
-  });
-}
+  }
+);
+
+
+$("currentLocationButton").onclick=
+  ()=>{
+
+    if(
+      userLat===null ||
+      userLng===null
+    ){
+
+      toast(
+        currentLanguage==="az"
+        ? "GPS hələ hazır deyil."
+        : "GPS is not ready yet."
+      );
+
+      return;
+    }
+
+
+    $("createLat").value=
+      userLat.toFixed(7);
+
+    $("createLng").value=
+      userLng.toFixed(7);
+
+
+    $("selectedPlaceBox")
+      .style.display=
+      "block";
+
+
+    $("selectedPlaceTitle")
+      .textContent=
+      currentLanguage==="az"
+      ? "Hazırkı mövqeyin"
+      : "Current position";
+
+
+    $("selectedPlaceAddress")
+      .textContent=
+      "GPS position";
+
+
+    $("selectedPlaceCoordinates")
+      .textContent=
+      `${userLat.toFixed(6)}, ${userLng.toFixed(6)}`;
+
+  };
 
 
 /* =========================================================
-   WORLD
-   ========================================================= */
+   SAVE OBJECT
+========================================================= */
 
-function distanceText(obj){
+$("saveObjectButton").onclick=
+  async()=>{
+
+    const name=
+      $("createName")
+        .value
+        .trim();
+
+
+    if(!name){
+
+      toast(
+        currentLanguage==="az"
+        ? "Başlıq yaz."
+        : "Enter a title."
+      );
+
+      return;
+
+    }
+
+
+    let lat=
+      Number(
+        $("createLat").value
+      );
+
+    let lng=
+      Number(
+        $("createLng").value
+      );
+
+
+    if(
+      !Number.isFinite(lat) ||
+      !Number.isFinite(lng)
+    ){
+
+      if(
+        userLat!==null &&
+        userLng!==null
+      ){
+
+        lat=userLat;
+        lng=userLng;
+
+      }else{
+
+        toast(
+          currentLanguage==="az"
+          ? "Koordinat seç."
+          : "Select coordinates."
+        );
+
+        return;
+
+      }
+
+    }
+
+
+    if(
+      !$("createConsent").checked
+    ){
+
+      toast(
+        currentLanguage==="az"
+        ? "Təsdiqi işarələ."
+        : "Confirm the content."
+      );
+
+      return;
+
+    }
+
+
+    const obj={
+
+      id:
+        "sp_"+Date.now()+"_"+
+        Math.random()
+          .toString(36)
+          .slice(2,8),
+
+      type:
+        $("createType").value,
+
+      mode:
+        $("createMode").value,
+
+      name,
+
+      username:
+        $("createUsername")
+          .value
+          .trim() ||
+        profile.username,
+
+      bio:
+        $("createBio")
+          .value
+          .trim(),
+
+      article:
+        $("createArticle")
+          .value
+          .trim(),
+
+      phone:
+        $("createContact").checked
+        ? $("createPhone")
+            .value
+            .trim()
+        : "",
+
+      whatsapp:
+        $("createContact").checked
+        ? $("createWhatsapp")
+            .value
+            .trim()
+        : "",
+
+      social:
+        $("createSocial")
+          .value
+          .trim(),
+
+      lat,
+      lng,
+
+      radius:
+        Number(
+          $("createRadius").value
+        ),
+
+      size:
+        $("createSize").value,
+
+      public:
+        $("createPublic").checked,
+
+      showContact:
+        $("createContact").checked,
+
+      authorId:"me",
+
+      author:
+        profile.name,
+
+      media:[],
+
+      createdAt:
+        Date.now()
+
+    };
+
+
+    /*
+      SAVE OBJECT IMMEDIATELY.
+      Media is processed after.
+    */
+
+    try{
+
+      await dbPut(
+        "objects",
+        obj
+      );
+
+
+      objects.push(
+        obj
+      );
+
+
+      closeModal(
+        "createModal"
+      );
+
+
+      layoutState.delete(
+        obj.id
+      );
+
+
+      renderAll();
+
+
+      toast(
+        currentLanguage==="az"
+        ? "Məkan obyekti yerləşdirildi."
+        : "Spatial object placed."
+      );
+
+
+      /*
+        Media blobs.
+      */
+
+      if(
+        selectedFiles.length
+      ){
+
+        const media=
+          selectedFiles.map(
+            file=>({
+
+              id:
+                "m_"+Date.now()+"_"+
+                Math.random()
+                  .toString(36)
+                  .slice(2,8),
+
+              name:file.name,
+
+              type:file.type,
+
+              size:file.size,
+
+              blob:file
+
+            })
+          );
+
+
+        obj.media=
+          media;
+
+
+        await dbPut(
+          "objects",
+          obj
+        );
+
+
+        const index=
+          objects.findIndex(
+            x=>x.id===obj.id
+          );
+
+
+        if(index>=0){
+
+          objects[index]=
+            obj;
+
+        }
+
+
+        renderAll();
+
+      }
+
+
+    }catch(err){
+
+      console.error(err);
+
+      toast(
+        currentLanguage==="az"
+        ? "Yadda saxlamaq mümkün olmadı."
+        : "Could not save object."
+      );
+
+    }
+
+
+    selectedFiles=[];
+
+    renderSelectedFiles();
+
+  };
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+function renderProfile(){
+
+  $("profileName")
+    .textContent=
+    profile.name;
+
+  $("profileUsername")
+    .textContent=
+    profile.username;
+
+  $("profileBio")
+    .textContent=
+    profile.bio ||
+    "Spatial identity";
+
+
+  $("profileObjectCount")
+    .textContent=
+    objects.filter(
+      x=>x.authorId==="me"
+    ).length;
+
+
+  if(profile.avatar){
+
+    $("profileAvatarImage")
+      .src=
+      profile.avatar;
+
+    $("profileAvatarImage")
+      .style.display=
+      "block";
+
+    $("avatarPlaceholder")
+      .style.display=
+      "none";
+
+  }else{
+
+    $("profileAvatarImage")
+      .style.display=
+      "none";
+
+    $("avatarPlaceholder")
+      .style.display=
+      "block";
+
+  }
+
+
+  const box=
+    $("profileObjects");
+
+
+  box.innerHTML="";
+
+
+  objects
+    .filter(
+      x=>x.authorId==="me"
+    )
+    .forEach(
+      obj=>{
+
+        box.appendChild(
+          objectListElement(
+            obj
+          )
+        );
+
+      }
+    );
+
+}
+
+
+$("avatarButton").onclick=
+  ()=>{
+    $("avatarInput").click();
+  };
+
+
+$("avatarInput").addEventListener(
+  "change",
+  e=>{
+
+    const file=
+      e.target.files?.[0];
+
+
+    if(!file) return;
+
+
+    const reader=
+      new FileReader();
+
+
+    reader.onload=
+      async()=>{
+
+        profile.avatar=
+          reader.result;
+
+
+        await dbPut(
+          "profile",
+          profile
+        );
+
+
+        renderProfile();
+
+
+        toast(
+          currentLanguage==="az"
+          ? "Profil şəkli əlavə edildi."
+          : "Profile photo updated."
+        );
+
+      };
+
+
+    reader.readAsDataURL(
+      file
+    );
+
+
+    e.target.value="";
+
+  }
+);
+
+
+/* =========================================================
+   EDIT PROFILE
+========================================================= */
+
+$("editProfileButton").onclick=
+  ()=>{
+
+    $("profileEditName").value=
+      profile.name;
+
+    $("profileEditUsername").value=
+      profile.username;
+
+    $("profileEditBio").value=
+      profile.bio;
+
+    $("profileEditArticle").value=
+      profile.article;
+
+    $("profileEditPhone").value=
+      profile.phone;
+
+    $("profileEditWhatsapp").value=
+      profile.whatsapp;
+
+    $("profileEditSocial").value=
+      profile.social;
+
+
+    openModal(
+      "profileModal"
+    );
+
+  };
+
+
+$("saveProfileButton").onclick=
+  async()=>{
+
+    profile.name=
+      $("profileEditName")
+        .value
+        .trim() ||
+      "ARWORLD";
+
+
+    profile.username=
+      $("profileEditUsername")
+        .value
+        .trim() ||
+      "@arworld";
+
+
+    profile.bio=
+      $("profileEditBio")
+        .value
+        .trim();
+
+
+    profile.article=
+      $("profileEditArticle")
+        .value
+        .trim();
+
+
+    profile.phone=
+      $("profileEditPhone")
+        .value
+        .trim();
+
+
+    profile.whatsapp=
+      $("profileEditWhatsapp")
+        .value
+        .trim();
+
+
+    profile.social=
+      $("profileEditSocial")
+        .value
+        .trim();
+
+
+    await dbPut(
+      "profile",
+      profile
+    );
+
+
+    closeModal(
+      "profileModal"
+    );
+
+
+    renderProfile();
+
+
+    toast(
+      currentLanguage==="az"
+      ? "Profil yadda saxlandı."
+      : "Profile saved."
+    );
+
+  };
+
+
+/* =========================================================
+   OBJECT LIST
+========================================================= */
+
+function objectListElement(
+  obj
+){
+
+  const el=
+    document.createElement(
+      "div"
+    );
+
+
+  el.className=
+    "worldCard";
+
+
+  el.innerHTML=`
+
+    <div class="objectMark">
+      ${typeLabel(obj.type).slice(0,2).toUpperCase()}
+    </div>
+
+    <div class="objectMain">
+
+      <div class="objectName">
+        ${esc(obj.name)}
+      </div>
+
+      <div class="objectSub">
+        ${esc(
+          obj.bio ||
+          typeLabel(obj.type)
+        )}
+      </div>
+
+    </div>
+
+    <div class="objectDistance">
+      ${distanceText(obj)}
+    </div>
+
+  `;
+
+
+  el.onclick=
+    ()=>{
+      openDetail(obj);
+    };
+
+
+  return el;
+
+}
+
+
+function distanceText(
+  obj
+){
 
   if(
     userLat===null ||
     userLng===null
   ){
+
     return "—";
+
   }
+
 
   return (
     Math.round(
-      dist(
+      distance(
         userLat,
         userLng,
         obj.lat,
@@ -4039,238 +6523,217 @@ function distanceText(obj){
     )+
     "m"
   );
+
 }
 
+
+/* =========================================================
+   WORLD / FEED
+========================================================= */
 
 function renderWorld(){
 
   const box=
     $("worldList");
 
+
   box.innerHTML="";
 
-  const visible=
+
+  const list=
     objects
-      .filter(x=>x.public!==false)
+      .filter(
+        x=>x.public!==false
+      )
       .sort(
         (a,b)=>
           distanceNumber(a)-
           distanceNumber(b)
       );
 
-  if(!visible.length){
 
-    box.innerHTML=`
-      <div class="card">
-        Yaxınlıqda obyekt yoxdur.
-      </div>
-    `;
+  if(!list.length){
+
+    box.innerHTML=
+      `<div class="worldCard">
+        <div class="objectMain">
+          No spatial objects yet.
+        </div>
+      </div>`;
 
     return;
+
   }
 
-  visible.forEach(obj=>{
 
-    const el=
-      document.createElement("div");
+  list.forEach(
+    obj=>{
+      box.appendChild(
+        objectListElement(
+          obj
+        )
+      );
+    }
+  );
 
-    el.className=
-      "card worldCard";
-
-    el.innerHTML=`
-
-      <div class="worldIcon">
-        ${typeIcon(obj.type)}
-      </div>
-
-      <div class="worldMain">
-
-        <div class="worldName">
-          ${esc(obj.name)}
-        </div>
-
-        <div class="worldDesc">
-          ${esc(obj.bio || typeName(obj.type))}
-        </div>
-
-      </div>
-
-      <div class="worldDistance">
-        ${distanceText(obj)}
-      </div>
-
-    `;
-
-    el.onclick=
-      ()=>openDetail(obj);
-
-    box.appendChild(el);
-  });
 }
 
 
-function distanceNumber(obj){
+function renderFeed(){
+
+  const box=
+    $("feedList");
+
+
+  box.innerHTML="";
+
+
+  const list=
+    [...objects]
+      .sort(
+        (a,b)=>
+          (b.createdAt||0)-
+          (a.createdAt||0)
+      );
+
+
+  if(!list.length){
+
+    box.innerHTML=
+      `<div class="worldCard">
+        <div class="objectMain">
+          No spatial content yet.
+        </div>
+      </div>`;
+
+    return;
+
+  }
+
+
+  list.forEach(
+    obj=>{
+      box.appendChild(
+        objectListElement(
+          obj
+        )
+      );
+    }
+  );
+
+}
+
+
+function distanceNumber(
+  obj
+){
 
   if(
     userLat===null ||
     userLng===null
   ){
+
     return Infinity;
+
   }
 
-  return dist(
+
+  return distance(
     userLat,
     userLng,
     obj.lat,
     obj.lng
   );
+
 }
 
 
-/* =========================================================
-   PROFILE
-   ========================================================= */
+function updateLists(){
 
-function renderProfile(){
+  renderWorld();
+  renderFeed();
+  renderProfile();
 
-  $("profileName")
-    .textContent=profile.name;
-
-  $("profileUsername")
-    .textContent=profile.username;
-
-  $("profileBio")
-    .textContent=
-      profile.bio ||
-      "Fiziki dünyaya rəqəmsal iz burax.";
-
-  $("profileObjectCount")
-    .textContent=
-      objects.filter(
-        x=>x.authorId==="me"
-      ).length;
-
-
-  if(profile.avatar){
-
-    $("profileAvatar").innerHTML=
-      `<img src="${profile.avatar}" alt="">`;
-
-  }else{
-
-    $("profileAvatar").textContent="◉";
+  if(map){
+    updateMapMarkers();
   }
 
+}
 
-  const box=
-    $("profileObjects");
 
-  box.innerHTML="";
+function renderAll(){
 
-  const mine=
-    objects.filter(
-      x=>x.authorId==="me"
-    );
+  renderWorld();
+  renderFeed();
+  renderProfile();
 
-  mine.forEach(obj=>{
+  updateAR();
 
-    const el=
-      document.createElement("div");
+  if(map){
+    updateMapMarkers();
+  }
 
-    el.className=
-      "card worldCard";
-
-    el.innerHTML=`
-
-      <div class="worldIcon">
-        ${typeIcon(obj.type)}
-      </div>
-
-      <div class="worldMain">
-
-        <div class="worldName">
-          ${esc(obj.name)}
-        </div>
-
-        <div class="worldDesc">
-          ${esc(typeName(obj.type))}
-          · ${obj.radius}m radius
-        </div>
-
-      </div>
-
-    `;
-
-    el.onclick=
-      ()=>openDetail(obj);
-
-    box.appendChild(el);
-  });
 }
 
 
 /* =========================================================
-   MAP
-   ========================================================= */
+   MAP MARKERS
+========================================================= */
 
-function initMap(){
-
-  if(map) return;
-
-  map=
-    L.map("map",{
-      zoomControl:false
-    }).setView(
-      [40.4093,49.8671],
-      13
-    );
-
-  L.tileLayer(
-    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    {
-      maxZoom:19,
-      attribution:"© OpenStreetMap"
-    }
-  ).addTo(map);
-
-  updateMapMarkers();
-}
+let mapMarkers=[];
 
 
 function updateMapMarkers(){
 
   if(!map) return;
 
+
   mapMarkers.forEach(
-    marker=>marker.remove()
+    marker=>{
+      try{
+        marker.remove();
+      }catch{}
+    }
   );
+
 
   mapMarkers=[];
 
+
   objects
-    .filter(x=>x.public!==false)
-    .forEach(obj=>{
+    .filter(
+      x=>x.public!==false
+    )
+    .forEach(
+      obj=>{
 
-      const marker=
-        L.marker(
-          [obj.lat,obj.lng]
-        ).addTo(map);
+        const marker=
+          L.marker(
+            [obj.lat,obj.lng]
+          )
+          .addTo(map);
 
-      marker.bindPopup(`
-        <strong>${esc(obj.name)}</strong><br>
-        ${esc(typeName(obj.type))}<br>
-        ${esc(obj.bio || "")}
-      `);
 
-      marker.on(
-        "click",
-        ()=>{
-          openDetail(obj);
-        }
-      );
+        marker.bindPopup(
+          `<strong>${esc(obj.name)}</strong><br>`+
+          `${esc(typeLabel(obj.type))}`
+        );
 
-      mapMarkers.push(marker);
-    });
+
+        marker.on(
+          "click",
+          ()=>{
+            openDetail(obj);
+          }
+        );
+
+
+        mapMarkers.push(
+          marker
+        );
+
+      }
+    );
 
 
   if(
@@ -4282,500 +6745,680 @@ function updateMapMarkers(){
       L.circleMarker(
         [userLat,userLng],
         {
-          radius:8,
-          color:"#00e5ff",
-          fillColor:"#00e5ff",
-          fillOpacity:.8
+          radius:7,
+          color:"#00d9ff",
+          fillColor:"#00d9ff",
+          fillOpacity:.85
         }
-      ).addTo(map);
+      )
+      .addTo(map);
+
 
     me.bindTooltip(
-      "Sən buradasan"
+      "YOU"
     );
 
-    mapMarkers.push(me);
+
+    mapMarkers.push(
+      me
+    );
+
   }
-}
 
-
-function updateMapMe(){
-
-  if(!map) return;
-
-  updateMapMarkers();
-}
-
-
-function showMap(){
-
-  initMap();
-
-  setTimeout(
-    ()=>{
-      map.invalidateSize();
-
-      if(
-        userLat!==null &&
-        userLng!==null
-      ){
-
-        map.setView(
-          [userLat,userLng],
-          Math.max(
-            map.getZoom(),
-            15
-          )
-        );
-      }
-
-    },
-    150
-  );
 }
 
 
 /* =========================================================
-   MAP PICKER
-   ========================================================= */
+   DETAIL
+========================================================= */
 
-let mapPickerMode=false;
+function openDetail(
+  obj
+){
 
-function enableMapPicker(){
-
-  initMap();
-
-  mapPickerMode=true;
-
-  switchView("map");
-
-  toast(
-    "Xəritədə istədiyin nöqtəyə toxun."
-  );
-}
+  const box=
+    $("detailContent");
 
 
-function handleMapClick(e){
+  let mediaHTML="";
 
-  if(!mapPickerMode){
-    return;
-  }
-
-  const lat=e.latlng.lat;
-  const lng=e.latlng.lng;
-
-  $("createLat").value=
-    lat.toFixed(7);
-
-  $("createLng").value=
-    lng.toFixed(7);
-
-  mapPickerMode=false;
-
-  switchView("ar");
-
-  openModal("createModal");
-
-  toast("Koordinat seçildi.");
-}
-
-
-function useCurrentLocation(){
 
   if(
-    userLat===null ||
-    userLng===null
+    obj.media &&
+    obj.media.length
   ){
 
-    toast("GPS hələ hazır deyil.");
-    return;
+    mediaHTML=
+      `<div class="detailMedia">`+
+      obj.media.map(
+        media=>{
+
+          const url=
+            mediaURL(
+              media
+            );
+
+
+          if(
+            media.type?.startsWith(
+              "video/"
+            )
+          ){
+
+            return `
+              <video
+                src="${url}"
+                controls
+                playsinline>
+              </video>
+            `;
+
+          }
+
+
+          return `
+            <img
+              src="${url}"
+              alt="">
+          `;
+
+        }
+      ).join("")+
+      `</div>`;
+
   }
 
-  $("createLat").value=
-    userLat.toFixed(7);
 
-  $("createLng").value=
-    userLng.toFixed(7);
+  let buttons="";
 
-  toast("Hazırkı koordinat əlavə edildi.");
+
+  if(obj.showContact){
+
+    if(obj.phone){
+
+      buttons+=`
+        <button
+          class="actionButton"
+          onclick="location.href='tel:${esc(obj.phone)}'">
+          CALL
+        </button>
+      `;
+
+    }
+
+
+    if(obj.whatsapp){
+
+      const number=
+        obj.whatsapp
+          .replace(/\D/g,"");
+
+
+      buttons+=`
+        <button
+          class="actionButton"
+          onclick="window.open(
+            'https://wa.me/${number}',
+            '_blank'
+          )">
+          WHATSAPP
+        </button>
+      `;
+
+    }
+
+  }
+
+
+  if(obj.social){
+
+    buttons+=`
+      <button
+        class="actionButton"
+        onclick="openExternal(
+          '${esc(obj.social)}'
+        )">
+        WEBSITE / SOCIAL
+      </button>
+    `;
+
+  }
+
+
+  const distText=
+    userLat!==null
+    ? `${Math.round(
+        distance(
+          userLat,
+          userLng,
+          obj.lat,
+          obj.lng
+        )
+      )} m`
+    : "—";
+
+
+  box.innerHTML=`
+
+    ${mediaHTML}
+
+    <div class="detailName">
+      ${esc(obj.name)}
+    </div>
+
+    <div class="detailUser">
+      ${esc(obj.username || "")}
+      ·
+      ${esc(typeLabel(obj.type))}
+    </div>
+
+    ${
+      obj.bio
+      ?
+      `<div class="detailText">
+        ${esc(obj.bio)}
+      </div>`
+      :
+      ""
+    }
+
+    ${
+      obj.article
+      ?
+      `<div class="detailText">
+        ${esc(obj.article)}
+      </div>`
+      :
+      ""
+    }
+
+
+    <div class="detailInfo">
+
+      LOCATION<br>
+
+      ${obj.lat.toFixed(7)},
+      ${obj.lng.toFixed(7)}
+
+      <br><br>
+
+      DISTANCE<br>
+
+      ${distText}
+
+      <br><br>
+
+      VISIBILITY<br>
+
+      ${obj.radius} m
+
+    </div>
+
+
+    <button
+      class="actionButton primary"
+      onclick="
+        routeTo(
+          ${obj.lat},
+          ${obj.lng}
+        )
+      ">
+      NAVIGATE HERE
+    </button>
+
+
+    ${buttons}
+
+
+    <button
+      class="actionButton danger"
+      onclick="
+        reportObject(
+          '${esc(obj.id)}'
+        )
+      ">
+      REPORT
+    </button>
+
+
+    ${
+      obj.authorId==="me"
+      ?
+      `
+        <button
+          class="actionButton danger"
+          onclick="
+            deleteObject(
+              '${esc(obj.id)}'
+            )
+          ">
+          DELETE MY OBJECT
+        </button>
+      `
+      :
+      ""
+    }
+
+  `;
+
+
+  openModal(
+    "detailModal"
+  );
+
+}
+
+
+function openExternal(
+  url
+){
+
+  if(!url) return;
+
+
+  let value=
+    url.trim();
+
+
+  if(
+    !/^https?:\/\//i
+      .test(value)
+  ){
+
+    value=
+      "https://"+
+      value;
+
+  }
+
+
+  window.open(
+    value,
+    "_blank",
+    "noopener"
+  );
+
+}
+
+
+function routeTo(
+  lat,
+  lng
+){
+
+  window.open(
+    `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`,
+    "_blank",
+    "noopener"
+  );
+
+}
+
+
+function reportObject(
+  id
+){
+
+  toast(
+    currentLanguage==="az"
+    ? "Şikayət demo rejimində qeyd edildi."
+    : "Report recorded in demo mode."
+  );
+
+}
+
+
+async function deleteObject(
+  id
+){
+
+  const obj=
+    objects.find(
+      x=>x.id===id
+    );
+
+
+  if(!obj) return;
+
+
+  if(
+    obj.authorId!=="me"
+  ){
+
+    toast("Not your object.");
+    return;
+
+  }
+
+
+  try{
+
+    const tx=
+      db.transaction(
+        "objects",
+        "readwrite"
+      );
+
+
+    tx.objectStore(
+      "objects"
+    ).delete(id);
+
+
+    tx.oncomplete=
+      ()=>{
+
+        objects=
+          objects.filter(
+            x=>x.id!==id
+          );
+
+
+        layoutState.delete(
+          id
+        );
+
+
+        pinnedState.delete(
+          id
+        );
+
+
+        closeModal(
+          "detailModal"
+        );
+
+
+        renderAll();
+
+
+        toast(
+          currentLanguage==="az"
+          ? "Obyekt silindi."
+          : "Object deleted."
+        );
+
+      };
+
+  }catch{
+
+    toast("Delete failed.");
+
+  }
+
 }
 
 
 /* =========================================================
-   VIEW SWITCH
-   ========================================================= */
+   LANGUAGE EVENTS
+========================================================= */
 
-function switchView(view){
-
-  activeView=view;
-
-  document
-    .querySelectorAll(".view")
-    .forEach(v=>{
-      v.classList.remove("active");
-    });
+$("languageButton").onclick=
+  ()=>{
+    openModal(
+      "languageModal"
+    );
+  };
 
 
-  const map={
+$("profileLanguageButton").onclick=
+  ()=>{
+    openModal(
+      "languageModal"
+    );
+  };
+
+
+document
+  .querySelectorAll(
+    "[data-language]"
+  )
+  .forEach(
+    button=>{
+
+      button.onclick=
+        ()=>{
+
+          setLanguage(
+            button.dataset.language
+          );
+
+          closeModal(
+            "languageModal"
+          );
+
+        };
+
+    }
+  );
+
+
+/* =========================================================
+   MODAL CLOSE
+========================================================= */
+
+document
+  .querySelectorAll(
+    "[data-close]"
+  )
+  .forEach(
+    button=>{
+
+      button.onclick=
+        ()=>{
+          closeModal(
+            button.dataset.close
+          );
+        };
+
+    }
+  );
+
+
+document
+  .querySelectorAll(
+    ".modal"
+  )
+  .forEach(
+    modal=>{
+
+      modal.addEventListener(
+        "click",
+        e=>{
+
+          if(
+            e.target===modal
+          ){
+
+            modal.classList.remove(
+              "show"
+            );
+
+          }
+
+        }
+      );
+
+    }
+  );
+
+
+/* =========================================================
+   PLACE BUTTON
+========================================================= */
+
+$("placeButton").onclick=
+  ()=>{
+
+    resetCreate();
+
+    openModal(
+      "createModal"
+    );
+
+  };
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function switchView(
+  view
+){
+
+  const ids={
+
     ar:"arView",
     world:"worldView",
     map:"mapView",
     feed:"feedView",
     profile:"profileView"
-  };
 
-  $(map[view])
-    .classList.add("active");
+  };
 
 
   document
-    .querySelectorAll(".navBtn")
-    .forEach(btn=>{
+    .querySelectorAll(
+      ".view"
+    )
+    .forEach(
+      el=>{
+        el.classList.remove(
+          "active"
+        );
+      }
+    );
 
-      btn.classList.toggle(
-        "active",
-        btn.dataset.view===view
-      );
 
-    });
+  $(ids[view])
+    .classList.add(
+      "active"
+    );
+
+
+  document
+    .querySelectorAll(
+      ".navButton"
+    )
+    .forEach(
+      button=>{
+
+        button.classList.toggle(
+          "active",
+          button.dataset.view===
+          view
+        );
+
+      }
+    );
 
 
   if(view==="map"){
-    showMap();
+
+    initMap();
+
+    setTimeout(
+      ()=>{
+        map.invalidateSize();
+
+        if(
+          userLat!==null &&
+          userLng!==null
+        ){
+
+          map.setView(
+            [userLat,userLng],
+            Math.max(
+              map.getZoom(),
+              15
+            )
+          );
+
+        }
+
+        updateMapMarkers();
+
+      },
+      80
+    );
+
   }
+
 
   if(view==="ar"){
     updateAR();
   }
 
+
   if(view==="world"){
     renderWorld();
   }
+
 
   if(view==="feed"){
     renderFeed();
   }
 
+
   if(view==="profile"){
     renderProfile();
   }
+
 }
 
 
-/* =========================================================
-   RENDER ALL
-   ========================================================= */
+document
+  .querySelectorAll(
+    ".navButton"
+  )
+  .forEach(
+    button=>{
 
-function renderAll(){
+      button.onclick=
+        ()=>{
+          switchView(
+            button.dataset.view
+          );
+        };
 
-  renderFeed();
-  renderWorld();
-  renderProfile();
-  updateMapMarkers();
-  updateAR();
-}
-
-
-/* =========================================================
-   MEDIA INPUTS
-   ========================================================= */
-
-$("galleryBtn").onclick=
-  ()=>$("galleryInput").click();
-
-$("photoBtn").onclick=
-  ()=>$("photoInput").click();
-
-$("videoBtn").onclick=
-  ()=>$("videoInput").click();
-
-
-["galleryInput","photoInput","videoInput"]
-.forEach(id=>{
-
-  $(id).addEventListener(
-    "change",
-    e=>{
-
-      const files=
-        Array.from(
-          e.target.files || []
-        );
-
-      selectedFiles.push(...files);
-
-      updateSelectedMedia();
-
-      e.target.value="";
     }
   );
 
-});
-
-
-/* =========================================================
-   EVENTS
-   ========================================================= */
-
-$("placeBtn").onclick=()=>{
-
-  resetCreateForm();
-
-  openModal("createModal");
-};
-
-
-$("saveObjectBtn").onclick=
-  placeObject;
-
-
-$("useCurrentLocation").onclick=
-  useCurrentLocation;
-
-
-$("pickOnMap").onclick=
-  enableMapPicker;
-
-
-$("refreshBtn").onclick=
-  refreshAR;
-
-
-$("spreadBtn").onclick=
-  refreshAR;
-
-
-$("searchToggle").onclick=()=>{
-
-  $("arSearch")
-    .classList.toggle("show");
-
-  if(
-    $("arSearch").classList.contains("show")
-  ){
-
-    $("arSearch").focus();
-
-  }else{
-
-    $("arSearch").value="";
-
-    updateAR();
-  }
-};
-
-
-$("arSearch").addEventListener(
-  "input",
-  updateAR
-);
-
-
-$("editProfileBtn").onclick=()=>{
-
-  $("profileEditName").value=
-    profile.name;
-
-  $("profileEditUsername").value=
-    profile.username;
-
-  $("profileEditBio").value=
-    profile.bio;
-
-  $("profileEditArticle").value=
-    profile.article;
-
-  $("profileEditPhone").value=
-    profile.phone;
-
-  $("profileEditWhatsapp").value=
-    profile.whatsapp;
-
-  $("profileEditSocial").value=
-    profile.social;
-
-  openModal("profileModal");
-};
-
-
-$("saveProfileBtn").onclick=
-async()=>{
-
-  profile.name=
-    $("profileEditName").value.trim() ||
-    "ARWORLD istifadəçisi";
-
-  profile.username=
-    $("profileEditUsername").value.trim() ||
-    "@arworld";
-
-  profile.bio=
-    $("profileEditBio").value.trim();
-
-  profile.article=
-    $("profileEditArticle").value.trim();
-
-  profile.phone=
-    $("profileEditPhone").value.trim();
-
-  profile.whatsapp=
-    $("profileEditWhatsapp").value.trim();
-
-  profile.social=
-    $("profileEditSocial").value.trim();
-
-  await saveProfile();
-
-  closeModal("profileModal");
-
-  renderProfile();
-
-  toast("Profil yadda saxlanıldı.");
-};
-
-
-$("privacyBtn").onclick=
-  ()=>openModal("privacyModal");
-
 
 document
-  .querySelectorAll(".navBtn")
-  .forEach(btn=>{
+  .querySelectorAll(
+    "[data-back]"
+  )
+  .forEach(
+    button=>{
 
-    btn.addEventListener(
-      "click",
-      ()=>{
-        switchView(
-          btn.dataset.view
-        );
-      }
-    );
+      button.onclick=
+        ()=>{
+          switchView(
+            button.dataset.back
+          );
+        };
 
-  });
-
-
-document
-  .querySelectorAll("[data-close]")
-  .forEach(btn=>{
-
-    btn.addEventListener(
-      "click",
-      ()=>{
-        closeModal(
-          btn.dataset.close
-        );
-      }
-    );
-
-  });
-
-
-document
-  .querySelectorAll(".modal")
-  .forEach(modal=>{
-
-    modal.addEventListener(
-      "click",
-      e=>{
-
-        if(e.target===modal){
-
-          modal.classList.remove("show");
-        }
-
-      }
-    );
-
-  });
-
-
-/* =========================================================
-   MAP EVENTS
-   ========================================================= */
-
-$("mapSearch").addEventListener(
-  "input",
-  e=>{
-
-    const q=
-      e.target.value
-       .trim()
-       .toLowerCase();
-
-    if(!q){
-
-      updateMapMarkers();
-      return;
     }
-
-    mapMarkers.forEach(
-      marker=>marker.remove()
-    );
-
-    mapMarkers=[];
-
-    objects
-      .filter(obj=>
-        obj.public!==false &&
-        objectMatches(obj,q)
-      )
-      .forEach(obj=>{
-
-        const marker=
-          L.marker(
-            [obj.lat,obj.lng]
-          ).addTo(map);
-
-        marker.bindPopup(
-          `<strong>${esc(obj.name)}</strong>`
-        );
-
-        marker.on(
-          "click",
-          ()=>{
-            openDetail(obj);
-          }
-        );
-
-        mapMarkers.push(marker);
-      });
-
-  }
-);
-
-
-document.addEventListener(
-  "click",
-  e=>{
-
-    if(
-      mapPickerMode &&
-      e.target.closest("#map")
-    ){
-      /*
-        Leaflet click itself handles selection.
-      */
-    }
-
-  }
-);
-
-
-/* Leaflet map click must be attached
-   after map initialization. */
-function attachMapClick(){
-
-  initMap();
-
-  map.on(
-    "click",
-    handleMapClick
   );
-}
+
+
+/* =========================================================
+   REFRESH
+========================================================= */
+
+$("refreshButton").onclick=
+  forceSpread;
+
+
+$("spreadButton").onclick=
+  forceSpread;
 
 
 /* =========================================================
    RESIZE
-   ========================================================= */
+========================================================= */
 
 window.addEventListener(
   "resize",
@@ -4790,84 +7433,135 @@ window.addEventListener(
 
 
 /* =========================================================
-   VISIBILITY
-   ========================================================= */
+   LOAD DATA
+========================================================= */
 
-document.addEventListener(
-  "visibilitychange",
-  ()=>{
-    if(!document.hidden){
-      updateAR();
-    }
-  }
-);
-
-
-/* =========================================================
-   INIT
-   ========================================================= */
-
-async function init(){
-
-  $("loading").style.display="grid";
+async function loadData(){
 
   try{
 
     await openDB();
 
-    const savedObjects=
-      await dbGetAll("objects");
 
-    objects=savedObjects || [];
+    const savedObjects=
+      await dbGetAll(
+        "objects"
+      );
+
+
+    objects=
+      savedObjects || [];
+
 
     const savedProfiles=
-      await dbGetAll("profile");
+      await dbGetAll(
+        "profile"
+      );
 
-    if(savedProfiles.length){
 
-      const p=savedProfiles[0];
+    if(
+      savedProfiles.length
+    ){
 
       profile={
         ...profile,
-        ...p
+        ...savedProfiles[0]
       };
+
     }
+
 
     renderAll();
 
-    startGPS();
-    startCompass();
-    startCamera();
-
-    /*
-      Initialize map lazily,
-      but attach click listener now.
-    */
-
-    attachMapClick();
 
   }catch(err){
 
     console.error(err);
 
     toast(
-      "ARWORLD məlumat bazası açıla bilmədi."
+      "Local database error."
     );
 
-  }finally{
-
-    $("loading").style.display="none";
   }
+
+}
+
+
+/* =========================================================
+   FAST START
+========================================================= */
+
+function hideStartup(){
+
+  const startup=
+    $("startup");
+
+
+  startup.style.opacity="0";
+
+
+  setTimeout(
+    ()=>{
+      startup.style.display="none";
+    },
+    220
+  );
+
+}
+
+
+/* =========================================================
+   INIT
+========================================================= */
+
+async function init(){
+
+  /*
+    LANGUAGE FIRST.
+  */
+
+  initLanguage();
+
+
+  /*
+    IMPORTANT:
+    UI is shown immediately.
+    DB / GPS / camera don't block startup.
+  */
+
+  setTimeout(
+    hideStartup,
+    180
+  );
+
+
+  /*
+    Parallel background initialization.
+  */
+
+  loadData();
+
+  startGPS();
+
+  startCompass();
+
+  startCamera();
+
+
+  /*
+    Lazy map.
+  */
+
 }
 
 
 /* =========================================================
    START
-   ========================================================= */
+========================================================= */
 
 init();
 
 </script>
 
 </body>
-                        </html>
+  </html>
