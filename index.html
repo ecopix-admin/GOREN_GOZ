@@ -1,1445 +1,591 @@
-<!DOCTYPE html>
-<html lang="en" class="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WORLDVIEW — Global Places & Travel</title>
-    
-    <!-- External CDN Resources -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <style>
-        :root {
-            --bg-dark: #070913;
-            --bg-card: rgba(15, 23, 42, 0.75);
-            --bg-card-hover: rgba(30, 41, 59, 0.85);
-            --border-glass: rgba(255, 255, 255, 0.08);
-            --border-glass-bright: rgba(0, 242, 254, 0.3);
-            --primary-emerald: #10b981;
-            --primary-cyan: #00f2fe;
-            --primary-blue: #3b82f6;
-            --accent-purple: #8b5cf6;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --sidebar-width: 420px;
-            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
-        }
-
-        /* App Container & Layout */
-        #app-container {
-            display: flex;
-            height: 100vh;
-            width: 100vw;
-            position: relative;
-        }
-
-        /* Header Navigation */
-        #main-header {
-            position: absolute;
-            top: 16px;
-            left: 16px;
-            right: 16px;
-            height: 64px;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            background: var(--bg-card);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--border-glass);
-            border-radius: 16px;
-            box-shadow: var(--glass-shadow);
-        }
-
-        .brand-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-        }
-
-        .brand-logo i {
-            font-size: 24px;
-            background: linear-gradient(135deg, var(--primary-cyan), var(--primary-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .brand-text h1 {
-            font-size: 18px;
-            font-weight: 800;
-            letter-spacing: 1px;
-            background: linear-gradient(135deg, #ffffff, var(--primary-cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .brand-text p {
-            font-size: 10px;
-            color: var(--text-muted);
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
-        /* Global Search Bar */
-        .search-container {
-            position: relative;
-            width: 420px;
-        }
-
-        .search-input-wrapper {
-            display: flex;
-            align-items: center;
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid var(--border-glass);
-            border-radius: 12px;
-            padding: 0 14px;
-            transition: all 0.3s ease;
-        }
-
-        .search-input-wrapper:focus-within {
-            border-color: var(--primary-cyan);
-            box-shadow: 0 0 12px rgba(0, 242, 254, 0.25);
-        }
-
-        .search-input-wrapper input {
-            width: 100%;
-            height: 42px;
-            background: transparent;
-            border: none;
-            color: var(--text-main);
-            font-size: 14px;
-            outline: none;
-            padding-left: 10px;
-        }
-
-        .search-suggestions {
-            position: absolute;
-            top: 50px;
-            left: 0;
-            right: 0;
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-glass);
-            border-radius: 12px;
-            max-height: 360px;
-            overflow-y: auto;
-            z-index: 1010;
-            display: none;
-            box-shadow: var(--glass-shadow);
-        }
-
-        .suggestion-item {
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-            transition: background 0.2s;
-        }
-
-        .suggestion-item:hover {
-            background: var(--bg-card-hover);
-        }
-
-        /* Controls & Actions */
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .btn-glass {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-glass);
-            color: var(--text-main);
-            padding: 10px 16px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
-        }
-
-        .btn-glass:hover {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: var(--border-glass-bright);
-            transform: translateY(-1px);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-cyan), var(--primary-blue));
-            border: none;
-            color: #000;
-            font-weight: 700;
-            padding: 10px 18px;
-            border-radius: 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
-        }
-
-        .btn-primary:hover {
-            opacity: 0.9;
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
-        }
-
-        /* Sidebar Panel */
-        #sidebar {
-            position: absolute;
-            top: 92px;
-            left: 16px;
-            bottom: 16px;
-            width: var(--sidebar-width);
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border-glass);
-            border-radius: 16px;
-            z-index: 990;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: var(--glass-shadow);
-        }
-
-        .sidebar-tabs {
-            display: flex;
-            background: rgba(0, 0, 0, 0.2);
-            border-bottom: 1px solid var(--border-glass);
-            padding: 6px;
-            gap: 4px;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 10px 0;
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-size: 12px;
-            font-weight: 600;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .tab-btn.active {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--primary-cyan);
-            border: 1px solid var(--border-glass);
-        }
-
-        .sidebar-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-        }
-
-        /* Category System Styles */
-        .category-group {
-            margin-bottom: 20px;
-        }
-
-        .category-group-title {
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--primary-cyan);
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .category-chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .chip {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--border-glass);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .chip:hover, .chip.active {
-            background: rgba(0, 242, 254, 0.15);
-            border-color: var(--primary-cyan);
-            color: var(--text-main);
-        }
-
-        /* Results List & Cards */
-        .results-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 14px;
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .place-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-glass);
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-        }
-
-        .place-card:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--border-glass-bright);
-            transform: translateY(-2px);
-        }
-
-        .place-title {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 4px;
-        }
-
-        .place-meta {
-            font-size: 12px;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
-        }
-
-        .place-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 10px;
-        }
-
-        .place-actions button {
-            flex: 1;
-            padding: 6px;
-            font-size: 11px;
-        }
-
-        /* Main Viewport Container */
-        #viewport-container {
-            flex: 1;
-            height: 100%;
-            position: relative;
-        }
-
-        #leaflet-map {
-            width: 100%;
-            height: 100%;
-            background: var(--bg-dark);
-            z-index: 1;
-        }
-
-        #globe-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 2;
-            display: none;
-            background: var(--bg-dark);
-        }
-
-        /* Floating Map Controls */
-        .map-controls-floating {
-            position: absolute;
-            right: 20px;
-            bottom: 30px;
-            z-index: 900;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .map-control-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border-glass);
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: var(--glass-shadow);
-        }
-
-        .map-control-btn:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--primary-cyan);
-            color: var(--primary-cyan);
-        }
-
-        /* Navigation Drawer/Overlay */
-        #navigation-panel {
-            position: absolute;
-            top: 92px;
-            right: 20px;
-            width: 360px;
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-glass);
-            border-radius: 16px;
-            z-index: 950;
-            padding: 16px;
-            display: none;
-            box-shadow: var(--glass-shadow);
-        }
-
-        .route-instruction-item {
-            padding: 8px 0;
-            border-bottom: 1px solid var(--border-glass);
-            font-size: 12px;
-            display: flex;
-            gap: 10px;
-        }
-
-        /* Modals & Full Profile */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(10px);
-            z-index: 2000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-glass);
-            border-radius: 20px;
-            width: 100%;
-            max-width: 700px;
-            max-height: 85vh;
-            overflow-y: auto;
-            position: relative;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-            padding: 24px;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: #fff;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Custom Leaflet Map Popup Dark Theme */
-        .leaflet-popup-content-wrapper, .leaflet-popup-tip {
-            background: rgba(15, 23, 42, 0.9) !important;
-            backdrop-filter: blur(12px);
-            color: var(--text-main) !important;
-            border: 1px solid var(--border-glass);
-            border-radius: 12px !important;
-        }
-
-        .leaflet-popup-content {
-            margin: 12px 14px !important;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        /* Toast Notifications */
-        #toast-container {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 3000;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .toast {
-            background: rgba(15, 23, 42, 0.95);
-            border: 1px solid var(--primary-cyan);
-            color: var(--text-main);
-            padding: 12px 24px;
-            border-radius: 30px;
-            font-size: 13px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Form Styling */
-        .form-group {
-            margin-bottom: 14px;
-        }
-        .form-group label {
-            display: block;
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-        .form-control {
-            width: 100%;
-            padding: 10px 12px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border-glass);
-            border-radius: 8px;
-            color: #fff;
-            outline: none;
-            font-size: 13px;
-        }
-        .form-control:focus {
-            border-color: var(--primary-cyan);
-        }
-
-        /* Responsive Breakpoints */
-        @media (max-width: 768px) {
-            #main-header {
-                flex-wrap: wrap;
-                height: auto;
-                padding: 12px;
-                gap: 10px;
-            }
-            .search-container {
-                width: 100%;
-                order: 3;
-            }
-            #sidebar {
-                top: auto;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                width: 100%;
-                height: 55vh;
-                border-radius: 20px 20px 0 0;
-            }
-            #navigation-panel {
-                width: calc(100% - 40px);
-                top: 150px;
-            }
-        }
-    </style>
-</head>
-<body>
-
-    <div id="app-container">
-        <!-- Main Application Header -->
-        <header id="main-header">
-            <div class="brand-logo" onclick="WorldViewApp.resetView()">
-                <i class="fa-solid => fa-earth-americas"></i>
-                <div class="brand-text">
-                    <h1>WORLDVIEW</h1>
-                    <p>Global Places & Travel</p>
-                </div>
-            </div>
-
-            <!-- Search Bar -->
-            <div class="search-container">
-                <div class="search-input-wrapper">
-                    <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted)"></i>
-                    <input type="text" id="global-search-input" placeholder="Search cities, places, coordinates (e.g. Paris, Cafes in Baku)..." autocomplete="off">
-                    <i class="fa-solid fa-xmark" id="clear-search" style="color: var(--text-muted); cursor: pointer; display: none;"></i>
-                </div>
-                <div class="search-suggestions" id="search-suggestions"></div>
-            </div>
-
-            <!-- Top Actions -->
-            <div class="nav-actions">
-                <select id="language-selector" class="btn-glass" onchange="WorldViewApp.changeLanguage(this.value)">
-                    <option value="en">English</option>
-                    <option value="az">Azərbaycan</option>
-                    <option value="tr">Türkçe</option>
-                    <option value="ru">Русский</option>
-                    <option value="de">Deutsch</option>
-                    <option value="fr">Français</option>
-                    <option value="es">Español</option>
-                </select>
-                
-                <button class="btn-glass" onclick="WorldViewApp.toggleGlobeView()">
-                    <i class="fa-solid fa-globe"></i> <span id="globe-btn-text">3D Globe</span>
-                </button>
-                <button class="btn-primary" onclick="WorldViewApp.openCreatePlaceModal()">
-                    <i class="fa-solid fa-plus"></i> Add Place
-                </button>
-            </div>
-        </header>
-
-        <!-- Sidebar Panel -->
-        <aside id="sidebar">
-            <div class="sidebar-tabs">
-                <button class="tab-btn active" onclick="WorldViewApp.switchTab('categories')">
-                    <i class="fa-solid fa-layer-group"></i> Categories
-                </button>
-                <button class="tab-btn" onclick="WorldViewApp.switchTab('results')">
-                    <i class="fa-solid fa-list"></i> Nearby Places
-                </button>
-                <button class="tab-btn" onclick="WorldViewApp.switchTab('explore')">
-                    <i class="fa-solid fa-compass"></i> Travel Info
-                </button>
-                <button class="tab-btn" onclick="WorldViewApp.switchTab('admin')">
-                    <i class="fa-solid fa-user-gear"></i> Admin / Saved
-                </button>
-            </div>
-
-            <div class="sidebar-content">
-                <!-- Tab 1: Category Drawer -->
-                <div id="tab-categories" class="tab-pane">
-                    <div id="categories-accordion"></div>
-                </div>
-
-                <!-- Tab 2: Nearby Results List -->
-                <div id="tab-results" class="tab-pane" style="display: none;">
-                    <div class="results-header">
-                        <span id="results-count">0 places found</span>
-                        <select id="results-sort" class="btn-glass" style="padding: 4px 8px; font-size: 11px;" onchange="WorldViewApp.sortResults(this.value)">
-                            <option value="distance">Nearest</option>
-                            <option value="name">Name</option>
-                        </select>
-                    </div>
-                    <div id="results-list">
-                        <div style="text-align: center; color: var(--text-muted); padding: 40px 0;">
-                            <i class="fa-solid fa-location-crosshairs" style="font-size: 32px; margin-bottom: 12px; color: var(--primary-cyan);"></i>
-                            <p>Select a category or search a place to view nearby locations.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tab 3: Travel & Country Guide -->
-                <div id="tab-explore" class="tab-pane" style="display: none;">
-                    <div id="travel-info-content">
-                        <h3 style="margin-bottom: 12px; color: var(--primary-cyan);">Global Travel Guide</h3>
-                        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Select or click a country on the map to display real-time safety, currency, and tourist recommendations.</p>
-                        <div id="country-card-details"></div>
-                    </div>
-                </div>
-
-                <!-- Tab 4: Admin & Saved Places -->
-                <div id="tab-admin" class="tab-pane" style="display: none;">
-                    <h3 style="font-size: 15px; margin-bottom: 12px; color: var(--primary-cyan);">Saved & Custom Places</h3>
-                    <div id="saved-places-list"></div>
-                    <hr style="border-color: var(--border-glass); margin: 20px 0;">
-                    <h3 style="font-size: 15px; margin-bottom: 12px; color: var(--primary-cyan);">Local Admin Dashboard</h3>
-                    <button class="btn-glass" style="width: 100%; margin-bottom: 8px;" onclick="WorldViewApp.exportData()">
-                        <i class="fa-solid fa-download"></i> Export Data (JSON)
-                    </button>
-                    <button class="btn-glass" style="width: 100%; color: #ef4444; border-color: rgba(239,68,68,0.3);" onclick="WorldViewApp.clearLocalData()">
-                        <i class="fa-solid fa-trash"></i> Clear Local Cache
-                    </button>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Main Viewport (2D Leaflet Map + 3D Globe) -->
-        <main id="viewport-container">
-            <div id="leaflet-map"></div>
-            <div id="globe-container"></div>
-
-            <!-- Floating Controls -->
-            <div class="map-controls-floating">
-                <button class="map-control-btn" onclick="WorldViewApp.locateUser()" title="Locate Me">
-                    <i class="fa-solid fa-crosshairs"></i>
-                </button>
-                <button class="map-control-btn" onclick="WorldViewApp.toggleMapLayer()" title="Switch Layer (Street/Satellite)">
-                    <i class="fa-solid fa-layer-group"></i>
-                </button>
-                <button class="map-control-btn" onclick="WorldViewApp.zoomIn()" title="Zoom In">
-                    <i class="fa-solid fa-plus"></i>
-                </button>
-                <button class="map-control-btn" onclick="WorldViewApp.zoomOut()" title="Zoom Out">
-                    <i class="fa-solid fa-minus"></i>
-                </button>
-            </div>
-
-            <!-- Live Navigation Panel -->
-            <div id="navigation-panel">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <h3 style="font-size: 14px; color: var(--primary-cyan);"><i class="fa-solid fa-route"></i> Route Navigation</h3>
-                    <button onclick="WorldViewApp.closeNavigation()" style="background:none; border:none; color:var(--text-muted); cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
-                </div>
-                <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-                    <button class="btn-glass" id="nav-mode-driving" onclick="WorldViewApp.setNavProfile('driving')" style="flex:1; padding:6px; font-size:11px;"><i class="fa-solid fa-car"></i> Drive</button>
-                    <button class="btn-glass" id="nav-mode-walking" onclick="WorldViewApp.setNavProfile('walking')" style="flex:1; padding:6px; font-size:11px;"><i class="fa-solid fa-person-walking"></i> Walk</button>
-                    <button class="btn-glass" id="nav-mode-cycling" onclick="WorldViewApp.setNavProfile('cycling')" style="flex:1; padding:6px; font-size:11px;"><i class="fa-solid fa-bicycle"></i> Cycle</button>
-                </div>
-                <div id="route-stats" style="font-size: 13px; margin-bottom: 12px; font-weight: 600; color: #fff;"></div>
-                <div id="route-steps" style="max-height: 200px; overflow-y: auto;"></div>
-                <div style="display: flex; gap: 8px; margin-top: 12px;">
-                    <button class="btn-primary" style="flex:1; font-size:11px;" onclick="WorldViewApp.openExternalMap('google')">Google Maps</button>
-                    <button class="btn-glass" style="flex:1; font-size:11px;" onclick="WorldViewApp.openExternalMap('apple')">Apple Maps</button>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Modals -->
-    <!-- Place Profile Modal -->
-    <div class="modal-overlay" id="profile-modal">
-        <div class="modal-card">
-            <button class="modal-close" onclick="WorldViewApp.closeModal('profile-modal')"><i class="fa-solid fa-xmark"></i></button>
-            <div id="profile-modal-content"></div>
-        </div>
-    </div>
-
-    <!-- Create Custom Place Modal -->
-    <div class="modal-overlay" id="create-place-modal">
-        <div class="modal-card">
-            <button class="modal-close" onclick="WorldViewApp.closeModal('create-place-modal')"><i class="fa-solid fa-xmark"></i></button>
-            <h2 style="font-size: 18px; color: var(--primary-cyan); margin-bottom: 16px;">Add New Place / Service</h2>
-            <form id="create-place-form" onsubmit="WorldViewApp.handleCreatePlace(event)">
-                <div class="form-group">
-                    <label>Place Name *</label>
-                    <input type="text" id="new-place-name" class="form-control" required placeholder="e.g. Grand View Hotel">
-                </div>
-                <div class="form-group">
-                    <label>Category *</label>
-                    <select id="new-place-category" class="form-control" required>
-                        <option value="hotel">Hotel / Accommodation</option>
-                        <option value="restaurant">Restaurant / Dining</option>
-                        <option value="cafe">Cafe / Bakery</option>
-                        <option value="pharmacy">Pharmacy / Health</option>
-                        <option value="attraction">Tourist Attraction</option>
-                        <option value="shop">Shopping / Store</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Coordinates (Lat, Lng) *</label>
-                    <div style="display: flex; gap: 8px;">
-                        <input type="text" id="new-place-lat" class="form-control" placeholder="Latitude" required>
-                        <input type="text" id="new-place-lng" class="form-control" placeholder="Longitude" required>
-                        <button type="button" class="btn-glass" onclick="WorldViewApp.useCurrentLocationForForm()">Current</button>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea id="new-place-desc" class="form-control" rows="3" placeholder="Describe the service or attraction..."></textarea>
-                </div>
-                <div style="display:flex; gap: 8px;">
-                    <div class="form-group" style="flex:1;">
-                        <label>Phone Number</label>
-                        <input type="text" id="new-place-phone" class="form-control" placeholder="+123456789">
-                    </div>
-                    <div class="form-group" style="flex:1;">
-                        <label>Website</label>
-                        <input type="url" id="new-place-website" class="form-control" placeholder="https://example.com">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-                        <input type="checkbox" required> I agree to the Terms of Service & Privacy Policy
-                    </label>
-                </div>
-                <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">Save & Publish Place</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Toast Container -->
-    <div id="toast-container"></div>
-
-    <!-- JavaScript Application Logic -->
-    <script>
-        /**
-         * WORLDVIEW Architecture & Main Controller
-         */
-        const WorldViewApp = (() => {
-            // State
-            let map, streetLayer, satLayer, currentLayer = 'street';
-            let globeScene, globeCamera, globeRenderer, globeMesh, globeControls, isGlobeActive = false;
-            let userLocation = { lat: 40.4093, lng: 49.8671 }; // Default Baku
-            let markersGroup = null;
-            let routeLayer = null;
-            let currentResults = [];
-            let currentNavDestination = null;
-            let activeNavProfile = 'driving';
-            let db = null;
-
-            // Translation Dictionary
-            const translations = {
-                en: {
-                    searchPlaceholder: "Search cities, places, coordinates...",
-                    globeView: "3D Globe",
-                    mapView: "2D Map",
-                    placesFound: "places found",
-                    addPlace: "Add Place"
-                },
-                az: {
-                    searchPlaceholder: "Şəhərlər, məkanlar, koordinatlar axtarın...",
-                    globeView: "3D Qlobus",
-                    mapView: "2D Xəritə",
-                    placesFound: "məkan tapıldı",
-                    addPlace: "Məkan Əlavə Et"
-                },
-                tr: {
-                    searchPlaceholder: "Şehirler, mekanlar, koordinatlar arayın...",
-                    globeView: "3D Küre",
-                    mapView: "2D Harita",
-                    placesFound: "mekan bulundu",
-                    addPlace: "Mekan Ekle"
-                },
-                ru: {
-                    searchPlaceholder: "Поиск городов, мест, координат...",
-                    globeView: "3D Глобус",
-                    mapView: "2D Карта",
-                    placesFound: "мест найдено",
-                    addPlace: "Добавить место"
-                }
-            };
-
-            // Comprehensive Categories Data Taxonomy
-            const categoriesTaxonomy = [
-                {
-                    title: "Travel & Stay",
-                    icon: "fa-plane-departure",
-                    items: [
-                        { name: "Hotels", key: "tourism=hotel", icon: "fa-hotel" },
-                        { name: "Hostels", key: "tourism=hostel", icon: "fa-bed" },
-                        { name: "Attractions", key: "tourism=attraction", icon: "fa-monument" },
-                        { name: "Museums", key: "tourism=museum", icon: "fa-building-columns" },
-                        { name: "Parks", key: "leisure=park", icon: "fa-tree" }
-                    ]
-                },
-                {
-                    title: "Food & Dining",
-                    icon: "fa-utensils",
-                    items: [
-                        { name: "Restaurants", key: "amenity=restaurant", icon: "fa-utensils" },
-                        { name: "Cafes", key: "amenity=cafe", icon: "fa-mug-hot" },
-                        { name: "Fast Food", key: "amenity=fast_food", icon: "fa-burger" },
-                        { name: "Bakeries", key: "shop=bakery", icon: "fa-bread-slice" }
-                    ]
-                },
-                {
-                    title: "Health & Care",
-                    icon: "fa-kit-medical",
-                    items: [
-                        { name: "Pharmacies", key: "amenity=pharmacy", icon: "fa-pills" },
-                        { name: "Hospitals", key: "amenity=hospital", icon: "fa-hospital" },
-                        { name: "Clinics", key: "amenity=clinic", icon: "fa-house-medical" }
-                    ]
-                },
-                {
-                    title: "Services & Shopping",
-                    icon: "fa-bag-shopping",
-                    items: [
-                        { name: "Supermarkets", key: "shop=supermarket", icon: "fa-cart-shopping" },
-                        { name: "Banks & ATMs", key: "amenity=bank", icon: "fa-building-columns" },
-                        { name: "Beauty Salons", key: "shop=beauty", icon: "fa-scissors" }
-                    ]
-                }
-            ];
-
-            // Initialize Application
-            const init = async () => {
-                initIndexedDB();
-                initLeafletMap();
-                init3DGlobe();
-                renderCategoriesDrawer();
-                setupSearchEngine();
-                getUserLocation();
-                loadSavedPlaces();
-            };
-
-            // IndexedDB Local Storage Initialization
-            const initIndexedDB = () => {
-                const request = indexedDB.open("WorldViewDB", 1);
-                request.onupgradeneeded = (e) => {
-                    db = e.target.result;
-                    if (!db.objectStoreNames.contains("custom_places")) {
-                        db.createObjectStore("custom_places", { keyPath: "id", autoIncrement: true });
-                    }
-                };
-                request.onsuccess = (e) => { db = e.target.result; };
-                request.onerror = (e) => console.error("IndexedDB Error:", e);
-            };
-
-            // Initialize Leaflet 2D Map
-            const initLeafletMap = () => {
-                map = L.map('leaflet-map', {
-                    zoomControl: false,
-                    attributionControl: false
-                }).setView([userLocation.lat, userLocation.lng], 13);
-
-                streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 });
-                satLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 18 });
-
-                streetLayer.addTo(map);
-                markersGroup = L.layerGroup().addTo(map);
-
-                // Map Click Listener
-                map.on('click', (e) => {
-                    const { lat, lng } = e.latlng;
-                    const popupContent = `
-                        <div style="font-size:12px;">
-                            <strong>Coordinates:</strong><br>${lat.toFixed(5)}, ${lng.toFixed(5)}<br><br>
-                            <button class="btn-primary" style="padding:4px 8px; font-size:10px; width:100%;" 
-                                onclick="WorldViewApp.openCreatePlaceModalWithCoords(${lat}, ${lng})">
-                                Create Place Here
-                            </button>
-                        </div>
-                    `;
-                    L.popup().setLatLng(e.latlng).setContent(popupContent).openOn(map);
-                });
-            };
-
-            // Initialize Three.js 3D Earth Globe
-            const init3DGlobe = () => {
-                const container = document.getElementById('globe-container');
-                globeScene = new THREE.Scene();
-                globeCamera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-                globeCamera.position.z = 250;
-
-                globeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-                globeRenderer.setSize(window.innerWidth, window.innerHeight);
-                container.appendChild(globeRenderer.domElement);
-
-                // Earth Sphere Geometry & Texture
-                const geometry = new THREE.SphereGeometry(80, 64, 64);
-                const textureLoader = new THREE.TextureLoader();
-                const texture = textureLoader.load('https://unpkg.com/three-globals@1.0.0/assets/earth-blue-marble.jpg', undefined, undefined, () => {
-                    // Fallback basic blue material if CDN image fails
-                    globeMesh.material = new THREE.MeshBasicMaterial({ color: 0x1d4ed8, wireframe: true });
-                });
-
-                const material = new THREE.MeshBasicMaterial({ map: texture });
-                globeMesh = new THREE.Mesh(geometry, material);
-                globeScene.add(globeMesh);
-
-                // Lighting
-                const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-                globeScene.add(ambientLight);
-
-                globeControls = new THREE.OrbitControls(globeCamera, globeRenderer.domElement);
-                globeControls.enableDamping = true;
-
-                const animate = () => {
-                    requestAnimationFrame(animate);
-                    if (isGlobeActive) {
-                        globeMesh.rotation.y += 0.001;
-                        globeControls.update();
-                        globeRenderer.render(globeScene, globeCamera);
-                    }
-                };
-                animate();
-
-                window.addEventListener('resize', () => {
-                    if (globeCamera && globeRenderer) {
-                        globeCamera.aspect = window.innerWidth / window.innerHeight;
-                        globeCamera.updateProjectionMatrix();
-                        globeRenderer.setSize(window.innerWidth, window.innerHeight);
-                    }
-                });
-            };
-
-            // Global Geocoding & Nominatim Search Integration
-            const setupSearchEngine = () => {
-                const input = document.getElementById('global-search-input');
-                const suggestionsBox = document.getElementById('search-suggestions');
-                const clearBtn = document.getElementById('clear-search');
-
-                let debounceTimer;
-
-                input.addEventListener('input', (e) => {
-                    const query = e.target.value.trim();
-                    clearBtn.style.display = query ? 'block' : 'none';
-
-                    clearTimeout(debounceTimer);
-                    if (query.length < 3) {
-                        suggestionsBox.style.display = 'none';
-                        return;
-                    }
-
-                    debounceTimer = setTimeout(() => {
-                        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`)
-                            .then(res => res.json())
-                            .then(data => {
-                                suggestionsBox.innerHTML = '';
-                                if (data.length === 0) {
-                                    suggestionsBox.style.display = 'none';
-                                    return;
-                                }
-
-                                data.forEach(item => {
-                                    const div = document.createElement('div');
-                                    div.className = 'suggestion-item';
-                                    div.innerHTML = `
-                                        <i class="fa-solid fa-location-dot" style="color:var(--primary-cyan)"></i>
-                                        <div>
-                                            <div style="font-size:13px; font-weight:600;">${item.display_name.split(',')[0]}</div>
-                                            <div style="font-size:11px; color:var(--text-muted);">${item.display_name}</div>
-                                        </div>
-                                    `;
-                                    div.onclick = () => {
-                                        const lat = parseFloat(item.lat);
-                                        const lon = parseFloat(item.lon);
-                                        map.setView([lat, lon], 14);
-                                        suggestionsBox.style.display = 'none';
-                                        input.value = item.display_name.split(',')[0];
-                                        showToast(`Centered on ${item.display_name.split(',')[0]}`);
-                                    };
-                                    suggestionsBox.appendChild(div);
-                                });
-                                suggestionsBox.style.display = 'block';
-                            })
-                            .catch(err => console.error("Search API error:", err));
-                    }, 400);
-                });
-
-                clearBtn.onclick = () => {
-                    input.value = '';
-                    clearBtn.style.display = 'none';
-                    suggestionsBox.style.display = 'none';
-                };
-            };
-
-            // Render Category Accordion & Chips
-            const renderCategoriesDrawer = () => {
-                const container = document.getElementById('categories-accordion');
-                container.innerHTML = '';
-
-                categoriesTaxonomy.forEach(cat => {
-                    const groupDiv = document.createElement('div');
-                    groupDiv.className = 'category-group';
-                    groupDiv.innerHTML = `
-                        <div class="category-group-title">
-                            <i class="fa-solid ${cat.icon}"></i> ${cat.title}
-                        </div>
-                        <div class="category-chips">
-                            ${cat.items.map(item => `
-                                <div class="chip" onclick="WorldViewApp.queryOverpassCategory('${item.key}', '${item.name}')">
-                                    <i class="fa-solid ${item.icon}"></i> ${item.name}
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
-                    container.appendChild(groupDiv);
-                });
-            };
-
-            // Query Overpass API for Real POI Data
-            const queryOverpassCategory = async (osmKeyValue, categoryName) => {
-                showToast(`Fetching ${categoryName}...`);
-                const center = map.getCenter();
-                const [key, val] = osmKeyValue.split('=');
-
-                const overpassQuery = `
-                    [out:json][timeout:15];
-                    (
-                      node["${key}"="${val}"](around:5000, ${center.lat}, ${center.lng});
-                      way["${key}"="${val}"](around:5000, ${center.lat}, ${center.lng});
-                    );
-                    out body center 30;
-                `;
-
-                try {
-                    const response = await fetch('https://overpass-api.de/api/interpreter', {
-                        method: 'POST',
-                        body: overpassQuery
-                    });
-                    const data = await response.json();
-                    
-                    markersGroup.clearLayers();
-                    currentResults = [];
-
-                    if (!data.elements || data.elements.length === 0) {
-                        showToast(`No ${categoryName} found nearby.`);
-                        switchTab('results');
-                        renderResultsList([]);
-                        return;
-                    }
-
-                    data.elements.forEach((item, index) => {
-                        const lat = item.lat || (item.center && item.center.lat);
-                        const lon = item.lon || (item.center && item.center.lon);
-                        if (!lat || !lon) return;
-
-                        const name = item.tags.name || `${categoryName} #${index + 1}`;
-                        const placeData = {
-                            id: item.id,
-                            name: name,
-                            category: categoryName,
-                            lat: lat,
-                            lng: lon,
-                            address: item.tags['addr:street'] ? `${item.tags['addr:street']} ${item.tags['addr:housenumber'] || ''}` : 'Address not specified',
-                            phone: item.tags.phone || item.tags['contact:phone'] || 'N/A',
-                            website: item.tags.website || item.tags['contact:website'] || null
-                        };
-
-                        currentResults.push(placeData);
-
-                        // Add Leaflet Marker
-                        const marker = L.marker([lat, lon]).addTo(markersGroup);
-                        marker.bindPopup(`
-                            <strong>${name}</strong><br>
-                            <span style="font-size:11px; color:#aaa;">${categoryName}</span><br><br>
-                            <button class="btn-primary" style="padding:4px 8px; font-size:10px; width:100%;" 
-                                onclick="WorldViewApp.startNavigation(${lat}, ${lon}, '${encodeURIComponent(name)}')">
-                                Navigate Here
-                            </button>
-                        `);
-                    });
-
-                    switchTab('results');
-                    renderResultsList(currentResults);
-                    showToast(`Found ${currentResults.length} locations.`);
-
-                } catch (error) {
-                    console.error('Overpass API Error:', error);
-                    showToast('Failed to load places. Please try again.');
-                }
-            };
-
-            // Render Results Tab
-            const renderResultsList = (results) => {
-                const listContainer = document.getElementById('results-list');
-                document.getElementById('results-count').innerText = `${results.length} places found`;
-
-                if (results.length === 0) {
-                    listContainer.innerHTML = `
-                        <div style="text-align: center; color: var(--text-muted); padding: 40px 0;">
-                            <p>No places to show.</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                listContainer.innerHTML = results.map(place => `
-                    <div class="place-card">
-                        <div class="place-title">${place.name}</div>
-                        <div class="place-meta">
-                            <span><i class="fa-solid fa-tag"></i> ${place.category}</span>
-                            <span><i class="fa-solid fa-location-dot"></i> ${place.address}</span>
-                        </div>
-                        <div class="place-actions">
-                            <button class="btn-primary" onclick="WorldViewApp.startNavigation(${place.lat}, ${place.lng}, '${encodeURIComponent(place.name)}')">
-                                <i class="fa-solid fa-route"></i> Navigate
-                            </button>
-                            <button class="btn-glass" onclick="WorldViewApp.openPlaceProfile('${place.id}')">
-                                Profile
-                            </button>
-                            <button class="btn-glass" onclick="WorldViewApp.savePlaceLocally('${place.id}')">
-                                <i class="fa-solid fa-bookmark"></i>
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
-            };
-
-            // OSRM Routing & Navigation System
-            const startNavigation = async (destLat, destLng, encodedName) => {
-                const destName = decodeURIComponent(encodedName);
-                currentNavDestination = { lat: destLat, lng: destLng, name: destName };
-                
-                showToast(`Calculating route to ${destName}...`);
-
-                const url = `https://router.project-osrm.org/route/v1/${activeNavProfile}/${userLocation.lng},${userLocation.lat};${destLng},${destLat}?overview=full&geometries=geojson&steps=true`;
-
-                try {
-                    const res = await fetch(url);
-                    const data = await res.json();
-
-                    if (!data.routes || data.routes.length === 0) {
-                        showToast('Route calculation failed.');
-                        return;
-                    }
-
-                    const route = data.routes[0];
-                    const distanceKm = (route.distance / 1000).toFixed(2);
-                    const durationMin = Math.round(route.duration / 60);
-
-                    // Draw Line on Map
-                    if (routeLayer) map.removeLayer(routeLayer);
-
-                    const coordinates = route.geometry.coordinates.map(coord => [coord[1], coord[0]]);
-                    routeLayer = L.polyline(coordinates, { color: '#00f2fe', weight: 5, opacity: 0.8 }).addTo(map);
-                    map.fitBounds(routeLayer.getBounds(), { padding: [50, 50] });
-
-                    // Render Navigation UI Drawer
-                    const navPanel = document.getElementById('navigation-panel');
-                    document.getElementById('route-stats').innerHTML = `
-                        <i class="fa-solid fa-clock"></i> ${durationMin} mins &nbsp;|&nbsp; 
-                        <i class="fa-solid fa-road"></i> ${distanceKm} km
-                    `;
-
-                    const stepsContainer = document.getElementById('route-steps');
-                    stepsContainer.innerHTML = route.legs[0].steps.map(step => `
-                        <div class="route-instruction-item">
-                            <i class="fa-solid fa-turn-right" style="color:var(--primary-cyan); margin-top:2px;"></i>
-                            <div>${step.maneuver.instruction || step.name || 'Proceed on route'}</div>
-                        </div>
-                    `).join('');
-
-                    navPanel.style.display = 'block';
-
-                } catch (err) {
-                    console.error("OSRM Route Error:", err);
-                    showToast('Error retrieving route.');
-                }
-            };
-
-            // Locate User Position
-            const getUserLocation = () => {
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        (pos) => {
-                            userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                            map.setView([userLocation.lat, userLocation.lng], 14);
-                            
-                            // User Location Marker
-                            L.circleMarker([userLocation.lat, userLocation.lng], {
-                                radius: 8,
-                                fillColor: '#00f2fe',
-                                color: '#ffffff',
-                                weight: 2,
-                                opacity: 1,
-                                fillOpacity: 0.9
-                            }).addTo(map).bindPopup("You are here");
-                        },
-                        () => showToast("Could not retrieve precise location. Using default.")
-                    );
-                }
-            };
-
-            // Switch Sidebar Tabs
-            const switchTab = (tabName) => {
-                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-                document.querySelectorAll('.tab-pane').forEach(pane => pane.style.display = 'none');
-
-                const targetPane = document.getElementById(`tab-${tabName}`);
-                if (targetPane) targetPane.style.display = 'block';
-
-                event?.currentTarget?.classList?.add('active');
-            };
-
-            // Toggle Map Layers (Street / Satellite)
-            const toggleMapLayer = () => {
-                if (currentLayer === 'street') {
-                    map.removeLayer(streetLayer);
-                    satLayer.addTo(map);
-                    currentLayer = 'sat';
-                    showToast('Switched to Satellite View');
-                } else {
-                    map.removeLayer(satLayer);
-                    streetLayer.addTo(map);
-                    currentLayer = 'street';
-                    showToast('Switched to Street Map View');
-                }
-            };
-
-            // Toggle 3D Globe Mode
-            const toggleGlobeView = () => {
-                const globeContainer = document.getElementById('globe-container');
-                const btnText = document.getElementById('globe-btn-text');
-                
-                isGlobeActive = !isGlobeActive;
-                if (isGlobeActive) {
-                    globeContainer.style.display = 'block';
-                    btnText.innerText = '2D Map';
-                    showToast('Entered 3D Globe View');
-                } else {
-                    globeContainer.style.display = 'none';
-                    btnText.innerText = '3D Globe';
-                    showToast('Entered 2D Map View');
-                }
-            };
-
-            // Modal Handlers
-            const openModal = (id) => document.getElementById(id).style.display = 'flex';
-            const closeModal = (id) => document.getElementById(id).style.display = 'none';
-
-            const openCreatePlaceModal = () => openModal('create-place-modal');
-            const openCreatePlaceModalWithCoords = (lat, lng) => {
-                document.getElementById('new-place-lat').value = lat;
-                document.getElementById('new-place-lng').value = lng;
-                openModal('create-place-modal');
-            };
-
-            // Custom Place Local Persistence
-            const handleCreatePlace = (e) => {
-                e.preventDefault();
-                const newPlace = {
-                    name: document.getElementById('new-place-name').value,
-                    category: document.getElementById('new-place-category').value,
-                    lat: parseFloat(document.getElementById('new-place-lat').value),
-                    lng: parseFloat(document.getElementById('new-place-lng').value),
-                    desc: document.getElementById('new-place-desc').value,
-                    phone: document.getElementById('new-place-phone').value,
-                    website: document.getElementById('new-place-website').value,
-                    timestamp: new Date().toISOString()
-                };
-
-                if (db) {
-                    const tx = db.transaction("custom_places", "readwrite");
-                    const store = tx.objectStore("custom_places");
-                    store.add(newPlace);
-                    tx.oncomplete = () => {
-                        showToast("Place created and saved locally!");
-                        closeModal('create-place-modal');
-                        loadSavedPlaces();
-                    };
-                }
-            };
-
-            const loadSavedPlaces = () => {
-                if (!db) return;
-                const tx = db.transaction("custom_places", "readonly");
-                const store = tx.objectStore("custom_places");
-                const request = store.getAll();
-
-                request.onsuccess = () => {
-                    const places = request.result;
-                    const container = document.getElementById('saved-places-list');
-                    if (places.length === 0) {
-                        container.innerHTML = '<p style="font-size:12px; color:var(--text-muted);">No saved custom places.</p>';
-                        return;
-                    }
-                    container.innerHTML = places.map(p => `
-                        <div class="place-card">
-                            <div class="place-title">${p.name}</div>
-                            <div class="place-meta">Category: ${p.category}</div>
-                            <button class="btn-primary" style="padding:4px 8px; font-size:11px;" 
-                                onclick="WorldViewApp.flyToCoords(${p.lat}, ${p.lng})">
-                                Show on Map
-                            </button>
-                        </div>
-                    `).join('');
-                };
-            };
-
-            // UI Utility Functions
-            const showToast = (message) => {
-                const container = document.getElementById('toast-container');
-                const toast = document.createElement('div');
-                toast.className = 'toast';
-                toast.innerHTML = `<i class="fa-solid fa-circle-info" style="color:var(--primary-cyan)"></i> ${message}`;
-                container.appendChild(toast);
-                setTimeout(() => toast.remove(), 3500);
-            };
-
-            const flyToCoords = (lat, lng) => {
-                map.setView([lat, lng], 16);
-            };
-
-            const changeLanguage = (langKey) => {
-                const lang = translations[langKey] || translations.en;
-                document.getElementById('global-search-input').placeholder = lang.searchPlaceholder;
-                showToast(`Language set to ${langKey.toUpperCase()}`);
-            };
-
-            const closeNavigation = () => {
-                document.getElementById('navigation-panel').style.display = 'none';
-                if (routeLayer) map.removeLayer(routeLayer);
-            };
-
-            return {
-                init,
-                resetView: () => map.setView([40.4093, 49.8671], 3),
-                switchTab,
-                queryOverpassCategory,
-                startNavigation,
-                closeNavigation,
-                toggleMapLayer,
-                toggleGlobeView,
-                locateUser: getUserLocation,
-                zoomIn: () => map.zoomIn(),
-                zoomOut: () => map.zoomOut(),
-                openCreatePlaceModal,
-                openCreatePlaceModalWithCoords,
-                closeModal,
-                handleCreatePlace,
-                exportData: () => showToast("Exported database to JSON."),
-                clearLocalData: () => {
-                    localStorage.clear();
-                    showToast("Cache cleared.");
-                },
-                changeLanguage,
-                flyToCoords,
-                openExternalMap: (type) => {
-                    if (!currentNavDestination) return;
-                    const url = type === 'google' 
-                        ? `https://www.google.com/maps/dir/?api=1&destination=${currentNavDestination.lat},${currentNavDestination.lng}`
-                        : `https://maps.apple.com/?daddr=${currentNavDestination.lat},${currentNavDestination.lng}`;
-                    window.open(url, '_blank');
-                }
-            };
-        })();
-
-        // Launch App on DOM Load
-        window.addEventListener('DOMContentLoaded', () => {
-            WorldViewApp.init();
-        });
-    </script>
+/* ============================ L. 3D GLOBE (Three.js) ============================ */
+let G = null;
+const GLOBE_CITIES = [['Istanbul', 41.01, 28.98, 'TR'], ['Baku', 40.41, 49.87, 'AZ'], ['Dubai', 25.2, 55.27, 'AE'], ['Paris', 48.86, 2.35, 'FR'], ['London', 51.51, -0.13, 'GB'], ['New York', 40.71, -74.0, 'US'], ['Tokyo', 35.68, 139.69, 'JP'], ['Sydney', -33.87, 151.21, 'AU'], ['Cairo', 30.04, 31.24, 'EG'], ['Rio de Janeiro', -22.91, -43.17, 'BR'], ['Singapore', 1.35, 103.82, 'SG'], ['Moscow', 55.75, 37.62, 'RU'], ['Rome', 41.9, 12.5, 'IT'], ['Mexico City', 19.43, -99.13, 'MX'], ['Cape Town', -33.92, 18.42, 'ZA'], ['Tehran', 35.69, 51.39, 'IR'], ['Tbilisi', 41.72, 44.79, 'GE'], ['Beijing', 39.9, 116.41, 'CN'], ['Berlin', 52.52, 13.4, 'DE'], ['Madrid', 40.42, -3.7, 'ES']];
+const ll2v = (lat, lon, r = 1) => { const la = lat * Math.PI / 180, lo = lon * Math.PI / 180; return new THREE.Vector3(r * Math.cos(la) * Math.cos(lo), r * Math.sin(la), -r * Math.cos(la) * Math.sin(lo)); };
+function loadTex(file) {
+  return new Promise(res => {
+    const loader = new THREE.TextureLoader(); loader.crossOrigin = 'anonymous'; let i = 0;
+    const next = () => { if (i >= CFG.globeTex.length) return res(null); loader.load(CFG.globeTex[i++] + file, tex => res(tex), undefined, next); };
+    next();
+  });
+}
+function sunDirection(d = new Date()) {
+  const doy = (Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - Date.UTC(d.getUTCFullYear(), 0, 0)) / 86400000;
+  const dec = 23.44 * Math.sin(2 * Math.PI * (doy - 81) / 365);
+  const hrs = d.getUTCHours() + d.getUTCMinutes() / 60;
+  return ll2v(dec, -(hrs - 12) * 15, 1).normalize();
+}
+function pointInRing(lon, lat, ring) {
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const xi = ring[i][0], yi = ring[i][1], xj = ring[j][0], yj = ring[j][1];
+    if (((yi > lat) !== (yj > lat)) && (lon < (xj - xi) * (lat - yi) / (yj - yi) + xi)) inside = !inside;
+  }
+  return inside;
+}
+function featurePolys(f) { const g = f.geometry; if (!g) return []; return g.type === 'Polygon' ? [g.coordinates] : g.type === 'MultiPolygon' ? g.coordinates : []; }
+function countryAt(lat, lon) {
+  if (!countriesGeo) return null;
+  for (const f of countriesGeo.features) {
+    if (!f._bb) { let a = 180, b = -180, c = 90, d = -90; featurePolys(f).forEach(p => p[0].forEach(pt => { a = Math.min(a, pt[0]); b = Math.max(b, pt[0]); c = Math.min(c, pt[1]); d = Math.max(d, pt[1]); })); f._bb = [a, b, c, d]; }
+    const bb = f._bb; if (lon < bb[0] || lon > bb[1] || lat < bb[2] || lat > bb[3]) continue;
+    for (const poly of featurePolys(f)) { if (pointInRing(lon, lat, poly[0]) && !poly.slice(1).some(h => pointInRing(lon, lat, h))) return f; }
+  }
+  return null;
+}
+function makeGeoTexture(geo) {
+  const cv = document.createElement('canvas'); cv.width = 2048; cv.height = 1024; const x = cv.getContext('2d');
+  const g = x.createLinearGradient(0, 0, 0, 1024); g.addColorStop(0, '#0b3a6b'); g.addColorStop(.5, '#0a4f86'); g.addColorStop(1, '#0b3a6b'); x.fillStyle = g; x.fillRect(0, 0, 2048, 1024);
+  if (geo) {
+    x.fillStyle = '#2f7d5b'; x.strokeStyle = '#d8f3e8'; x.lineWidth = 1;
+    geo.features.forEach(f => featurePolys(f).forEach(poly => { poly.forEach(ring => { x.beginPath(); ring.forEach((pt, i) => { const px = (pt[0] + 180) / 360 * 2048, py = (90 - pt[1]) / 180 * 1024; i ? x.lineTo(px, py) : x.moveTo(px, py); }); x.closePath(); x.fill('evenodd'); x.stroke(); }); }));
+  }
+  const tex = new THREE.CanvasTexture(cv); return tex;
+}
+async function initGlobe() {
+  const wrap = $('#globeWrap');
+  if (G) { G.running = true; G.resize(); globeLoop(); syncGlobeToContext(); return; }
+  if (!window.THREE) { $('#globeInfo').innerHTML = '<b>3D globe unavailable</b><br><span class="muted small">Three.js could not be loaded. Check your connection and reload. The 2D map still works.</span>'; return; }
+  let renderer;
+  try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); }
+  catch (e) { $('#globeInfo').innerHTML = '<b>WebGL is not available</b><br><span class="muted small">Your browser or device does not support WebGL. Use the 2D map instead.</span>'; return; }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  wrap.appendChild(renderer.domElement);
+  const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(45, 1, .1, 100);
+  const earthGroup = new THREE.Group(); scene.add(earthGroup);
+  G = { renderer, scene, camera, earthGroup, rx: .5, ry: -1.5, dist: 3.4, running: true, spin: true, light: true, interacting: false, lastInteract: 0, fly: null, raf: 0, markers: [], markerGroup: new THREE.Group(), sel: null };
+  earthGroup.add(G.markerGroup);
+  // Earth (custom day/night shader)
+  const placeholder = makeGeoTexture(null);
+  const uniforms = { dayMap: { value: placeholder }, nightMap: { value: new THREE.Texture() }, sunDir: { value: sunDirection() }, useNight: { value: 1 }, hasNight: { value: 0 } };
+  G.uniforms = uniforms;
+  const mat = new THREE.ShaderMaterial({
+    uniforms,
+    vertexShader: 'varying vec2 vUv; varying vec3 vN; void main(){ vUv=uv; vN=normal; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }',
+    fragmentShader: 'uniform sampler2D dayMap; uniform sampler2D nightMap; uniform vec3 sunDir; uniform float useNight; uniform float hasNight; varying vec2 vUv; varying vec3 vN;' +
+      'void main(){ float d=dot(normalize(vN),normalize(sunDir)); float k=smoothstep(-0.12,0.2,d); vec3 day=texture2D(dayMap,vUv).rgb; vec3 night=texture2D(nightMap,vUv).rgb*hasNight;' +
+      'vec3 lit=day*(0.62+0.5*max(d,0.0)); vec3 dark=day*0.09+night*1.5+vec3(0.0,0.01,0.03); vec3 c=mix(dark,lit,k); c=mix(day*0.95,c,useNight); gl_FragColor=vec4(c,1.0); }'
+  });
+  G.earth = new THREE.Mesh(new THREE.SphereGeometry(1, 96, 96), mat); earthGroup.add(G.earth);
+  // Atmosphere glow
+  const atm = new THREE.Mesh(new THREE.SphereGeometry(1.13, 64, 64), new THREE.ShaderMaterial({
+    vertexShader: 'varying vec3 vN; void main(){ vN=normalize(normalMatrix*normal); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }',
+    fragmentShader: 'varying vec3 vN; void main(){ float i=pow(max(0.0,0.74-dot(vN,vec3(0.0,0.0,1.0))),3.0); gl_FragColor=vec4(0.25,0.78,1.0,1.0)*i*1.5; }',
+    blending: THREE.AdditiveBlending, side: THREE.BackSide, transparent: true, depthWrite: false
+  })); scene.add(atm);
+  // Stars
+  const sp = []; for (let i = 0; i < 900; i++) { const v = new THREE.Vector3(Math.random() - .5, Math.random() - .5, Math.random() - .5).normalize().multiplyScalar(30 + Math.random() * 20); sp.push(v.x, v.y, v.z); }
+  const sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3));
+  scene.add(new THREE.Points(sg, new THREE.PointsMaterial({ color: 0xffffff, size: .12, sizeAttenuation: true, transparent: true, opacity: .8 })));
+  // Resize
+  G.resize = () => { const w = wrap.clientWidth || 300, h = wrap.clientHeight || 300; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); };
+  G.resize();
+  if (window.ResizeObserver) new ResizeObserver(() => G.resize()).observe(wrap); else window.addEventListener('resize', G.resize);
+  bindGlobeInput(wrap);
+  buildGlobeMarkers();
+  $('#globeInfo').innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px"></span> Loading Earth textures…';
+  globeLoop();
+  // Textures (async with fallbacks)
+  const [day, night, clouds] = await Promise.all([loadTex('earth_atmos_2048.jpg'), loadTex('earth_lights_2048.png'), loadTex('earth_clouds_1024.png')]);
+  const geo = await loadCountries();
+  if (day) { uniforms.dayMap.value = day; $('#globeInfo').innerHTML = '<b>🌍 WORLDVIEW Globe</b><div class="muted small">Textures: three.js example Earth maps (NASA-derived). Drag to rotate · scroll/pinch to zoom · click a country or city.</div>'; }
+  else { uniforms.dayMap.value = makeGeoTexture(geo); $('#globeInfo').innerHTML = '<b>🌍 WORLDVIEW Globe</b><div class="muted small">Satellite texture unavailable — using a boundary-based fallback map. Click a country or city.</div>'; }
+  if (night) { uniforms.nightMap.value = night; uniforms.hasNight.value = 1; }
+  if (clouds) { G.clouds = new THREE.Mesh(new THREE.SphereGeometry(1.012, 64, 64), new THREE.MeshBasicMaterial({ map: clouds, transparent: true, opacity: .5, depthWrite: false })); earthGroup.add(G.clouds); }
+  if (geo) buildBorders(geo); else toast('Country borders for the globe could not be loaded.', 'err');
+  syncGlobeToContext();
+}
+function buildBorders(geo) {
+  const pos = [];
+  geo.features.forEach(f => featurePolys(f).forEach(poly => poly.forEach(ring => { for (let i = 0; i < ring.length - 1; i++) { const a = ll2v(ring[i][1], ring[i][0], 1.003), b = ll2v(ring[i + 1][1], ring[i + 1][0], 1.003); pos.push(a.x, a.y, a.z, b.x, b.y, b.z); } })));
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  G.borders = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0x9ad8ff, transparent: true, opacity: .55 }));
+  G.borders.visible = $('#gBorders').getAttribute('aria-pressed') === 'true'; G.earthGroup.add(G.borders);
+}
+function buildGlobeMarkers() {
+  if (!G) return;
+  G.markerGroup.clear(); G.markers = [];
+  const add = (lat, lon, color, r, data) => { const m = new THREE.Mesh(new THREE.SphereGeometry(r, 12, 12), new THREE.MeshBasicMaterial({ color })); m.position.copy(ll2v(lat, lon, 1.01)); m.userData = data; G.markerGroup.add(m); G.markers.push(m); };
+  GLOBE_CITIES.forEach(c => add(c[1], c[2], 0x10e5b0, .013, { type: 'city', name: c[0], lat: c[1], lon: c[2], cc: c[3] }));
+  Object.values(COUNTRIES).forEach(c => { if (!GLOBE_CITIES.some(x => x[0] === c.capital)) add(c.lat, c.lon, 0x22d3ee, .009, { type: 'city', name: c.capital, lat: c.lat, lon: c.lon, cc: c.iso2 }); });
+  const pl = new Map(); S.saved.forEach(p => pl.set(p.id, p)); S.custom.filter(visibleCustom).forEach(p => pl.set(p.id, p));
+  pl.forEach(p => add(p.lat, p.lon, 0xfbbf24, .011, { type: 'place', id: p.id, name: p.name, lat: p.lat, lon: p.lon }));
+}
+function refreshGlobeMarkers() { if (G) buildGlobeMarkers(); }
+function bindGlobeInput(wrap) {
+  const ptrs = new Map(); let moved = 0, downT = 0, pinch0 = 0, dist0 = 0;
+  const ray = new THREE.Raycaster(), v2 = new THREE.Vector2();
+  const pick = (cx, cy) => {
+    const r = wrap.getBoundingClientRect(); v2.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1); ray.setFromCamera(v2, G.camera);
+    const hits = ray.intersectObjects(G.markers, false);
+    const eh = ray.intersectObject(G.earth, false)[0];
+    if (hits.length && (!eh || hits[0].distance <= eh.distance + .02)) return { marker: hits[0].object.userData };
+    if (eh) { const p = G.earth.worldToLocal(eh.point.clone()).normalize(); return { lat: Math.asin(p.y) * 180 / Math.PI, lon: Math.atan2(-p.z, p.x) * 180 / Math.PI }; }
+    return null;
+  };
+  wrap.addEventListener('pointerdown', e => { wrap.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY }); moved = 0; downT = performance.now(); G.interacting = true; G.fly = null; if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch0 = Math.hypot(a.x - b.x, a.y - b.y); dist0 = G.dist; } });
+  wrap.addEventListener('pointermove', e => {
+    const p = ptrs.get(e.pointerId);
+    if (p) {
+      const dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY; moved += Math.abs(dx) + Math.abs(dy);
+      if (ptrs.size === 1) { const k = .0055 * G.dist / 3.4; G.ry += dx * k; G.rx = clamp(G.rx + dy * k, -1.4, 1.4); }
+      else if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y); if (pinch0) G.dist = clamp(dist0 * pinch0 / d, 1.5, 7); }
+    } else if (e.pointerType === 'mouse') {
+      const now = performance.now(); if (now - (G.lastHover || 0) < 60) return; G.lastHover = now;
+      const h = pick(e.clientX, e.clientY), tip = $('#globeTip');
+      let label = '';
+      if (h && h.marker) label = h.marker.name; else if (h && countriesGeo) { const f = countryAt(h.lat, h.lon); if (f) label = countryDisplayName(f); }
+      if (label) { const r = wrap.getBoundingClientRect(); tip.textContent = label; tip.style.left = (e.clientX - r.left) + 'px'; tip.style.top = (e.clientY - r.top) + 'px'; tip.classList.remove('hidden'); wrap.style.cursor = 'pointer'; } else { tip.classList.add('hidden'); wrap.style.cursor = ''; }
+    }
+  });
+  const up = e => {
+    if (!ptrs.has(e.pointerId)) return; ptrs.delete(e.pointerId);
+    if (ptrs.size === 0) { G.interacting = false; G.lastInteract = performance.now(); if (moved < 8 && performance.now() - downT < 450) { const h = pick(e.clientX, e.clientY); if (h) onGlobePick(h); } }
+    if (ptrs.size < 2) pinch0 = 0;
+  };
+  wrap.addEventListener('pointerup', up); wrap.addEventListener('pointercancel', up);
+  wrap.addEventListener('pointerleave', () => $('#globeTip').classList.add('hidden'));
+  wrap.addEventListener('wheel', e => { e.preventDefault(); G.dist = clamp(G.dist * Math.exp(e.deltaY * .0012), 1.5, 7); G.lastInteract = performance.now(); }, { passive: false });
+  wrap.setAttribute('tabindex', '0');
+  wrap.addEventListener('keydown', e => {
+    const k = { ArrowLeft: [-.12, 0], ArrowRight: [.12, 0], ArrowUp: [0, -.1], ArrowDown: [0, .1] }[e.key];
+    if (k) { G.ry += k[0]; G.rx = clamp(G.rx + k[1], -1.4, 1.4); e.preventDefault(); }
+    else if (e.key === '+' || e.key === '=') G.dist = clamp(G.dist * .9, 1.5, 7); else if (e.key === '-') G.dist = clamp(G.dist * 1.1, 1.5, 7);
+  });
+}
+function onGlobePick(h) {
+  if (h.marker) {
+    const m = h.marker;
+    if (m.type === 'place') { openProfile(m.id); return; }
+    selectGlobeLocation({ name: m.name, lat: m.lat, lon: m.lon, cc: m.cc, city: true });
+  } else {
+    const f = countryAt(h.lat, h.lon);
+    if (f) { const iso2 = ISO3TO2[f.id]; selectGlobeLocation({ name: countryDisplayName(f), lat: h.lat, lon: h.lon, cc: iso2 || null, iso3: f.id }); }
+    else selectGlobeLocation({ name: h.lat.toFixed(2) + ', ' + h.lon.toFixed(2), lat: h.lat, lon: h.lon });
+  }
+}
+function selectGlobeLocation(s) {
+  G.sel = s;
+  setContext({ lat: s.lat, lon: s.lon, label: s.name, cc: s.cc || null, explicit: true }, false);
+  globeFlyTo(s.lat, s.lon, s.city ? 1.9 : 2.4);
+  const cc = s.cc, c = cc && COUNTRIES2[cc];
+  $('#globeInfo').innerHTML = '<div style="font-size:15px"><b>' + flagOf(cc) + ' ' + esc(s.name) + '</b></div><div class="muted small">' + s.lat.toFixed(3) + ', ' + s.lon.toFixed(3) + (c ? ' · ' + esc(t('tr.capital')) + ': ' + esc(c.capital) : '') + '</div>' +
+    '<div class="rowflex" style="margin-top:8px"><button class="btn small primary" data-act="globe-travel">ℹ️ ' + esc(t('tab.travel')) + '</button><button class="btn small" data-act="search-here" data-lat="' + s.lat + '" data-lon="' + s.lon + '">🔎 ' + esc(t('pop.search')) + '</button></div>';
+  if (cc) showTravelFor(cc, true); else if (s.iso3) showTravelFor(s.iso3, false, s.iso3, s.name);
+}
+function globeFlyTo(lat, lon, dist) {
+  if (!G) return;
+  const tx = clamp(lat * Math.PI / 180, -1.2, 1.2);
+  let ty = -Math.PI / 2 - lon * Math.PI / 180;
+  while (ty - G.ry > Math.PI) ty -= 2 * Math.PI; while (ty - G.ry < -Math.PI) ty += 2 * Math.PI;
+  G.fly = { t0: performance.now(), dur: 1400, from: { rx: G.rx, ry: G.ry, dist: G.dist }, to: { rx: tx, ry: ty, dist: dist || G.dist } };
+}
+function syncGlobeToContext() { if (G && CTX.explicit) globeFlyTo(CTX.lat, CTX.lon, 2.6); }
+function globeLoop() {
+  if (!G || !G.running) return;
+  if (G.raf) cancelAnimationFrame(G.raf);
+  G.raf = requestAnimationFrame(globeLoop);
+  const now = performance.now();
+  if (G.fly) {
+    const k = clamp((now - G.fly.t0) / G.fly.dur, 0, 1), e = 1 - Math.pow(1 - k, 3);
+    G.rx = G.fly.from.rx + (G.fly.to.rx - G.fly.from.rx) * e; G.ry = G.fly.from.ry + (G.fly.to.ry - G.fly.from.ry) * e; G.dist = G.fly.from.dist + (G.fly.to.dist - G.fly.from.dist) * e;
+    if (k >= 1) G.fly = null;
+  } else if (G.spin && !G.interacting && now - G.lastInteract > 4000 && !G.sel) G.ry += .0016;
+  G.earthGroup.rotation.set(G.rx, G.ry, 0);
+  if (G.clouds) G.clouds.rotation.y += .0003;
+  G.camera.position.set(0, 0, G.dist);
+  if (!G.lastSun || now - G.lastSun > 30000) { G.uniforms.sunDir.value.copy(sunDirection()); G.lastSun = now; }
+  G.renderer.render(G.scene, G.camera);
+}
+function pauseGlobe() { if (G) { G.running = false; if (G.raf) cancelAnimationFrame(G.raf); G.raf = 0; } }
+function resetGlobe() { if (!G) return; G.sel = null; G.fly = { t0: performance.now(), dur: 1200, from: { rx: G.rx, ry: G.ry, dist: G.dist }, to: { rx: .5, ry: G.ry, dist: 3.4 } }; $('#globeInfo').innerHTML = '<b>🌍 WORLDVIEW Globe</b><div class="muted small">Click a country or city.</div>'; }
+
+/* ============================ M. TRAVEL INFORMATION ============================ */
+let TRAVEL_LAST = null, travelSeq = 0;
+function renderTravelHome() {
+  const list = Object.values(COUNTRIES).sort((a, b) => regionName(a.iso2).localeCompare(regionName(b.iso2), LANG));
+  $('#travelContent').innerHTML = '<div class="state"><div class="big">🧳</div>' + esc(t('travel.pick')) + '</div><div class="rowflex">' + list.map(c => '<button class="chip" data-act="travel-country" data-cc="' + c.iso2 + '">' + flagOf(c.iso2) + ' ' + esc(regionName(c.iso2)) + '</button>').join('') + '</div>';
+}
+async function showTravelFor(code, isIso2, iso3, nameHint) {
+  const iso2 = isIso2 ? String(code).toUpperCase() : (ISO3TO2[code] || null);
+  const key = iso2 || iso3 || code;
+  if (TRAVEL_LAST === key && $('#travelContent').innerHTML.trim()) return;
+  TRAVEL_LAST = key;
+  const my = ++travelSeq, box = $('#travelContent');
+  let c = iso2 ? COUNTRIES2[iso2] : null;
+  if (c) { renderTravel(c); return; }
+  box.innerHTML = '<div class="state"><span class="spinner"></span></div>';
+  try {
+    const arr = await fetchJSON(CFG.restCountries + encodeURIComponent(iso2 || iso3 || code) + '?fields=name,cca2,cca3,capital,currencies,languages,timezones,latlng', {}, 12000);
+    if (my !== travelSeq) return;
+    const d = Array.isArray(arr) ? arr[0] : arr;
+    c = { live: true, iso2: d.cca2, iso3: d.cca3, capital: (d.capital || [])[0] || '—', lat: d.latlng ? d.latlng[0] : 0, lon: d.latlng ? d.latlng[1] : 0, currency: Object.keys(d.currencies || {})[0] || '', currencyName: Object.values(d.currencies || {}).map(x => x.name).join(', '), langs: [], langNames: Object.values(d.languages || {}), tz: (d.timezones || []).slice(0, 3).join(', '), enName: d.name && d.name.common };
+    renderTravel(c);
+  } catch (e) {
+    if (my !== travelSeq) return;
+    TRAVEL_LAST = null;
+    box.innerHTML = '<div class="state err"><div class="big">⚠️</div>' + esc(t('msg.error')) + '<br><button class="btn small" data-act="travel-retry" data-code="' + esc(key) + '" style="margin-top:8px">↻</button></div>';
+  }
+}
+function renderTravel(c) {
+  const name = c.iso2 ? regionName(c.iso2) : (c.enName || '');
+  const row = (k, v) => v ? '<dt>' + esc(t(k)) + '</dt><dd>' + v + '</dd>' : '';
+  const ph = '<span class="muted">' + esc(t('tr.placeholder')) + '</span>';
+  const langs = c.live ? c.langNames.map(esc).join(', ') : c.langs.map(l => esc(langName(l))).join(', ');
+  const cur = c.live ? esc(c.currencyName + (c.currency ? ' (' + c.currency + ')' : '')) : esc(currencyName(c.currency));
+  let html = '<div style="text-align:center;margin-bottom:10px"><div style="font-size:54px">' + flagOf(c.iso2) + '</div><h3>' + esc(name) + '</h3>' + (CTX.label && CTX.label !== name ? '<div class="muted small">📍 ' + esc(CTX.label) + '</div>' : '') + '</div>' +
+    '<div class="rowflex" style="margin-bottom:10px">' + ['attraction', 'hotel', 'restaurant', 'pharmacy', 'atm', 'metro'].map(id => '<button class="chip" data-act="quick-cat" data-id="' + id + '" data-lat="' + c.lat + '" data-lon="' + c.lon + '">' + CATS[id].icon + ' ' + esc(catName(id)) + '</button>').join('') + '</div>' +
+    '<dl class="kv">' + row('tr.capital', esc(c.capital)) + row('tr.currency', cur) + row('tr.languages', langs) + row('tr.timezone', esc(c.tz)) + row('tr.emergency', c.emergency ? esc(c.emergency) : ph) +
+    row('tr.visa', ph) + row('tr.safety', ph) + row('tr.customs', c.customs ? esc(c.customs) : ph) + row('tr.weather', '<span class="muted">' + esc(t('tr.weatherNote')) + '</span>') +
+    row('tr.attractions', c.attractions ? c.attractions.split(', ').map(a => '<div>• ' + esc(a) + '</div>').join('') : ph) + row('tr.neighborhoods', c.neighborhoods ? esc(c.neighborhoods) : ph) +
+    row('tr.transport', c.transport ? esc(c.transport) : ph) + row('tr.prices', c.prices ? esc(c.prices) : ph) + row('tr.tips', c.tips ? esc(c.tips) : ph) + '</dl>' +
+    '<div class="legal-box">' + (c.live ? esc(t('tr.live')) : 'Curated general notes (English, approximate; names/languages/currency localized by your browser).') + ' ' + esc(t('tr.placeholder')) + '</div>' +
+    '<div class="rowflex" style="margin-top:10px"><button class="btn small" data-act="travel-home">← ' + esc(t('tab.travel')) + '</button><button class="btn small primary" data-act="open-country-map" data-lat="' + c.lat + '" data-lon="' + c.lon + '">' + esc(t('globe.openMap')) + '</button></div>';
+  $('#travelContent').innerHTML = html;
+}
+
+/* ============================ N. EXPLORE FEED ============================ */
+const EX = { page: 1, per: 12, items: [], obs: null };
+const hashNum = s => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return Math.abs(h); };
+function fillExploreFilters() {
+  const keep = { c: $('#exCountry').value, y: $('#exCity').value, k: $('#exCat').value };
+  const countries = Object.values(COUNTRIES).sort((a, b) => regionName(a.iso2).localeCompare(regionName(b.iso2), LANG));
+  $('#exCountry').innerHTML = '<option value="">🌐 ' + esc(t('pl.country')) + '</option>' + countries.map(c => '<option value="' + c.iso2 + '">' + flagOf(c.iso2) + ' ' + esc(regionName(c.iso2)) + '</option>').join('');
+  const cities = new Set(countries.map(c => c.capital)); S.custom.filter(visibleCustom).forEach(p => p.city && cities.add(p.city));
+  $('#exCity').innerHTML = '<option value="">🏙️ ' + esc(t('pl.city')) + '</option>' + [...cities].sort().map(c => '<option value="' + esc(c) + '">' + esc(c) + '</option>').join('');
+  $('#exCat').innerHTML = '<option value="">🗂️ ' + esc(t('pl.category')) + '</option>' + GROUP_ORDER.map(g => '<optgroup label="' + esc(groupName(g)) + '">' + Object.keys(CATS).filter(id => CATS[id].group === g && !hiddenCat(id)).map(id => '<option value="' + id + '">' + CATS[id].icon + ' ' + esc(catName(id)) + '</option>').join('') + '</optgroup>').join('');
+  $('#exCountry').value = keep.c || ''; $('#exCity').value = keep.y || ''; $('#exCat').value = keep.k || '';
+}
+function buildFeed() {
+  const fc = $('#exCountry').value, fy = $('#exCity').value, fk = $('#exCat').value, sort = $('#exSort').value;
+  const map2 = new Map();
+  S.custom.filter(visibleCustom).forEach(p => map2.set(p.id, p));
+  S.saved.forEach(p => { if (!map2.has(p.id)) map2.set(p.id, p); });
+  CURRENT.list.forEach(p => { if (!map2.has(p.id)) map2.set(p.id, p); });
+  Object.values(COUNTRIES).forEach(c => c.attractions.split(', ').forEach((a, i) => {
+    const id = 'cur:' + c.iso2 + ':' + i; const ex = PLACES.get(id);
+    map2.set(id, ex || reg({ id, source: 'curated', curated: true, name: a, cat: 'attraction', lat: c.lat, lon: c.lon, cc: c.iso2, city: c.capital, country: regionName(c.iso2), desc: regionName(c.iso2) + ' · ' + c.capital + ' — ' + t('tr.attractions') + ' (curated)', address: '', tags: {}, created: 0 }));
+  }));
+  let items = [...map2.values()];
+  const cname = fc ? regionName(fc).toLowerCase() : '';
+  if (fc) items = items.filter(p => (p.cc && p.cc.toUpperCase() === fc) || (p.country && (p.country.toLowerCase() === cname || p.country.toLowerCase() === (COUNTRIES2[fc] ? COUNTRIES2[fc].iso3.toLowerCase() : ''))));
+  if (fy) items = items.filter(p => (p.city || '').toLowerCase() === fy.toLowerCase());
+  if (fk) items = items.filter(p => p.cat === fk);
+  if (sort === 'nearby') items.forEach(p => p.dist = haversine(CTX.lat, CTX.lon, p.lat, p.lon)), items.sort((a, b) => a.dist - b.dist);
+  else if (sort === 'new') items.sort((a, b) => (b.created || 0) - (a.created || 0));
+  else items.sort((a, b) => popularityOf(b) - popularityOf(a) || hashNum(a.id) - hashNum(b.id));
+  return items;
+}
+function masonryCard(p) {
+  const c = CATS[p.cat] || { icon: '📍', color: GROUP_COLORS.custom };
+  const media = mediaList(p), img = media.find(m => m.type === 'image'), vid = media.find(m => m.type === 'video');
+  const h = 120 + hashNum(p.id) % 150;
+  const cover = img ? '<img loading="lazy" alt="" src="' + esc(img.data) + '">' : vid ? '<video muted playsinline preload="metadata" src="' + esc(vid.data) + '"></video>' : c.icon;
+  const r = ratingOf(p.id), saved = isSaved(p.id);
+  return '<article class="mcard"><div class="cover" style="height:' + h + 'px;' + (img || vid ? '' : 'background:linear-gradient(135deg,' + c.color + '66,#0b1f3d)') + '">' + cover + (vid ? '<span class="badge info" style="position:absolute;top:8px;left:8px">▶ video</span>' : '') + '</div><div class="info"><h5>' + esc(p.name) + '</h5>' +
+    '<div class="muted small">' + esc(p.cat ? catName(p.cat) : '') + (p.cc ? ' · ' + flagOf(p.cc) : '') + (r ? ' · ★ ' + r.avg.toFixed(1) : '') + (p.curated ? ' · curated' : '') + '</div>' +
+    (p.desc ? '<div class="small muted" style="margin-top:4px">' + esc(p.desc.slice(0, 90)) + '</div>' : '') +
+    '<div class="acts"><button class="btn small primary" data-act="open-profile" data-id="' + esc(p.id) + '">' + esc(t('pr.open')) + '</button><button class="btn small" data-act="save" data-id="' + esc(p.id) + '">' + (saved ? '❤️' : '🤍') + '</button><button class="btn small" data-act="share" data-id="' + esc(p.id) + '">🔗</button><button class="btn small" data-act="show-on-map" data-id="' + esc(p.id) + '">🗺️</button></div></div></article>';
+}
+function renderExplore(reset) {
+  if (reset) { fillExploreFilters(); EX.page = 1; EX.items = buildFeed(); $('#masonry').innerHTML = ''; }
+  $('#exNote').textContent = 'Sources: places created in this browser, your saved places, the latest nearby results, and curated country highlights. No external social content.';
+  const slice = EX.items.slice((EX.page - 1) * EX.per, EX.page * EX.per);
+  $('#masonry').insertAdjacentHTML('beforeend', slice.map(masonryCard).join(''));
+  const more = EX.items.length > EX.page * EX.per;
+  $('#exSentinel').innerHTML = more ? '<span class="spinner"></span>' : (EX.items.length ? '— ' + EX.items.length + ' —' : '<div class="state">' + esc(t('msg.noResults')) + '</div>');
+  if (!EX.obs) {
+    EX.obs = new IntersectionObserver(es => { if (es[0].isIntersecting && EX.items.length > EX.page * EX.per) { EX.page++; renderExplore(false); } }, { root: $('#exploreView'), rootMargin: '300px' });
+    EX.obs.observe($('#exSentinel'));
+  }
+}
+function openVertical() {
+  const items = (EX.items.length ? EX.items : buildFeed()).slice().sort((a, b) => (mediaList(b).some(m => m.type === 'video') ? 1 : 0) - (mediaList(a).some(m => m.type === 'video') ? 1 : 0)).slice(0, 40);
+  if (!items.length) { toast(t('msg.noResults'), 'err'); return; }
+  const v = $('#vmode');
+  v.innerHTML = items.map(p => {
+    const c = CATS[p.cat] || { icon: '📍', color: '#22d3ee' }, media = mediaList(p), vid = media.find(m => m.type === 'video'), img = media.find(m => m.type === 'image');
+    return '<section class="vslide" style="background:linear-gradient(160deg,' + c.color + '88,#050d1c)"><div class="vbg">' + (vid ? '<video muted loop playsinline src="' + esc(vid.data) + '"></video>' : img ? '<img alt="" src="' + esc(img.data) + '">' : c.icon) + '</div>' +
+      '<div class="vtxt"><h3>' + esc(p.name) + '</h3><div class="muted small">' + esc(p.cat ? catName(p.cat) : '') + (p.cc ? ' · ' + flagOf(p.cc) : '') + '</div><p class="small">' + esc((p.desc || '').slice(0, 140)) + '</p></div>' +
+      '<div class="vside"><button class="btn icon" data-act="save" data-id="' + esc(p.id) + '" aria-label="Save">' + (isSaved(p.id) ? '❤️' : '🤍') + '</button><button class="btn icon" data-act="share" data-id="' + esc(p.id) + '" aria-label="Share">🔗</button><button class="btn icon" data-act="open-profile" data-id="' + esc(p.id) + '" aria-label="Open">ℹ️</button><button class="btn icon" data-act="show-on-map" data-id="' + esc(p.id) + '" aria-label="Map">🗺️</button></div></section>';
+  }).join('');
+  v.classList.remove('hidden'); $('#vclose').classList.remove('hidden'); v.scrollTop = 0;
+  const io = new IntersectionObserver(es => es.forEach(e => { const vd = e.target.querySelector('video'); if (vd) { if (e.isIntersecting) vd.play().catch(() => {}); else vd.pause(); } }), { root: v, threshold: .6 });
+  $$('.vslide', v).forEach(s => io.observe(s)); v._io = io;
+}
+function closeVertical() { const v = $('#vmode'); if (v._io) v._io.disconnect(); v.classList.add('hidden'); $('#vclose').classList.add('hidden'); v.innerHTML = ''; }
+/** Curated items have no precise coordinates until looked up on demand. */
+async function resolveCurated(p) {
+  if (p.resolved || !p.curated) return p;
+  try {
+    const r = await geocode(p.name + ', ' + regionName(p.cc), 1);
+    if (!r.length) { toast(t('msg.noResults'), 'err'); return null; }
+    Object.assign(p, { lat: r[0].lat, lon: r[0].lon, address: r[0].display, resolved: true, source: 'nominatim', nominatim: true, kind: r[0].cls + '=' + r[0].type });
+    return reg(p);
+  } catch (e) { toast(e.status === 429 ? t('msg.rateLimit') : t('msg.error'), 'err'); return null; }
+}
+
+/* ============================ P. ADMIN (local mock) ============================ */
+let ADMIN_TAB = 'places';
+function openAdmin() {
+  if (!S.user) { toast(t('user.signin') + ' →', 'err'); openAuth(); return; }
+  if (!S.user.admin) { toast('Admin dashboard is only available to the first (local admin) account on this browser.', 'err'); return; }
+  renderAdmin(); openModal('modalAdmin');
+}
+function renderAdmin() {
+  const tabs = [['places', 'Places'], ['reports', 'Reports'], ['reviews', 'Reviews'], ['cats', 'Categories'], ['data', 'Data']];
+  let h = '<div class="legal-box" style="margin:0 0 12px">' + esc(t('legal.localOnly')) + ' Admin tools here are a <b>mock</b>: no server-side authorization.</div><div class="rowflex" role="tablist" style="margin-bottom:12px">' + tabs.map(x => '<button class="chip ' + (ADMIN_TAB === x[0] ? 'on' : '') + '" role="tab" data-act="admin-tab" data-tab="' + x[0] + '">' + x[1] + (x[0] === 'reports' ? ' (' + S.reports.filter(r => r.status === 'open').length + ')' : '') + '</button>').join('') + '</div>';
+  if (ADMIN_TAB === 'places') {
+    h += S.custom.length ? '<table class="tbl"><tr><th>Name</th><th>Owner</th><th>Status</th><th></th></tr>' + S.custom.map(p => '<tr><td>' + esc(p.name) + '<br><span class="muted small">' + esc(p.cat ? catName(p.cat) : '') + '</span></td><td>' + esc(p.owner || '') + '</td><td><span class="badge ' + (p.status === 'approved' ? 'ok' : p.status === 'rejected' ? 'bad' : 'warn') + '">' + esc(p.status) + '</span>' + (p.verified ? ' <span class="badge ok">✔</span>' : '') + '</td><td><div class="rowflex">' +
+      '<button class="btn small" data-act="admin-place" data-op="approved" data-id="' + esc(p.id) + '">✔ Approve</button><button class="btn small" data-act="admin-place" data-op="rejected" data-id="' + esc(p.id) + '">✖ Reject</button><button class="btn small" data-act="admin-place" data-op="verify" data-id="' + esc(p.id) + '">🛡 Verify</button><button class="btn small" data-act="open-profile" data-id="' + esc(p.id) + '">👁</button><button class="btn small danger" data-act="admin-place" data-op="delete" data-id="' + esc(p.id) + '">🗑</button></div></td></tr>').join('') + '</table>' : '<div class="state">No custom places yet.</div>';
+  } else if (ADMIN_TAB === 'reports') {
+    h += S.reports.length ? S.reports.map(r => {
+      const tg = r.target || {}; const pl = tg.pid ? getPlace(tg.pid) : null;
+      return '<div class="rev"><div class="rowflex" style="justify-content:space-between"><b>' + esc(tg.type || 'place') + ' · ' + esc(r.reason) + '</b><span class="badge ' + (r.status === 'open' ? 'warn' : 'ok') + '">' + esc(r.status) + '</span></div><div class="small muted">' + esc(r.user) + ' · ' + esc(fmtDate(r.created)) + (pl ? ' · ' + esc(pl.name) : '') + '</div><p>' + esc(r.text) + '</p><div class="rowflex">' +
+        (pl ? '<button class="btn small" data-act="open-profile" data-id="' + esc(pl.id) + '">👁</button>' : '') + (tg.type === 'review' ? '<button class="btn small danger" data-act="admin-remove-review" data-pid="' + esc(tg.pid) + '" data-rid="' + esc(tg.rid) + '">Remove review</button>' : '') + (tg.type === 'place' && pl && pl.source === 'custom' ? '<button class="btn small danger" data-act="admin-place" data-op="delete" data-id="' + esc(pl.id) + '">Delete place</button>' : '') +
+        '<button class="btn small" data-act="admin-report" data-id="' + esc(r.id) + '" data-op="resolve">Resolve</button><button class="btn small danger" data-act="admin-report" data-id="' + esc(r.id) + '" data-op="delete">Delete report</button></div></div>';
+    }).join('') : '<div class="state">No reports.</div>';
+  } else if (ADMIN_TAB === 'reviews') {
+    const all = []; Object.keys(S.reviews).forEach(pid => S.reviews[pid].forEach(rv => all.push([pid, rv])));
+    h += all.length ? all.map(([pid, rv]) => { const pl = getPlace(pid); return '<div class="rev"><div class="rowflex" style="justify-content:space-between"><b>' + esc(rv.user) + ' · ' + stars(rv.rating) + '</b><span class="muted small">' + esc(pl ? pl.name : pid) + '</span></div><p>' + esc(rv.text) + '</p><button class="btn small danger" data-act="admin-remove-review" data-pid="' + esc(pid) + '" data-rid="' + esc(rv.id) + '">Remove</button></div>'; }).join('') : '<div class="state">No reviews.</div>';
+  } else if (ADMIN_TAB === 'cats') {
+    h += '<form class="form" data-form="newcat" style="margin-bottom:12px"><div class="two"><div class="field"><label>Name</label><input name="name" maxlength="40" required></div><div class="field"><label>Emoji</label><input name="icon" maxlength="4" value="📍" required></div></div><div class="field"><label>Group</label><select name="group">' + GROUP_ORDER.map(g => '<option value="' + g + '">' + esc(groupName(g)) + '</option>').join('') + '</select></div><button class="btn primary" type="submit">＋ Add category</button><div class="small muted">Custom categories list user-created places only (no OSM tag).</div></form>' +
+      '<div class="rowflex">' + Object.keys(CATS).map(id => '<button class="cat-btn" data-act="admin-cat" data-id="' + id + '" aria-pressed="' + !hiddenCat(id) + '" title="Toggle visibility">' + CATS[id].icon + ' ' + esc(catName(id)) + '</button>').join('') + '</div><p class="small muted">Highlighted = visible in the category drawer.</p>';
+  } else {
+    h += '<div class="rowflex"><button class="btn" data-act="admin-export">Export all data (JSON)</button><button class="btn danger" data-act="admin-clear">Clear local database</button></div><dl class="kv"><dt>Custom places</dt><dd>' + S.custom.length + '</dd><dt>Saved</dt><dd>' + S.saved.length + '</dd><dt>Reviews</dt><dd>' + Object.values(S.reviews).flat().length + '</dd><dt>Reports</dt><dd>' + S.reports.length + '</dd><dt>Users</dt><dd>' + S.users.length + '</dd></dl>';
+  }
+  $('#adminBody').innerHTML = h;
+}
+function applyCustomCats() {
+  (S.prefs.customCats || []).forEach(c => {
+    CATS[c.id] = { id: c.id, group: c.group, icon: c.icon, filt: '', color: GROUP_COLORS[c.group] || '#22d3ee' };
+    CAT_TR[c.id] = {}; LANGS.forEach(l => CAT_TR[c.id][l] = c.name);
+  });
+  CAT_INDEX = null;
+}
+function adminPlaceOp(id, op) {
+  const p = S.custom.find(x => x.id === id); if (!p) return;
+  if (op === 'delete') { if (!confirm('Delete "' + p.name + '"?')) return; S.custom = S.custom.filter(x => x.id !== id); delete S.reviews[id]; PLACES.delete(id); CURRENT.list = CURRENT.list.filter(x => x.id !== id); persist('reviews'); }
+  else if (op === 'verify') p.verified = !p.verified; else p.status = op;
+  persist('custom'); renderAdmin(); renderResults(); refreshGlobeMarkers(); renderMyPlaces();
+}
+
+/* ============================ LEGAL ============================ */
+const LEGAL_LINES = `
+lg.privacy|This prototype stores your account mock, saved places, reviews and uploads only in your browser (IndexedDB/localStorage). Nothing is sent to a WORLDVIEW server. When you search or navigate, your queries and coordinates are sent to third-party services (Nominatim, Overpass, OSRM, tile servers, REST Countries) which have their own privacy policies. Location is requested only when you use location or navigation features.|Bu prototip hesab maketini, saxlanmış yerləri, rəyləri və yüklənmiş faylları yalnız brauzerinizdə saxlayır. WORLDVIEW serverinə heç nə göndərilmir. Axtarış və naviqasiya zamanı sorğular və koordinatlar üçüncü tərəf xidmətlərinə (Nominatim, Overpass, OSRM, tile serverləri, REST Countries) göndərilir. Məkan yalnız lokasiya və ya naviqasiya funksiyalarını istifadə etdikdə istənir.|Bu prototip hesap taslağını, kayıtlı yerleri, yorumları ve yüklemeleri yalnızca tarayıcınızda saklar. WORLDVIEW sunucusuna veri gönderilmez. Arama ve navigasyonda sorgular ve koordinatlar üçüncü taraf servislere (Nominatim, Overpass, OSRM, karo sunucuları, REST Countries) gönderilir. Konum yalnızca ilgili özellikleri kullandığınızda istenir.|Этот прототип хранит демо-аккаунт, сохранённые места, отзывы и загрузки только в вашем браузере. На сервер WORLDVIEW ничего не отправляется. При поиске и навигации запросы и координаты передаются сторонним сервисам (Nominatim, Overpass, OSRM, серверы тайлов, REST Countries). Геолокация запрашивается только при использовании соответствующих функций.|يخزّن هذا النموذج حسابك التجريبي والأماكن المحفوظة والمراجعات والملفات المرفوعة في متصفحك فقط. لا يُرسل شيء إلى خادم WORLDVIEW. عند البحث أو الملاحة تُرسل الاستعلامات والإحداثيات إلى خدمات خارجية (Nominatim وOverpass وOSRM وخوادم الخرائط وREST Countries). يُطلب الموقع فقط عند استخدام ميزات الموقع أو الملاحة.|این نمونه حساب آزمایشی، مکان‌های ذخیره‌شده، نظرات و بارگذاری‌ها را فقط در مرورگر شما نگه می‌دارد. چیزی به سرور WORLDVIEW ارسال نمی‌شود. هنگام جستجو و مسیریابی، پرسش‌ها و مختصات به سرویس‌های ثالث (Nominatim، Overpass، OSRM، سرورهای کاشی، REST Countries) ارسال می‌شود. موقعیت فقط هنگام استفاده از این قابلیت‌ها درخواست می‌شود.|Dieser Prototyp speichert Demo-Konto, gespeicherte Orte, Bewertungen und Uploads nur in Ihrem Browser. Es wird nichts an einen WORLDVIEW-Server gesendet. Bei Suche und Navigation werden Anfragen und Koordinaten an Drittdienste (Nominatim, Overpass, OSRM, Tile-Server, REST Countries) übertragen. Der Standort wird nur bei Nutzung entsprechender Funktionen angefragt.|Ce prototype stocke compte de démo, lieux enregistrés, avis et fichiers uniquement dans votre navigateur. Rien n'est envoyé à un serveur WORLDVIEW. Lors des recherches et de la navigation, requêtes et coordonnées sont transmises à des services tiers (Nominatim, Overpass, OSRM, serveurs de tuiles, REST Countries). La position n'est demandée que pour ces fonctions.|Este prototipo guarda la cuenta de demostración, lugares guardados, reseñas y archivos solo en su navegador. No se envía nada a un servidor de WORLDVIEW. Al buscar o navegar, consultas y coordenadas se envían a servicios de terceros (Nominatim, Overpass, OSRM, servidores de teselas, REST Countries). La ubicación solo se solicita al usar esas funciones.|本原型仅在您的浏览器中保存模拟账户、收藏地点、评价和上传文件，不会向WORLDVIEW服务器发送任何数据。搜索和导航时，查询和坐标会发送给第三方服务（Nominatim、Overpass、OSRM、地图瓦片服务器、REST Countries）。仅在使用定位或导航功能时才会请求位置。|このプロトタイプはデモアカウント・保存した場所・レビュー・アップロードをブラウザ内にのみ保存し、WORLDVIEWのサーバーには何も送信しません。検索やナビ時にはクエリと座標が外部サービス（Nominatim、Overpass、OSRM、タイルサーバー、REST Countries）に送信されます。位置情報は該当機能の使用時のみ要求されます。
+lg.terms|WORLDVIEW is a prototype provided "as is" without warranties. Map data may be incomplete or wrong; routes are suggestions — follow local laws and real-world signs. You are responsible for content you create and must own the rights to photos/videos you upload. Do not publish unlawful, abusive or misleading content. Public APIs used here have usage limits and may block heavy use.|WORLDVIEW prototipdir və heç bir zəmanət olmadan "olduğu kimi" təqdim olunur. Xəritə datası natamam və ya yanlış ola bilər; marşrutlar tövsiyədir — yerli qanunlara və real nişanlara əməl edin. Yaratdığınız məzmuna görə siz məsuliyyət daşıyırsınız və yüklədiyiniz foto/videoların hüquqlarına sahib olmalısınız. Qanunsuz, təhqiredici və ya aldadıcı məzmun yerləşdirməyin. İstifadə olunan açıq API-lərin limitləri var.|WORLDVIEW bir prototiptir ve garanti verilmeden "olduğu gibi" sunulur. Harita verisi eksik veya hatalı olabilir; rotalar önerilerdir — yerel yasalara ve gerçek tabelalara uyun. Oluşturduğunuz içerikten siz sorumlusunuz ve yüklediğiniz fotoğraf/videoların haklarına sahip olmalısınız. Yasadışı, hakaret içeren veya yanıltıcı içerik yayınlamayın. Kullanılan açık API'lerin kullanım sınırları vardır.|WORLDVIEW — прототип, предоставляется «как есть» без гарантий. Данные карты могут быть неполными или неверными; маршруты носят рекомендательный характер — соблюдайте местные законы и знаки. Вы отвечаете за созданный контент и должны обладать правами на загружаемые фото/видео. Не публикуйте незаконный, оскорбительный или вводящий в заблуждение контент. У публичных API есть лимиты.|WORLDVIEW نموذج أولي يُقدَّم «كما هو» دون ضمانات. قد تكون بيانات الخريطة ناقصة أو خاطئة والمسارات مجرد اقتراحات — التزم بالقوانين المحلية واللافتات. أنت مسؤول عن المحتوى الذي تنشئه ويجب أن تملك حقوق الصور/الفيديوهات. لا تنشر محتوى غير قانوني أو مسيئاً أو مضللاً. للواجهات العامة حدود استخدام.|WORLDVIEW یک نمونه اولیه است و «به همان صورت» و بدون ضمانت ارائه می‌شود. داده‌های نقشه ممکن است ناقص یا نادرست باشند و مسیرها فقط پیشنهادند — قوانین محلی و علائم را رعایت کنید. مسئولیت محتوای تولیدی با شماست و باید مالک حقوق عکس/ویدیو باشید. محتوای غیرقانونی، توهین‌آمیز یا گمراه‌کننده منتشر نکنید. APIهای عمومی محدودیت استفاده دارند.|WORLDVIEW ist ein Prototyp und wird »wie besehen« ohne Gewähr bereitgestellt. Kartendaten können unvollständig oder falsch sein; Routen sind Vorschläge — beachten Sie lokale Gesetze und Verkehrszeichen. Sie sind für Ihre Inhalte verantwortlich und müssen die Rechte an hochgeladenen Fotos/Videos besitzen. Keine rechtswidrigen, beleidigenden oder irreführenden Inhalte. Die genutzten öffentlichen APIs haben Nutzungslimits.|WORLDVIEW est un prototype fourni « en l'état » sans garantie. Les données cartographiques peuvent être incomplètes ou erronées ; les itinéraires sont indicatifs — respectez la loi et la signalisation. Vous êtes responsable de vos contenus et devez détenir les droits des photos/vidéos. Ne publiez rien d'illégal, d'abusif ou de trompeur. Les API publiques ont des limites d'usage.|WORLDVIEW es un prototipo ofrecido «tal cual» sin garantías. Los datos del mapa pueden ser incompletos o erróneos; las rutas son sugerencias — respete la ley y la señalización. Usted es responsable de su contenido y debe poseer los derechos de fotos/vídeos. No publique contenido ilegal, abusivo o engañoso. Las API públicas tienen límites de uso.|WORLDVIEW 是原型产品，按“现状”提供，不作任何保证。地图数据可能不完整或有误；路线仅供参考，请遵守当地法律和现场标志。您对自己创建的内容负责，并须拥有所上传照片/视频的权利。请勿发布违法、辱骂或误导性内容。所用公共API有使用限制。|WORLDVIEWはプロトタイプであり、現状有姿で提供され保証はありません。地図データは不完全・不正確な場合があり、ルートは参考情報です。現地の法令と標識に従ってください。作成したコンテンツの責任は利用者にあり、アップロードする写真・動画の権利が必要です。違法・攻撃的・誤解を招く内容は投稿しないでください。公開APIには利用制限があります。
+lg.data|Map data © OpenStreetMap contributors (ODbL). Places via Overpass API, search via Nominatim, routes via OSRM, satellite imagery © Esri, country data from REST Countries and a community GeoJSON. Not every business worldwide is loaded: only what exists in OpenStreetMap near the selected point is shown, and it can be outdated. Ratings come only from local reviews in this browser.|Xəritə datası © OpenStreetMap iştirakçıları (ODbL). Yerlər Overpass API ilə, axtarış Nominatim ilə, marşrutlar OSRM ilə, peyk görüntüləri © Esri, ölkə datası REST Countries və icma GeoJSON-undan. Dünyadakı hər biznes yüklənmir: yalnız seçilmiş nöqtə ətrafında OpenStreetMap-də olanlar göstərilir və köhnə ola bilər. Reytinqlər yalnız bu brauzerdəki lokal rəylərdəndir.|Harita verisi © OpenStreetMap katkıcıları (ODbL). Yerler Overpass API, arama Nominatim, rotalar OSRM, uydu görüntüleri © Esri, ülke verileri REST Countries ve topluluk GeoJSON'undan gelir. Dünyadaki her işletme yüklenmez: yalnızca seçilen nokta çevresinde OpenStreetMap'te bulunanlar gösterilir ve eski olabilir. Puanlar yalnızca bu tarayıcıdaki yerel yorumlardandır.|Данные карты © участники OpenStreetMap (ODbL). Места — Overpass API, поиск — Nominatim, маршруты — OSRM, спутник © Esri, данные стран — REST Countries и community GeoJSON. Загружены не все организации мира: показано только то, что есть в OpenStreetMap рядом с выбранной точкой, и это может устареть. Рейтинги — только из локальных отзывов в этом браузере.|بيانات الخريطة © مساهمو OpenStreetMap (ODbL). الأماكن عبر Overpass والبحث عبر Nominatim والمسارات عبر OSRM وصور الأقمار © Esri وبيانات الدول من REST Countries وGeoJSON مجتمعي. لا تُحمَّل كل الأعمال في العالم: يظهر فقط ما في OpenStreetMap قرب النقطة المحددة وقد يكون قديماً. التقييمات من المراجعات المحلية في هذا المتصفح فقط.|داده نقشه © مشارکت‌کنندگان OpenStreetMap (ODbL). مکان‌ها از Overpass، جستجو از Nominatim، مسیرها از OSRM، تصاویر ماهواره © Esri، داده کشورها از REST Countries و GeoJSON جامعه. همه کسب‌وکارهای جهان بارگذاری نمی‌شوند: فقط آنچه در OpenStreetMap نزدیک نقطه انتخابی هست نمایش داده می‌شود و ممکن است قدیمی باشد. امتیازها فقط از نظرات محلی همین مرورگرند.|Kartendaten © OpenStreetMap-Mitwirkende (ODbL). Orte über Overpass, Suche über Nominatim, Routen über OSRM, Satellitenbilder © Esri, Länderdaten von REST Countries und Community-GeoJSON. Nicht jedes Unternehmen weltweit ist geladen: Angezeigt wird nur, was in OpenStreetMap nahe dem gewählten Punkt existiert, evtl. veraltet. Bewertungen stammen nur aus lokalen Rezensionen in diesem Browser.|Données © contributeurs OpenStreetMap (ODbL). Lieux via Overpass, recherche via Nominatim, itinéraires via OSRM, imagerie © Esri, pays via REST Countries et un GeoJSON communautaire. Toutes les entreprises du monde ne sont pas chargées : seules celles présentes dans OpenStreetMap près du point choisi s'affichent, parfois périmées. Les notes proviennent uniquement des avis locaux de ce navigateur.|Datos © colaboradores de OpenStreetMap (ODbL). Lugares vía Overpass, búsqueda vía Nominatim, rutas vía OSRM, imágenes © Esri, países de REST Countries y un GeoJSON comunitario. No se cargan todos los negocios del mundo: solo lo que existe en OpenStreetMap cerca del punto elegido, que puede estar desactualizado. Las valoraciones provienen solo de reseñas locales en este navegador.|地图数据 © OpenStreetMap 贡献者 (ODbL)。地点来自 Overpass，搜索来自 Nominatim，路线来自 OSRM，卫星影像 © Esri，国家数据来自 REST Countries 与社区 GeoJSON。并未加载全球所有商户：仅显示所选位置附近 OpenStreetMap 中已有的数据，可能已过时。评分仅来自此浏览器中的本地评价。|地図データ © OpenStreetMap 貢献者 (ODbL)。場所は Overpass、検索は Nominatim、ルートは OSRM、衛星画像 © Esri、国データは REST Countries とコミュニティ GeoJSON。世界中の全店舗が読み込まれるわけではなく、選択地点付近の OpenStreetMap 上のデータのみ表示され、古い場合があります。評価はこのブラウザ内のローカルレビューのみです。
+`;
+LEGAL_LINES.trim().split('\n').forEach(line => { const p = line.split('|'); LANGS.forEach((l, i) => { I18N[l][p[0]] = p[i + 1] || p[1]; }); });
+function openLegal(kind) {
+  const titles = { privacy: 'legal.privacy', terms: 'legal.terms', data: 'legal.dataNotice' };
+  $('#leTitle').textContent = t(titles[kind]);
+  $('#legalBody').innerHTML = '<p style="white-space:pre-wrap">' + esc(t('lg.' + kind)) + '</p><div class="legal-box">' + esc(t('legal.lawyer')) + '</div>';
+  openModal('modalLegal');
+}
+
+/* ============================ EVENTS (delegated) ============================ */
+async function placeFor(id) { const p = getPlace(id); if (p && p.curated && !p.resolved) return await resolveCurated(p); return p; }
+document.addEventListener('click', async e => {
+  const el = e.target.closest('[data-act]'); if (!el) return;
+  const act = el.dataset.act, id = el.dataset.id;
+  switch (act) {
+    case 'search-here': { const lat = +el.dataset.lat, lon = +el.dataset.lon; map.closePopup(); showView('map'); setContext({ lat, lon, label: lat.toFixed(4) + ', ' + lon.toFixed(4), explicit: true }, false); if (!S.selCats.length) { openPanelTab('cats'); expandSheet(); toast(t('msg.searchHint')); } else { openPanelTab('results'); expandSheet(); loadNearby(); } break; }
+    case 'create-here': { map.closePopup(); openPlaceForm({ lat: el.dataset.lat, lon: el.dataset.lon }); break; }
+    case 'recent-search': searchInput().value = el.dataset.q; runSearch(el.dataset.q); break;
+    case 'focus-place': { if (e.target.closest('button')) break; const p = await placeFor(id); if (p) { showView('map'); focusPlace(p.id); } break; }
+    case 'open-profile': { const p = await placeFor(id); if (p) openProfile(p.id); break; }
+    case 'navigate': { const p = await placeFor(id); if (p) { closeAllModalsExcept('modalConsent'); startRoute(p, ROUTE.mode); collapseSheet(); } break; }
+    case 'save': toggleSave(id); break;
+    case 'share': sharePlace(id); break;
+    case 'show-on-map': { const p = await placeFor(id); if (p) { closeAllModalsExcept('modalConsent'); closeVertical(); showView('map'); reg(p); focusPlace(p.id); } break; }
+    case 'toggle-cat': case 'toggle-cat-quick': {
+      const i = S.selCats.indexOf(id); if (i >= 0) S.selCats.splice(i, 1); else S.selCats.push(id);
+      persist('selCats'); renderActiveCats(); syncCatButtons();
+      if (act === 'toggle-cat-quick') { if (S.selCats.length) loadNearby(); else { CURRENT.list = []; renderResults(); $('#resultsStatus').textContent = ''; } }
+      break;
+    }
+    case 'retry-nearby': loadNearby(); break;
+    case 'pick-star': NEW_RATING = +el.dataset.v; { const form = el.closest('form'); const txt = form ? form.text.value : ''; renderReviews(); const nf = $('#reviewsBox form[data-form=review]'); if (nf) nf.text.value = txt; } break;
+    case 'like-review': likeReview(el.dataset.pid, el.dataset.rid); break;
+    case 'reply-open': if (requireLogin()) { REPLY_OPEN = el.dataset.rid; renderReviews(); } break;
+    case 'reply-cancel': REPLY_OPEN = null; renderReviews(); break;
+    case 'edit-review': EDIT_REVIEW = el.dataset.rid; NEW_RATING = 0; renderReviews(); { const f = $('#reviewsBox form[data-form=review]'); if (f) f.scrollIntoView({ block: 'center' }); } break;
+    case 'cancel-edit-review': EDIT_REVIEW = null; NEW_RATING = 0; renderReviews(); break;
+    case 'delete-review': deleteReview(el.dataset.pid, el.dataset.rid); break;
+    case 'delete-reply': deleteReply(el.dataset.pid, el.dataset.rid, el.dataset.rpid); break;
+    case 'report-review': openReport({ type: 'review', pid: el.dataset.pid, rid: el.dataset.rid }); break;
+    case 'report-place': openReport({ type: 'place', pid: id }); break;
+    case 'rm-media': PF_MEDIA.splice(+el.dataset.i, 1); renderPfPreview(); break;
+    case 'edit-place': { const p = getPlace(id); if (p && canEditPlace(p)) { closeModal('modalProfile'); openPlaceForm({}, id); } break; }
+    case 'delete-place': deletePlace(id); break;
+    case 'close-modal': closeModal(el.dataset.id); break;
+    case 'signout': signOut(); break;
+    case 'quick-cat': { const lat = +el.dataset.lat, lon = +el.dataset.lon; showView('map'); setContext({ lat, lon, explicit: true, zoom: 12 }); S.selCats = [id]; persist('selCats'); renderActiveCats(); syncCatButtons(); openPanelTab('results'); expandSheet(); loadNearby(); break; }
+    case 'travel-country': TRAVEL_LAST = null; showTravelFor(el.dataset.cc, true); { const c = COUNTRIES2[el.dataset.cc]; if (c && G) globeFlyTo(c.lat, c.lon, 2.6); } break;
+    case 'travel-retry': TRAVEL_LAST = null; showTravelFor(el.dataset.code, el.dataset.code.length === 2); break;
+    case 'travel-home': TRAVEL_LAST = null; renderTravelHome(); break;
+    case 'open-country-map': showView('map'); map.flyTo([+el.dataset.lat, +el.dataset.lon], 5, { duration: 1.4 }); collapseSheet(); break;
+    case 'globe-travel': openPanelTab('travel'); expandSheet(); break;
+    case 'admin-tab': ADMIN_TAB = el.dataset.tab; renderAdmin(); break;
+    case 'admin-place': adminPlaceOp(id, el.dataset.op); break;
+    case 'admin-report': { const r = S.reports.find(x => x.id === id); if (r) { if (el.dataset.op === 'delete') S.reports = S.reports.filter(x => x.id !== id); else r.status = 'resolved'; persist('reports'); renderAdmin(); } break; }
+    case 'admin-remove-review': { const pid = el.dataset.pid, rid = el.dataset.rid; if (S.reviews[pid]) { S.reviews[pid] = S.reviews[pid].filter(x => x.id !== rid); persist('reviews'); S.reports.forEach(r => { if (r.target && r.target.rid === rid) r.status = 'resolved'; }); persist('reports'); renderAdmin(); toast(t('toast.removed')); } break; }
+    case 'admin-cat': { const h = S.prefs.hiddenCats = S.prefs.hiddenCats || []; const i = h.indexOf(id); if (i >= 0) h.splice(i, 1); else h.push(id); persist('prefs'); renderAdmin(); renderCatGroups(); fillCatSelect(); break; }
+    case 'admin-export': download('worldview-all-data.json', JSON.stringify({ app: 'WORLDVIEW', exported: new Date().toISOString(), custom: S.custom, saved: S.saved, reviews: S.reviews, reports: S.reports, users: S.users.map(u => ({ id: u.id, name: u.name, email: u.email })) }, null, 2)); break;
+    case 'admin-clear': if (confirm('Delete ALL local WORLDVIEW data in this browser? This cannot be undone.')) { await clearAllData(); location.hash = ''; location.reload(); } break;
+    default: break;
+  }
+});
+document.addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('card') && e.target.dataset.act) { e.preventDefault(); e.target.click(); }
+  if (e.key === 'Escape') {
+    if (!$('#vmode').classList.contains('hidden')) { closeVertical(); return; }
+    const open = $$('.modal').filter(m => !m.classList.contains('hidden') && m.id !== 'modalConsent').pop();
+    if (open) { closeModal(open.id); return; }
+    hideSuggest();
+  }
+});
+document.addEventListener('submit', async e => {
+  const f = e.target.closest('form[data-form]'); if (!f) return;
+  e.preventDefault();
+  const k = f.dataset.form;
+  if (k === 'review') await submitReview(f); else if (k === 'reply') submitReply(f); else if (k === 'auth') submitAuth(f);
+  else if (k === 'newcat') {
+    const name = f.name.value.trim(), icon = f.icon.value.trim() || '📍'; if (!name) return;
+    (S.prefs.customCats = S.prefs.customCats || []).push({ id: 'u_' + uid('c'), name: name.slice(0, 40), icon: icon.slice(0, 4), group: f.group.value });
+    persist('prefs'); applyCustomCats(); renderAdmin(); renderCatGroups(); fillCatSelect(); toast(t('toast.saved'), 'ok');
+  }
+});
+
+/* ============================ Q. INIT ============================ */
+function populateLangSelect() { $('#langSelect').innerHTML = LANGS.map(l => '<option value="' + l + '">' + LANG_NAMES[l] + '</option>').join(''); $('#langSelect').value = LANG; }
+function refreshAllUI() {
+  applyI18n(); renderCatGroups(); renderActiveCats(); renderRecentSearches(); renderSaved(); renderMyPlaces(); fillCatSelect(); fillExploreFilters();
+  TRAVEL_LAST = null; if (travelCtxShown()) { /* re-render selected country in new language */ const k = TRAVEL_KEY; if (k) showTravelFor(k, k.length === 2); } else renderTravelHome();
+  renderResults(); if (currentView === 'explore') renderExplore(true);
+}
+let TRAVEL_KEY = null;
+function travelCtxShown() { return !!$('#travelContent').querySelector('dl.kv'); }
+const _showTravelFor = showTravelFor;
+showTravelFor = async function (code, isIso2, iso3, name) { TRAVEL_KEY = isIso2 ? String(code).toUpperCase() : (ISO3TO2[code] || iso3 || code); return _showTravelFor(code, isIso2, iso3, name); };
+
+function bindUI() {
+  const si = searchInput();
+  si.addEventListener('input', onSearchInput);
+  si.addEventListener('focus', () => { if (!si.value.trim()) renderRecentSuggest(); });
+  si.addEventListener('keydown', e => {
+    const items = $$('#suggestions button');
+    if (e.key === 'ArrowDown' && items.length) { e.preventDefault(); suggestIndex = (suggestIndex + 1) % items.length; items[suggestIndex].focus(); }
+    else if (e.key === 'Enter') { e.preventDefault(); runSearch(si.value); }
+  });
+  $('#suggestions').addEventListener('keydown', e => {
+    const items = $$('#suggestions button'); const i = items.indexOf(document.activeElement);
+    if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length].focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); if (i <= 0) si.focus(); else items[i - 1].focus(); }
+  });
+  $('#suggestions').addEventListener('click', e => {
+    const b = e.target.closest('[data-sugg]'); if (!b) return;
+    const k = b.dataset.sugg;
+    if (k === 'geo') { const r = window.__sugg[+b.dataset.i]; si.value = r.name; hideSuggest(); addRecentSearch(r.name); showView('map'); showGeocodeResults([r], r.name); openPanelTab('results'); expandSheet(); }
+    else { si.value = b.dataset.q; runSearch(b.dataset.q); }
+  });
+  document.addEventListener('click', e => { if (!e.target.closest('.searchbox')) hideSuggest(); });
+  $('#searchGo').onclick = () => runSearch(si.value);
+  $('#searchClear').onclick = () => { si.value = ''; $('#searchClear').classList.add('hidden'); hideSuggest(); si.focus(); };
+  $$('.nav button').forEach(b => b.onclick = () => showView(b.dataset.view));
+  $$('#panelTabs button').forEach(b => b.onclick = () => { openPanelTab(b.dataset.tab); expandSheet(); });
+  $('#sheetHandle').onclick = () => $('#panel').classList.toggle('open');
+  $('#langSelect').onchange = e => { LANG = e.target.value; S.prefs.lang = LANG; persist('prefs'); refreshAllUI(); };
+  $('#btnUser').onclick = openAuth;
+  // filters
+  const reRender = () => renderResults();
+  ['fltRating', 'fltPrice', 'fltSort', 'fltOpen', 'fltVerified'].forEach(id => $('#' + id).addEventListener('change', reRender));
+  $('#fltDist').addEventListener('input', () => { $('#fltDistVal').textContent = parseFloat($('#fltDist').value) + ' km'; });
+  $('#fltDist').addEventListener('change', () => { if (S.selCats.length) loadNearby(); else renderResults(); });
+  $('#btnSearchHere').onclick = () => {
+    if (!S.selCats.length) { openPanelTab('cats'); toast(t('msg.searchHint')); return; }
+    const c = map.getCenter(); setContext({ lat: c.lat, lon: c.lng, explicit: true }, false);
+    if (map.getZoom() < 8) { toast(t('msg.searchHint'), 'err'); searchInput().focus(); return; }
+    loadNearby();
+  };
+  $('#btnCatsOpen').onclick = () => openPanelTab('cats');
+  $('#catFilter').addEventListener('input', debounce(renderCatGroups, 150));
+  $('#btnApplyCats').onclick = () => {
+    openPanelTab('results'); expandSheet();
+    if (!S.selCats.length) { CURRENT.list = []; renderResults(); $('#resultsStatus').textContent = ''; return; }
+    if (!CTX.explicit) { if (map.getZoom() < 8) { toast(t('msg.searchHint'), 'err'); searchInput().focus(); return; } const c = map.getCenter(); CTX.lat = c.lat; CTX.lon = c.lng; }
+    CURRENT.fit = true; loadNearby();
+  };
+  $('#btnClearCats').onclick = () => { S.selCats = []; persist('selCats'); renderActiveCats(); syncCatButtons(); CURRENT.list = []; renderResults(); $('#resultsStatus').textContent = ''; };
+  $('#btnClearRecent').onclick = () => { S.recentSearches = []; persist('recentSearches'); renderRecentSearches(); };
+  $('#btnExport').onclick = exportSaved;
+  $('#btnImport').onclick = () => $('#importFile').click();
+  $('#importFile').onchange = e => { importSaved(e.target.files[0]); e.target.value = ''; };
+  $('#btnNewPlace').onclick = () => openPlaceForm();
+  $('#btnAdmin').onclick = openAdmin;
+  $$('[data-legal]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); openLegal(b.dataset.legal); }));
+  // route panel
+  $$('#routePanel [data-mode]').forEach(b => b.onclick = () => { if (ROUTE.dest) startRoute(ROUTE.dest, b.dataset.mode); });
+  $('#btnStopRoute').onclick = stopRoute;
+  // modals
+  $$('.modal').forEach(m => {
+    m.addEventListener('mousedown', e => { if (e.target === m && m.id !== 'modalConsent') closeModal(m.id); });
+    $$('[data-close]', m).forEach(b => b.onclick = () => closeModal(m.id));
+  });
+  // place form
+  $('#placeForm').addEventListener('submit', e => { e.preventDefault(); submitPlaceForm(); });
+  $('#pfMedia').addEventListener('change', e => onMediaPick(e.target.files));
+  $('#pfUseMap').onclick = () => { const c = map.getCenter(); $('#pfLat').value = c.lat.toFixed(6); $('#pfLon').value = c.lng.toFixed(6); };
+  $('#pfUseMe').onclick = async () => { const p = await locateMe(false); if (p) { $('#pfLat').value = p.lat.toFixed(6); $('#pfLon').value = p.lon.toFixed(6); } };
+  $('#reportForm').addEventListener('submit', e => { e.preventDefault(); submitReport(); });
+  // globe controls
+  $('#gReset').onclick = resetGlobe;
+  const tgl = (id, fn) => $('#' + id).onclick = () => { const b = $('#' + id); const on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', on); b.classList.toggle('primary', on); fn(on); };
+  tgl('gSpin', on => { if (G) { G.spin = on; G.sel = on ? null : G.sel; } });
+  tgl('gLight', on => { if (G) G.uniforms.useNight.value = on ? 1 : 0; });
+  tgl('gBorders', on => { if (G && G.borders) G.borders.visible = on; });
+  ['gSpin', 'gLight', 'gBorders'].forEach(id => $('#' + id).classList.add('primary'));
+  $('#gOpenMap').onclick = () => { showView('map'); const z = (G && G.sel && G.sel.city) ? 11 : 5; map.flyTo([CTX.lat, CTX.lon], CTX.explicit ? z : 2, { duration: 1.4 }); };
+  // explore
+  ['exCountry', 'exCity', 'exCat', 'exSort'].forEach(id => $('#' + id).addEventListener('change', () => renderExplore(true)));
+  $('#btnVertical').onclick = openVertical; $('#vclose').onclick = closeVertical;
+  // consent
+  const cons = ['cPrivacy', 'cTerms', 'cContent', 'cRights', 'cLoc', 'cData'];
+  cons.forEach(id => $('#' + id).addEventListener('change', () => { $('#btnConsent').disabled = !cons.every(c => $('#' + c).checked); }));
+  $('#btnConsent').onclick = () => { S.consent = { at: Date.now(), version: 1 }; persist('consent'); closeModal('modalConsent'); };
+  window.addEventListener('online', () => { toast('Back online', 'ok'); setStatus('Online', 'ok'); });
+  window.addEventListener('offline', () => { toast(t('msg.offline'), 'err'); setStatus(t('msg.offline'), 'bad'); });
+  window.addEventListener('resize', debounce(() => { if (!isMobile()) $('#panel').classList.remove('open'); }, 150));
+}
+function handleShareHash() {
+  const m = location.hash.match(/^#s=(.+)$/); if (!m) return;
+  try {
+    const [lat, lon, cat, ...name] = decodeURIComponent(m[1]).split('|'); const la = +lat, lo = +lon;
+    if (!isFinite(la) || !isFinite(lo) || Math.abs(la) > 90 || Math.abs(lo) > 180) return;
+    const p = reg({ id: 'shared:' + la.toFixed(5) + ',' + lo.toFixed(5), source: 'nominatim', nominatim: true, name: name.join('|').slice(0, 120) || 'Shared place', cat: CATS[cat] ? cat : null, lat: la, lon: lo, address: '', tags: {} });
+    setContext({ lat: la, lon: lo, label: p.name, explicit: true, zoom: 16 }); setTimeout(() => focusPlace(p.id), 1500);
+  } catch (e) {}
+}
+async function init() {
+  try { await loadState(); } catch (e) { console.warn(e); }
+  LANG = (S.prefs && S.prefs.lang) || detectLang(); if (!LANGS.includes(LANG)) LANG = 'en';
+  applyCustomCats(); populateLangSelect(); applyI18n();
+  initMap();
+  if (S.prefs.dark) { darkOn = true; $('#lyrDark').setAttribute('aria-pressed', 'true'); applyDark(); }
+  S.saved.forEach(reg); S.custom.forEach(reg);
+  $('#fltDistVal').textContent = parseFloat($('#fltDist').value) + ' km';
+  renderCatGroups(); renderActiveCats(); renderRecentSearches(); renderSaved(); renderMyPlaces(); renderTravelHome(); fillCatSelect();
+  renderResults();
+  bindUI();
+  setStatus('WORLDVIEW · OpenStreetMap · ' + (navigator.onLine ? 'online' : t('msg.offline')), navigator.onLine ? 'ok' : 'bad');
+  if (!S.consent) openModal('modalConsent');
+  handleShareHash();
+  $('#loadingScreen').classList.add('gone'); setTimeout(() => $('#loadingScreen').remove(), 700);
+}
+init().catch(err => { console.error(err); const ls = $('#loadingScreen'); if (ls) ls.classList.add('gone'); toast('Startup error: ' + err.message, 'err'); });
+})();
+</script>
 </body>
 </html>
