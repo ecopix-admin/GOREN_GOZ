@@ -1,44 +1,507 @@
+
 <!doctype html>
 <html lang="az">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#020611"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>WORLDVIEW — World Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#030813">
+<title>WORLDVIEW — Living Earth</title>
 <style>
-:root{--bg:#020611;--panel:#071321cc;--line:#ffffff20;--text:#f5fbff;--muted:#9bb0c1;--cyan:#4de9ff;--mint:#48efb1;--violet:#8d78ff;--yellow:#ffd66b;--shadow:0 22px 70px #000b}
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}body{color:var(--text);font:14px Inter,system-ui,sans-serif;background:#020611 radial-gradient(circle at 50% 42%,#0b3552 0,transparent 33%),radial-gradient(circle at 12% 20%,#122a47 0,transparent 27%),#020611}button,input{font:inherit}button{cursor:pointer}.stars{position:fixed;inset:0;opacity:.45;background-image:radial-gradient(#fff 1px,transparent 1px),radial-gradient(#9cf 1px,transparent 1px);background-size:97px 91px,151px 137px;background-position:11px 17px,73px 44px;pointer-events:none}.dashboard{position:relative;z-index:1;height:100dvh;width:min(1500px,100%);margin:auto;padding:24px 28px 20px;display:grid;grid-template-rows:auto 1fr auto;gap:10px}.top{display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{display:flex;align-items:center;gap:12px;font:700 22px "Space Grotesk";letter-spacing:1px}.brandmark{display:grid;place-items:center;width:43px;height:43px;border:1px solid #50f3c588;border-radius:15px;color:var(--mint);background:#48efb112;box-shadow:0 0 32px #48efb144}.top-right{display:flex;gap:9px;align-items:center;color:var(--muted)}.live{display:flex;align-items:center;gap:7px;font-size:11px;letter-spacing:1px;text-transform:uppercase}.live i{display:block;width:8px;height:8px;background:var(--mint);border-radius:50%;box-shadow:0 0 14px var(--mint)}.glass{background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(18px);box-shadow:var(--shadow);border-radius:18px}.icon-btn,.city-btn,.mode-btn{border:1px solid var(--line);background:#ffffff09;color:var(--text);border-radius:12px;padding:10px 12px}.icon-btn:hover,.city-btn:hover,.mode-btn.active{border-color:var(--cyan);color:var(--cyan);background:#4de9ff12}.stage{position:relative;min-height:0;display:grid;place-items:center}.globe-wrap{width:min(70vw,720px);height:min(70vw,720px,75vh);min-height:350px;position:relative}.globe-wrap:before,.globe-wrap:after{content:"";position:absolute;left:50%;top:50%;border:1px solid #4de9ff55;border-radius:50%;pointer-events:none}.globe-wrap:before{width:94%;height:28%;transform:translate(-50%,-50%) rotate(-25deg)}.globe-wrap:after{width:76%;height:24%;transform:translate(-50%,-50%) rotate(29deg);border-color:#48efb155}#globe{width:100%;height:100%;display:block;position:relative;z-index:1}.label{position:absolute;z-index:2;left:18px;top:17px;font-size:11px;letter-spacing:2px;color:var(--mint)}.help{position:absolute;z-index:2;left:18px;bottom:18px;color:#ffffff88;font-size:11px}.left-panel,.right-panel{position:absolute;top:50%;transform:translateY(-50%);z-index:4;width:220px}.left-panel{left:0}.right-panel{right:0;width:250px}.panel-title{margin:0 0 12px;font:600 14px "Space Grotesk";letter-spacing:.4px}.controls{display:grid;gap:8px}.control-row{display:flex;gap:8px}.control-row>*{flex:1}.search{width:100%;background:#ffffff08;color:#fff;border:1px solid var(--line);border-radius:12px;padding:11px;outline:none}.search:focus{border-color:var(--cyan)}.info{padding:17px}.info h2{margin:0 0 3px;font:700 24px "Space Grotesk"}.info .country{font-size:12px;color:var(--cyan)}.weather{display:flex;align-items:center;gap:10px;margin:18px 0}.weather-icon{font-size:34px}.temp{font-size:29px;font-weight:700}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px}.metric{padding:10px;border:1px solid #ffffff12;border-radius:12px;background:#ffffff06}.metric b{display:block;font-size:14px}.metric span{display:block;color:var(--muted);font-size:10px;margin-top:4px}.coordinates{font-size:11px;color:var(--muted);line-height:1.7;margin-top:14px}.bottom{display:flex;align-items:center;justify-content:center;gap:8px;min-height:53px}.city-btn{font-size:11px}.city-btn.active{color:#020611;background:var(--mint);border-color:var(--mint);font-weight:700}.modebar{display:flex;gap:7px}.mode-btn{font-size:11px}.loading{color:var(--muted);font-size:12px}.footer-note{position:absolute;left:50%;transform:translateX(-50%);bottom:8px;color:#ffffff55;font-size:10px;letter-spacing:1px;text-transform:uppercase;pointer-events:none}.tooltip{position:absolute;z-index:8;display:none;pointer-events:none;padding:8px 10px;border:1px solid #ffffff33;border-radius:10px;background:#061421e8;font-size:11px;color:#fff;white-space:nowrap}.tooltip.show{display:block}@media(max-width:1000px){.left-panel,.right-panel{position:relative;top:auto;left:auto;right:auto;transform:none;width:100%;max-width:480px;margin:auto}.stage{display:flex;flex-direction:column;gap:10px;overflow:auto}.globe-wrap{order:0;width:min(92vw,620px);height:min(92vw,620px);min-height:340px}.left-panel{order:1}.right-panel{order:2}.panel-title{display:inline-block;margin:0 0 8px}.dashboard{padding:14px 14px 12px;gap:4px}.stage{justify-content:flex-start}.right-panel{display:none}.footer-note{display:none}}@media(max-width:600px){.top-right .live{display:none}.brand{font-size:18px}.brandmark{width:37px;height:37px}.globe-wrap{min-height:300px;height:82vw}.bottom{overflow:auto;justify-content:flex-start}.city-btn{white-space:nowrap}.left-panel{max-width:none}.control-row{flex-direction:column}}
-.cinema{position:fixed;inset:0;z-index:30;display:grid;place-items:center;background:#020611;animation:cinemaOut 1.4s 2.5s forwards;pointer-events:none}.cinema-mark{text-align:center;animation:cinemaIn 1.4s ease-out}.cinema-mark strong{display:block;font:700 clamp(28px,7vw,70px) "Space Grotesk";letter-spacing:8px;color:#fff}.cinema-mark span{color:var(--mint);letter-spacing:4px;font-size:11px}.cinema-orbit{width:140px;height:140px;border:1px solid #48efb177;border-radius:50%;margin:0 auto 25px;box-shadow:0 0 55px #48efb144;animation:orbit 5s linear infinite}@keyframes cinemaIn{from{opacity:0;transform:scale(.82);filter:blur(12px)}to{opacity:1;transform:scale(1);filter:blur(0)}}@keyframes cinemaOut{to{opacity:0;visibility:hidden}}@keyframes orbit{to{transform:rotate(360deg)}}
+:root{
+ --bg:#030813;--panel:rgba(8,20,36,.88);--line:#ffffff20;
+ --text:#f4f9ff;--muted:#9aafc5;--cyan:#56e8ff;
+ --mint:#4ef2bc;--violet:#a18bff;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{background:radial-gradient(ellipse at 50% 44%,#102f4d,#030813 65%);
+ color:var(--text);font:14px system-ui,-apple-system,sans-serif}
+button,input{font:inherit}
+button{color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--cyan)}
+#stars{position:fixed;inset:0;pointer-events:none;opacity:.5;
+ background-image:radial-gradient(#fff 1px,transparent 1.5px),
+ radial-gradient(#73cfff 1px,transparent 1.5px);
+ background-size:83px 83px,139px 139px;background-position:12px 22px,57px 70px}
+.app{height:100dvh;position:relative;isolation:isolate}
+header{position:absolute;z-index:5;top:0;left:0;right:0;
+ display:flex;align-items:center;justify-content:space-between;
+ padding:calc(14px + env(safe-area-inset-top)) 18px 12px;
+ background:linear-gradient(#030813dd,transparent)}
+.brand{display:flex;align-items:center;gap:10px;font-size:19px;
+ font-weight:850;letter-spacing:1.5px}
+.logo{width:39px;height:39px;border:1px solid #4ef2bc77;
+ border-radius:13px;display:grid;place-items:center;color:var(--mint);
+ background:#4ef2bc12;font-size:25px;box-shadow:0 0 25px #4ef2bc15}
+.head-actions{display:flex;gap:7px}
+.btn{border:1px solid var(--line);background:#ffffff09;
+ padding:10px 12px;border-radius:12px;font-size:12px}
+.btn:active{transform:scale(.97)}
+.btn.active,.btn:hover{border-color:#56e8ff77;color:var(--cyan)}
+#world{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
+.hud{position:absolute;z-index:3;left:20px;top:100px;pointer-events:none}
+.eyebrow{font-size:10px;letter-spacing:2px;color:var(--mint);font-weight:800}
+.hud h1{font-size:clamp(25px,4vw,43px);letter-spacing:-1.5px;margin:8px 0}
+.hud p{color:var(--muted);font-size:12px;line-height:1.6;margin:0}
+.searchbox{position:absolute;z-index:6;top:100px;left:50%;
+ transform:translateX(-50%);width:min(360px,calc(100% - 36px))}
+.searchline{display:flex;gap:7px;padding:6px;
+ border:1px solid var(--line);border-radius:15px;background:#071626dd;
+ backdrop-filter:blur(20px);box-shadow:0 12px 45px #0005}
+.searchline input{min-width:0;flex:1;border:0;outline:0;background:transparent;
+ color:white;padding:9px;font-size:13px}
+.searchline button{border:0;border-radius:10px;background:#4ef2bc;
+ color:#03120f;font-weight:800;padding:0 14px}
+#searchResults{display:none;margin-top:6px;max-height:220px;overflow:auto;
+ border:1px solid var(--line);border-radius:14px;background:#071626f5;
+ backdrop-filter:blur(20px)}
+.result{display:block;width:100%;padding:12px;text-align:left;
+ border:0;border-bottom:1px solid #ffffff12;background:transparent;
+ color:white;font-size:12px}
+.result:hover{background:#ffffff12}
+.globe-help{position:absolute;z-index:2;bottom:240px;left:50%;
+ transform:translateX(-50%);font-size:11px;color:#b5cad9aa;
+ white-space:nowrap;pointer-events:none}
+.panel{position:absolute;z-index:4;right:18px;bottom:24px;
+ width:min(340px,calc(100% - 36px));border:1px solid #ffffff20;
+ border-radius:23px;background:var(--panel);backdrop-filter:blur(24px);
+ box-shadow:0 20px 70px #0008;padding:19px}
+.panel-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.live{font-size:10px;color:var(--mint);letter-spacing:1px}
+.live:before{content:"";display:inline-block;width:6px;height:6px;
+ margin-right:7px;border-radius:50%;background:var(--mint);
+ box-shadow:0 0 10px var(--mint)}
+.close{border:1px solid var(--line);background:#ffffff09;
+ width:30px;height:30px;border-radius:10px;font-size:17px}
+.place{font-size:26px;line-height:1.15;letter-spacing:-.8px;
+ margin:12px 0 5px;overflow-wrap:anywhere}
+.location{font-size:11px;line-height:1.5;color:var(--muted)}
+.weather-main{display:flex;align-items:center;gap:13px;
+ margin:18px 0;padding:14px;border:1px solid #ffffff13;
+ border-radius:17px;background:linear-gradient(120deg,#56e8ff0e,#a18bff0a)}
+.weather-icon{font-size:39px}
+.temp{font-size:35px;font-weight:800;letter-spacing:-1.5px}
+.description{font-size:11px;color:var(--muted);margin-top:3px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{padding:12px;border:1px solid #ffffff12;border-radius:14px;
+ background:#ffffff05;min-width:0}
+.stat .symbol{font-size:15px}
+.stat b{display:block;font-size:15px;margin-top:7px;overflow-wrap:anywhere}
+.stat small{display:block;font-size:10px;color:var(--muted);margin-top:4px}
+.coords{margin-top:13px;display:flex;justify-content:space-between;
+ align-items:center;gap:8px;font-size:10px;color:var(--muted)}
+.coords button{border:0;background:transparent;color:var(--cyan);padding:5px}
+.status{font-size:11px;line-height:1.5;color:var(--muted);margin-top:10px}
+.citybar{position:absolute;z-index:4;bottom:16px;left:18px;
+ display:flex;gap:7px;max-width:calc(100% - 400px);overflow-x:auto;
+ padding:5px 0;scrollbar-width:none}
+.citybar::-webkit-scrollbar{display:none}
+.city{white-space:nowrap;padding:10px 13px;border:1px solid var(--line);
+ border-radius:13px;background:#071626d9;font-size:11px}
+.city.active{background:var(--mint);border-color:var(--mint);color:#03120e;font-weight:800}
+.toast{position:absolute;z-index:20;left:50%;bottom:30px;
+ transform:translateX(-50%);background:#11253a;border:1px solid #56e8ff66;
+ border-radius:12px;padding:12px 16px;font-size:12px;
+ box-shadow:0 10px 30px #0008;max-width:90%;text-align:center}
+.hidden{display:none!important}
+#loading{position:absolute;z-index:2;top:50%;left:50%;
+ transform:translate(-50%,-50%);text-align:center;color:var(--muted);
+ font-size:12px;pointer-events:none}
+.spinner{width:28px;height:28px;margin:0 auto 12px;border:2px solid #ffffff22;
+ border-top-color:var(--mint);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(min-width:1000px){
+ .panel{bottom:28px;right:26px}
+ .citybar{bottom:30px;left:26px}
+ .globe-help{bottom:30px;left:50%}
+}
+@media(max-width:700px){
+ header{padding-left:13px;padding-right:13px}
+ .brand{font-size:16px;gap:7px}
+ .logo{width:34px;height:34px}
+ .head-actions .btn{padding:9px;font-size:11px}
+ .hud{top:83px;left:15px}
+ .hud h1{font-size:25px;margin:5px 0}
+ .hud p{font-size:10px}
+ .searchbox{top:157px}
+ .panel{bottom:74px;left:12px;right:12px;width:auto;
+  padding:14px;border-radius:19px}
+ .place{font-size:22px;margin:9px 0 4px}
+ .weather-main{margin:11px 0;padding:10px}
+ .weather-icon{font-size:31px}
+ .temp{font-size:29px}
+ .stat{padding:9px}
+ .stat b{font-size:13px;margin-top:4px}
+ .stats{gap:6px}
+ .coords{margin-top:8px}
+ .citybar{left:12px;right:12px;bottom:9px;max-width:none}
+ .city{padding:9px 12px}
+ .globe-help{bottom:calc(74px + 285px);font-size:10px}
+}
+@media(max-height:690px) and (max-width:700px){
+ .hud{display:none}
+ .searchbox{top:75px}
+ .panel{bottom:65px;padding:10px}
+ .weather-main{margin:7px 0}
+ .stat{padding:7px}
+ .citybar{bottom:4px}
+ .globe-help{display:none}
+}
 </style>
 </head>
-<body><div class="cinema"><div class="cinema-mark"><div class="cinema-orbit"></div><strong>WORLDVIEW</strong><span>A LIVING VIEW OF EARTH</span></div></div>
-<div class="stars"></div>
-<div class="dashboard">
-<header class="top"><div class="brand"><span class="brandmark">◎</span> WORLDVIEW</div><div class="top-right"><span class="live"><i></i> Live world data</span><button id="installBtn" class="icon-btn" hidden onclick="installApp()">＋ Install</button><button class="icon-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button><button class="icon-btn" onclick="locateMe()">◎ My location</button></div></header>
-<main class="stage">
- <section class="left-panel glass" style="padding:15px"><h3 class="panel-title">Explore the planet</h3><div class="controls"><input id="search" class="search" placeholder="Search a city or country..."><div class="control-row"><button class="mode-btn active" id="rotateBtn" onclick="toggleRotation()">↻ Auto rotate</button><button class="mode-btn" onclick="resetView()">◎ Reset</button></div><div class="control-row"><button class="mode-btn active" onclick="focusCity('Baku',40.4093,49.8671)">Baku</button><button class="mode-btn" onclick="focusCity('London',51.5072,-.1276)">London</button></div><div class="control-row"><button class="mode-btn" onclick="focusCity('New York',40.7128,-74.006)">New York</button><button class="mode-btn" onclick="focusCity('Tokyo',35.6762,139.6503)">Tokyo</button></div></div></section>
- <div class="globe-wrap"><canvas id="globe"></canvas><span class="label">SATELLITE EARTH · 3D</span><span class="help">Drag to rotate · Scroll to zoom · Click a city</span><div id="tooltip" class="tooltip"></div></div>
- <section class="right-panel glass info" id="info"><span class="weather-icon">🌍</span><h2>Select a place</h2><div class="country">Explore any city on Earth</div><div class="weather"><span class="loading">Live weather and local time will appear here</span></div><div class="coordinates">Click a city chip or search above.</div></section>
-</main>
-<footer class="bottom"><button class="city-btn active" onclick="focusCity('Baku',40.4093,49.8671)">Baku</button><button class="city-btn" onclick="focusCity('London',51.5072,-.1276)">London</button><button class="city-btn" onclick="focusCity('New York',40.7128,-74.006)">New York</button><button class="city-btn" onclick="focusCity('Paris',48.8566,2.3522)">Paris</button><button class="city-btn" onclick="focusCity('Dubai',25.2048,55.2708)">Dubai</button><button class="city-btn" onclick="focusCity('Tokyo',35.6762,139.6503)">Tokyo</button><span class="footer-note">A living view of our connected world</span></footer>
+<body>
+<div id="stars"></div>
+<div class="app">
+<header>
+ <div class="brand"><span class="logo">◎</span> WORLDVIEW</div>
+ <div class="head-actions">
+  <button class="btn" id="rotateBtn">Ⅱ Fırlanma</button>
+  <button class="btn" id="homeBtn">⌖ Mərkəz</button>
+  <button class="btn" id="fullBtn">⛶</button>
+ </div>
+</header>
+
+<div class="hud">
+ <div class="eyebrow">PLANET EARTH · 3D</div>
+ <h1>Dünyanı kəşf et.</h1>
+ <p>Qlobusu çevir. İstənilən nöqtəni seç.<br>Planet haqqında məlumatları öyrən.</p>
 </div>
+
+<div class="searchbox">
+ <form class="searchline" id="searchForm">
+  <input id="searchInput" placeholder="Şəhər, ölkə və ya məkan axtar..." autocomplete="off">
+  <button type="submit">Axtar</button>
+ </form>
+ <div id="searchResults"></div>
+</div>
+
+<canvas id="world"></canvas>
+<div id="loading"><div class="spinner"></div>Yer kürəsi hazırlanır...</div>
+<div class="globe-help">↔ Barmaqla çevir · İki barmaqla böyüt · Nöqtəyə toxun</div>
+
+<section class="panel" id="info">
+ <div class="panel-top"><span class="live">WORLD DATA</span><button class="close" id="refreshBtn" title="Məlumatı yenilə">↻</button></div>
+ <h2 class="place" id="placeName">Bakı</h2>
+ <div class="location" id="placeLocation">Azərbaycan · Yerli məlumatlar</div>
+ <div class="weather-main">
+  <span class="weather-icon" id="weatherIcon">🌍</span>
+  <div><div class="temp" id="temperature">--°C</div>
+  <div class="description" id="weatherDescription">Hava məlumatı yüklənir</div></div>
+ </div>
+ <div class="stats">
+  <div class="stat"><span class="symbol">◷</span><b id="localTime">--:--:--</b><small>Yerli saat</small></div>
+  <div class="stat"><span class="symbol">💧</span><b id="humidity">--</b><small>Rütubət</small></div>
+  <div class="stat"><span class="symbol">〰</span><b id="wind">--</b><small>Küləyin sürəti</small></div>
+  <div class="stat"><span class="symbol">◉</span><b id="windDirection">--</b><small>Küləyin istiqaməti</small></div>
+ </div>
+ <div class="coords"><span id="coordinates">40.4093, 49.8671</span><button id="copyCoords">Koordinatları köçür</button></div>
+ <div class="status" id="status">Məlumatlar hazırlanır...</div>
+</section>
+
+<nav class="citybar">
+ <button class="city active" data-name="Bakı" data-lat="40.4093" data-lng="49.8671">🇦🇿 Bakı</button>
+ <button class="city" data-name="London" data-lat="51.5072" data-lng="-0.1276">London</button>
+ <button class="city" data-name="New York" data-lat="40.7128" data-lng="-74.0060">New York</button>
+ <button class="city" data-name="Paris" data-lat="48.8566" data-lng="2.3522">Paris</button>
+ <button class="city" data-name="Dubai" data-lat="25.2048" data-lng="55.2708">Dubai</button>
+ <button class="city" data-name="Tokyo" data-lat="35.6762" data-lng="139.6503">Tokyo</button>
+ <button class="city" data-name="Istanbul" data-lat="41.0082" data-lng="28.9784">İstanbul</button>
+ <button class="city" data-name="Sydney" data-lat="-33.8688" data-lng="151.2093">Sydney</button>
+</nav>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 "use strict";
-let scene,camera,renderer,earth,grid,drag=false,lastX=0,autoRotate=true,ready=false,target={name:"Baku",lat:40.4093,lng:49.8671};
-const cities=[["Baku",40.4093,49.8671],["London",51.5072,-.1276],["New York",40.7128,-74.006],["Paris",48.8566,2.3522],["Dubai",25.2048,55.2708],["Tokyo",35.6762,139.6503]];
-const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
-function init(){let c=$("globe");renderer=new THREE.WebGLRenderer({canvas:c,alpha:true,antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(38,c.clientWidth/c.clientHeight,.1,100);camera.position.z=3.25;earth=new THREE.Mesh(new THREE.SphereGeometry(1,64,64),new THREE.MeshPhongMaterial({color:0xffffff,shininess:18}));scene.add(earth);grid=new THREE.Mesh(new THREE.SphereGeometry(1.012,32,20),new THREE.MeshBasicMaterial({color:0x48efb1,wireframe:true,transparent:true,opacity:.16}));scene.add(grid);let loader=new THREE.TextureLoader;loader.setCrossOrigin("anonymous");loader.load("https://eoimages.gsfc.nasa.gov/images/imagerecords/57000/57730/world.topo.bathy.200412.3x5400x2700.jpg",t=>{earth.material.map=t;earth.material.needsUpdate=true},undefined,()=>earth.material.color.set(0x257f99));scene.add(new THREE.AmbientLight(0xaeefff,1.3));let sun=new THREE.DirectionalLight(0xffffff,2.3);sun.position.set(4,3,5);scene.add(sun);c.onpointerdown=e=>{drag=true;lastX=e.clientX};window.addEventListener("pointerup",()=>drag=false);c.onpointermove=e=>{if(drag){earth.rotation.y+=(e.clientX-lastX)*.008;grid.rotation.y=earth.rotation.y;lastX=e.clientX}};c.onwheel=e=>{e.preventDefault();camera.position.z=Math.max(1.65,Math.min(7,camera.position.z+e.deltaY*.003))};window.addEventListener("resize",resize);function loop(){requestAnimationFrame(loop);if(autoRotate&&!drag)earth.rotation.y+=.0013;grid.rotation.y=earth.rotation.y;renderer.render(scene,camera)}loop();ready=true;resize();focusCity("Baku",40.4093,49.8671)}
-function resize(){let c=$("globe");if(!renderer)return;camera.aspect=c.clientWidth/c.clientHeight;camera.updateProjectionMatrix();renderer.setSize(c.clientWidth,c.clientHeight,false)}
-function toggleRotation(){autoRotate=!autoRotate;$("rotateBtn").classList.toggle("active",autoRotate);$("rotateBtn").textContent=autoRotate?"↻ Auto rotate":"⏸ Rotation paused"}
-function resetView(){camera.position.z=3.25;earth.rotation.set(0,0,0);target={name:"Baku",lat:40.4093,lng:49.8671};updateInfo(target.name,target.lat,target.lng)}
-function focusCity(name,lat,lng){target={name,lat,lng};if(ready)earth.rotation.y=THREE.MathUtils.degToRad(-lng);document.querySelectorAll(".city-btn").forEach(b=>b.classList.toggle("active",b.textContent===name));updateInfo(name,lat,lng)}
-function localZone(lng){let h=Math.round(lng/15);return "Etc/GMT"+(h===0?"":h>0?"-"+h:"+"+Math.abs(h))}
-function weatherIcon(code){if(code===0)return"☀️";if([1,2,3].includes(code))return"⛅";if([45,48].includes(code))return"🌫";if([51,53,55,61,63,65,80,81,82].includes(code))return"🌧";if([71,73,75,85,86].includes(code))return"❄️";if([95,96,99].includes(code))return"⛈";return"🌍"}
-async function updateInfo(name,lat,lng){let info=$("info"),time=new Intl.DateTimeFormat("az-AZ",{timeZone:localZone(lng),hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false}).format(new Date());info.innerHTML=`<span class="weather-icon">⏳</span><h2>${esc(name)}</h2><div class="country">Local time and live conditions</div><div class="weather"><span class="loading">Loading live data...</span></div><div class="coordinates">📍 ${lat.toFixed(4)}, ${lng.toFixed(4)}</div>`;try{let w=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&timezone=auto`).then(r=>r.json()),cur=w.current||{};info.innerHTML=`<span class="weather-icon">${weatherIcon(cur.weather_code)}</span><h2>${esc(name)}</h2><div class="country">Live local conditions</div><div class="weather"><div><div class="temp">${cur.temperature_2m??"—"}°C</div><div class="loading">${weatherText(cur.weather_code)}</div></div></div><div class="metrics"><div class="metric"><b>🕒 ${time}</b><span>Local time</span></div><div class="metric"><b>💧 ${cur.relative_humidity_2m??"—"}%</b><span>Humidity</span></div><div class="metric"><b>💨 ${cur.wind_speed_10m??"—"} km/h</b><span>Wind</span></div><div class="metric"><b>🌐 ${lat.toFixed(2)}, ${lng.toFixed(2)}</b><span>Coordinates</span></div></div>`}catch(e){info.innerHTML=`<span class="weather-icon">🌍</span><h2>${esc(name)}</h2><div class="country">Local time</div><div class="weather"><div class="temp">${time}</div></div><p class="loading">Weather service is temporarily unavailable.</p><div class="coordinates">📍 ${lat.toFixed(4)}, ${lng.toFixed(4)}</div>`}}
-function weatherText(c){if(c===0)return"Clear sky";if([1,2,3].includes(c))return"Partly cloudy";if([45,48].includes(c))return"Fog";if([51,53,55,61,63,65,80,81,82].includes(c))return"Rain";if([71,73,75,85,86].includes(c))return"Snow";if([95,96,99].includes(c))return"Thunderstorm";return"Current weather"}
-let deferredInstall=null;window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstall=e;$("installBtn").hidden=false});async function installApp(){if(!deferredInstall)return showToast("Brauzer menyusundan ana ekrana əlavə edin");deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$("installBtn").hidden=true}function toggleFullscreen(){if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.()}async function keepAwake(){try{window.wakeLock=await navigator.wakeLock?.request("screen")}catch(e){}}
-function showToast(t){let x=document.createElement("div");x.textContent=t;x.style="position:fixed;z-index:20;bottom:25px;left:50%;transform:translateX(-50%);padding:12px 16px;border:1px solid #4de9ff;background:#071321;color:white;border-radius:12px";document.body.appendChild(x);setTimeout(()=>x.remove(),2500)}
-$("search").addEventListener("keydown",async e=>{if(e.key!=="Enter")return;let q=e.target.value.trim();if(!q)return;try{let r=await fetch("https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&accept-language=az&q="+encodeURIComponent(q)).then(x=>x.json());if(r[0])focusCity(r[0].display_name.split(",")[0],+r[0].lat,+r[0].lon);else showToast("Place not found")}catch{showToast("Search unavailable")}});window.addEventListener("load",()=>{init();keepAwake()});
+const $=id=>document.getElementById(id);
+const state={lat:40.4093,lng:49.8671,name:"Bakı",auto:true,loadingId:0};
+let scene,camera,renderer,earth,clouds,marker,raycaster,mouse;
+let down=false,moved=false,px=0,py=0,prevX=0,prevY=0;
+let lastTap=0,pinchStart=0,zoom=3.05,ready=false;
+let pointerStart=null;
+
+function toast(msg){
+ const old=document.querySelector(".toast");if(old)old.remove();
+ const d=document.createElement("div");d.className="toast";d.textContent=msg;
+ document.querySelector(".app").appendChild(d);
+ setTimeout(()=>d.remove(),2600);
+}
+function init(){
+ const canvas=$("world");
+ scene=new THREE.Scene();
+ camera=new THREE.PerspectiveCamera(38,1,.1,100);
+ camera.position.z=zoom;
+ renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:"high-performance"});
+ renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.7));
+ renderer.outputEncoding=THREE.sRGBEncoding;
+ scene.add(new THREE.AmbientLight(0xb8d9ff,1.5));
+ const sun=new THREE.DirectionalLight(0xffffff,2.1);
+ sun.position.set(4,3,5);scene.add(sun);
+
+ earth=new THREE.Mesh(
+  new THREE.SphereGeometry(1,72,56),
+  new THREE.MeshPhongMaterial({color:0xffffff,specular:0x24394b,shininess:14})
+ );
+ scene.add(earth);
+
+ const loader=new THREE.TextureLoader();
+ loader.setCrossOrigin("anonymous");
+ loader.load(
+  "https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg",
+  texture=>{
+   texture.encoding=THREE.sRGBEncoding;
+   earth.material.map=texture;earth.material.color.set(0xffffff);
+   earth.material.needsUpdate=true;
+   $("loading").classList.add("hidden");
+  },undefined,()=>{
+   $("loading").innerHTML="Yer teksturası yüklənmədi.<br>İnternet bağlantısını yoxla.";
+   earth.material.color.set(0x1c6284);
+  }
+ );
+
+ clouds=new THREE.Mesh(
+  new THREE.SphereGeometry(1.009,48,36),
+  new THREE.MeshBasicMaterial({color:0x8edcff,transparent:true,opacity:.045,wireframe:true})
+ );
+ scene.add(clouds);
+
+ const atmosphere=new THREE.Mesh(
+  new THREE.SphereGeometry(1.055,48,36),
+  new THREE.MeshBasicMaterial({color:0x24baff,transparent:true,opacity:.075,side:THREE.BackSide})
+ );
+ scene.add(atmosphere);
+
+ marker=new THREE.Mesh(
+  new THREE.SphereGeometry(.018,12,10),
+  new THREE.MeshBasicMaterial({color:0x4ef2bc})
+ );
+ earth.add(marker);
+
+ raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();
+ resize();
+ window.addEventListener("resize",resize);
+
+ canvas.addEventListener("pointerdown",e=>{
+  down=true;moved=false;px=e.clientX;py=e.clientY;
+  prevX=e.clientX;prevY=e.clientY;
+  pointerStart={x:e.clientX,y:e.clientY,time:Date.now()};
+  if(canvas.setPointerCapture)canvas.setPointerCapture(e.pointerId);
+ });
+ canvas.addEventListener("pointermove",e=>{
+  if(!down)return;
+  const dx=e.clientX-prevX,dy=e.clientY-prevY;
+  if(Math.abs(e.clientX-px)+Math.abs(e.clientY-py)>5)moved=true;
+  if(moved){
+   state.auto=false;updateRotateButton();
+   earth.rotation.y+=dx*.006;
+   earth.rotation.x+=dy*.006;
+   earth.rotation.x=Math.max(-Math.PI/2,Math.min(Math.PI/2,earth.rotation.x));
+   clouds.rotation.copy(earth.rotation);
+  }
+  prevX=e.clientX;prevY=e.clientY;
+ });
+ canvas.addEventListener("pointerup",e=>{
+  if(!down)return;down=false;
+  if(!moved&&pointerStart&&Date.now()-pointerStart.time<700)selectAt(e.clientX,e.clientY);
+  pointerStart=null;
+ });
+ canvas.addEventListener("pointercancel",()=>{down=false;pointerStart=null});
+ canvas.addEventListener("wheel",e=>{
+  e.preventDefault();
+  zoom=Math.max(1.55,Math.min(5.5,zoom+e.deltaY*.0025));
+  camera.position.z=zoom;
+ },{passive:false});
+
+ $("rotateBtn").addEventListener("click",()=>{
+  state.auto=!state.auto;updateRotateButton();
+ });
+ $("homeBtn").addEventListener("click",()=>{
+  zoom=3.05;camera.position.z=zoom;focus(40.4093,49.8671,"Bakı");
+ });
+ $("fullBtn").addEventListener("click",async()=>{
+  try{
+   if(!document.fullscreenElement)await document.documentElement.requestFullscreen();
+   else await document.exitFullscreen();
+  }catch{toast("Tam ekran rejimi bu brauzerdə dəstəklənmir");}
+ });
+ $("refreshBtn").addEventListener("click",()=>loadPlace(state.lat,state.lng,state.name,true));
+ $("copyCoords").addEventListener("click",async()=>{
+  const t=state.lat.toFixed(5)+", "+state.lng.toFixed(5);
+  try{await navigator.clipboard.writeText(t);toast("Koordinatlar köçürüldü");}
+  catch{toast(t);}
+ });
+
+ document.querySelectorAll(".city").forEach(b=>b.addEventListener("click",()=>{
+  focus(+b.dataset.lat,+b.dataset.lng,b.dataset.name);
+ }));
+
+ $("searchForm").addEventListener("submit",searchPlace);
+ document.addEventListener("click",e=>{
+  if(!$("searchResults").contains(e.target)&&e.target!==$("searchInput"))
+   $("searchResults").style.display="none";
+ });
+
+ ready=true;
+ focus(40.4093,49.8671,"Bakı");
+ animate();
+}
+function resize(){
+ if(!renderer)return;
+ const w=window.innerWidth,h=window.innerHeight;
+ renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
+}
+function animate(){
+ requestAnimationFrame(animate);
+ if(state.auto&&!down&&earth){
+  earth.rotation.y+=.0008;
+  clouds.rotation.y=earth.rotation.y*1.015;
+ }
+ if(renderer)renderer.render(scene,camera);
+}
+function updateRotateButton(){
+ $("rotateBtn").textContent=state.auto?"Ⅱ Fırlanma":"▶ Fırlanma";
+ $("rotateBtn").classList.toggle("active",state.auto);
+}
+function markerPosition(lat,lng){
+ const a=lat*Math.PI/180,b=lng*Math.PI/180,r=1.022;
+ marker.position.set(r*Math.cos(a)*Math.sin(b),r*Math.sin(a),r*Math.cos(a)*Math.cos(b));
+}
+function focus(lat,lng,name){
+ state.lat=lat;state.lng=lng;state.name=name;
+ if(earth){
+  earth.rotation.x=lat*Math.PI/180;
+  earth.rotation.y=-lng*Math.PI/180;
+  clouds.rotation.copy(earth.rotation);
+  markerPosition(lat,lng);
+ }
+ zoom=3.05;camera.position.z=zoom;
+ state.auto=false;updateRotateButton();
+ document.querySelectorAll(".city").forEach(b=>
+  b.classList.toggle("active",b.dataset.name===name));
+ loadPlace(lat,lng,name);
+}
+function selectAt(clientX,clientY){
+ if(!ready)return;
+ const r=renderer.domElement.getBoundingClientRect();
+ mouse.x=((clientX-r.left)/r.width)*2-1;
+ mouse.y=-((clientY-r.top)/r.height)*2+1;
+ raycaster.setFromCamera(mouse,camera);
+ const hits=raycaster.intersectObject(earth,false);
+ if(!hits.length)return;
+ const p=earth.worldToLocal(hits[0].point.clone()).normalize();
+ const lat=Math.asin(Math.max(-1,Math.min(1,p.y)))*180/Math.PI;
+ const lng=Math.atan2(p.x,p.z)*180/Math.PI;
+ state.lat=lat;state.lng=lng;state.name="Seçilmiş məkan";
+ markerPosition(lat,lng);
+ loadPlace(lat,lng,"Seçilmiş məkan");
+}
+async function searchPlace(e){
+ e.preventDefault();
+ const q=$("searchInput").value.trim();if(!q)return;
+ $("searchResults").style.display="block";
+ $("searchResults").innerHTML='<div class="result">Məkan axtarılır...</div>';
+ try{
+  const url="https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&accept-language=az&q="+encodeURIComponent(q);
+  const data=await fetch(url,{headers:{"Accept":"application/json"}}).then(r=>{
+   if(!r.ok)throw Error("Search");return r.json();
+  });
+  const box=$("searchResults");box.innerHTML="";
+  if(!data.length){box.innerHTML='<div class="result">Məkan tapılmadı. Başqa ad yoxla.</div>';return;}
+  data.forEach(p=>{
+   const b=document.createElement("button");b.type="button";b.className="result";
+   b.textContent=p.display_name;
+   b.addEventListener("click",()=>{
+    box.style.display="none";
+    focus(+p.lat,+p.lon,(p.name||p.display_name.split(",")[0]));
+   });
+   box.appendChild(b);
+  });
+ }catch{
+  $("searchResults").innerHTML='<div class="result">Axtarış alınmadı. İnterneti yoxla.</div>';
+ }
+}
+function weatherInfo(code){
+ if(code===0)return["☀️","Açıq səma"];
+ if([1,2,3].includes(code))return["⛅","Az buludlu / buludlu"];
+ if([45,48].includes(code))return["🌫️","Duman"];
+ if([51,53,55,56,57].includes(code))return["🌦️","Çiskin"];
+ if([61,63,65,66,67,80,81,82].includes(code))return["🌧️","Yağış"];
+ if([71,73,75,77,85,86].includes(code))return["❄️","Qar"];
+ if([95,96,99].includes(code))return["⛈️","Tufan"];
+ return["🌍","Hava məlumatı"];
+}
+function direction(deg){
+ if(deg==null)return"—";
+ return ["Şimal","Şimal-şərq","Şərq","Cənub-şərq","Cənub","Cənub-qərb","Qərb","Şimal-qərb"][Math.round(deg/45)%8];
+}
+async function loadPlace(lat,lng,name,refresh=false){
+ const id=++state.loadingId;
+ state.lat=lat;state.lng=lng;state.name=name;
+ $("placeName").textContent=name;
+ $("placeLocation").textContent="Məkan məlumatları yüklənir...";
+ $("weatherIcon").textContent="🌍";
+ $("temperature").textContent="--°C";
+ $("weatherDescription").textContent="Hava yüklənir...";
+ $("localTime").textContent="--:--:--";
+ $("humidity").textContent="--";
+ $("wind").textContent="--";
+ $("windDirection").textContent="--";
+ $("coordinates").textContent=lat.toFixed(4)+", "+lng.toFixed(4);
+ $("status").textContent="Canlı hava xidməti ilə əlaqə qurulur...";
+ try{
+  const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,weather_code&timezone=auto`;
+  const res=await fetch(url);
+  if(!res.ok)throw Error("Weather");
+  const w=await res.json();
+  if(id!==state.loadingId)return;
+  const c=w.current||{},[icon,desc]=weatherInfo(c.weather_code);
+  $("weatherIcon").textContent=icon;
+  $("temperature").textContent=c.temperature_2m==null?"--°C":Math.round(c.temperature_2m)+"°C";
+  $("weatherDescription").textContent=desc;
+  $("humidity").textContent=c.relative_humidity_2m==null?"—":c.relative_humidity_2m+"%";
+  $("wind").textContent=c.wind_speed_10m==null?"—":c.wind_speed_10m+" km/s";
+  $("windDirection").textContent=direction(c.wind_direction_10m);
+  if(c.time){
+   const parts=c.time.split("T");
+   $("localTime").textContent=(parts[1]||"--:--").slice(0,8);
+  }
+  $("placeLocation").textContent=(w.timezone||"Yerli vaxt")+" · "+(w.timezone_abbreviation||"");
+  $("status").textContent="Son hava məlumatı: "+(c.time||"vaxt göstərilməyib")+
+   ". Dəqiqlik seçilmiş koordinatın yaxınlığından asılıdır.";
+  reverseName(lat,lng,id);
+ }catch{
+  if(id!==state.loadingId)return;
+  $("placeLocation").textContent="Koordinat üzrə seçilmiş məkan";
+  $("status").textContent="Hava məlumatını almaq mümkün olmadı. İnternet bağlantısını və xidmətin vəziyyətini yoxla.";
+  reverseName(lat,lng,id);
+ }
+}
+async function reverseName(lat,lng,id){
+ try{
+  const u=`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&zoom=10&accept-language=az`;
+  const d=await fetch(u,{headers:{"Accept":"application/json"}}).then(r=>{
+   if(!r.ok)throw Error("Reverse");return r.json();
+  });
+  if(id!==state.loadingId)return;
+  const a=d.address||{};
+  const city=a.city||a.town||a.village||a.municipality||a.county;
+  const country=a.country;
+  if(country){
+   $("placeLocation").textContent=[city&&city!==state.name?city:null,country].filter(Boolean).join(" · ");
+   if(state.name==="Seçilmiş məkan"||state.name==="Məkan"){
+    $("placeName").textContent=city||country;
+    state.name=city||country;
+   }
+  }
+ }catch{}
+}
+window.addEventListener("load",()=>{
+ if(!window.THREE){
+  $("loading").innerHTML="3D kitabxanası yüklənmədi.<br>İnternet bağlantısını yoxla.";
+  return;
+ }
+ init();
+});
 </script>
 </body>
 </html>
