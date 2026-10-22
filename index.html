@@ -1,46 +1,1445 @@
-<!doctype html><html lang="az"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>USTAMAP — EarthView Pro</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<style>
-:root{--bg:#06101e;--card:#0e1c2e;--card2:#13273e;--line:#203b59;--text:#f2f7fb;--muted:#8fa6ba;--mint:#3de3a6;--blue:#5f8eff;--yellow:#ffd166;--red:#ff7185;--shadow:0 20px 70px #0008}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 80% -10%,#174267 0,#06101e 42%);color:var(--text);font-family:Inter,Arial,sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer}.app{max-width:1440px;margin:auto;padding:16px 24px 100px}.top{display:flex;align-items:center;justify-content:space-between;gap:20px;position:sticky;top:0;z-index:10;padding:12px 0;background:#06101ed9;backdrop-filter:blur(16px)}.brand{display:flex;align-items:center;gap:12px;font-family:"Space Grotesk";font-weight:700}.brandmark{width:46px;height:46px;display:grid;place-items:center;border-radius:15px;background:linear-gradient(135deg,var(--mint),#4385ff);color:#06101e;font-size:25px;box-shadow:0 12px 35px #3de3a64d}.brand small{display:block;letter-spacing:2px;color:var(--muted);font:600 10px Inter;margin-top:3px}.nav{display:flex;gap:6px;align-items:center}.nav button,.iconbtn,.lang{border:1px solid var(--line);border-radius:12px;background:#ffffff08;color:var(--text);padding:10px 13px}.nav button.active,.nav button:hover{background:#3de3a620;color:var(--mint);border-color:#3de3a677}.primary{background:linear-gradient(135deg,var(--mint),#3ca9ff)!important;color:#05121d!important;border:0!important;font-weight:800}.mobilebar{display:none}.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:34px;align-items:center;padding:62px 0 42px}.eyebrow{color:var(--mint);font-size:12px;font-weight:800;letter-spacing:2px}.hero h1{font:700 clamp(37px,5.5vw,74px)/1.02 "Space Grotesk";letter-spacing:-2px;margin:12px 0 20px;max-width:800px}.hero p{color:var(--muted);line-height:1.75;max-width:680px;font-size:17px}.searchline{display:flex;gap:9px;margin-top:27px;max-width:760px}.input,.select{background:#071522;border:1px solid var(--line);border-radius:12px;color:var(--text);padding:13px 14px;outline:0;width:100%}.input:focus,.select:focus{border-color:var(--mint)}.stats{display:flex;gap:11px;flex-wrap:wrap;margin-top:23px}.stat{padding:13px 16px;border:1px solid var(--line);background:#ffffff08;border-radius:15px}.stat b{font-size:21px;display:block}.stat span{font-size:11px;color:var(--muted)}.hero-globe{height:350px;display:grid;place-items:center;position:relative}.hero-globe .ball{width:285px;height:285px;border-radius:50%;background:radial-gradient(circle at 30% 24%,#71f4c3,#2384a3 43%,#06111e 73%);box-shadow:inset -40px -30px 60px #000a,0 0 80px #3de3a655;animation:levitate 7s ease-in-out infinite}.hero-globe:before,.hero-globe:after{content:"";position:absolute;border:1px solid #3de3a677;border-radius:50%;width:360px;height:105px;transform:rotate(-24deg)}.hero-globe:after{width:315px;height:75px;transform:rotate(30deg)}@keyframes levitate{50%{transform:translateY(-12px) rotate(5deg)}}.section{margin-top:29px}.sectionhead{display:flex;align-items:flex-end;justify-content:space-between;gap:15px;margin-bottom:14px}.section h2{font:600 26px "Space Grotesk";margin:0}.sectionhead p{color:var(--muted);font-size:13px;margin:6px 0 0}.mapgrid{display:grid;grid-template-columns:1.25fr .75fr;gap:16px}.panel{background:linear-gradient(145deg,#12263c,#0b1728);border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:var(--shadow)}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:11px}.chip{border:1px solid var(--line);border-radius:30px;background:#ffffff08;color:var(--muted);padding:9px 12px}.chip:hover,.chip.active{color:var(--mint);border-color:#3de3a688;background:#3de3a614}.mapbox{height:450px;border-radius:15px;overflow:hidden}.leaflet-container{background:#0b1a2b}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#12263c;color:#fff}.leaflet-popup-content{line-height:1.5}.globe3d{height:450px;border-radius:15px;overflow:hidden;position:relative;background:radial-gradient(circle at 40% 35%,#1b5c79,#07111f 67%)}#globeCanvas{width:100%;height:100%;display:block}.globe-label{position:absolute;top:16px;left:16px;color:var(--mint);font-weight:700;font-size:13px;letter-spacing:1px}.globe-help{position:absolute;bottom:14px;left:16px;color:#ffffff99;font-size:11px}.filters{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr auto;gap:9px}.category-row{display:flex;gap:8px;overflow:auto;padding-bottom:4px}.category-row .chip{white-space:nowrap}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.listing{overflow:hidden;padding:0;min-width:0}.listing .cover{height:180px;width:100%;object-fit:cover;display:block;background:#18324e}.listing-body{padding:14px}.listing h3{font-size:16px;margin:7px 0;line-height:1.35}.tag{font-size:11px;color:var(--mint);font-weight:700}.meta{font-size:12px;color:var(--muted);line-height:1.8}.listing-actions{display:flex;gap:6px;margin-top:11px}.mini{padding:7px 9px;border:1px solid var(--line);background:#ffffff08;color:var(--text);border-radius:9px;font-size:12px}.mini:hover{border-color:var(--mint);color:var(--mint)}.discover-grid{columns:4 250px;column-gap:14px}.discover-card{break-inside:avoid;margin:0 0 14px;padding:0;overflow:hidden;cursor:pointer}.discover-card img{display:block;width:100%;max-height:390px;object-fit:cover}.discover-card .discover-info{padding:13px}.discover-card h3{font-size:15px;margin:5px 0}.profile{display:grid;grid-template-columns:145px 1fr auto;gap:18px;align-items:center}.avatar{width:128px;height:128px;border-radius:50%;object-fit:cover;border:3px solid var(--mint)}.profile h2{margin:0 0 6px;font:600 27px "Space Grotesk"}.profile p{color:var(--muted);line-height:1.6;margin:5px 0}.badges{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.badge{font-size:11px;padding:6px 9px;border-radius:20px;background:#3de3a615;color:var(--mint);border:1px solid #3de3a655}.bottomnav{position:fixed;z-index:12;bottom:15px;left:50%;transform:translateX(-50%);display:flex;gap:3px;padding:7px;background:#0a192ad9;border:1px solid var(--line);border-radius:18px;backdrop-filter:blur(18px);box-shadow:var(--shadow)}.bottomnav button{background:transparent;color:var(--muted);border:0;border-radius:12px;padding:9px 14px;font-size:12px}.bottomnav button:hover,.bottomnav button.active{color:var(--mint);background:#3de3a615}.modal{display:none;position:fixed;z-index:30;inset:0;background:#000b;place-items:center;padding:15px}.modal.open{display:grid}.modalbox{width:min(820px,100%);max-height:92vh;overflow:auto;border:1px solid var(--line);background:var(--card);border-radius:24px;padding:23px;box-shadow:var(--shadow)}.modalhead{display:flex;justify-content:space-between;align-items:center;gap:15px}.modalhead h2{font:600 25px "Space Grotesk";margin:0}.close{background:#ffffff0b;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:8px 11px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:18px}.full{grid-column:1/-1}.checkline{display:flex;gap:9px;align-items:flex-start;color:var(--muted);font-size:12px;line-height:1.5}.checkline input{accent-color:var(--mint);margin-top:3px}.profile-modal{display:grid;grid-template-columns:180px 1fr;gap:22px}.profile-hero{width:180px;height:230px;object-fit:cover;border-radius:16px}.detail-title{font:600 29px "Space Grotesk";margin:0 0 8px}.metricrow{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0}.metric{border:1px solid var(--line);border-radius:12px;padding:9px 12px;color:var(--muted);font-size:12px}.metric b{display:block;color:var(--text);font-size:17px}.comment{border-top:1px solid var(--line);padding:12px 0;font-size:13px}.comment b{color:var(--mint)}.reels{height:72vh;overflow-y:auto;scroll-snap-type:y mandatory;background:#02070e;border-radius:18px}.reel{height:72vh;scroll-snap-align:start;position:relative;display:flex;align-items:flex-end;background:#0d1b2d center/cover no-repeat}.reel:after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 35%,#000d)}.reel-info{position:relative;z-index:1;padding:25px;color:white;max-width:80%}.reel-info h2{margin:0 0 7px;font:600 25px "Space Grotesk"}.reel-info p{color:#ffffffbb;line-height:1.5}.reel-actions{position:absolute;right:18px;bottom:26px;z-index:2;display:grid;gap:12px}.reel-actions button{width:48px;height:48px;border-radius:50%;border:1px solid #ffffff44;background:#0008;color:#fff}.toast{position:fixed;z-index:50;bottom:90px;left:50%;transform:translateX(-50%);padding:12px 16px;background:#132a41;border:1px solid var(--mint);color:#fff;border-radius:12px;display:none}.toast.show{display:block}.footer{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap;color:var(--muted);font-size:12px;padding:42px 0 10px}@media(max-width:1050px){.hero{grid-template-columns:1fr}.hero-globe{max-height:310px}.cards{grid-template-columns:repeat(3,1fr)}.filters{grid-template-columns:1fr 1fr 1fr}.filters .searchwide{grid-column:1/-1}}@media(max-width:750px){.app{padding:10px 14px 90px}.nav{display:none}.mobilebar{display:flex;gap:7px}.hero{padding-top:35px}.hero h1{letter-spacing:-1px}.mapgrid{grid-template-columns:1fr}.cards{grid-template-columns:1fr 1fr}.profile{grid-template-columns:75px 1fr}.profile .avatar{width:70px;height:70px}.profile .profile-actions{grid-column:1/-1}.profile-modal{grid-template-columns:1fr}.profile-hero{width:100%;height:250px}.formgrid,.filters{grid-template-columns:1fr}.full{grid-column:auto}.bottomnav button{padding:8px 9px;font-size:11px}.mapbox,.globe3d{height:350px}}@media(max-width:450px){.cards{grid-template-columns:1fr}.hero-globe .ball{width:230px;height:230px}.hero-globe:before{width:290px}.hero-globe:after{width:255px}}
-</style></head><body><div class="app">
-<header class="top"><div class="brand"><div class="brandmark">◎</div><div>USTAMAP<small>EARTHVIEW PRO</small></div></div><nav class="nav"><button class="active" data-go="home">⌂ Ana səhifə</button><button data-go="discoverSection">✦ Kəşf et</button><button data-go="mapSection">🌍 Xəritə</button><button onclick="showSaved()">♡ Sevimlilər</button></nav><div class="mobilebar"><select id="language" class="lang"><option>AZ</option><option>EN</option><option>RU</option></select><button class="iconbtn primary" onclick="openPost()">＋ Elan</button></div></header>
-<main id="home"><section class="hero"><div><div class="eyebrow">GLOBAL SERVICES · LOCAL TRUST</div><h1>Dünyanı xəritədə kəşf et. Xidmətini dünyaya göstər.</h1><p>USTAMAP peşəkarları, xidmətləri və elanları interaktiv xəritə və 3D qlobus üzərindən birləşdirən yeni nəsil platformadır.</p><div class="searchline"><input id="q" class="input" placeholder="Xidmət, peşə, ölkə, şəhər, küçə və ya koordinat axtar..."><button class="iconbtn primary" onclick="searchAds()">Axtar</button></div><div class="stats"><div class="stat"><b>3D</b><span>interaktiv qlobus</span></div><div class="stat"><b>100+</b><span>peşə kateqoriyası</span></div><div class="stat"><b>∞</b><span>yerli və qlobal elan</span></div></div></div><div class="hero-globe"><div class="ball"></div></div></section>
-<section class="section" id="mapSection"><div class="sectionhead"><div><h2>🌍 Dünya xəritələri</h2><p>İstənilən yerə toxunun, məkanı dəqiqləşdirin və elanlara baxın</p></div><div class="toolbar"><button class="chip active" onclick="setMap('street',this)">🗺 Küçə</button><button class="chip" onclick="setMap('satellite',this)">🛰 Peyk</button><button class="chip" onclick="locateMe()">◎ Mənim yerim</button></div></div><div class="mapgrid"><div class="panel"><div class="toolbar"><button class="chip" onclick="fly(40.4093,49.8671,'Bakı, Azərbaycan')">📍 Bakı</button><button class="chip" onclick="fly(41.0082,28.9784,'İstanbul, Türkiyə')">📍 İstanbul</button><button class="chip" onclick="fly(52.52,13.405,'Berlin, Almaniya')">📍 Berlin</button><button class="chip" onclick="fly(40.7128,-74.006,'New York, ABŞ')">📍 New York</button></div><div class="mapbox" id="map"></div></div><div class="panel"><div class="globe3d"><canvas id="globeCanvas"></canvas><span class="globe-label">EARTHVIEW PRO · 3D GLOBE</span><span class="globe-help">Döndürmək üçün sürüşdürün · çarxla yaxınlaşdırın</span></div></div></div></section>
-<section class="section"><div class="sectionhead"><div><h2>🔎 Ətraflı qlobal axtarış</h2><p>Peşə, ölkə, şəhər, rayon, qəsəbə, küçə və koordinat üzrə axtarın</p></div></div><div class="panel filters"><input id="profession" class="input searchwide" placeholder="Peşə və ya xidmət kateqoriyası"><input id="country" class="input" placeholder="Ölkə"><input id="city" class="input" placeholder="Şəhər / rayon / küçə"><input id="coords" class="input" placeholder="Koordinat: 40.4093,49.8671"><button class="iconbtn primary" onclick="advancedSearch()">Elanları filtrlə</button><button class="iconbtn" onclick="findGlobalPlaces()">🌍 Yaxın obyektləri tap</button></div><div class="panel" style="margin-top:12px"><div class="toolbar"><button class="chip" onclick="findGlobalPlaces('cafe')">☕ Kafelər</button><button class="chip" onclick="findGlobalPlaces('restaurant')">🍽 Restoranlar</button><button class="chip" onclick="findGlobalPlaces('hairdresser')">💈 Bərbərlər</button><button class="chip" onclick="findGlobalPlaces('fitness_centre')">🏋 Fitnes</button><button class="chip" onclick="findGlobalPlaces('supermarket')">🛒 Marketlər</button><button class="chip" onclick="findGlobalPlaces('hotel')">🏨 Otellər</button></div><div class="cards" id="globalPlaces"></div></div></section>
-<section class="section"><div class="sectionhead"><div><h2>⚡ Önə çıxan kateqoriyalar</h2><p>Ən çox axtarılan peşələr</p></div></div><div class="category-row" id="categories"></div></section>
-<section class="section" id="adsSection"><div class="sectionhead"><div><h2>📌 Yaxınlıqdakı elanlar</h2><p id="resultText">Xəritədə göstərilən və seçilən məkana yaxın elanlar</p></div><button class="chip" onclick="renderAds(ads)">Hamısı</button></div><div class="cards" id="ads"></div></section>
-<section class="section" id="discoverSection"><div class="sectionhead"><div><h2>✦ Kəşf et</h2><p>Pinterest görünüşündə elanlar və TikTok üslubunda şaquli baxış</p></div><button class="iconbtn primary" onclick="openReels()">▣ Şaquli baxış</button></div><div class="discover-grid" id="discover"></div></section>
-<section class="section"><div class="sectionhead"><div><h2>♙ Peşəkar profil</h2><p>Etibar göstəriciləri, xidmət sahələri və media</p></div></div><div class="panel profile"><img class="avatar" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80"><div><h2>USTAMAP peşəkarları</h2><p>Yerli və beynəlxalq xidmət mütəxəssislərini bir platformada kəşf edin.</p><div class="badges"><span class="badge">✓ Təsdiqlənmiş profil</span><span class="badge">★ Yüksək reytinq</span><span class="badge">🌍 Qlobal görünürlük</span></div></div><div class="profile-actions"><button class="iconbtn primary" onclick="openProfile(ads[0].id)">Profilə bax</button></div></div></section></main>
-<footer class="footer"><span>© 2025 USTAMAP — EarthView Pro</span><span>Elanlar cihazda saxlanılır. İctimai istifadədən əvvəl hüquqi mətnləri hüquqşünasla uyğunlaşdırın.</span></footer></div>
-<div class="bottomnav"><button class="active" data-go="home">⌂ Ana</button><button data-go="discoverSection">✦ Kəşf et</button><button data-go="mapSection">🌍 Xəritə</button><button onclick="openPost()">＋ Elan</button><button onclick="showSaved()">♡ Saxlanılan</button></div>
-<div class="modal" id="postModal"><div class="modalbox"><div class="modalhead"><h2>＋ Məkana elan yerləşdir</h2><button class="close" onclick="closeModal('postModal')">✕</button></div><p class="meta">Seçilən məkan: <b id="chosenPlace">Bakı, Azərbaycan</b></p><form id="postForm"><div class="formgrid"><input class="input" name="name" required placeholder="Ad və ya şirkət / usta adı"><input class="input" name="profession" required placeholder="Peşə / xidmət kateqoriyası"><input class="input full" name="title" required placeholder="Elanın başlığı"><textarea class="input full" name="description" required placeholder="Ətraflı məlumat, iş təcrübəsi və xidmət şərtləri"></textarea><input class="input" name="country" required placeholder="Ölkə"><input class="input" name="city" required placeholder="Şəhər / rayon"><input class="input" name="settlement" placeholder="Qəsəbə / kənd"><input class="input" name="street" placeholder="Küçə və ünvan"><input class="input" name="lat" placeholder="Enlik (latitude)"><input class="input" name="lng" placeholder="Uzunluq (longitude)"><input class="input full" id="mediaFiles" type="file" accept="image/*,video/*" multiple><input class="input full" name="media" placeholder="və ya şəkil/video URL-ləri vergüllə ayırın"><label class="checkline full"><input type="checkbox" required> Elanı yerləşdirməklə məlumatların doğruluğuna, şəkil/videolardan istifadə hüququna, qanunlara uyğunluğa və istifadə qaydalarına əməl etməyə razıyam.</label><label class="checkline full"><input type="checkbox" required> Məxfilik siyasətini, məsuliyyət qaydalarını və platformanın elanları yalnız təqdim etdiyini qəbul edirəm.</label><button class="iconbtn primary full">Elanı yoxla və xəritədə yayımla</button></div></form></div></div>
-<div class="modal" id="detailModal"><div class="modalbox" id="detailBox"></div></div><div class="modal" id="reelsModal"><div class="modalbox"><div class="modalhead"><h2>▣ Elan lentləri</h2><button class="close" onclick="closeModal('reelsModal')">✕</button></div><div class="reels" id="reels"></div></div></div><div class="toast" id="toast"></div>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script><script>
-const img1="https://images.unsplash.com/photo-1503387762-5928?auto=format&fit=crop&w=900&q=85",img2="https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&w=900&q=85",img3="https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=900&q=85";
-const categories=["Tikinti","Mənzil təmiri","Ev tikintisi","Beton işi","Armaturçu","Qəlibçi","Alçıpan","Suvaqçı","Rəngsaz","Divar kağızı","Plitə ustası","Parket ustası","Laminat döşəmə","Dam örtüyü","Metal kirəmit","Qaynaqçı","Dəmirçi","Mebel ustası","Dülgər","Qapı-pəncərə","Şüşə ustası","Elektrik","Elektrik avadanlığı","Santexnik","Kombi ustası","Kondisioner","Havalandırma","Soyuducu təmiri","Texnika təmiri","Avtomobil ustası","Avtoelektrik","Avtoyuma","Şin təmiri","Motosiklet ustası","Kompüter ustası","Telefon təmiri","İT xidməti","Proqramçı","Veb dizayn","Qrafik dizayn","Fotoqraf","Videograf","Tərcüməçi","İngilis dili müəllimi","Müəllim","Repetitor","Uşaq baxıcısı","Təmizlik","Bağban","Landşaft","Kənd təsərrüfatı","Heyvandarlıq","Daşıma","Yükdaşıma","Sürücü","Kuryer","Mühafizə","Bərbər","Saç ustası","Vizajist","Manikür","Dərzi","Ayaqqabı təmiri","Aşpaz","Catering","Marketinq","SMM","Mühasib","Hüquqi xidmət","Daşınmaz əmlak","İcarə","Satış","Digər xidmət"];
-let ads=JSON.parse(localStorage.getItem("ustamap_ads")||"null")||[{id:1,tag:"Alçıpan",title:"Mənzil təmiri və alçıpan",name:"Nümunə usta",country:"Azərbaycan",city:"Bakı",settlement:"Yasamal",street:"İnşaatçılar prospekti",lat:40.4093,lng:49.8671,desc:"Daxili təmir, alçıpan və boya işləri. 10 ildən artıq təcrübə.",media:[img1],likes:126,comments:["Çox məsuliyyətli usta."],saved:false},{id:2,tag:"Elektrik",title:"Elektrik və ağıllı ev sistemləri",name:"Nümunə elektrik xidməti",country:"Türkiyə",city:"İstanbul",settlement:"Beşiktaş",street:"Barbaros bulvarı",lat:41.0082,lng:28.9784,desc:"Elektrik xətləri, kamera və ağıllı ev quraşdırılması.",media:[img2],likes:98,comments:["İşlərini bəyəndim."],saved:false},{id:3,tag:"Rəngsaz",title:"Divar boyası və interyer",name:"Nümunə təmir xidməti",country:"Almaniya",city:"Berlin",settlement:"Mitte",street:"Alexanderplatz",lat:52.52,lng:13.405,desc:"Peşəkar rəngsaz və interyer yenilənməsi.",media:[img3],likes:77,comments:[],saved:false},{id:4,tag:"Kompüter ustası",title:"Kompüter və şəbəkə xidməti",name:"Digital Usta",country:"ABŞ",city:"New York",settlement:"Manhattan",street:"5th Avenue",lat:40.7128,lng:-74.006,desc:"Kompüter təmiri, şəbəkə, təhlükəsizlik və proqram təminatı.",media:[img2],likes:64,comments:[],saved:false}];
-let map=L.map("map").setView([40.4093,49.8671],3),street=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap contributors"}).addTo(map),sat=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{attribution:"© Esri"}),markers=[],selected={lat:40.4093,lng:49.8671,name:"Bakı, Azərbaycan"};
-function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}function toast(t){let x=document.getElementById("toast");x.textContent=t;x.classList.add("show");setTimeout(()=>x.classList.remove("show"),2500)}function renderCategories(){document.getElementById("categories").innerHTML=categories.map(c=>`<button class="chip" onclick="categorySearch('${esc(c)}')"># ${c}</button>`).join("")}
-function card(a){return `<article class="panel listing"><img class="cover" src="${esc(a.media?.[0]||img1)}" onerror="this.src='${img1}'"><div class="listing-body"><div class="tag">✦ ${esc(a.tag)}</div><h3>${esc(a.title)}</h3><div class="meta">👤 ${esc(a.name)}<br>📍 ${esc(a.city)}, ${esc(a.country)}<br>🧭 ${a.lat.toFixed(4)}, ${a.lng.toFixed(4)}</div><div class="listing-actions"><button class="mini" onclick="openDetail(${a.id})">Ətraflı</button><button class="mini" onclick="openProfile(${a.id})">Profilə bax</button><button class="mini" onclick="saveAd(${a.id})">♡</button></div></div></article>`}
-function renderAds(list=ads){document.getElementById("ads").innerHTML=list.length?list.map(card).join(""):'<div class="panel empty">Bu axtarış üzrə elan tapılmadı.</div>';renderDiscover(list)}function renderDiscover(list=ads){document.getElementById("discover").innerHTML=list.map(a=>`<article class="panel discover-card" onclick="openDetail(${a.id})"><img src="${esc(a.media?.[0]||img1)}" onerror="this.src='${img1}'"><div class="discover-info"><div class="tag">✦ ${esc(a.tag)} · ${esc(a.city)}</div><h3>${esc(a.title)}</h3><span class="meta">♡ ${a.likes} · ${a.comments.length} şərh</span></div></article>`).join("")}function renderMap(){markers.forEach(m=>map.removeLayer(m));markers=[];ads.forEach(a=>{let m=L.marker([a.lat,a.lng]).addTo(map).bindPopup(`<b>${esc(a.title)}</b><br>${esc(a.city)}, ${esc(a.country)}<br><button onclick="openDetail(${a.id})" class="mini">Elana bax</button>`);markers.push(m)})}
-function fly(lat,lng,name){selected={lat,lng,name};map.flyTo([lat,lng],9);document.getElementById("chosenPlace").textContent=name;toast(name+" seçildi. Bu məkana elan yerləşdirə bilərsiniz.")}map.on("click",e=>{selected={lat:e.latlng.lat,lng:e.latlng.lng,name:"Seçilmiş koordinat: "+e.latlng.lat.toFixed(5)+", "+e.latlng.lng.toFixed(5)};L.popup().setLatLng(e.latlng).setContent(`<b>${selected.name}</b><br><button onclick="openPost()" class="mini">＋ Bu məkana elan yerləşdir</button>`).openOn(map)});function setMap(type,btn){document.querySelectorAll("#mapSection .toolbar .chip").forEach(x=>x.classList.remove("active"));btn.classList.add("active");if(type==="satellite"){map.removeLayer(street);sat.addTo(map)}else{map.removeLayer(sat);street.addTo(map)}}function locateMe(){if(!navigator.geolocation)return toast("Geolokasiya dəstəklənmir.");navigator.geolocation.getCurrentPosition(p=>fly(p.coords.latitude,p.coords.longitude,"Mənim yerim"),()=>toast("Məkan icazəsi verilmədi."))}
-function searchAds(){let q=document.getElementById("q").value.toLowerCase();let r=ads.filter(a=>(a.title+a.tag+a.name+a.country+a.city+a.settlement+a.street+a.lat+a.lng).toLowerCase().includes(q));renderAds(r);if(r[0])fly(r[0].lat,r[0].lng,r[0].city+", "+r[0].country);document.getElementById("resultText").textContent=r.length+" elan tapıldı"}function advancedSearch(){let p=document.getElementById("profession").value.toLowerCase(),c=document.getElementById("country").value.toLowerCase(),city=document.getElementById("city").value.toLowerCase(),co=document.getElementById("coords").value.toLowerCase();let r=ads.filter(a=>(!p||(a.tag+a.title).toLowerCase().includes(p))&&(!c||a.country.toLowerCase().includes(c))&&(!city||(a.city+a.settlement+a.street).toLowerCase().includes(city))&&(!co||(a.lat+","+a.lng).includes(co)));renderAds(r);document.getElementById("resultText").textContent=r.length+" uyğun elan tapıldı"}function categorySearch(c){document.getElementById("profession").value=c;advancedSearch();document.getElementById("adsSection").scrollIntoView({behavior:"smooth"})}function saveAd(id){let a=ads.find(x=>x.id===id);a.saved=!a.saved;localStorage.setItem("ustamap_ads",JSON.stringify(ads));toast(a.saved?"Sevimlilərə əlavə edildi":"Sevimlilərdən çıxarıldı")}
-function openDetail(id){let a=ads.find(x=>x.id===id);document.getElementById("detailBox").innerHTML=`<div class="modalhead"><h2>${esc(a.title)}</h2><button class="close" onclick="closeModal('detailModal')">✕</button></div><div class="profile-modal"><img class="profile-hero" src="${esc(a.media?.[0]||img1)}"><div><div class="tag">✦ ${esc(a.tag)}</div><h2 class="detail-title">${esc(a.title)}</h2><p class="meta">👤 ${esc(a.name)}<br>📍 ${esc(a.country)}, ${esc(a.city)}, ${esc(a.settlement||"")} ${esc(a.street||"")}<br>🧭 ${a.lat}, ${a.lng}</p><p>${esc(a.desc)}</p><div class="metricrow"><div class="metric"><b>★ 4.9</b>reytinq</div><div class="metric"><b>♡ ${a.likes}</b>bəyənmə</div><div class="metric"><b>✓ 7 il</b>təcrübə</div></div><button class="iconbtn primary" onclick="openProfile(${a.id})">Profilə bax</button> <button class="iconbtn" onclick="like(${a.id})">♡ Bəyən</button> <button class="iconbtn" onclick="saveAd(${a.id})">🔖 Saxla</button><h3>Şərhlər</h3><div>${a.comments.map(c=>`<div class="comment"><b>İstifadəçi</b> · ${esc(c)}</div>`).join("")||'<span class="meta">Hələ şərh yoxdur.</span>'}</div><div style="display:flex;gap:8px;margin-top:12px"><input id="comment" class="input" placeholder="Şərh yaz..."><button class="iconbtn" onclick="comment(${a.id})">Göndər</button></div></div></div>`;openModal("detailModal")}
-function openProfile(id){let a=ads.find(x=>x.id===id);document.getElementById("detailBox").innerHTML=`<div class="modalhead"><h2>♙ Peşəkar profil</h2><button class="close" onclick="closeModal('detailModal')">✕</button></div><div class="profile-modal"><img class="profile-hero" src="${esc(a.media?.[0]||img1)}"><div><div class="tag">✓ Təsdiqlənmiş xidmət profili</div><h2 class="detail-title">${esc(a.name)}</h2><p class="meta">📍 ${esc(a.city)}, ${esc(a.country)} · ${esc(a.tag)}</p><p>${esc(a.desc)}</p><div class="badges"><span class="badge">★ 4.9 / 5</span><span class="badge">⚡ Sürətli cavab</span><span class="badge">🛡 Etibarlı profil</span></div><div class="metricrow"><div class="metric"><b>${a.likes}</b>bəyənmə</div><div class="metric"><b>${a.comments.length}</b>şərh</div><div class="metric"><b>98%</b>tövsiyə</div></div><button class="iconbtn primary" onclick="toast('Əlaqə funksiyası backend qoşulduqda aktiv olacaq')">Əlaqə saxla</button><button class="iconbtn" onclick="openReels()">▣ Media lentinə bax</button></div></div>`;openModal("detailModal")}
-function like(id){let a=ads.find(x=>x.id===id);a.likes++;localStorage.setItem("ustamap_ads",JSON.stringify(ads));toast("Elan bəyənildi")}function comment(id){let v=document.getElementById("comment").value.trim(),a=ads.find(x=>x.id===id);if(v){a.comments.push(v);localStorage.setItem("ustamap_ads",JSON.stringify(ads));openDetail(id);toast("Şərh əlavə edildi")}}function openPost(){document.getElementById("chosenPlace").textContent=selected.name;openModal("postModal")}function openModal(id){document.getElementById(id).classList.add("open")}function closeModal(id){document.getElementById(id).classList.remove("open")}
-const readFile=f=>new Promise((resolve,reject)=>{let r=new FileReader;r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(f)});
-document.getElementById("postForm").onsubmit=async e=>{e.preventDefault();let f=new FormData(e.target),files=[...document.getElementById("mediaFiles").files],uploaded=await Promise.all(files.slice(0,8).map(readFile)),urls=(f.get("media")||"").split(",").map(x=>x.trim()).filter(Boolean),a={id:Date.now(),tag:f.get("profession"),title:f.get("title"),name:f.get("name"),country:f.get("country"),city:f.get("city"),settlement:f.get("settlement"),street:f.get("street"),lat:+f.get("lat")||selected.lat,lng:+f.get("lng")||selected.lng,desc:f.get("description"),media:uploaded.concat(urls).length?uploaded.concat(urls):[img1],likes:0,comments:[],saved:false};ads.unshift(a);localStorage.setItem("ustamap_ads",JSON.stringify(ads));renderAds();renderMap();closeModal("postModal");e.target.reset();toast("Elanınız media ilə xəritədə yayımlandı")}
-function showSaved(){let r=ads.filter(a=>a.saved);renderAds(r);document.getElementById("adsSection").scrollIntoView({behavior:"smooth"});toast(r.length+" saxlanılan elan")}function openReels(){document.getElementById("reels").innerHTML=ads.map(a=>`<article class="reel" style="background-image:url('${esc(a.media?.[0]||img1)}')"><div class="reel-info"><div class="tag">✦ ${esc(a.tag)} · ${esc(a.city)}</div><h2>${esc(a.title)}</h2><p>${esc(a.desc)}</p><b>👤 ${esc(a.name)}</b></div><div class="reel-actions"><button onclick="like(${a.id})">♡<small>${a.likes}</small></button><button onclick="saveAd(${a.id})">🔖</button><button onclick="openDetail(${a.id})">💬</button></div></article>`).join("");openModal("reelsModal")}
-function initGlobe(){let c=document.getElementById("globeCanvas"),r=new THREE.WebGLRenderer({canvas:c,alpha:true,antialias:true});r.setPixelRatio(Math.min(devicePixelRatio,2));let s=new THREE.Scene(),cam=new THREE.PerspectiveCamera(42,c.clientWidth/c.clientHeight,.1,100);cam.position.z=3.3;let earth=new THREE.Mesh(new THREE.SphereGeometry(1,64,64),new THREE.MeshPhongMaterial({color:0x238ca3,emissive:0x06283a,shininess:15}));s.add(earth);let wire=new THREE.Mesh(new THREE.SphereGeometry(1.015,24,16),new THREE.MeshBasicMaterial({color:0x3de3a6,wireframe:true,transparent:true,opacity:.15}));s.add(wire);s.add(new THREE.AmbientLight(0x8deeff,1.2));let light=new THREE.DirectionalLight(0xffffff,2);light.position.set(4,3,5);s.add(light);let down=false,last=0;c.onpointerdown=e=>{down=true;last=e.clientX};window.onpointerup=()=>down=false;c.onpointermove=e=>{if(down){earth.rotation.y+=(e.clientX-last)*.008;wire.rotation.y=earth.rotation.y;last=e.clientX}};c.onwheel=e=>{e.preventDefault();cam.position.z=Math.max(1.7,Math.min(7,cam.position.z+e.deltaY*.003))};function loop(){requestAnimationFrame(loop);if(!down)earth.rotation.y+=.002;wire.rotation.y=earth.rotation.y;r.render(s,cam)}loop()}
-function commentText(c){return typeof c==="string"?c:c.text}
-function persist(){localStorage.setItem("ustamap_ads",JSON.stringify(ads))}
-function renderComment(c,i,a){let text=commentText(c),replies=(typeof c==="object"&&c.replies)||[];return `<div class="comment"><b>İstifadəçi</b> · ${esc(text)} <button class="mini" onclick="replyTo(${a.id},${i})">Cavab yaz</button>${replies.map(r=>`<div class="comment" style="margin:8px 0 0 18px"><b>↳ ${esc(r.name||"Cavab")}</b> · ${esc(r.text)}</div>`).join("")}</div>`}
-function openDetail(id){let a=ads.find(x=>x.id===id);if(!a)return;let comments=a.comments||[];document.getElementById("detailBox").innerHTML=`<div class="modalhead"><h2>${esc(a.title)}</h2><button class="close" onclick="closeModal('detailModal')">✕</button></div><div class="profile-modal"><img class="profile-hero" src="${esc(a.media?.[0]||img1)}"><div><div class="tag">✦ ${esc(a.tag)}</div><h2 class="detail-title">${esc(a.title)}</h2><p class="meta">👤 ${esc(a.name)}<br>📍 ${esc(a.country)}, ${esc(a.city)}, ${esc(a.settlement||"")} ${esc(a.street||"")}<br>🧭 ${a.lat}, ${a.lng}</p><p>${esc(a.desc)}</p><div class="metricrow"><div class="metric"><b>★ 4.9</b>reytinq</div><div class="metric"><b>♡ ${a.likes}</b>bəyənmə</div><div class="metric"><b>${comments.length}</b> rəy</div></div><button class="iconbtn primary" onclick="openProfile(${a.id})">Profilə bax</button> <button class="iconbtn" onclick="like(${a.id})">♡ Bəyən</button> <button class="iconbtn" onclick="saveAd(${a.id})">🔖 Saxla</button> <button class="iconbtn" onclick="deleteAd(${a.id})">🗑 Sil</button><h3>Rəylər və cavablar</h3><div>${comments.map((c,i)=>renderComment(c,i,a)).join("")||'<span class="meta">Hələ rəy yoxdur.</span>'}</div><div style="display:flex;gap:8px;margin-top:12px"><input id="comment" class="input" placeholder="Rəy yaz..."><button class="iconbtn" onclick="comment(${a.id})">Göndər</button></div></div></div>`;openModal("detailModal")}
-function comment(id){let v=document.getElementById("comment")?.value.trim(),a=ads.find(x=>x.id===id);if(!v||!a)return;a.comments=a.comments||[];a.comments.push({text:v,replies:[]});persist();openDetail(id);toast("Rəy əlavə edildi")}
-function replyTo(id,index){let v=prompt("Cavabınızı yazın:");let a=ads.find(x=>x.id===id);if(!v||!a)return;let c=a.comments[index];if(typeof c==="string"){c={text:c,replies:[]};a.comments[index]=c}c.replies=c.replies||[];c.replies.push({name:"USTAMAP istifadəçisi",text:v});persist();openDetail(id);toast("Cavab əlavə edildi")}
-function deleteAd(id){if(!confirm("Bu elanı silmək istəyirsiniz?"))return;ads=ads.filter(a=>a.id!==id);persist();renderAds();renderMap();closeModal("detailModal");toast("Elan silindi")}
-let globalMarkers=[];
-async function findGlobalPlaces(kind=""){let lat=selected.lat,lng=selected.lng,city=document.getElementById("city").value.trim(),query=city||document.getElementById("q").value.trim();try{if(query&&!/^[-\d.]+,\s*[-\d.]+$/.test(query)){let g=await fetch("https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&accept-language=az&q="+encodeURIComponent(query)).then(r=>r.json());if(g[0]){lat=+g[0].lat;lng=+g[0].lon;selected={lat,lng,name:g[0].display_name};map.flyTo([lat,lng],14)}}let selector=kind?`[\"${kind.includes("cafe")||kind.includes("restaurant")?"amenity":kind.includes("hairdresser")?"shop":kind.includes("fitness")?"leisure":kind.includes("supermarket")?"shop":"tourism"}\"=\"${kind}\"]`:"[\"amenity\"]";let q=`[out:json][timeout:25];(nwr(around:5000,${lat},${lng})${selector};);out center tags;`;let result=await fetch("https://overpass-api.de/api/interpreter?data="+encodeURIComponent(q)).then(r=>r.json());globalMarkers.forEach(m=>map.removeLayer(m));globalMarkers=[];let places=(result.elements||[]).slice(0,60).map((x,i)=>{let p={id:"g"+i,name:x.tags?.name||"Adsız obyekt",type:x.tags?.amenity||x.tags?.shop||x.tags?.tourism||x.tags?.leisure||kind,lat:x.lat??x.center?.lat,lng:x.lon??x.center?.lon,address:x.tags?.["addr:street"]||x.tags?.["addr:city"]||"Ünvan xəritədən seçilir",phone:x.tags?.phone||"",website:x.tags?.website||""};let m=L.marker([p.lat,p.lng]).addTo(map).bindPopup(`<b>${esc(p.name)}</b><br>${esc(p.address)}<br><a target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}">📍 İstiqamət al</a>`);globalMarkers.push(m);return p});document.getElementById("globalPlaces").innerHTML=places.length?places.map(p=>`<article class="panel listing"><div class="listing-body"><div class="tag">🌍 ${esc(p.type)}</div><h3>${esc(p.name)}</h3><div class="meta">📍 ${esc(p.address)}<br>${p.phone?"☎ "+esc(p.phone):"Məlumat xəritə xidmətindən alınır"}</div><div class="listing-actions"><button class="mini" onclick="fly(${p.lat},${p.lng},'${esc(p.name)}')">Xəritədə aç</button><a class="mini" target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}">İstiqamət</a></div></div></article>`).join(""):'<div class="empty">Bu məkanda obyekt tapılmadı.</div>';toast(places.length+" obyekt tapıldı")}catch(e){toast("Xəritə məlumatı yüklənmədi; bir az sonra yenidən yoxlayın.")}}
-function initGlobe(){let c=document.getElementById("globeCanvas"),r=new THREE.WebGLRenderer({canvas:c,alpha:true,antialias:true});r.setPixelRatio(Math.min(devicePixelRatio,2));let s=new THREE.Scene(),cam=new THREE.PerspectiveCamera(42,c.clientWidth/c.clientHeight,.1,100);cam.position.z=3.3;let earth=new THREE.Mesh(new THREE.SphereGeometry(1,64,64),new THREE.MeshPhongMaterial({color:0x238ca3,emissive:0x06283a,shininess:15}));s.add(earth);let loader=new THREE.TextureLoader;loader.setCrossOrigin("anonymous");loader.load("https://eoimages.gsfc.nasa.gov/images/imagerecords/57000/57730/world.topo.bathy.200412.3x5400x2700.jpg",t=>{earth.material.map=t;earth.material.color.set(0xffffff);earth.material.needsUpdate=true});let borders=new THREE.Mesh(new THREE.SphereGeometry(1.012,32,20),new THREE.MeshBasicMaterial({color:0x9fffe0,wireframe:true,transparent:true,opacity:.14}));s.add(borders);s.add(new THREE.AmbientLight(0x9deeff,1.3));let light=new THREE.DirectionalLight(0xffffff,2.3);light.position.set(4,3,5);s.add(light);let down=false,last=0;c.onpointerdown=e=>{down=true;last=e.clientX};window.onpointerup=()=>down=false;c.onpointermove=e=>{if(down){earth.rotation.y+=(e.clientX-last)*.008;borders.rotation.y=earth.rotation.y;last=e.clientX}};c.onwheel=e=>{e.preventDefault();cam.position.z=Math.max(1.65,Math.min(7,cam.position.z+e.deltaY*.003))};addEventListener("resize",()=>{cam.aspect=c.clientWidth/c.clientHeight;cam.updateProjectionMatrix();r.setSize(c.clientWidth,c.clientHeight,false)});function loop(){requestAnimationFrame(loop);if(!down)earth.rotation.y+=.0015;borders.rotation.y=earth.rotation.y;r.render(s,cam)}loop()}
-document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{document.getElementById(b.dataset.go)?.scrollIntoView({behavior:"smooth"});document.querySelectorAll("[data-go]").forEach(x=>x.classList.remove("active"));b.classList.add("active")});renderCategories();renderAds();renderMap();initGlobe();
-</script></body></html>
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WORLDVIEW — Global Places & Travel</title>
+    
+    <!-- External CDN Resources -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-dark: #070913;
+            --bg-card: rgba(15, 23, 42, 0.75);
+            --bg-card-hover: rgba(30, 41, 59, 0.85);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --border-glass-bright: rgba(0, 242, 254, 0.3);
+            --primary-emerald: #10b981;
+            --primary-cyan: #00f2fe;
+            --primary-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --sidebar-width: 420px;
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* App Container & Layout */
+        #app-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+        }
+
+        /* Header Navigation */
+        #main-header {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            right: 16px;
+            height: 64px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            box-shadow: var(--glass-shadow);
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .brand-logo i {
+            font-size: 24px;
+            background: linear-gradient(135deg, var(--primary-cyan), var(--primary-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-text h1 {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #ffffff, var(--primary-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-text p {
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* Global Search Bar */
+        .search-container {
+            position: relative;
+            width: 420px;
+        }
+
+        .search-input-wrapper {
+            display: flex;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 0 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input-wrapper:focus-within {
+            border-color: var(--primary-cyan);
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.25);
+        }
+
+        .search-input-wrapper input {
+            width: 100%;
+            height: 42px;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 14px;
+            outline: none;
+            padding-left: 10px;
+        }
+
+        .search-suggestions {
+            position: absolute;
+            top: 50px;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            max-height: 360px;
+            overflow-y: auto;
+            z-index: 1010;
+            display: none;
+            box-shadow: var(--glass-shadow);
+        }
+
+        .suggestion-item {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            transition: background 0.2s;
+        }
+
+        .suggestion-item:hover {
+            background: var(--bg-card-hover);
+        }
+
+        /* Controls & Actions */
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-glass {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            color: var(--text-main);
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-glass:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--border-glass-bright);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-cyan), var(--primary-blue));
+            border: none;
+            color: #000;
+            font-weight: 700;
+            padding: 10px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+        }
+
+        /* Sidebar Panel */
+        #sidebar {
+            position: absolute;
+            top: 92px;
+            left: 16px;
+            bottom: 16px;
+            width: var(--sidebar-width);
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            z-index: 990;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--glass-shadow);
+        }
+
+        .sidebar-tabs {
+            display: flex;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid var(--border-glass);
+            padding: 6px;
+            gap: 4px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 0;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tab-btn.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--primary-cyan);
+            border: 1px solid var(--border-glass);
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        /* Category System Styles */
+        .category-group {
+            margin-bottom: 20px;
+        }
+
+        .category-group-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary-cyan);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .category-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .chip {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-glass);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .chip:hover, .chip.active {
+            background: rgba(0, 242, 254, 0.15);
+            border-color: var(--primary-cyan);
+            color: var(--text-main);
+        }
+
+        /* Results List & Cards */
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .place-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .place-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-glass-bright);
+            transform: translateY(-2px);
+        }
+
+        .place-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .place-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .place-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .place-actions button {
+            flex: 1;
+            padding: 6px;
+            font-size: 11px;
+        }
+
+        /* Main Viewport Container */
+        #viewport-container {
+            flex: 1;
+            height: 100%;
+            position: relative;
+        }
+
+        #leaflet-map {
+            width: 100%;
+            height: 100%;
+            background: var(--bg-dark);
+            z-index: 1;
+        }
+
+        #globe-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            display: none;
+            background: var(--bg-dark);
+        }
+
+        /* Floating Map Controls */
+        .map-controls-floating {
+            position: absolute;
+            right: 20px;
+            bottom: 30px;
+            z-index: 900;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .map-control-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glass);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: var(--glass-shadow);
+        }
+
+        .map-control-btn:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--primary-cyan);
+            color: var(--primary-cyan);
+        }
+
+        /* Navigation Drawer/Overlay */
+        #navigation-panel {
+            position: absolute;
+            top: 92px;
+            right: 20px;
+            width: 360px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            z-index: 950;
+            padding: 16px;
+            display: none;
+            box-shadow: var(--glass-shadow);
+        }
+
+        .route-instruction-item {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-glass);
+            font-size: 12px;
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Modals & Full Profile */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            padding: 24px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Custom Leaflet Map Popup Dark Theme */
+        .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+            background: rgba(15, 23, 42, 0.9) !important;
+            backdrop-filter: blur(12px);
+            color: var(--text-main) !important;
+            border: 1px solid var(--border-glass);
+            border-radius: 12px !important;
+        }
+
+        .leaflet-popup-content {
+            margin: 12px 14px !important;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* Toast Notifications */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--primary-cyan);
+            color: var(--text-main);
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 13px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 14px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-glass);
+            border-radius: 8px;
+            color: #fff;
+            outline: none;
+            font-size: 13px;
+        }
+        .form-control:focus {
+            border-color: var(--primary-cyan);
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 768px) {
+            #main-header {
+                flex-wrap: wrap;
+                height: auto;
+                padding: 12px;
+                gap: 10px;
+            }
+            .search-container {
+                width: 100%;
+                order: 3;
+            }
+            #sidebar {
+                top: auto;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                width: 100%;
+                height: 55vh;
+                border-radius: 20px 20px 0 0;
+            }
+            #navigation-panel {
+                width: calc(100% - 40px);
+                top: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        <!-- Main Application Header -->
+        <header id="main-header">
+            <div class="brand-logo" onclick="WorldViewApp.resetView()">
+                <i class="fa-solid => fa-earth-americas"></i>
+                <div class="brand-text">
+                    <h1>WORLDVIEW</h1>
+                    <p>Global Places & Travel</p>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="search-container">
+                <div class="search-input-wrapper">
+                    <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted)"></i>
+                    <input type="text" id="global-search-input" placeholder="Search cities, places, coordinates (e.g. Paris, Cafes in Baku)..." autocomplete="off">
+                    <i class="fa-solid fa-xmark" id="clear-search" style="color: var(--text-muted); cursor: pointer; display: none;"></i>
+                </div>
+                <div class="search-suggestions" id="search-suggestions"></div>
+            </div>
+
+            <!-- Top Actions -->
+            <div class="nav-actions">
+                <select id="language-selector" class="btn-glass" onchange="WorldViewApp.changeLanguage(this.value)">
+                    <option value="en">English</option>
+                    <option value="az">Azərbaycan</option>
+                    <option value="tr">Türkçe</option>
+                    <option value="ru">Русский</option>
+                    <option value="de">Deutsch</option>
+                    <option value="fr">Français</option>
+                    <option value="es">Español</option>
+                </select>
+                
+                <button class="btn-glass" onclick="WorldViewApp.toggleGlobeView()">
+                    <i class="fa-solid fa-globe"></i> <span id="globe-btn-text">3D Globe</span>
+                </button>
+                <button class="btn-primary" onclick="WorldViewApp.openCreatePlaceModal()">
+                    <i class="fa-solid fa-plus"></i> Add Place
+                </button>
+            </div>
+        </header>
+
+        <!-- Sidebar Panel -->
+        <aside id="sidebar">
+            <div class="sidebar-tabs">
+                <button class="tab-btn active" onclick="WorldViewApp.switchTab('categories')">
+                    <i class="fa-solid fa-layer-group"></i> Categories
+                </button>
+                <button class="tab-btn" onclick="WorldViewApp.switchTab('results')">
+                    <i class="fa-solid fa-list"></i> Nearby Places
+                </button>
+                <button class="tab-btn" onclick="WorldViewApp.switchTab('explore')">
+                    <i class="fa-solid fa-compass"></i> Travel Info
+                </button>
+                <button class="tab-btn" onclick="WorldViewApp.switchTab('admin')">
+                    <i class="fa-solid fa-user-gear"></i> Admin / Saved
+                </button>
+            </div>
+
+            <div class="sidebar-content">
+                <!-- Tab 1: Category Drawer -->
+                <div id="tab-categories" class="tab-pane">
+                    <div id="categories-accordion"></div>
+                </div>
+
+                <!-- Tab 2: Nearby Results List -->
+                <div id="tab-results" class="tab-pane" style="display: none;">
+                    <div class="results-header">
+                        <span id="results-count">0 places found</span>
+                        <select id="results-sort" class="btn-glass" style="padding: 4px 8px; font-size: 11px;" onchange="WorldViewApp.sortResults(this.value)">
+                            <option value="distance">Nearest</option>
+                            <option value="name">Name</option>
+                        </select>
+                    </div>
+                    <div id="results-list">
+                        <div style="text-align: center; color: var(--text-muted); padding: 40px 0;">
+                            <i class="fa-solid fa-location-crosshairs" style="font-size: 32px; margin-bottom: 12px; color: var(--primary-cyan);"></i>
+                            <p>Select a category or search a place to view nearby locations.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Travel & Country Guide -->
+                <div id="tab-explore" class="tab-pane" style="display: none;">
+                    <div id="travel-info-content">
+                        <h3 style="margin-bottom: 12px; color: var(--primary-cyan);">Global Travel Guide</h3>
+                        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Select or click a country on the map to display real-time safety, currency, and tourist recommendations.</p>
+                        <div id="country-card-details"></div>
+                    </div>
+                </div>
+
+                <!-- Tab 4: Admin & Saved Places -->
+                <div id="tab-admin" class="tab-pane" style="display: none;">
+                    <h3 style="font-size: 15px; margin-bottom: 12px; color: var(--primary-cyan);">Saved & Custom Places</h3>
+                    <div id="saved-places-list"></div>
+                    <hr style="border-color: var(--border-glass); margin: 20px 0;">
+                    <h3 style="font-size: 15px; margin-bottom: 12px; color: var(--primary-cyan);">Local Admin Dashboard</h3>
+                    <button class="btn-glass" style="width: 100%; margin-bottom: 8px;" onclick="WorldViewApp.exportData()">
+                        <i class="fa-solid fa-download"></i> Export Data (JSON)
+                    </button>
+                    <button class="btn-glass" style="width: 100%; color: #ef4444; border-color: rgba(239,68,68,0.3);" onclick="WorldViewApp.clearLocalData()">
+                        <i class="fa-solid fa-trash"></i> Clear Local Cache
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Viewport (2D Leaflet Map + 3D Globe) -->
+        <main id="viewport-container">
+            <div id="leaflet-map"></div>
+            <div id="globe-container"></div>
+
+            <!-- Floating Controls -->
+            <div class="map-controls-floating">
+                <button class="map-control-btn" onclick="WorldViewApp.locateUser()" title="Locate Me">
+                    <i class="fa-solid fa-crosshairs"></i>
+                </button>
+                <button class="map-control-btn" onclick="WorldViewApp.toggleMapLayer()" title="Switch Layer (Street/Satellite)">
+                    <i class="fa-solid fa-layer-group"></i>
+                </button>
+                <button class="map-control-btn" onclick="WorldViewApp.zoomIn()" title="Zoom In">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <button class="map-control-btn" onclick="WorldViewApp.zoomOut()" title="Zoom Out">
+                    <i class="fa-solid fa-minus"></i>
+                </button>
+            </div>
+
+            <!-- Live Navigation Panel -->
+            <div id="navigation-panel">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h3 style="font-size: 14px; color: var(--primary-cyan);"><i class="fa-solid fa-route"></i> Route Navigation</h3>
+                    <button onclick="WorldViewApp.closeNavigation()" style="background:none; border:none; color:var(--text-muted); cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                    <button class="btn-glass" id="nav-mode-driving" onclick="WorldViewApp.setNavProfile('driving')" style="flex:1; padding:6px; font-size:11px;"><i class="fa-solid fa-car"></i> Drive</button>
+                    <button class="btn-glass" id="nav-mode-walking" onclick="WorldViewApp.setNavProfile('walking')" style="flex:1; padding:6px; font-size:11px;"><i class="fa-solid fa-person-walking"></i> Walk</button>
+                    <button class="btn-glass" id="nav-mode-cycling" onclick="WorldViewApp.setNavProfile('cycling')" style="flex:1; padding:6px; font-size:11px;"><i class="fa-solid fa-bicycle"></i> Cycle</button>
+                </div>
+                <div id="route-stats" style="font-size: 13px; margin-bottom: 12px; font-weight: 600; color: #fff;"></div>
+                <div id="route-steps" style="max-height: 200px; overflow-y: auto;"></div>
+                <div style="display: flex; gap: 8px; margin-top: 12px;">
+                    <button class="btn-primary" style="flex:1; font-size:11px;" onclick="WorldViewApp.openExternalMap('google')">Google Maps</button>
+                    <button class="btn-glass" style="flex:1; font-size:11px;" onclick="WorldViewApp.openExternalMap('apple')">Apple Maps</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Place Profile Modal -->
+    <div class="modal-overlay" id="profile-modal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="WorldViewApp.closeModal('profile-modal')"><i class="fa-solid fa-xmark"></i></button>
+            <div id="profile-modal-content"></div>
+        </div>
+    </div>
+
+    <!-- Create Custom Place Modal -->
+    <div class="modal-overlay" id="create-place-modal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="WorldViewApp.closeModal('create-place-modal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="font-size: 18px; color: var(--primary-cyan); margin-bottom: 16px;">Add New Place / Service</h2>
+            <form id="create-place-form" onsubmit="WorldViewApp.handleCreatePlace(event)">
+                <div class="form-group">
+                    <label>Place Name *</label>
+                    <input type="text" id="new-place-name" class="form-control" required placeholder="e.g. Grand View Hotel">
+                </div>
+                <div class="form-group">
+                    <label>Category *</label>
+                    <select id="new-place-category" class="form-control" required>
+                        <option value="hotel">Hotel / Accommodation</option>
+                        <option value="restaurant">Restaurant / Dining</option>
+                        <option value="cafe">Cafe / Bakery</option>
+                        <option value="pharmacy">Pharmacy / Health</option>
+                        <option value="attraction">Tourist Attraction</option>
+                        <option value="shop">Shopping / Store</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Coordinates (Lat, Lng) *</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="new-place-lat" class="form-control" placeholder="Latitude" required>
+                        <input type="text" id="new-place-lng" class="form-control" placeholder="Longitude" required>
+                        <button type="button" class="btn-glass" onclick="WorldViewApp.useCurrentLocationForForm()">Current</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="new-place-desc" class="form-control" rows="3" placeholder="Describe the service or attraction..."></textarea>
+                </div>
+                <div style="display:flex; gap: 8px;">
+                    <div class="form-group" style="flex:1;">
+                        <label>Phone Number</label>
+                        <input type="text" id="new-place-phone" class="form-control" placeholder="+123456789">
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label>Website</label>
+                        <input type="url" id="new-place-website" class="form-control" placeholder="https://example.com">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                        <input type="checkbox" required> I agree to the Terms of Service & Privacy Policy
+                    </label>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">Save & Publish Place</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        /**
+         * WORLDVIEW Architecture & Main Controller
+         */
+        const WorldViewApp = (() => {
+            // State
+            let map, streetLayer, satLayer, currentLayer = 'street';
+            let globeScene, globeCamera, globeRenderer, globeMesh, globeControls, isGlobeActive = false;
+            let userLocation = { lat: 40.4093, lng: 49.8671 }; // Default Baku
+            let markersGroup = null;
+            let routeLayer = null;
+            let currentResults = [];
+            let currentNavDestination = null;
+            let activeNavProfile = 'driving';
+            let db = null;
+
+            // Translation Dictionary
+            const translations = {
+                en: {
+                    searchPlaceholder: "Search cities, places, coordinates...",
+                    globeView: "3D Globe",
+                    mapView: "2D Map",
+                    placesFound: "places found",
+                    addPlace: "Add Place"
+                },
+                az: {
+                    searchPlaceholder: "Şəhərlər, məkanlar, koordinatlar axtarın...",
+                    globeView: "3D Qlobus",
+                    mapView: "2D Xəritə",
+                    placesFound: "məkan tapıldı",
+                    addPlace: "Məkan Əlavə Et"
+                },
+                tr: {
+                    searchPlaceholder: "Şehirler, mekanlar, koordinatlar arayın...",
+                    globeView: "3D Küre",
+                    mapView: "2D Harita",
+                    placesFound: "mekan bulundu",
+                    addPlace: "Mekan Ekle"
+                },
+                ru: {
+                    searchPlaceholder: "Поиск городов, мест, координат...",
+                    globeView: "3D Глобус",
+                    mapView: "2D Карта",
+                    placesFound: "мест найдено",
+                    addPlace: "Добавить место"
+                }
+            };
+
+            // Comprehensive Categories Data Taxonomy
+            const categoriesTaxonomy = [
+                {
+                    title: "Travel & Stay",
+                    icon: "fa-plane-departure",
+                    items: [
+                        { name: "Hotels", key: "tourism=hotel", icon: "fa-hotel" },
+                        { name: "Hostels", key: "tourism=hostel", icon: "fa-bed" },
+                        { name: "Attractions", key: "tourism=attraction", icon: "fa-monument" },
+                        { name: "Museums", key: "tourism=museum", icon: "fa-building-columns" },
+                        { name: "Parks", key: "leisure=park", icon: "fa-tree" }
+                    ]
+                },
+                {
+                    title: "Food & Dining",
+                    icon: "fa-utensils",
+                    items: [
+                        { name: "Restaurants", key: "amenity=restaurant", icon: "fa-utensils" },
+                        { name: "Cafes", key: "amenity=cafe", icon: "fa-mug-hot" },
+                        { name: "Fast Food", key: "amenity=fast_food", icon: "fa-burger" },
+                        { name: "Bakeries", key: "shop=bakery", icon: "fa-bread-slice" }
+                    ]
+                },
+                {
+                    title: "Health & Care",
+                    icon: "fa-kit-medical",
+                    items: [
+                        { name: "Pharmacies", key: "amenity=pharmacy", icon: "fa-pills" },
+                        { name: "Hospitals", key: "amenity=hospital", icon: "fa-hospital" },
+                        { name: "Clinics", key: "amenity=clinic", icon: "fa-house-medical" }
+                    ]
+                },
+                {
+                    title: "Services & Shopping",
+                    icon: "fa-bag-shopping",
+                    items: [
+                        { name: "Supermarkets", key: "shop=supermarket", icon: "fa-cart-shopping" },
+                        { name: "Banks & ATMs", key: "amenity=bank", icon: "fa-building-columns" },
+                        { name: "Beauty Salons", key: "shop=beauty", icon: "fa-scissors" }
+                    ]
+                }
+            ];
+
+            // Initialize Application
+            const init = async () => {
+                initIndexedDB();
+                initLeafletMap();
+                init3DGlobe();
+                renderCategoriesDrawer();
+                setupSearchEngine();
+                getUserLocation();
+                loadSavedPlaces();
+            };
+
+            // IndexedDB Local Storage Initialization
+            const initIndexedDB = () => {
+                const request = indexedDB.open("WorldViewDB", 1);
+                request.onupgradeneeded = (e) => {
+                    db = e.target.result;
+                    if (!db.objectStoreNames.contains("custom_places")) {
+                        db.createObjectStore("custom_places", { keyPath: "id", autoIncrement: true });
+                    }
+                };
+                request.onsuccess = (e) => { db = e.target.result; };
+                request.onerror = (e) => console.error("IndexedDB Error:", e);
+            };
+
+            // Initialize Leaflet 2D Map
+            const initLeafletMap = () => {
+                map = L.map('leaflet-map', {
+                    zoomControl: false,
+                    attributionControl: false
+                }).setView([userLocation.lat, userLocation.lng], 13);
+
+                streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 });
+                satLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 18 });
+
+                streetLayer.addTo(map);
+                markersGroup = L.layerGroup().addTo(map);
+
+                // Map Click Listener
+                map.on('click', (e) => {
+                    const { lat, lng } = e.latlng;
+                    const popupContent = `
+                        <div style="font-size:12px;">
+                            <strong>Coordinates:</strong><br>${lat.toFixed(5)}, ${lng.toFixed(5)}<br><br>
+                            <button class="btn-primary" style="padding:4px 8px; font-size:10px; width:100%;" 
+                                onclick="WorldViewApp.openCreatePlaceModalWithCoords(${lat}, ${lng})">
+                                Create Place Here
+                            </button>
+                        </div>
+                    `;
+                    L.popup().setLatLng(e.latlng).setContent(popupContent).openOn(map);
+                });
+            };
+
+            // Initialize Three.js 3D Earth Globe
+            const init3DGlobe = () => {
+                const container = document.getElementById('globe-container');
+                globeScene = new THREE.Scene();
+                globeCamera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+                globeCamera.position.z = 250;
+
+                globeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                globeRenderer.setSize(window.innerWidth, window.innerHeight);
+                container.appendChild(globeRenderer.domElement);
+
+                // Earth Sphere Geometry & Texture
+                const geometry = new THREE.SphereGeometry(80, 64, 64);
+                const textureLoader = new THREE.TextureLoader();
+                const texture = textureLoader.load('https://unpkg.com/three-globals@1.0.0/assets/earth-blue-marble.jpg', undefined, undefined, () => {
+                    // Fallback basic blue material if CDN image fails
+                    globeMesh.material = new THREE.MeshBasicMaterial({ color: 0x1d4ed8, wireframe: true });
+                });
+
+                const material = new THREE.MeshBasicMaterial({ map: texture });
+                globeMesh = new THREE.Mesh(geometry, material);
+                globeScene.add(globeMesh);
+
+                // Lighting
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+                globeScene.add(ambientLight);
+
+                globeControls = new THREE.OrbitControls(globeCamera, globeRenderer.domElement);
+                globeControls.enableDamping = true;
+
+                const animate = () => {
+                    requestAnimationFrame(animate);
+                    if (isGlobeActive) {
+                        globeMesh.rotation.y += 0.001;
+                        globeControls.update();
+                        globeRenderer.render(globeScene, globeCamera);
+                    }
+                };
+                animate();
+
+                window.addEventListener('resize', () => {
+                    if (globeCamera && globeRenderer) {
+                        globeCamera.aspect = window.innerWidth / window.innerHeight;
+                        globeCamera.updateProjectionMatrix();
+                        globeRenderer.setSize(window.innerWidth, window.innerHeight);
+                    }
+                });
+            };
+
+            // Global Geocoding & Nominatim Search Integration
+            const setupSearchEngine = () => {
+                const input = document.getElementById('global-search-input');
+                const suggestionsBox = document.getElementById('search-suggestions');
+                const clearBtn = document.getElementById('clear-search');
+
+                let debounceTimer;
+
+                input.addEventListener('input', (e) => {
+                    const query = e.target.value.trim();
+                    clearBtn.style.display = query ? 'block' : 'none';
+
+                    clearTimeout(debounceTimer);
+                    if (query.length < 3) {
+                        suggestionsBox.style.display = 'none';
+                        return;
+                    }
+
+                    debounceTimer = setTimeout(() => {
+                        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`)
+                            .then(res => res.json())
+                            .then(data => {
+                                suggestionsBox.innerHTML = '';
+                                if (data.length === 0) {
+                                    suggestionsBox.style.display = 'none';
+                                    return;
+                                }
+
+                                data.forEach(item => {
+                                    const div = document.createElement('div');
+                                    div.className = 'suggestion-item';
+                                    div.innerHTML = `
+                                        <i class="fa-solid fa-location-dot" style="color:var(--primary-cyan)"></i>
+                                        <div>
+                                            <div style="font-size:13px; font-weight:600;">${item.display_name.split(',')[0]}</div>
+                                            <div style="font-size:11px; color:var(--text-muted);">${item.display_name}</div>
+                                        </div>
+                                    `;
+                                    div.onclick = () => {
+                                        const lat = parseFloat(item.lat);
+                                        const lon = parseFloat(item.lon);
+                                        map.setView([lat, lon], 14);
+                                        suggestionsBox.style.display = 'none';
+                                        input.value = item.display_name.split(',')[0];
+                                        showToast(`Centered on ${item.display_name.split(',')[0]}`);
+                                    };
+                                    suggestionsBox.appendChild(div);
+                                });
+                                suggestionsBox.style.display = 'block';
+                            })
+                            .catch(err => console.error("Search API error:", err));
+                    }, 400);
+                });
+
+                clearBtn.onclick = () => {
+                    input.value = '';
+                    clearBtn.style.display = 'none';
+                    suggestionsBox.style.display = 'none';
+                };
+            };
+
+            // Render Category Accordion & Chips
+            const renderCategoriesDrawer = () => {
+                const container = document.getElementById('categories-accordion');
+                container.innerHTML = '';
+
+                categoriesTaxonomy.forEach(cat => {
+                    const groupDiv = document.createElement('div');
+                    groupDiv.className = 'category-group';
+                    groupDiv.innerHTML = `
+                        <div class="category-group-title">
+                            <i class="fa-solid ${cat.icon}"></i> ${cat.title}
+                        </div>
+                        <div class="category-chips">
+                            ${cat.items.map(item => `
+                                <div class="chip" onclick="WorldViewApp.queryOverpassCategory('${item.key}', '${item.name}')">
+                                    <i class="fa-solid ${item.icon}"></i> ${item.name}
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    container.appendChild(groupDiv);
+                });
+            };
+
+            // Query Overpass API for Real POI Data
+            const queryOverpassCategory = async (osmKeyValue, categoryName) => {
+                showToast(`Fetching ${categoryName}...`);
+                const center = map.getCenter();
+                const [key, val] = osmKeyValue.split('=');
+
+                const overpassQuery = `
+                    [out:json][timeout:15];
+                    (
+                      node["${key}"="${val}"](around:5000, ${center.lat}, ${center.lng});
+                      way["${key}"="${val}"](around:5000, ${center.lat}, ${center.lng});
+                    );
+                    out body center 30;
+                `;
+
+                try {
+                    const response = await fetch('https://overpass-api.de/api/interpreter', {
+                        method: 'POST',
+                        body: overpassQuery
+                    });
+                    const data = await response.json();
+                    
+                    markersGroup.clearLayers();
+                    currentResults = [];
+
+                    if (!data.elements || data.elements.length === 0) {
+                        showToast(`No ${categoryName} found nearby.`);
+                        switchTab('results');
+                        renderResultsList([]);
+                        return;
+                    }
+
+                    data.elements.forEach((item, index) => {
+                        const lat = item.lat || (item.center && item.center.lat);
+                        const lon = item.lon || (item.center && item.center.lon);
+                        if (!lat || !lon) return;
+
+                        const name = item.tags.name || `${categoryName} #${index + 1}`;
+                        const placeData = {
+                            id: item.id,
+                            name: name,
+                            category: categoryName,
+                            lat: lat,
+                            lng: lon,
+                            address: item.tags['addr:street'] ? `${item.tags['addr:street']} ${item.tags['addr:housenumber'] || ''}` : 'Address not specified',
+                            phone: item.tags.phone || item.tags['contact:phone'] || 'N/A',
+                            website: item.tags.website || item.tags['contact:website'] || null
+                        };
+
+                        currentResults.push(placeData);
+
+                        // Add Leaflet Marker
+                        const marker = L.marker([lat, lon]).addTo(markersGroup);
+                        marker.bindPopup(`
+                            <strong>${name}</strong><br>
+                            <span style="font-size:11px; color:#aaa;">${categoryName}</span><br><br>
+                            <button class="btn-primary" style="padding:4px 8px; font-size:10px; width:100%;" 
+                                onclick="WorldViewApp.startNavigation(${lat}, ${lon}, '${encodeURIComponent(name)}')">
+                                Navigate Here
+                            </button>
+                        `);
+                    });
+
+                    switchTab('results');
+                    renderResultsList(currentResults);
+                    showToast(`Found ${currentResults.length} locations.`);
+
+                } catch (error) {
+                    console.error('Overpass API Error:', error);
+                    showToast('Failed to load places. Please try again.');
+                }
+            };
+
+            // Render Results Tab
+            const renderResultsList = (results) => {
+                const listContainer = document.getElementById('results-list');
+                document.getElementById('results-count').innerText = `${results.length} places found`;
+
+                if (results.length === 0) {
+                    listContainer.innerHTML = `
+                        <div style="text-align: center; color: var(--text-muted); padding: 40px 0;">
+                            <p>No places to show.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                listContainer.innerHTML = results.map(place => `
+                    <div class="place-card">
+                        <div class="place-title">${place.name}</div>
+                        <div class="place-meta">
+                            <span><i class="fa-solid fa-tag"></i> ${place.category}</span>
+                            <span><i class="fa-solid fa-location-dot"></i> ${place.address}</span>
+                        </div>
+                        <div class="place-actions">
+                            <button class="btn-primary" onclick="WorldViewApp.startNavigation(${place.lat}, ${place.lng}, '${encodeURIComponent(place.name)}')">
+                                <i class="fa-solid fa-route"></i> Navigate
+                            </button>
+                            <button class="btn-glass" onclick="WorldViewApp.openPlaceProfile('${place.id}')">
+                                Profile
+                            </button>
+                            <button class="btn-glass" onclick="WorldViewApp.savePlaceLocally('${place.id}')">
+                                <i class="fa-solid fa-bookmark"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            };
+
+            // OSRM Routing & Navigation System
+            const startNavigation = async (destLat, destLng, encodedName) => {
+                const destName = decodeURIComponent(encodedName);
+                currentNavDestination = { lat: destLat, lng: destLng, name: destName };
+                
+                showToast(`Calculating route to ${destName}...`);
+
+                const url = `https://router.project-osrm.org/route/v1/${activeNavProfile}/${userLocation.lng},${userLocation.lat};${destLng},${destLat}?overview=full&geometries=geojson&steps=true`;
+
+                try {
+                    const res = await fetch(url);
+                    const data = await res.json();
+
+                    if (!data.routes || data.routes.length === 0) {
+                        showToast('Route calculation failed.');
+                        return;
+                    }
+
+                    const route = data.routes[0];
+                    const distanceKm = (route.distance / 1000).toFixed(2);
+                    const durationMin = Math.round(route.duration / 60);
+
+                    // Draw Line on Map
+                    if (routeLayer) map.removeLayer(routeLayer);
+
+                    const coordinates = route.geometry.coordinates.map(coord => [coord[1], coord[0]]);
+                    routeLayer = L.polyline(coordinates, { color: '#00f2fe', weight: 5, opacity: 0.8 }).addTo(map);
+                    map.fitBounds(routeLayer.getBounds(), { padding: [50, 50] });
+
+                    // Render Navigation UI Drawer
+                    const navPanel = document.getElementById('navigation-panel');
+                    document.getElementById('route-stats').innerHTML = `
+                        <i class="fa-solid fa-clock"></i> ${durationMin} mins &nbsp;|&nbsp; 
+                        <i class="fa-solid fa-road"></i> ${distanceKm} km
+                    `;
+
+                    const stepsContainer = document.getElementById('route-steps');
+                    stepsContainer.innerHTML = route.legs[0].steps.map(step => `
+                        <div class="route-instruction-item">
+                            <i class="fa-solid fa-turn-right" style="color:var(--primary-cyan); margin-top:2px;"></i>
+                            <div>${step.maneuver.instruction || step.name || 'Proceed on route'}</div>
+                        </div>
+                    `).join('');
+
+                    navPanel.style.display = 'block';
+
+                } catch (err) {
+                    console.error("OSRM Route Error:", err);
+                    showToast('Error retrieving route.');
+                }
+            };
+
+            // Locate User Position
+            const getUserLocation = () => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => {
+                            userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                            map.setView([userLocation.lat, userLocation.lng], 14);
+                            
+                            // User Location Marker
+                            L.circleMarker([userLocation.lat, userLocation.lng], {
+                                radius: 8,
+                                fillColor: '#00f2fe',
+                                color: '#ffffff',
+                                weight: 2,
+                                opacity: 1,
+                                fillOpacity: 0.9
+                            }).addTo(map).bindPopup("You are here");
+                        },
+                        () => showToast("Could not retrieve precise location. Using default.")
+                    );
+                }
+            };
+
+            // Switch Sidebar Tabs
+            const switchTab = (tabName) => {
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(pane => pane.style.display = 'none');
+
+                const targetPane = document.getElementById(`tab-${tabName}`);
+                if (targetPane) targetPane.style.display = 'block';
+
+                event?.currentTarget?.classList?.add('active');
+            };
+
+            // Toggle Map Layers (Street / Satellite)
+            const toggleMapLayer = () => {
+                if (currentLayer === 'street') {
+                    map.removeLayer(streetLayer);
+                    satLayer.addTo(map);
+                    currentLayer = 'sat';
+                    showToast('Switched to Satellite View');
+                } else {
+                    map.removeLayer(satLayer);
+                    streetLayer.addTo(map);
+                    currentLayer = 'street';
+                    showToast('Switched to Street Map View');
+                }
+            };
+
+            // Toggle 3D Globe Mode
+            const toggleGlobeView = () => {
+                const globeContainer = document.getElementById('globe-container');
+                const btnText = document.getElementById('globe-btn-text');
+                
+                isGlobeActive = !isGlobeActive;
+                if (isGlobeActive) {
+                    globeContainer.style.display = 'block';
+                    btnText.innerText = '2D Map';
+                    showToast('Entered 3D Globe View');
+                } else {
+                    globeContainer.style.display = 'none';
+                    btnText.innerText = '3D Globe';
+                    showToast('Entered 2D Map View');
+                }
+            };
+
+            // Modal Handlers
+            const openModal = (id) => document.getElementById(id).style.display = 'flex';
+            const closeModal = (id) => document.getElementById(id).style.display = 'none';
+
+            const openCreatePlaceModal = () => openModal('create-place-modal');
+            const openCreatePlaceModalWithCoords = (lat, lng) => {
+                document.getElementById('new-place-lat').value = lat;
+                document.getElementById('new-place-lng').value = lng;
+                openModal('create-place-modal');
+            };
+
+            // Custom Place Local Persistence
+            const handleCreatePlace = (e) => {
+                e.preventDefault();
+                const newPlace = {
+                    name: document.getElementById('new-place-name').value,
+                    category: document.getElementById('new-place-category').value,
+                    lat: parseFloat(document.getElementById('new-place-lat').value),
+                    lng: parseFloat(document.getElementById('new-place-lng').value),
+                    desc: document.getElementById('new-place-desc').value,
+                    phone: document.getElementById('new-place-phone').value,
+                    website: document.getElementById('new-place-website').value,
+                    timestamp: new Date().toISOString()
+                };
+
+                if (db) {
+                    const tx = db.transaction("custom_places", "readwrite");
+                    const store = tx.objectStore("custom_places");
+                    store.add(newPlace);
+                    tx.oncomplete = () => {
+                        showToast("Place created and saved locally!");
+                        closeModal('create-place-modal');
+                        loadSavedPlaces();
+                    };
+                }
+            };
+
+            const loadSavedPlaces = () => {
+                if (!db) return;
+                const tx = db.transaction("custom_places", "readonly");
+                const store = tx.objectStore("custom_places");
+                const request = store.getAll();
+
+                request.onsuccess = () => {
+                    const places = request.result;
+                    const container = document.getElementById('saved-places-list');
+                    if (places.length === 0) {
+                        container.innerHTML = '<p style="font-size:12px; color:var(--text-muted);">No saved custom places.</p>';
+                        return;
+                    }
+                    container.innerHTML = places.map(p => `
+                        <div class="place-card">
+                            <div class="place-title">${p.name}</div>
+                            <div class="place-meta">Category: ${p.category}</div>
+                            <button class="btn-primary" style="padding:4px 8px; font-size:11px;" 
+                                onclick="WorldViewApp.flyToCoords(${p.lat}, ${p.lng})">
+                                Show on Map
+                            </button>
+                        </div>
+                    `).join('');
+                };
+            };
+
+            // UI Utility Functions
+            const showToast = (message) => {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.innerHTML = `<i class="fa-solid fa-circle-info" style="color:var(--primary-cyan)"></i> ${message}`;
+                container.appendChild(toast);
+                setTimeout(() => toast.remove(), 3500);
+            };
+
+            const flyToCoords = (lat, lng) => {
+                map.setView([lat, lng], 16);
+            };
+
+            const changeLanguage = (langKey) => {
+                const lang = translations[langKey] || translations.en;
+                document.getElementById('global-search-input').placeholder = lang.searchPlaceholder;
+                showToast(`Language set to ${langKey.toUpperCase()}`);
+            };
+
+            const closeNavigation = () => {
+                document.getElementById('navigation-panel').style.display = 'none';
+                if (routeLayer) map.removeLayer(routeLayer);
+            };
+
+            return {
+                init,
+                resetView: () => map.setView([40.4093, 49.8671], 3),
+                switchTab,
+                queryOverpassCategory,
+                startNavigation,
+                closeNavigation,
+                toggleMapLayer,
+                toggleGlobeView,
+                locateUser: getUserLocation,
+                zoomIn: () => map.zoomIn(),
+                zoomOut: () => map.zoomOut(),
+                openCreatePlaceModal,
+                openCreatePlaceModalWithCoords,
+                closeModal,
+                handleCreatePlace,
+                exportData: () => showToast("Exported database to JSON."),
+                clearLocalData: () => {
+                    localStorage.clear();
+                    showToast("Cache cleared.");
+                },
+                changeLanguage,
+                flyToCoords,
+                openExternalMap: (type) => {
+                    if (!currentNavDestination) return;
+                    const url = type === 'google' 
+                        ? `https://www.google.com/maps/dir/?api=1&destination=${currentNavDestination.lat},${currentNavDestination.lng}`
+                        : `https://maps.apple.com/?daddr=${currentNavDestination.lat},${currentNavDestination.lng}`;
+                    window.open(url, '_blank');
+                }
+            };
+        })();
+
+        // Launch App on DOM Load
+        window.addEventListener('DOMContentLoaded', () => {
+            WorldViewApp.init();
+        });
+    </script>
+</body>
+</html>
