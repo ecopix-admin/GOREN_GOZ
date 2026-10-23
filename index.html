@@ -1,507 +1,323 @@
-
 <!doctype html>
 <html lang="az">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#030813">
-<title>WORLDVIEW — Living Earth</title>
+<meta name="theme-color" content="#020817">
+<title>WORLDVIEW — Real Earth 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
-:root{
- --bg:#030813;--panel:rgba(8,20,36,.88);--line:#ffffff20;
- --text:#f4f9ff;--muted:#9aafc5;--cyan:#56e8ff;
- --mint:#4ef2bc;--violet:#a18bff;
-}
+:root{--bg:#020817;--panel:rgba(5,20,43,.87);--line:#42cfff40;--cyan:#40e5ff;--mint:#42f3c1;--text:#f1f8ff;--muted:#9bb2cd}
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden}
-body{background:radial-gradient(ellipse at 50% 44%,#102f4d,#030813 65%);
- color:var(--text);font:14px system-ui,-apple-system,sans-serif}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif}
 button,input{font:inherit}
-button{color:inherit;cursor:pointer}
-button:focus-visible,input:focus-visible{outline:2px solid var(--cyan)}
-#stars{position:fixed;inset:0;pointer-events:none;opacity:.5;
- background-image:radial-gradient(#fff 1px,transparent 1.5px),
- radial-gradient(#73cfff 1px,transparent 1.5px);
- background-size:83px 83px,139px 139px;background-position:12px 22px,57px 70px}
-.app{height:100dvh;position:relative;isolation:isolate}
-header{position:absolute;z-index:5;top:0;left:0;right:0;
- display:flex;align-items:center;justify-content:space-between;
- padding:calc(14px + env(safe-area-inset-top)) 18px 12px;
- background:linear-gradient(#030813dd,transparent)}
-.brand{display:flex;align-items:center;gap:10px;font-size:19px;
- font-weight:850;letter-spacing:1.5px}
-.logo{width:39px;height:39px;border:1px solid #4ef2bc77;
- border-radius:13px;display:grid;place-items:center;color:var(--mint);
- background:#4ef2bc12;font-size:25px;box-shadow:0 0 25px #4ef2bc15}
-.head-actions{display:flex;gap:7px}
-.btn{border:1px solid var(--line);background:#ffffff09;
- padding:10px 12px;border-radius:12px;font-size:12px}
+button{cursor:pointer;color:inherit}
+#map{position:absolute;inset:0;background:#020817}
+.leaflet-container{background:#020817;font-family:Inter,sans-serif}
+.leaflet-control-attribution{font-size:9px!important;background:#061326cc!important;color:#abc!important}
+.leaflet-control-attribution a{color:#58dfff!important}
+.leaflet-control-zoom{display:none}
+.leaflet-tile{filter:saturate(1.08) contrast(1.04)}
+.shade{position:absolute;inset:0;z-index:400;pointer-events:none;background:linear-gradient(180deg,#020817c9 0%,transparent 19%,transparent 53%,#02081720 65%,#020817b8 100%)}
+header{position:absolute;z-index:800;top:env(safe-area-inset-top,0px);left:0;right:0;padding:15px 17px;display:flex;align-items:center;justify-content:space-between;gap:8px;pointer-events:none}
+header>*{pointer-events:auto}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.logo{width:42px;height:42px;flex-shrink:0;display:grid;place-items:center;border:1px solid #40e5ff9c;border-radius:15px;background:#062441c9;color:var(--cyan);font-size:25px;box-shadow:0 0 25px #00cfff27}
+.brand h1{font-size:18px;letter-spacing:3px;margin:0;font-weight:800}
+.brand small{display:block;font-size:8px;letter-spacing:2px;color:var(--cyan);margin-top:5px;white-space:nowrap}
+.actions{display:flex;align-items:center;gap:6px}
+.btn{border:1px solid var(--line);background:#07172bdc;backdrop-filter:blur(15px);border-radius:13px;padding:10px 11px;font-size:11px;white-space:nowrap}
 .btn:active{transform:scale(.97)}
-.btn.active,.btn:hover{border-color:#56e8ff77;color:var(--cyan)}
-#world{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
-.hud{position:absolute;z-index:3;left:20px;top:100px;pointer-events:none}
-.eyebrow{font-size:10px;letter-spacing:2px;color:var(--mint);font-weight:800}
-.hud h1{font-size:clamp(25px,4vw,43px);letter-spacing:-1.5px;margin:8px 0}
-.hud p{color:var(--muted);font-size:12px;line-height:1.6;margin:0}
-.searchbox{position:absolute;z-index:6;top:100px;left:50%;
- transform:translateX(-50%);width:min(360px,calc(100% - 36px))}
-.searchline{display:flex;gap:7px;padding:6px;
- border:1px solid var(--line);border-radius:15px;background:#071626dd;
- backdrop-filter:blur(20px);box-shadow:0 12px 45px #0005}
-.searchline input{min-width:0;flex:1;border:0;outline:0;background:transparent;
- color:white;padding:9px;font-size:13px}
-.searchline button{border:0;border-radius:10px;background:#4ef2bc;
- color:#03120f;font-weight:800;padding:0 14px}
-#searchResults{display:none;margin-top:6px;max-height:220px;overflow:auto;
- border:1px solid var(--line);border-radius:14px;background:#071626f5;
- backdrop-filter:blur(20px)}
-.result{display:block;width:100%;padding:12px;text-align:left;
- border:0;border-bottom:1px solid #ffffff12;background:transparent;
- color:white;font-size:12px}
-.result:hover{background:#ffffff12}
-.globe-help{position:absolute;z-index:2;bottom:240px;left:50%;
- transform:translateX(-50%);font-size:11px;color:#b5cad9aa;
- white-space:nowrap;pointer-events:none}
-.panel{position:absolute;z-index:4;right:18px;bottom:24px;
- width:min(340px,calc(100% - 36px));border:1px solid #ffffff20;
- border-radius:23px;background:var(--panel);backdrop-filter:blur(24px);
- box-shadow:0 20px 70px #0008;padding:19px}
-.panel-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.live{font-size:10px;color:var(--mint);letter-spacing:1px}
-.live:before{content:"";display:inline-block;width:6px;height:6px;
- margin-right:7px;border-radius:50%;background:var(--mint);
- box-shadow:0 0 10px var(--mint)}
-.close{border:1px solid var(--line);background:#ffffff09;
- width:30px;height:30px;border-radius:10px;font-size:17px}
-.place{font-size:26px;line-height:1.15;letter-spacing:-.8px;
- margin:12px 0 5px;overflow-wrap:anywhere}
-.location{font-size:11px;line-height:1.5;color:var(--muted)}
-.weather-main{display:flex;align-items:center;gap:13px;
- margin:18px 0;padding:14px;border:1px solid #ffffff13;
- border-radius:17px;background:linear-gradient(120deg,#56e8ff0e,#a18bff0a)}
-.weather-icon{font-size:39px}
-.temp{font-size:35px;font-weight:800;letter-spacing:-1.5px}
-.description{font-size:11px;color:var(--muted);margin-top:3px}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.stat{padding:12px;border:1px solid #ffffff12;border-radius:14px;
- background:#ffffff05;min-width:0}
-.stat .symbol{font-size:15px}
-.stat b{display:block;font-size:15px;margin-top:7px;overflow-wrap:anywhere}
-.stat small{display:block;font-size:10px;color:var(--muted);margin-top:4px}
-.coords{margin-top:13px;display:flex;justify-content:space-between;
- align-items:center;gap:8px;font-size:10px;color:var(--muted)}
-.coords button{border:0;background:transparent;color:var(--cyan);padding:5px}
-.status{font-size:11px;line-height:1.5;color:var(--muted);margin-top:10px}
-.citybar{position:absolute;z-index:4;bottom:16px;left:18px;
- display:flex;gap:7px;max-width:calc(100% - 400px);overflow-x:auto;
- padding:5px 0;scrollbar-width:none}
-.citybar::-webkit-scrollbar{display:none}
-.city{white-space:nowrap;padding:10px 13px;border:1px solid var(--line);
- border-radius:13px;background:#071626d9;font-size:11px}
-.city.active{background:var(--mint);border-color:var(--mint);color:#03120e;font-weight:800}
-.toast{position:absolute;z-index:20;left:50%;bottom:30px;
- transform:translateX(-50%);background:#11253a;border:1px solid #56e8ff66;
- border-radius:12px;padding:12px 16px;font-size:12px;
- box-shadow:0 10px 30px #0008;max-width:90%;text-align:center}
-.hidden{display:none!important}
-#loading{position:absolute;z-index:2;top:50%;left:50%;
- transform:translate(-50%,-50%);text-align:center;color:var(--muted);
- font-size:12px;pointer-events:none}
-.spinner{width:28px;height:28px;margin:0 auto 12px;border:2px solid #ffffff22;
- border-top-color:var(--mint);border-radius:50%;animation:spin 1s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-@media(min-width:1000px){
- .panel{bottom:28px;right:26px}
- .citybar{bottom:30px;left:26px}
- .globe-help{bottom:30px;left:50%}
+.btn.active{border-color:var(--cyan);background:#0a3a51e8;color:var(--cyan)}
+.iconbtn{width:43px;height:43px;padding:0;display:grid;place-items:center;font-size:19px}
+.side{position:absolute;z-index:700;left:14px;top:105px;display:grid;gap:9px}
+.side button{width:43px;height:43px;border:1px solid #4bcfff59;border-radius:15px;background:#05152bdd;backdrop-filter:blur(15px);font-size:19px;box-shadow:0 5px 18px #0005}
+.side button.active{color:var(--cyan);border-color:var(--cyan)}
+.searchbar{position:absolute;z-index:700;top:94px;left:68px;right:15px;max-width:490px;margin:auto;display:flex;gap:7px;padding:7px;border:1px solid #4bcfff45;border-radius:17px;background:#06152bdf;backdrop-filter:blur(20px)}
+.searchbar input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:white;padding:8px 10px;font-size:13px}
+.searchbar input::placeholder{color:#94abc4}
+.searchbar button{border:0;border-radius:12px;padding:0 17px;background:var(--mint);color:#01201e;font-weight:800}
+#status{position:absolute;z-index:700;top:151px;left:69px;font-size:10px;color:#b7d3e8;background:#041327c9;border:1px solid #ffffff15;border-radius:8px;padding:6px 9px;pointer-events:none}
+.crosshair{position:absolute;z-index:450;left:50%;top:43%;transform:translate(-50%,-50%);pointer-events:none;width:44px;height:44px;border:1px solid #40e5ffab;border-radius:50%;box-shadow:0 0 25px #40e5ff40}
+.crosshair:before,.crosshair:after{content:"";position:absolute;background:var(--cyan)}
+.crosshair:before{width:1px;height:60px;left:21px;top:-9px}
+.crosshair:after{height:1px;width:60px;top:21px;left:-9px}
+.crosshair i{position:absolute;inset:13px;border-radius:50%;background:var(--cyan);box-shadow:0 0 15px var(--cyan)}
+.coords{position:absolute;z-index:700;top:calc(43% + 33px);left:50%;transform:translateX(-50%);background:#031328e8;border:1px solid #43dfff4d;border-radius:10px;padding:7px 11px;font-size:10px;white-space:nowrap;color:#e2f7ff}
+.card{position:absolute;z-index:750;bottom:calc(62px + env(safe-area-inset-bottom,0px));left:12px;right:12px;max-width:720px;margin:auto;max-height:59vh;overflow:auto;border:1px solid #5bd9ff62;border-radius:24px;background:rgba(4,19,40,.83);backdrop-filter:blur(24px);box-shadow:0 15px 65px #0009,0 0 35px #008cff12;scrollbar-width:thin;scrollbar-color:#42e5ff55 transparent}
+.cardhead{display:flex;align-items:center;justify-content:space-between;padding:16px 17px 8px;gap:10px}
+.kicker{font-size:10px;color:var(--mint);letter-spacing:2px;font-weight:700}
+.close{border:1px solid #ffffff29;border-radius:11px;background:#ffffff08;width:34px;height:34px;font-size:18px}
+.place{padding:0 17px 14px}
+.place h2{font-size:clamp(25px,6vw,37px);margin:5px 0;font-weight:800;letter-spacing:-1.2px;overflow-wrap:anywhere}
+.sub{font-size:12px;color:#a8bfd7;line-height:1.6}
+.weatherhero{margin:0 15px 10px;border:1px solid #ffffff18;border-radius:19px;padding:14px;display:flex;align-items:center;gap:13px;background:linear-gradient(120deg,#193755b8,#0c1d33b9)}
+.weathericon{font-size:40px}
+.temp{font-size:32px;font-weight:800;letter-spacing:-1px}
+.weatherdesc{font-size:12px;color:#b5c8dc;margin-top:4px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:0 15px 12px}
+.metric{min-width:0;padding:12px;border:1px solid #ffffff17;border-radius:16px;background:#ffffff06}
+.metric .ico{font-size:16px;margin-bottom:8px}
+.metric b{font-size:14px;display:block;overflow-wrap:anywhere}
+.metric span{font-size:10px;color:#9db3cc;display:block;margin-top:5px;line-height:1.5}
+.detailrow{padding:12px 17px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid #ffffff10;font-size:11px}
+.detailrow .value{color:#b9d2e7;overflow-wrap:anywhere}
+.linkbtn{border:0;background:none;color:var(--cyan);font-size:11px;padding:5px}
+.mapmodes{display:flex;gap:6px;padding:0 15px 13px;overflow-x:auto}
+.mapmodes button{flex:1;min-width:75px;border:1px solid #ffffff1e;border-radius:11px;background:#06152b;padding:10px 7px;font-size:10px}
+.mapmodes button.active{border-color:var(--cyan);color:var(--cyan);background:#07344c}
+.bottom{position:absolute;z-index:800;bottom:calc(9px + env(safe-area-inset-bottom,0px));left:0;right:0;display:flex;gap:7px;padding:0 12px;overflow-x:auto;scrollbar-width:none}
+.bottom::-webkit-scrollbar{display:none}
+.city{flex-shrink:0;border:1px solid #53cfff43;background:#05152be8;backdrop-filter:blur(15px);padding:11px 14px;border-radius:30px;font-size:11px}
+.city.active{border-color:var(--cyan);background:#073b52;color:var(--mint)}
+.toast{position:absolute;z-index:1200;top:185px;left:50%;transform:translateX(-50%);max-width:90%;padding:11px 15px;border:1px solid #4de9ff66;border-radius:12px;background:#06172af2;color:#fff;font-size:12px;text-align:center;display:none}
+.toast.show{display:block}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#06172b;color:white}
+.leaflet-popup-content{font-size:12px}
+@media(min-width:850px){
+ .card{left:auto;right:20px;bottom:80px;width:410px;max-height:calc(100vh - 200px)}
+ .searchbar{top:105px;left:80px}
+ .crosshair{top:50%}
+ .coords{top:calc(50% + 34px)}
+ .side{top:160px}
 }
-@media(max-width:700px){
- header{padding-left:13px;padding-right:13px}
- .brand{font-size:16px;gap:7px}
- .logo{width:34px;height:34px}
- .head-actions .btn{padding:9px;font-size:11px}
- .hud{top:83px;left:15px}
- .hud h1{font-size:25px;margin:5px 0}
- .hud p{font-size:10px}
- .searchbox{top:157px}
- .panel{bottom:74px;left:12px;right:12px;width:auto;
-  padding:14px;border-radius:19px}
- .place{font-size:22px;margin:9px 0 4px}
- .weather-main{margin:11px 0;padding:10px}
- .weather-icon{font-size:31px}
- .temp{font-size:29px}
- .stat{padding:9px}
- .stat b{font-size:13px;margin-top:4px}
- .stats{gap:6px}
- .coords{margin-top:8px}
- .citybar{left:12px;right:12px;bottom:9px;max-width:none}
- .city{padding:9px 12px}
- .globe-help{bottom:calc(74px + 285px);font-size:10px}
-}
-@media(max-height:690px) and (max-width:700px){
- .hud{display:none}
- .searchbox{top:75px}
- .panel{bottom:65px;padding:10px}
- .weather-main{margin:7px 0}
- .stat{padding:7px}
- .citybar{bottom:4px}
- .globe-help{display:none}
+@media(max-width:430px){
+ header{padding:10px 10px}
+ .brand{gap:7px}
+ .logo{width:35px;height:35px;border-radius:12px}
+ .brand h1{font-size:15px;letter-spacing:2px}
+ .brand small{font-size:7px;letter-spacing:1.2px}
+ .actions{gap:4px}
+ .btn{padding:9px 7px;font-size:10px}
+ .iconbtn{width:34px;height:36px}
+ .side{left:9px;top:153px;gap:7px}
+ .side button{width:37px;height:37px;border-radius:12px}
+ .searchbar{top:99px;left:10px;right:10px}
+ #status{top:149px;left:10px;font-size:9px}
+ .card{bottom:calc(61px + env(safe-area-inset-bottom,0px));left:7px;right:7px;max-height:57vh;border-radius:21px}
+ .cardhead{padding:12px 13px 7px}
+ .place{padding:0 13px 12px}
+ .weatherhero{margin:0 10px 9px;padding:11px}
+ .grid{padding:0 10px 10px;gap:6px}
+ .metric{padding:10px;border-radius:13px}
+ .metric b{font-size:12px}
+ .metric span{font-size:9px}
+ .detailrow{padding:10px 13px}
+ .mapmodes{padding:0 10px 10px}
+ .bottom{padding:0 8px;gap:5px}
+ .city{padding:10px 12px}
 }
 </style>
 </head>
 <body>
-<div id="stars"></div>
-<div class="app">
+<div id="map"></div>
+<div class="shade"></div>
 <header>
- <div class="brand"><span class="logo">◎</span> WORLDVIEW</div>
- <div class="head-actions">
-  <button class="btn" id="rotateBtn">Ⅱ Fırlanma</button>
-  <button class="btn" id="homeBtn">⌖ Mərkəz</button>
-  <button class="btn" id="fullBtn">⛶</button>
+ <div class="brand">
+  <div class="logo">◎</div>
+  <div><h1>WORLDVIEW</h1><small>REAL EARTH · LIVE DATA · 3D</small></div>
+ </div>
+ <div class="actions">
+  <button class="btn active" id="rotate" onclick="toggleRotate()">Ⅱ Fırlanma</button>
+  <button class="btn active" id="satBtn" onclick="setMap('sat')">◉ Peyk</button>
+  <button class="btn iconbtn" onclick="fullScreen()" aria-label="Tam ekran">⛶</button>
  </div>
 </header>
-
-<div class="hud">
- <div class="eyebrow">PLANET EARTH · 3D</div>
- <h1>Dünyanı kəşf et.</h1>
- <p>Qlobusu çevir. İstənilən nöqtəni seç.<br>Planet haqqında məlumatları öyrən.</p>
+<div class="searchbar">
+ <input id="query" placeholder="Şəhər, ölkə və ya ünvan axtar..." autocomplete="off">
+ <button onclick="searchPlace()">Axtar</button>
 </div>
-
-<div class="searchbox">
- <form class="searchline" id="searchForm">
-  <input id="searchInput" placeholder="Şəhər, ölkə və ya məkan axtar..." autocomplete="off">
-  <button type="submit">Axtar</button>
- </form>
- <div id="searchResults"></div>
+<div id="status">● Xəritə hazırlanır...</div>
+<div class="side">
+ <button onclick="focusSearch()" title="Axtarış">⌕</button>
+ <button onclick="toggleLabels()" title="Etiketlər">▱</button>
+ <button onclick="locateMe()" title="Mənim yerim">➤</button>
+ <button onclick="homeView()" title="Mərkəzə qayıt">⌖</button>
+ <button id="zoomIn" onclick="map.zoomIn()" title="Yaxınlaşdır">＋</button>
+ <button onclick="map.zoomOut()" title="Uzaqlaşdır">−</button>
 </div>
+<div class="crosshair"><i></i></div>
+<div class="coords" id="coords">40.4093° N · 49.8671° E</div>
+<div class="toast" id="toast"></div>
 
-<canvas id="world"></canvas>
-<div id="loading"><div class="spinner"></div>Yer kürəsi hazırlanır...</div>
-<div class="globe-help">↔ Barmaqla çevir · İki barmaqla böyüt · Nöqtəyə toxun</div>
-
-<section class="panel" id="info">
- <div class="panel-top"><span class="live">WORLD DATA</span><button class="close" id="refreshBtn" title="Məlumatı yenilə">↻</button></div>
- <h2 class="place" id="placeName">Bakı</h2>
- <div class="location" id="placeLocation">Azərbaycan · Yerli məlumatlar</div>
- <div class="weather-main">
-  <span class="weather-icon" id="weatherIcon">🌍</span>
-  <div><div class="temp" id="temperature">--°C</div>
-  <div class="description" id="weatherDescription">Hava məlumatı yüklənir</div></div>
+<section class="card" id="card">
+ <div class="cardhead">
+  <span class="kicker">● WORLD DATA / REAL LOCATION</span>
+  <button class="close" onclick="toggleCard()" id="closeCard">⌄</button>
  </div>
- <div class="stats">
-  <div class="stat"><span class="symbol">◷</span><b id="localTime">--:--:--</b><small>Yerli saat</small></div>
-  <div class="stat"><span class="symbol">💧</span><b id="humidity">--</b><small>Rütubət</small></div>
-  <div class="stat"><span class="symbol">〰</span><b id="wind">--</b><small>Küləyin sürəti</small></div>
-  <div class="stat"><span class="symbol">◉</span><b id="windDirection">--</b><small>Küləyin istiqaməti</small></div>
+ <div class="place">
+  <h2 id="placeName">Bakı</h2>
+  <div class="sub" id="placeSub">Azərbaycan · Məlumatlar yüklənir</div>
  </div>
- <div class="coords"><span id="coordinates">40.4093, 49.8671</span><button id="copyCoords">Koordinatları köçür</button></div>
- <div class="status" id="status">Məlumatlar hazırlanır...</div>
+ <div class="weatherhero">
+  <div class="weathericon" id="weatherIcon">🌍</div>
+  <div><div class="temp" id="temp">—°C</div><div class="weatherdesc" id="weatherDesc">Hava məlumatı yüklənir</div></div>
+ </div>
+ <div class="grid">
+  <div class="metric"><div class="ico">◷</div><b id="clock">--:--:--</b><span id="zone">Yerli saat / saat qurşağı</span></div>
+  <div class="metric"><div class="ico">💧</div><b id="humidity">—%</b><span>Rütubət</span></div>
+  <div class="metric"><div class="ico">〰</div><b id="wind">— km/saat</b><span id="windDir">Küləyin sürəti və istiqaməti</span></div>
+  <div class="metric"><div class="ico">◉</div><b id="pressure">— hPa</b><span>Atmosfer təzyiqi</span></div>
+ </div>
+ <div class="detailrow"><span>⌖ Koordinatlar</span><span class="value" id="exactCoords">—</span><button class="linkbtn" onclick="copyCoords()">Köçür</button></div>
+ <div class="detailrow"><span>☀ Günəş</span><span class="value" id="sun">Məlumat gözlənilir</span></div>
+ <div class="detailrow"><span>◷ Saat qurşağı</span><span class="value" id="timezone">—</span></div>
+ <div class="mapmodes">
+  <button class="active" id="modeSat" onclick="setMap('sat')">◈ Peyk</button>
+  <button id="modeHybrid" onclick="setMap('hybrid')">▤ Peyk + adlar</button>
+  <button id="modeStreet" onclick="setMap('street')">⌘ Küçələr</button>
+  <button id="modePolitical" onclick="setMap('political')">▦ Siyasi</button>
+ </div>
+ <div class="detailrow"><span>Son yenilənmə</span><span class="value" id="updated">—</span></div>
 </section>
 
-<nav class="citybar">
- <button class="city active" data-name="Bakı" data-lat="40.4093" data-lng="49.8671">🇦🇿 Bakı</button>
- <button class="city" data-name="London" data-lat="51.5072" data-lng="-0.1276">London</button>
- <button class="city" data-name="New York" data-lat="40.7128" data-lng="-74.0060">New York</button>
- <button class="city" data-name="Paris" data-lat="48.8566" data-lng="2.3522">Paris</button>
- <button class="city" data-name="Dubai" data-lat="25.2048" data-lng="55.2708">Dubai</button>
- <button class="city" data-name="Tokyo" data-lat="35.6762" data-lng="139.6503">Tokyo</button>
- <button class="city" data-name="Istanbul" data-lat="41.0082" data-lng="28.9784">İstanbul</button>
- <button class="city" data-name="Sydney" data-lat="-33.8688" data-lng="151.2093">Sydney</button>
-</nav>
+<div class="bottom">
+ <button class="city active" onclick="goCity('Bakı',40.4093,49.8671)">🇦🇿 Bakı</button>
+ <button class="city" onclick="goCity('New York',40.7128,-74.006)">🇺🇸 New York</button>
+ <button class="city" onclick="goCity('London',51.5072,-0.1276)">🇬🇧 London</button>
+ <button class="city" onclick="goCity('Paris',48.8566,2.3522)">🇫🇷 Paris</button>
+ <button class="city" onclick="goCity('Dubai',25.2048,55.2708)">🇦🇪 Dubai</button>
+ <button class="city" onclick="goCity('Tokyo',35.6762,139.6503)">🇯🇵 Tokyo</button>
+ <button class="city" onclick="goCity('İstanbul',41.0082,28.9784)">🇹🇷 İstanbul</button>
+ <button class="city" onclick="goCity('Sydney',-33.8688,151.2093)">🇦🇺 Sydney</button>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 "use strict";
 const $=id=>document.getElementById(id);
-const state={lat:40.4093,lng:49.8671,name:"Bakı",auto:true,loadingId:0};
-let scene,camera,renderer,earth,clouds,marker,raycaster,mouse;
-let down=false,moved=false,px=0,py=0,prevX=0,prevY=0;
-let lastTap=0,pinchStart=0,zoom=3.05,ready=false;
-let pointerStart=null;
-
-function toast(msg){
- const old=document.querySelector(".toast");if(old)old.remove();
- const d=document.createElement("div");d.className="toast";d.textContent=msg;
- document.querySelector(".app").appendChild(d);
- setTimeout(()=>d.remove(),2600);
-}
+let map,baseLayer,labelLayer,marker,rotation=false,rotationTimer=null,labelsOn=true,selected={lat:40.4093,lon:49.8671,name:"Bakı"},requestId=0,clockTimer=null;
+const layers={};
+const cities=[
+{name:"Bakı",lat:40.4093,lon:49.8671},
+{name:"New York",lat:40.7128,lon:-74.006},
+{name:"London",lat:51.5072,lon:-0.1276},
+{name:"Paris",lat:48.8566,lon:2.3522},
+{name:"Dubai",lat:25.2048,lon:55.2708},
+{name:"Tokyo",lat:35.6762,lon:139.6503},
+{name:"İstanbul",lat:41.0082,lon:28.9784},
+{name:"Sydney",lat:-33.8688,lon:151.2093}
+];
+function say(s){const t=$("toast");t.textContent=s;t.classList.add("show");clearTimeout(say.timer);say.timer=setTimeout(()=>t.classList.remove("show"),3000)}
+function setStatus(s){$("status").textContent="● "+s}
 function init(){
- const canvas=$("world");
- scene=new THREE.Scene();
- camera=new THREE.PerspectiveCamera(38,1,.1,100);
- camera.position.z=zoom;
- renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:"high-performance"});
- renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.7));
- renderer.outputEncoding=THREE.sRGBEncoding;
- scene.add(new THREE.AmbientLight(0xb8d9ff,1.5));
- const sun=new THREE.DirectionalLight(0xffffff,2.1);
- sun.position.set(4,3,5);scene.add(sun);
-
- earth=new THREE.Mesh(
-  new THREE.SphereGeometry(1,72,56),
-  new THREE.MeshPhongMaterial({color:0xffffff,specular:0x24394b,shininess:14})
- );
- scene.add(earth);
-
- const loader=new THREE.TextureLoader();
- loader.setCrossOrigin("anonymous");
- loader.load(
-  "https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg",
-  texture=>{
-   texture.encoding=THREE.sRGBEncoding;
-   earth.material.map=texture;earth.material.color.set(0xffffff);
-   earth.material.needsUpdate=true;
-   $("loading").classList.add("hidden");
-  },undefined,()=>{
-   $("loading").innerHTML="Yer teksturası yüklənmədi.<br>İnternet bağlantısını yoxla.";
-   earth.material.color.set(0x1c6284);
-  }
- );
-
- clouds=new THREE.Mesh(
-  new THREE.SphereGeometry(1.009,48,36),
-  new THREE.MeshBasicMaterial({color:0x8edcff,transparent:true,opacity:.045,wireframe:true})
- );
- scene.add(clouds);
-
- const atmosphere=new THREE.Mesh(
-  new THREE.SphereGeometry(1.055,48,36),
-  new THREE.MeshBasicMaterial({color:0x24baff,transparent:true,opacity:.075,side:THREE.BackSide})
- );
- scene.add(atmosphere);
-
- marker=new THREE.Mesh(
-  new THREE.SphereGeometry(.018,12,10),
-  new THREE.MeshBasicMaterial({color:0x4ef2bc})
- );
- earth.add(marker);
-
- raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();
- resize();
- window.addEventListener("resize",resize);
-
- canvas.addEventListener("pointerdown",e=>{
-  down=true;moved=false;px=e.clientX;py=e.clientY;
-  prevX=e.clientX;prevY=e.clientY;
-  pointerStart={x:e.clientX,y:e.clientY,time:Date.now()};
-  if(canvas.setPointerCapture)canvas.setPointerCapture(e.pointerId);
- });
- canvas.addEventListener("pointermove",e=>{
-  if(!down)return;
-  const dx=e.clientX-prevX,dy=e.clientY-prevY;
-  if(Math.abs(e.clientX-px)+Math.abs(e.clientY-py)>5)moved=true;
-  if(moved){
-   state.auto=false;updateRotateButton();
-   earth.rotation.y+=dx*.006;
-   earth.rotation.x+=dy*.006;
-   earth.rotation.x=Math.max(-Math.PI/2,Math.min(Math.PI/2,earth.rotation.x));
-   clouds.rotation.copy(earth.rotation);
-  }
-  prevX=e.clientX;prevY=e.clientY;
- });
- canvas.addEventListener("pointerup",e=>{
-  if(!down)return;down=false;
-  if(!moved&&pointerStart&&Date.now()-pointerStart.time<700)selectAt(e.clientX,e.clientY);
-  pointerStart=null;
- });
- canvas.addEventListener("pointercancel",()=>{down=false;pointerStart=null});
- canvas.addEventListener("wheel",e=>{
-  e.preventDefault();
-  zoom=Math.max(1.55,Math.min(5.5,zoom+e.deltaY*.0025));
-  camera.position.z=zoom;
- },{passive:false});
-
- $("rotateBtn").addEventListener("click",()=>{
-  state.auto=!state.auto;updateRotateButton();
- });
- $("homeBtn").addEventListener("click",()=>{
-  zoom=3.05;camera.position.z=zoom;focus(40.4093,49.8671,"Bakı");
- });
- $("fullBtn").addEventListener("click",async()=>{
-  try{
-   if(!document.fullscreenElement)await document.documentElement.requestFullscreen();
-   else await document.exitFullscreen();
-  }catch{toast("Tam ekran rejimi bu brauzerdə dəstəklənmir");}
- });
- $("refreshBtn").addEventListener("click",()=>loadPlace(state.lat,state.lng,state.name,true));
- $("copyCoords").addEventListener("click",async()=>{
-  const t=state.lat.toFixed(5)+", "+state.lng.toFixed(5);
-  try{await navigator.clipboard.writeText(t);toast("Koordinatlar köçürüldü");}
-  catch{toast(t);}
- });
-
- document.querySelectorAll(".city").forEach(b=>b.addEventListener("click",()=>{
-  focus(+b.dataset.lat,+b.dataset.lng,b.dataset.name);
- }));
-
- $("searchForm").addEventListener("submit",searchPlace);
- document.addEventListener("click",e=>{
-  if(!$("searchResults").contains(e.target)&&e.target!==$("searchInput"))
-   $("searchResults").style.display="none";
- });
-
- ready=true;
- focus(40.4093,49.8671,"Bakı");
- animate();
+ if(!window.L){setStatus("Xəritə kitabxanası yüklənmədi");say("İnternet bağlantısını yoxla və səhifəni yenilə.");return}
+ map=L.map("map",{center:[25,10],zoom:2,zoomControl:false,attributionControl:true,worldCopyJump:true,preferCanvas:true,zoomAnimation:true,fadeAnimation:true}).setView([40.4093,49.8671],3);
+ layers.sat=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,attribution:'Tiles © Esri — Sources: Esri, Maxar, Earthstar Geographics'});
+ layers.street=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,attribution:'Tiles © Esri'});
+ layers.political=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,attribution:'Tiles © Esri'});
+ layers.labels=L.tileLayer("https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png",{subdomains:"abcd",maxZoom:20,opacity:.95,attribution:'Labels © CARTO'});
+ setMap("sat");
+ marker=L.circleMarker([40.4093,49.8671],{radius:7,color:"#40e5ff",weight:3,fillColor:"#40e5ff",fillOpacity:.85}).addTo(map);
+ marker.bindTooltip("Bakı",{permanent:true,direction:"top",className:"worldview-tip"});
+ map.on("click",e=>selectPoint(e.latlng.lat,e.latlng.lng));
+ map.on("moveend",()=>{if(map.getZoom()>=5){const c=map.getCenter();$("coords").textContent=fmt(c.lat)+ " · "+fmt(c.lng)}});
+ setStatus("Peyk xəritəsi hazırdır");
+ selectPoint(40.4093,49.8671,"Bakı");
 }
-function resize(){
- if(!renderer)return;
- const w=window.innerWidth,h=window.innerHeight;
- renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
+function setMap(type){
+ if(!map)return;
+ if(baseLayer)map.removeLayer(baseLayer);
+ if(labelLayer){map.removeLayer(labelLayer);labelLayer=null}
+ baseLayer=layers[type==="hybrid"?"sat":type==="political"?"political":type==="street"?"street":"sat"];
+ baseLayer.addTo(map);
+ if(type==="hybrid"||(type==="sat"&&labelsOn)) {labelLayer=layers.labels;labelLayer.addTo(map)}
+ document.querySelectorAll("#modeSat,#modeHybrid,#modeStreet,#modePolitical").forEach(b=>b.classList.remove("active"));
+ const id=type==="sat"?"modeSat":type==="hybrid"?"modeHybrid":type==="street"?"modeStreet":"modePolitical";
+ $(id).classList.add("active");
+ $("satBtn").classList.toggle("active",type==="sat"||type==="hybrid");
+ setStatus(type==="sat"?"Peyk görüntüsü":type==="hybrid"?"Peyk və coğrafi adlar":type==="street"?"Küçə xəritəsi":"Topoqrafik / siyasi görünüş");
 }
-function animate(){
- requestAnimationFrame(animate);
- if(state.auto&&!down&&earth){
-  earth.rotation.y+=.0008;
-  clouds.rotation.y=earth.rotation.y*1.015;
- }
- if(renderer)renderer.render(scene,camera);
+function toggleLabels(){labelsOn=!labelsOn;if(labelLayer){map.removeLayer(labelLayer);labelLayer=null}if(labelsOn&&baseLayer===layers.sat){labelLayer=layers.labels;labelLayer.addTo(map)}say(labelsOn?"Xəritə adları aktivdir":"Xəritə adları söndürüldü")}
+function fmt(n){return Math.abs(n).toFixed(5)+"° "+(n>=0?"N":"S")}
+function fmtLon(n){return Math.abs(n).toFixed(5)+"° "+(n>=0?"E":"W")}
+function selectPoint(lat,lon,name){
+ lat=Math.max(-85,Math.min(85,lat));lon=((lon+180)%360+360)%360-180;
+ selected={lat,lon,name:name||"Məkan müəyyən edilir"};
+ $("coords").textContent=fmt(lat)+" · "+fmtLon(lon);
+ $("exactCoords").textContent=lat.toFixed(5)+", "+lon.toFixed(5);
+ if(marker){marker.setLatLng([lat,lon]);marker.bindTooltip(name||"Seçilmiş nöqtə",{permanent:true,direction:"top",className:"worldview-tip"})}
+ document.querySelectorAll(".city").forEach(b=>b.classList.toggle("active",name&&b.textContent.toLowerCase().includes(name.toLowerCase())));
+ loadLocation(lat,lon,name);
 }
-function updateRotateButton(){
- $("rotateBtn").textContent=state.auto?"Ⅱ Fırlanma":"▶ Fırlanma";
- $("rotateBtn").classList.toggle("active",state.auto);
-}
-function markerPosition(lat,lng){
- const a=lat*Math.PI/180,b=lng*Math.PI/180,r=1.022;
- marker.position.set(r*Math.cos(a)*Math.sin(b),r*Math.sin(a),r*Math.cos(a)*Math.cos(b));
-}
-function focus(lat,lng,name){
- state.lat=lat;state.lng=lng;state.name=name;
- if(earth){
-  earth.rotation.x=lat*Math.PI/180;
-  earth.rotation.y=-lng*Math.PI/180;
-  clouds.rotation.copy(earth.rotation);
-  markerPosition(lat,lng);
- }
- zoom=3.05;camera.position.z=zoom;
- state.auto=false;updateRotateButton();
- document.querySelectorAll(".city").forEach(b=>
-  b.classList.toggle("active",b.dataset.name===name));
- loadPlace(lat,lng,name);
-}
-function selectAt(clientX,clientY){
- if(!ready)return;
- const r=renderer.domElement.getBoundingClientRect();
- mouse.x=((clientX-r.left)/r.width)*2-1;
- mouse.y=-((clientY-r.top)/r.height)*2+1;
- raycaster.setFromCamera(mouse,camera);
- const hits=raycaster.intersectObject(earth,false);
- if(!hits.length)return;
- const p=earth.worldToLocal(hits[0].point.clone()).normalize();
- const lat=Math.asin(Math.max(-1,Math.min(1,p.y)))*180/Math.PI;
- const lng=Math.atan2(p.x,p.z)*180/Math.PI;
- state.lat=lat;state.lng=lng;state.name="Seçilmiş məkan";
- markerPosition(lat,lng);
- loadPlace(lat,lng,"Seçilmiş məkan");
-}
-async function searchPlace(e){
- e.preventDefault();
- const q=$("searchInput").value.trim();if(!q)return;
- $("searchResults").style.display="block";
- $("searchResults").innerHTML='<div class="result">Məkan axtarılır...</div>';
+function goCity(name,lat,lon){map.flyTo([lat,lon],Math.max(map.getZoom(),5),{duration:1.4});selectPoint(lat,lon,name)}
+async function loadLocation(lat,lon,knownName){
+ const id=++requestId;
+ $("placeName").textContent=knownName||"Məkan müəyyən edilir…";
+ $("placeSub").textContent="Dəqiq coğrafi ad axtarılır";
+ $("weatherDesc").textContent="Hava məlumatları yüklənir…";
+ $("updated").textContent="Yüklənir…";
  try{
-  const url="https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&accept-language=az&q="+encodeURIComponent(q);
-  const data=await fetch(url,{headers:{"Accept":"application/json"}}).then(r=>{
-   if(!r.ok)throw Error("Search");return r.json();
-  });
-  const box=$("searchResults");box.innerHTML="";
-  if(!data.length){box.innerHTML='<div class="result">Məkan tapılmadı. Başqa ad yoxla.</div>';return;}
-  data.forEach(p=>{
-   const b=document.createElement("button");b.type="button";b.className="result";
-   b.textContent=p.display_name;
-   b.addEventListener("click",()=>{
-    box.style.display="none";
-    focus(+p.lat,+p.lon,(p.name||p.display_name.split(",")[0]));
-   });
-   box.appendChild(b);
-  });
- }catch{
-  $("searchResults").innerHTML='<div class="result">Axtarış alınmadı. İnterneti yoxla.</div>';
- }
-}
-function weatherInfo(code){
- if(code===0)return["☀️","Açıq səma"];
- if([1,2,3].includes(code))return["⛅","Az buludlu / buludlu"];
- if([45,48].includes(code))return["🌫️","Duman"];
- if([51,53,55,56,57].includes(code))return["🌦️","Çiskin"];
- if([61,63,65,66,67,80,81,82].includes(code))return["🌧️","Yağış"];
- if([71,73,75,77,85,86].includes(code))return["❄️","Qar"];
- if([95,96,99].includes(code))return["⛈️","Tufan"];
- return["🌍","Hava məlumatı"];
-}
-function direction(deg){
- if(deg==null)return"—";
- return ["Şimal","Şimal-şərq","Şərq","Cənub-şərq","Cənub","Cənub-qərb","Qərb","Şimal-qərb"][Math.round(deg/45)%8];
-}
-async function loadPlace(lat,lng,name,refresh=false){
- const id=++state.loadingId;
- state.lat=lat;state.lng=lng;state.name=name;
- $("placeName").textContent=name;
- $("placeLocation").textContent="Məkan məlumatları yüklənir...";
- $("weatherIcon").textContent="🌍";
- $("temperature").textContent="--°C";
- $("weatherDescription").textContent="Hava yüklənir...";
- $("localTime").textContent="--:--:--";
- $("humidity").textContent="--";
- $("wind").textContent="--";
- $("windDirection").textContent="--";
- $("coordinates").textContent=lat.toFixed(4)+", "+lng.toFixed(4);
- $("status").textContent="Canlı hava xidməti ilə əlaqə qurulur...";
- try{
-  const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,weather_code&timezone=auto`;
-  const res=await fetch(url);
-  if(!res.ok)throw Error("Weather");
-  const w=await res.json();
-  if(id!==state.loadingId)return;
-  const c=w.current||{},[icon,desc]=weatherInfo(c.weather_code);
-  $("weatherIcon").textContent=icon;
-  $("temperature").textContent=c.temperature_2m==null?"--°C":Math.round(c.temperature_2m)+"°C";
-  $("weatherDescription").textContent=desc;
-  $("humidity").textContent=c.relative_humidity_2m==null?"—":c.relative_humidity_2m+"%";
-  $("wind").textContent=c.wind_speed_10m==null?"—":c.wind_speed_10m+" km/s";
-  $("windDirection").textContent=direction(c.wind_direction_10m);
-  if(c.time){
-   const parts=c.time.split("T");
-   $("localTime").textContent=(parts[1]||"--:--").slice(0,8);
+  const [geo,weather]=await Promise.allSettled([
+   fetch("https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat="+lat+"&lon="+lon+"&zoom=10&addressdetails=1&accept-language=az",{headers:{"Accept":"application/json"}}).then(r=>{if(!r.ok)throw Error();return r.json()}),
+   fetch("https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lon+"&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,pressure_msl,wind_speed_10m,wind_direction_10m&daily=sunrise,sunset&timezone=auto&forecast_days=1").then(r=>{if(!r.ok)throw Error();return r.json()})
+  ]);
+  if(id!==requestId)return;
+  let g=geo.status==="fulfilled"?geo.value:null,w=weather.status==="fulfilled"?weather.value:null;
+  let a=g?.address||{},city=a.city||a.town||a.village||a.municipality||a.county||a.state||a.province;
+  let country=a.country;
+  let name=knownName&&cities.some(c=>c.name===knownName)?knownName:(city||knownName||"Seçilmiş məkan");
+  if(!knownName||knownName==="Məkan müəyyən edilir")selected.name=name;
+  $("placeName").textContent=name;
+  $("placeSub").textContent=[a.suburb||a.neighbourhood||a.city_district,a.state,country].filter(Boolean).filter((x,i,arr)=>arr.indexOf(x)===i).join(" · ")||"Seçilmiş koordinatın yaxınlığı";
+  if(g?.address?.country_code){const cc=g.address.country_code.toUpperCase();$("placeSub").textContent+=" · "+cc}
+  if(w&&w.current){
+   const c=w.current,code=c.weather_code;
+   $("weatherIcon").textContent=weatherIcon(code,c.is_day);
+   $("temp").textContent=(c.temperature_2m??"—")+"°C";
+   $("weatherDesc").textContent=weatherText(code)+(c.apparent_temperature!=null?" · Hiss olunur "+c.apparent_temperature+"°C":"");
+   $("humidity").textContent=(c.relative_humidity_2m??"—")+"%";
+   $("wind").textContent=(c.wind_speed_10m??"—")+" km/saat";
+   $("windDir").textContent=windDirection(c.wind_direction_10m)+" · "+(c.wind_direction_10m??"—")+"°";
+   $("pressure").textContent=(c.pressure_msl??"—")+" hPa";
+   $("sun").textContent=w.daily?.sunrise?.[0]?new Date(w.daily.sunrise[0]).toLocaleTimeString("az-AZ",{hour:"2-digit",minute:"2-digit"})+" / "+new Date(w.daily.sunset[0]).toLocaleTimeString("az-AZ",{hour:"2-digit",minute:"2-digit"}):"—";
+   $("updated").textContent=new Date().toLocaleTimeString("az-AZ");
+   $("timezone").textContent=(w.timezone||"UTC")+(w.utc_offset_seconds!=null?" · UTC"+offset(w.utc_offset_seconds):"");
+   startClock(w.timezone||"UTC");
+  }else{
+   $("weatherDesc").textContent="Hava xidməti cavab vermir";
+   $("updated").textContent="Məlumat əlçatan deyil";
+   $("timezone").textContent="Saat qurşağı müəyyən edilmədi";
+   startClock(null,lon);
   }
-  $("placeLocation").textContent=(w.timezone||"Yerli vaxt")+" · "+(w.timezone_abbreviation||"");
-  $("status").textContent="Son hava məlumatı: "+(c.time||"vaxt göstərilməyib")+
-   ". Dəqiqlik seçilmiş koordinatın yaxınlığından asılıdır.";
-  reverseName(lat,lng,id);
- }catch{
-  if(id!==state.loadingId)return;
-  $("placeLocation").textContent="Koordinat üzrə seçilmiş məkan";
-  $("status").textContent="Hava məlumatını almaq mümkün olmadı. İnternet bağlantısını və xidmətin vəziyyətini yoxla.";
-  reverseName(lat,lng,id);
- }
+ }catch(e){if(id===requestId){$("placeSub").textContent="Məkan məlumatı müvəqqəti əlçatan deyil";startClock(null,lon)}}
 }
-async function reverseName(lat,lng,id){
+function offset(s){let sign=s>=0?"+":"−",n=Math.abs(s)/3600;return sign+String(Math.floor(n)).padStart(2,"0")+":"+String(Math.round((n%1)*60)).padStart(2,"0")}
+function startClock(zone,lon){
+ clearInterval(clockTimer);
+ const tick=()=>{try{$("clock").textContent=new Intl.DateTimeFormat("az-AZ",{timeZone:zone||"UTC",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false}).format(new Date());if(!zone)$("zone").textContent="UTC — saat qurşağı əlçatan deyil";else $("zone").textContent="Yerli saat"}catch{$("clock").textContent=new Date().toLocaleTimeString("az-AZ")}};
+ tick();clockTimer=setInterval(tick,1000);
+}
+function weatherIcon(c,day){if(c===0)return day?"☀️":"🌙";if([1,2,3].includes(c))return"⛅";if([45,48].includes(c))return"🌫️";if([51,53,55,56,57,61,63,65,66,67,80,81,82].includes(c))return"🌧️";if([71,73,75,77,85,86].includes(c))return"❄️";if([95,96,99].includes(c))return"⛈️";return"🌍"}
+function weatherText(c){const d={0:"Açıq səma",1:"Əsasən açıq",2:"Az buludlu",3:"Buludlu",45:"Duman",48:"Şaxtalı duman",51:"Yüngül çiskin",53:"Çiskin",55:"Güclü çiskin",61:"Yüngül yağış",63:"Yağış",65:"Güclü yağış",71:"Yüngül qar",73:"Qar",75:"Güclü qar",80:"Yağış keçidləri",81:"Yağış",82:"Güclü yağış",85:"Qar keçidləri",86:"Güclü qar",95:"Şimşəkli fırtına",96:"Dolu ehtimalı",99:"Güclü dolulu fırtına"};return d[c]||"Hava məlumatı"}
+function windDirection(d){if(d==null)return"İstiqamət yoxdur";return["Şimal","Şimal-şərq","Şərq","Cənub-şərq","Cənub","Cənub-qərb","Qərb","Şimal-qərb"][Math.round(d/45)%8]}
+async function searchPlace(){
+ const q=$("query").value.trim();if(!q)return say("Şəhər, ölkə və ya ünvan yaz.");
+ setStatus("Məkan axtarılır…");
  try{
-  const u=`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&zoom=10&accept-language=az`;
-  const d=await fetch(u,{headers:{"Accept":"application/json"}}).then(r=>{
-   if(!r.ok)throw Error("Reverse");return r.json();
-  });
-  if(id!==state.loadingId)return;
-  const a=d.address||{};
-  const city=a.city||a.town||a.village||a.municipality||a.county;
-  const country=a.country;
-  if(country){
-   $("placeLocation").textContent=[city&&city!==state.name?city:null,country].filter(Boolean).join(" · ");
-   if(state.name==="Seçilmiş məkan"||state.name==="Məkan"){
-    $("placeName").textContent=city||country;
-    state.name=city||country;
-   }
-  }
- }catch{}
+  const r=await fetch("https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&addressdetails=1&accept-language=az&q="+encodeURIComponent(q));
+  if(!r.ok)throw Error();
+  const arr=await r.json();
+  if(!arr.length){setStatus("Məkan tapılmadı");return say("Başqa adla axtarmağa çalış.")}
+  const p=arr[0],lat=+p.lat,lon=+p.lon;
+  const name=p.name||p.display_name.split(",")[0];
+  map.flyTo([lat,lon],Math.max(6,Math.min(12,map.getZoom()+3)),{duration:1.5});
+  selectPoint(lat,lon,name);
+  $("placeSub").textContent=p.display_name;
+  setStatus("Məkan tapıldı");
+ }catch(e){setStatus("Axtarış əlçatan deyil");say("İnterneti yoxla və yenidən cəhd et.")}
 }
-window.addEventListener("load",()=>{
- if(!window.THREE){
-  $("loading").innerHTML="3D kitabxanası yüklənmədi.<br>İnternet bağlantısını yoxla.";
-  return;
- }
- init();
-});
+$("query").addEventListener("keydown",e=>{if(e.key==="Enter")searchPlace()});
+function focusSearch(){$("query").focus()}
+function homeView(){map.flyTo([selected.lat,selected.lon],Math.max(map.getZoom(),5),{duration:1});say("Seçilmiş məkana qayıdılır")}
+function locateMe(){if(!navigator.geolocation)return say("Bu brauzer məkan təyin etməyi dəstəkləmir.");say("Məkan icazəsi gözlənilir…");navigator.geolocation.getCurrentPosition(p=>{const {latitude:lat,longitude:lon}=p.coords;map.flyTo([lat,lon],12,{duration:1.5});selectPoint(lat,lon,"Mənim yerim")},()=>say("Məkan icazəsi verilmədi. Telefonun məkan xidmətini aktiv et."),{enableHighAccuracy:true,timeout:12000})}
+function toggleRotate(){rotation=!rotation;$("rotate").textContent=rotation?"▶ Fırlat":"Ⅱ Fırlanma";$("rotate").classList.toggle("active",rotation);if(rotation){rotationTimer=setInterval(()=>{if(map&&!document.hidden&&map.getZoom()<4){const c=map.getCenter();map.panTo([c.lat,c.lng+.18],{animate:false})}},80);say("Avtomatik fırlanma aktivdir")}else{clearInterval(rotationTimer);say("Fırlanma pauza edildi")}}
+function fullScreen(){if(!document.fullscreenElement)document.documentElement.requestFullscreen?.().catch(()=>say("Tam ekran brauzer tərəfindən dəstəklənmir"));else document.exitFullscreen?.()}
+function toggleCard(){const c=$("card");const hidden=c.dataset.hidden==="1";c.dataset.hidden=hidden?"0":"1";if(hidden){c.style.display="block";$("closeCard").textContent="⌄"}else{c.style.display="none";$("closeCard").textContent="＋"}}
+function copyCoords(){const s=selected.lat.toFixed(6)+", "+selected.lon.toFixed(6);if(navigator.clipboard?.writeText)navigator.clipboard.writeText(s).then(()=>say("Koordinatlar köçürüldü")).catch(()=>say(s));else say(s)}
+window.addEventListener("load",init);
 </script>
 </body>
 </html>
